@@ -5,6 +5,7 @@ import me.odinmain.events.impl.ChatPacketEvent
 import me.odinmain.events.impl.InputEvent
 import me.odinmain.events.impl.PacketEvent
 import me.odinmain.events.impl.ServerTickEvent
+import me.odinmain.features.impl.render.ClickGUIModule
 import me.odinmain.features.settings.impl.KeybindSetting
 import me.odinmain.ui.hud.EditHUDGui
 import me.odinmain.ui.hud.HudElement
@@ -39,6 +40,7 @@ object ModuleManager {
     val huds = arrayListOf<HudElement>()
 
     val modules: ArrayList<Module> = arrayListOf(
+        ClickGUIModule
     )
 
     init {

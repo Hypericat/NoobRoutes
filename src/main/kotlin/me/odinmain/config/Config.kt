@@ -17,7 +17,7 @@ object Config {
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val parser = JsonParser()
 
-    private val configFile = File(mc.mcDataDir, "config/odin/odin-config.json").apply {
+    private val configFile = File(mc.mcDataDir, "config/noobroutes/config.json").apply {
         try {
             createNewFile()
         } catch (e: Exception) {

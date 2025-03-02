@@ -72,7 +72,7 @@ sourceSets.main {
 repositories {
     mavenCentral()
 
-    maven("https://repo.essential.gg/repository/maven-public/")
+    maven("https://repo.essential.gg/public")
     maven("https://repo.spongepowered.org/maven/")
     // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
@@ -84,13 +84,16 @@ val shadowImpl: Configuration by configurations.creating {
 
 dependencies {
     implementation("gg.essential:loader-launchwrapper:1.1.3")
-    compileOnly("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5")
-
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    implementation("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("com.mojang:brigadier:1.2.9")
+    implementation("gg.essential:loader-launchwrapper:1.1.3")
+    implementation("com.github.Stivais:Commodore:bea320fe0a")
     minecraft("com.mojang:minecraft:1.8.9")
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
-
+    //implementation("gg.essential:essential-universal:0.10.0.+")
     shadowImpl(kotlin("stdlib-jdk8"))
 
     // If you don't want mixins, remove these lines

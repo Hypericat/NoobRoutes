@@ -1,5 +1,6 @@
 package me.odinmain.ui.clickgui.elements.menu
 
+import me.odinmain.OdinMain.logger
 import me.odinmain.features.impl.render.ClickGUIModule
 import me.odinmain.features.settings.impl.BooleanSetting
 import me.odinmain.font.OdinFont
@@ -39,6 +40,8 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
         else isAreaHovered(x + w - 43f, y + 4f, 34f, 20f)
 
     override fun draw() {
+        logger.info("Drawing Switch")
+
         roundedRectangle(x, y, w, h, elementBackground)
         text(name, x + 6f, y + h / 2f, textColor, 12f, OdinFont.REGULAR)
 
