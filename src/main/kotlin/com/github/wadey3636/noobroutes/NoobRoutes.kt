@@ -1,5 +1,6 @@
 package com.github.wadey3636.noobroutes
 
+import com.github.wadey3636.noobroutes.commands.AutoP3Command
 import com.github.wadey3636.noobroutes.commands.NoobRoutesCommand
 import me.odinmain.OdinMain
 import me.odinmain.OdinMain.mc
@@ -36,6 +37,7 @@ class NoobRoutes {
             throw java.lang.RuntimeException(e)
         }
         ClientCommandHandler.instance.registerCommand(NoobRoutesCommand())
+        ClientCommandHandler.instance.registerCommand(AutoP3Command())
         println("Dirt: ${Blocks.dirt.unlocalizedName}")
 	    // Below is a demonstration of an access-transformed class access.
 	    println("Color State: " + GlStateManager.Color());
