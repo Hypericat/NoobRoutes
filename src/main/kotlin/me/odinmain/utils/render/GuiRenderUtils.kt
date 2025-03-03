@@ -116,7 +116,7 @@ fun mcText(text: String, x: Number, y: Number, scale: Number, color: Color, shad
 
 fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = OdinFont.REGULAR, align: TextAlign = Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false): Float {
     text(text, x, y, color, size, type, align, verticalAlign, shadow)
-    return getTextWidth(text, size)
+    return getTextWidth(text, size).toFloat()
 }
 
 fun mcTextAndWidth(text: String, x: Number, y: Number, scale: Number, color: Color, shadow: Boolean = true, center: Boolean = true): Float {
@@ -130,7 +130,7 @@ fun getTextWidth(text: String, size: Float) = OdinFont.getTextWidth(text, size)
 
 fun getMCTextHeight() = mc.fontRendererObj.FONT_HEIGHT
 
-fun getTextHeight(text: String, size: Float) = OdinFont.getTextHeight(text, size)
+fun getTextHeight(size: Float) = OdinFont.getTextHeight(size)
 
 fun translate(x: Number, y: Number, z: Number = 1f) = GlStateManager.translate(x.toDouble(), y.toDouble(), z.toDouble())
 

@@ -21,6 +21,7 @@ import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import java.io.File
 
 
@@ -28,6 +29,7 @@ import java.io.File
 class NoobRoutes {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
+
         try {
             val resource: net.minecraft.client.resources.IResource = Minecraft.getMinecraft().resourceManager
                 .getResource(net.minecraft.util.ResourceLocation("test:test.txt"))
@@ -51,7 +53,13 @@ class NoobRoutes {
         Modules.forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }
+        OdinFont.init()
     }
+    @Mod.EventHandler
+    fun postInit(event: FMLPostInitializationEvent) {
+        OdinMain.postInit()
+    }
+
     @Mod.EventHandler
     fun loadComplete(event: FMLLoadCompleteEvent) {
         ModuleManager.addModules()
