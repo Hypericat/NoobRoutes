@@ -1,5 +1,6 @@
 package me.odinmain.features
 
+import com.github.wadey3636.noobroutes.features.AutoP3
 import com.github.wadey3636.noobroutes.features.AutoP3Test
 import com.github.wadey3636.noobroutes.features.FontRendererTest
 import com.github.wadey3636.noobroutes.features.Blink
@@ -46,7 +47,8 @@ object ModuleManager {
         ClickGUIModule,
         AutoP3Test,
         Blink,
-        FontRendererTest
+        FontRendererTest,
+        AutoP3
     )
 
     init {
