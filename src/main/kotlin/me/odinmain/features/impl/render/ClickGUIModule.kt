@@ -1,24 +1,16 @@
 package me.odinmain.features.impl.render
 
-import kotlinx.coroutines.launch
+
 import me.odinmain.OdinMain
-import me.odinmain.OdinMain.scope
 import me.odinmain.config.Config
 import me.odinmain.features.Category
 import me.odinmain.features.Module
 import me.odinmain.features.settings.AlwaysActive
-import me.odinmain.features.settings.Setting.Companion.withDependency
 import me.odinmain.features.settings.impl.*
 import me.odinmain.ui.clickgui.ClickGUI
 import me.odinmain.ui.hud.EditHUDGui
 import me.odinmain.utils.render.Color
-import me.odinmain.utils.sendDataToServer
 import me.odinmain.utils.skyblock.LocationUtils
-import me.odinmain.utils.skyblock.createClickStyle
-import me.odinmain.utils.skyblock.getChatBreak
-import me.odinmain.utils.skyblock.modMessage
-import net.minecraft.event.ClickEvent
-import net.minecraft.util.ChatComponentText
 import org.lwjgl.input.Keyboard
 
 @AlwaysActive

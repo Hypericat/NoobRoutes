@@ -45,8 +45,7 @@ class NoobRoutes {
             Executor,
             Renderer,
             RenderUtils2D,
-            RenderUtils,
-            ClickGUI
+            RenderUtils
         )
         Modules.forEach {
             MinecraftForge.EVENT_BUS.register(it)
