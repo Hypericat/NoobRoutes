@@ -18,15 +18,16 @@ object Blink: Module (
     ) {
     private var cancelled = 0
     @SubscribeEvent
-    fun onC03(event: PacketEvent) {
+    fun canceller(event: PacketEvent) {
         if (event.packet !is C03PacketPlayer) return
-        modMessage(cancelled)
-        if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook) {
-            if(cancelled > 0) cancelled--
-            return
-        }
+        if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook) return
         if (!event.isCanceled) event.isCanceled = true
-        cancelled++
-
+    }
+    @SubscribeEvent
+    fun counter(event: PacketEvent) {
+        if (event.packet !is C03PacketPlayer) return
+        if (event.isCanceled) cancelled++
+        else if(cancelled > 0) cancelled--
+        modMessage(cancelled)
     }
 }
