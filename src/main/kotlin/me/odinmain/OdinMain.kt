@@ -57,7 +57,7 @@ object OdinMain {
             this
         ).forEach { MinecraftForge.EVENT_BUS.register(it) }
 
-        OdinFont.init()
+
 
     }
 
@@ -68,9 +68,10 @@ object OdinMain {
                 Config.load()
             }.join()
         }
+        OdinFont.init()
         ClickGUI.init()
         RoundedRect.initShaders()
-        OdinFont.init()
+
     }
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {

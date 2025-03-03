@@ -41,7 +41,8 @@ object ModuleManager {
     val huds = arrayListOf<HudElement>()
 
     val modules: ArrayList<Module> = arrayListOf(
-        ClickGUIModule
+        ClickGUIModule,
+        AutoP3Test
     )
 
     init {
