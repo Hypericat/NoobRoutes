@@ -37,7 +37,7 @@ fun sendChatMessage(message: Any) {
  * @param prefix If `true`, adds a prefix to the message.
  * @param chatStyle Optional chat style to be applied to the message.
  */
-fun modMessage(message: Any?, prefix: String = "§3Odin §8»§r ", chatStyle: ChatStyle? = null) {
+fun modMessage(message: Any?, prefix: String = "§3Gay §8»§r ", chatStyle: ChatStyle? = null) {
     val chatComponent = ChatComponentText("$prefix$message")
     chatStyle?.let { chatComponent.setChatStyle(it) } // Set chat style using setChatStyle method
     runOnMCThread { mc.thePlayer?.addChatMessage(chatComponent) }

@@ -1,5 +1,6 @@
 package me.odinmain.features
 
+import com.github.wadey3636.noobroutes.features.AutoP3Test
 import me.odinmain.OdinMain.mc
 import me.odinmain.events.impl.ChatPacketEvent
 import me.odinmain.events.impl.InputEvent
