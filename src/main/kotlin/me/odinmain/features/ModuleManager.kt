@@ -1,6 +1,7 @@
 package me.odinmain.features
 
 import com.github.wadey3636.noobroutes.features.AutoP3Test
+import com.github.wadey3636.noobroutes.features.Blink
 import me.odinmain.OdinMain.mc
 import me.odinmain.events.impl.ChatPacketEvent
 import me.odinmain.events.impl.InputEvent
@@ -42,7 +43,8 @@ object ModuleManager {
 
     val modules: ArrayList<Module> = arrayListOf(
         ClickGUIModule,
-        AutoP3Test
+        AutoP3Test,
+        Blink
     )
 
     init {

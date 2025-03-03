@@ -5,10 +5,9 @@ import me.odinmain.events.impl.PacketEvent
 import me.odinmain.features.Category
 import me.odinmain.features.Module
 import me.odinmain.utils.skyblock.modMessage
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
+import net.minecraft.network.Packet
 
 object AutoP3Test: Module(
     name = "Gay",
@@ -16,24 +15,22 @@ object AutoP3Test: Module(
     category = Category.RENDER,
     description = "Gay0"
 ) {
+    private val cancelledPackets = mutableListOf<Packet<*>>()
+    override fun onDisable() {
+        super.onDisable()
+        cancelledPackets.forEach { PacketUtils.sendPacket(it) }
+        cancelledPackets.clear()
+    }
+
+    override fun onEnable() {
+        cancelledPackets.clear()
+        super.onEnable()
+    }
     @SubscribeEvent
-    fun onC03(event: PacketEvent.Send) {
-        if (event.packet is C06PacketPlayerPosLook) {
-            modMessage("${event.packet.positionX}, ${event.packet.positionY}, ${event.packet.positionZ}")
-            if (!event.isCanceled) event.isCanceled = true
-            mc.addScheduledTask {
-                PacketUtils.sendPacket(
-                    C06PacketPlayerPosLook(
-                        69420.0,
-                        69420.0,
-                        69420.0,
-                        0F,
-                        0F,
-                        false
-                    )
-                )
-            }
-        }
-        
+    fun onPacket(event: PacketEvent.Send) {
+        if (event.packet.toString().contains("server")) return
+        if (!event.isCanceled) event.isCanceled = true
+        cancelledPackets.add(event.packet)
+        modMessage("cancelled that fucker")
     }
 }
