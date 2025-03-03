@@ -21,6 +21,11 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.input.Mouse
 import kotlin.math.sign
+import me.odinmain.OdinMain.logger
+import net.minecraft.client.renderer.Tessellator
+import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.floor
 
 /**
  * Renders all the modules.
@@ -33,6 +38,7 @@ import kotlin.math.sign
  */
 object ClickGUI : Screen() {
 
+
     private val panels: ArrayList<Panel> = arrayListOf()
 
     private var anim = EaseInOut(700)
@@ -43,8 +49,19 @@ object ClickGUI : Screen() {
         for (category in Category.entries) {
             panels.add(Panel(category))
         }
+        panels.forEach{
+            logger.info(it.moduleButtons)
+            logger.info(it.displayName)
+            logger.info(it.x)
+            logger.info(it.y)
+            logger.info(it.category)
+        }
+
+
     }
+
     override fun draw() {
+
         GlStateManager.pushMatrix()
         translate(0f, 0f, 200f)
         if (anim.isAnimating()) {
@@ -106,6 +123,10 @@ object ClickGUI : Screen() {
             }
         }
         super.keyTyped(typedChar, keyCode)
+    }
+    //@SubscribeEvent
+    fun onRender(event: RenderWorldLastEvent) {
+        draw()
     }
 
     override fun initGui() {
@@ -185,4 +206,5 @@ object ClickGUI : Screen() {
             scale(scaleFactor, scaleFactor, 1f)
         }
     }
+
 }

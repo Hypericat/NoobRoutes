@@ -1,5 +1,6 @@
 package me.odinmain.ui.clickgui.elements
 
+import me.odinmain.OdinMain.logger
 import me.odinmain.features.Module
 import me.odinmain.features.impl.render.ClickGUIModule
 import me.odinmain.features.settings.impl.*
@@ -94,6 +95,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
     }
 
     fun draw(): Float {
+
         var offs = height
 
         hoverHandler.handle(x, y, width, height - 1)
@@ -129,6 +131,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
             drawY += menuElements[i].render()
         }
         resetScissor(scissor)
+
 
         return offs
     }

@@ -25,8 +25,11 @@ import me.odinmain.utils.skyblock.dungeon.DungeonUtils
 import me.odinmain.utils.skyblock.dungeon.ScanUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.io.File
@@ -37,7 +40,7 @@ object OdinMain {
 
     const val VERSION = "@VER@"
     val scope = CoroutineScope(SupervisorJob() + EmptyCoroutineContext)
-    val logger: Logger = LogManager.getLogger("Odin")
+    val logger: Logger = LogManager.getLogger("NoobRoutes")
 
     var display: GuiScreen? = null
     val isLegitVersion: Boolean
@@ -59,25 +62,18 @@ object OdinMain {
     }
 
 
-
     fun loadComplete() {
         runBlocking(Dispatchers.IO) {
             launch {
                 Config.load()
-                ClickGUIModule.firstTimeOnVersion = ClickGUIModule.lastSeenVersion != VERSION
-                ClickGUIModule.lastSeenVersion = VERSION
-            }.join() // Ensure Config.load() and version checks are complete before proceeding
+            }.join()
         }
         ClickGUI.init()
         RoundedRect.initShaders()
-
-        val name = mc.session?.username?.takeIf { !it.matches(Regex("Player\\d{2,3}")) } ?: return
-        scope.launch(Dispatchers.IO) {
-            sendDataToServer(body = """{"username": "$name", "version": "${if (isLegitVersion) "legit" else "cheater"} $VERSION"}""")
-        }
+        OdinFont.init()
     }
-
-    fun onTick() {
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
         if (display == null) return
         mc.displayGuiScreen(display)
         display = null

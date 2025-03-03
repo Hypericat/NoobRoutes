@@ -1,5 +1,6 @@
 package me.odinmain.ui.clickgui
 
+import me.odinmain.OdinMain.logger
 import me.odinmain.features.Category
 import me.odinmain.features.ModuleManager.modules
 import me.odinmain.features.impl.render.ClickGUIModule
@@ -55,6 +56,7 @@ class Panel(
     }
 
     fun draw() {
+        logger.info(moduleButtons.size)
         if (dragging) {
             x = floor(x2 + mouseX)
             y = floor(y2 + mouseY)

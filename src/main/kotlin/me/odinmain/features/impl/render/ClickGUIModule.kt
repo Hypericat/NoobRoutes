@@ -22,7 +22,7 @@ import net.minecraft.util.ChatComponentText
 import org.lwjgl.input.Keyboard
 
 @AlwaysActive
-object ClickGUIModule: Module(
+object  ClickGUIModule: Module(
     name = "Click Gui",
     Keyboard.KEY_RSHIFT,
     category = Category.RENDER,
@@ -32,9 +32,7 @@ object ClickGUIModule: Module(
     val enableNotification by BooleanSetting("Enable notifications", true, description = "Shows you a notification in chat when you toggle an option with a keybind.")
     val color by ColorSetting("Gui Color", Color(50, 150, 220), allowAlpha = false, description = "Color theme in the gui.")
     val switchType by BooleanSetting("Switch Type", true, description = "Switches the type of the settings in the gui.")
-    val hudChat by BooleanSetting("Shows HUDs in GUIs", true, description = "Shows HUDs in GUIs.")
     val forceHypixel by BooleanSetting("Force Hypixel", false, description = "Forces the hypixel check to be on (not recommended).")
-    val updateMessage by SelectorSetting("Update Message", "Beta", arrayListOf("Beta", "Full", "None"), description = "Shows the update message in chat.")
 
 
     val action by ActionSetting("Open Example Hud", description = "Opens an example hud to allow configuration of huds.") {

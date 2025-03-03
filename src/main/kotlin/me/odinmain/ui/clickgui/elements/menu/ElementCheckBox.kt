@@ -1,5 +1,6 @@
 package me.odinmain.ui.clickgui.elements.menu
 
+import me.odinmain.OdinMain.logger
 import me.odinmain.features.impl.render.ClickGUIModule
 import me.odinmain.features.settings.impl.BooleanSetting
 import me.odinmain.font.OdinFont
@@ -16,6 +17,8 @@ import me.odinmain.ui.clickgui.util.ColorUtil.textColor
 import me.odinmain.ui.clickgui.util.HoverHandler
 import me.odinmain.ui.util.MouseUtils.isAreaHovered
 import me.odinmain.utils.render.*
+import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * Renders all the modules.
@@ -39,6 +42,8 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
         else isAreaHovered(x + w - 43f, y + 4f, 34f, 20f)
 
     override fun draw() {
+        logger.info("Drawing Switch")
+
         roundedRectangle(x, y, w, h, elementBackground)
         text(name, x + 6f, y + h / 2f, textColor, 12f, OdinFont.REGULAR)
 
@@ -72,4 +77,6 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
         }
         return false
     }
+
+
 }
