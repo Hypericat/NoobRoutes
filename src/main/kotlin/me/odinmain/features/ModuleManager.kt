@@ -1,6 +1,7 @@
 package me.odinmain.features
 
 import com.github.wadey3636.noobroutes.features.AutoP3Test
+import com.github.wadey3636.noobroutes.features.FontRendererTest
 import com.github.wadey3636.noobroutes.features.Blink
 import me.odinmain.OdinMain.mc
 import me.odinmain.events.impl.ChatPacketEvent
@@ -44,7 +45,8 @@ object ModuleManager {
     val modules: ArrayList<Module> = arrayListOf(
         ClickGUIModule,
         AutoP3Test,
-        Blink
+        Blink,
+        FontRendererTest
     )
 
     init {

@@ -24,13 +24,13 @@ import org.lwjgl.input.Keyboard
 @AlwaysActive
 object  ClickGUIModule: Module(
     name = "Click Gui",
-    Keyboard.KEY_RSHIFT,
+    Keyboard.KEY_NONE,
     category = Category.RENDER,
     description = "Allows you to customize the GUI."
 ) {
     val blur by BooleanSetting("Blur", false, description = "Toggles the background blur for the gui.")
     val enableNotification by BooleanSetting("Enable notifications", true, description = "Shows you a notification in chat when you toggle an option with a keybind.")
-    val color by ColorSetting("Gui Color", Color(50, 150, 220), allowAlpha = false, description = "Color theme in the gui.")
+    val color by ColorSetting("Gui Color", Color(57, 191, 60), allowAlpha = false, description = "Color theme in the gui.")
     val switchType by BooleanSetting("Switch Type", true, description = "Switches the type of the settings in the gui.")
     val forceHypixel by BooleanSetting("Force Hypixel", false, description = "Forces the hypixel check to be on (not recommended).")
 
