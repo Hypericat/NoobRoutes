@@ -23,6 +23,8 @@ import org.lwjgl.input.Mouse
 import kotlin.math.sign
 import me.odinmain.OdinMain.logger
 import net.minecraft.client.renderer.Tessellator
+import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.floor
 
 /**
@@ -69,14 +71,13 @@ object ClickGUI : Screen() {
             ColorUtil.clickGUIColor.alpha = alpha
             Color.WHITE.alpha = alpha
         }
-        drawRect(-110, 82, 130, 18, buttonColor.rgba)
 
         for (i in 0 until panels.size) {
             panels[i].draw()
         }
 
-        //SearchBar.draw()
-        //desc.render()
+        SearchBar.draw()
+        desc.render()
 
         if (anim.isAnimating()) {
             ColorUtil.moduleButtonColor.alpha = 1f
@@ -88,7 +89,6 @@ object ClickGUI : Screen() {
     }
 
     override fun onScroll(amount: Int) {
-        logger.info("On Scroll")
         if (Mouse.getEventDWheel() != 0) {
             val actualAmount = amount.sign * 16
             for (i in panels.size - 1 downTo 0) {
@@ -98,7 +98,6 @@ object ClickGUI : Screen() {
     }
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
-        logger.info("Clicked")
         if (SearchBar.mouseClicked(mouseButton)) return
         for (i in panels.size - 1 downTo 0) {
             if (panels[i].mouseClicked(mouseButton)) return
@@ -106,14 +105,12 @@ object ClickGUI : Screen() {
     }
 
     override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
-        logger.info("Mouse Released")
         for (i in panels.size - 1 downTo 0) {
             panels[i].mouseReleased(state)
         }
     }
 
     override fun keyTyped(typedChar: Char, keyCode: Int) {
-        logger.info("Key Typed")
         if (SearchBar.keyTyped(typedChar, keyCode)) return
         for (i in panels.size - 1 downTo 0) {
             if (panels[i].keyTyped(typedChar, keyCode)) return
@@ -127,9 +124,12 @@ object ClickGUI : Screen() {
         }
         super.keyTyped(typedChar, keyCode)
     }
+    //@SubscribeEvent
+    fun onRender(event: RenderWorldLastEvent) {
+        draw()
+    }
 
     override fun initGui() {
-        logger.info("Initializing gui")
         open = true
         anim.start(true)
 
@@ -147,7 +147,6 @@ object ClickGUI : Screen() {
     }
 
     override fun onGuiClosed() {
-        logger.info("Gui Closed")
         for (panel in panels.filter { it.extended }.reversed()) {
             for (moduleButton in panel.moduleButtons.filter { it.extended }) {
                 for (element in moduleButton.menuElements) {

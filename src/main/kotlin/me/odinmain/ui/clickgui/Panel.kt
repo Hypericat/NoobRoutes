@@ -56,7 +56,6 @@ class Panel(
     }
 
     fun draw() {
-        logger.info("drawing")
         logger.info(moduleButtons.size)
         if (dragging) {
             x = floor(x2 + mouseX)
@@ -86,7 +85,6 @@ class Panel(
         roundedRectangle(x, y + startY, WIDTH, 10f, lastColor, lastColor, lastColor, 0f, 0f, 0f, 10f, 10f, 4f)
         resetScissor(s)
         scale(scaleFactor, scaleFactor, 1f)
-        logger.info("Drawing")
     }
 
     fun handleScroll(amount: Int): Boolean {

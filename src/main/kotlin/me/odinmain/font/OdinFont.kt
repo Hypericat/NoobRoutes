@@ -3,6 +3,7 @@ package me.odinmain.font
 import gg.essential.elementa.font.FontRenderer
 import gg.essential.elementa.font.data.Font
 import gg.essential.universal.UMatrixStack
+import me.odinmain.OdinMain.logger
 import me.odinmain.utils.render.*
 import kotlin.math.max
 
@@ -15,6 +16,7 @@ object OdinFont {
 
     fun init() {
         fontRenderer = FontRenderer(Font.fromResource("/assets/odinmain/fonts/Regular"), Font.fromResource("/assets/odinmain/fonts/SemiBold"))
+        logger.info("Loaded font renderer.")
     }
 
     fun text(text: String, x: Float, y: Float, color: Color, scale: Float, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, type: Int = REGULAR) {
@@ -34,6 +36,7 @@ object OdinFont {
         val typeText = if (type == BOLD) "§l$text" else text
 
         fontRenderer.drawString(UMatrixStack.Compat.get(), typeText, color.javaColor, drawX, drawY, 1f, scale, shadow)
+        logger.info("Drawing text: $typeText at $drawX, $drawY")
     }
 
     fun getTextWidth(text: String, size: Float): Float {

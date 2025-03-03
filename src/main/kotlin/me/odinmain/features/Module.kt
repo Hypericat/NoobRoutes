@@ -12,7 +12,9 @@ import me.odinmain.utils.clock.Executor.Companion.register
 import me.odinmain.utils.clock.Executor.LimitedExecutor
 import me.odinmain.utils.skyblock.modMessage
 import net.minecraft.network.Packet
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.reflect.full.hasAnnotation
 
@@ -159,4 +161,6 @@ abstract class Module(
     enum class TagType {
         NONE, NEW, RISKY, FPSTAX
     }
+
+
 }

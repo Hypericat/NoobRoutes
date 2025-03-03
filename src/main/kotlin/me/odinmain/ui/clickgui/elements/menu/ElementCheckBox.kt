@@ -17,6 +17,8 @@ import me.odinmain.ui.clickgui.util.ColorUtil.textColor
 import me.odinmain.ui.clickgui.util.HoverHandler
 import me.odinmain.ui.util.MouseUtils.isAreaHovered
 import me.odinmain.utils.render.*
+import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * Renders all the modules.
@@ -75,4 +77,6 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
         }
         return false
     }
+
+
 }

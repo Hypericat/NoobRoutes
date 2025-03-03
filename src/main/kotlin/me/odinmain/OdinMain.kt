@@ -25,6 +25,7 @@ import me.odinmain.utils.skyblock.dungeon.DungeonUtils
 import me.odinmain.utils.skyblock.dungeon.ScanUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -61,19 +62,15 @@ object OdinMain {
     }
 
 
-
     fun loadComplete() {
         runBlocking(Dispatchers.IO) {
             launch {
                 Config.load()
-                //ClickGUIModule.firstTimeOnVersion = ClickGUIModule.lastSeenVersion != VERSION
-                //ClickGUIModule.lastSeenVersion = VERSION
-            }.join() // Ensure Config.load() and version checks are complete before proceeding
+            }.join()
         }
         ClickGUI.init()
-        //RoundedRect.initShaders()
-
-
+        RoundedRect.initShaders()
+        OdinFont.init()
     }
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {

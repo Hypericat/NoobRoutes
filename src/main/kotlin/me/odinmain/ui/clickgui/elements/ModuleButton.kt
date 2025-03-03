@@ -106,10 +106,6 @@ class ModuleButton(val module: Module, val panel: Panel) {
         }
 
         roundedRectangle(x, y, width, height, color)
-        logger.info(x)
-        logger.info(y)
-        logger.info(width)
-        logger.info(height)
         text(module.name, x + width / 2, y + height / 2, textColor, 14f, OdinFont.REGULAR, TextAlign.Middle)
         val textWidth = getTextWidth(module.name, 18f)
 

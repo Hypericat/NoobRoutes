@@ -3,12 +3,14 @@ package me.odinmain.ui.util.shader
 import gg.essential.elementa.components.UIBlock
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.shader.*
+import me.odinmain.OdinMain.logger
 import me.odinmain.utils.render.Color
 import me.odinmain.utils.render.RenderUtils.createLegacyShader
 
 object RoundedRect {
 
     fun initShaders() {
+        logger.info("initing rounded rect shader")
         RoundedRectangle.initShader()
         HSBBox.initShader()
         Circle.initShader()
@@ -22,7 +24,6 @@ object RoundedRect {
         color2: Color, gradientDir: Int, shadowSoftness: Float = 0f
     ) {
         if (!RoundedRectangle.isInitialized() || !RoundedRectangle.shader.usable) return
-
         RoundedRectangle.shader.bind()
         RoundedRectangle.shaderCenterUniform.setValue(x + (width / 2), y + (height / 2))
         RoundedRectangle.shaderSizeUniform.setValue(width, height)
@@ -110,7 +111,7 @@ object RoundedRect {
 
             shader = createLegacyShader("rectangle", "roundedrectangle", BlendState.NORMAL)
             if (!shader.usable) {
-                println("Failed to load Odin rounded rectangle shader")
+                logger.error("Failed to load NoobRoutes rounded rectangle shader")
                 return
             }
             shaderCenterUniform = shader.getFloat2Uniform("u_rectCenter")

@@ -5,7 +5,9 @@ import me.odinmain.OdinMain
 import me.odinmain.OdinMain.mc
 import me.odinmain.config.Config
 import me.odinmain.features.ModuleManager
+import me.odinmain.features.impl.render.ClickGUIModule
 import me.odinmain.font.OdinFont
+import me.odinmain.ui.clickgui.ClickGUI
 import me.odinmain.utils.clock.Executor
 import me.odinmain.utils.render.RenderUtils
 import me.odinmain.utils.render.RenderUtils2D
@@ -43,13 +45,8 @@ class NoobRoutes {
             Executor,
             Renderer,
             RenderUtils2D,
-            RenderUtils
-
-
-
-
-
-
+            RenderUtils,
+            ClickGUI
         )
         Modules.forEach {
             MinecraftForge.EVENT_BUS.register(it)
@@ -59,7 +56,7 @@ class NoobRoutes {
     fun loadComplete(event: FMLLoadCompleteEvent) {
         ModuleManager.addModules()
         OdinMain.loadComplete()
-        OdinFont.init()
+
         File(mc.mcDataDir, "config/noobroutes").takeIf { !it.exists() }?.mkdirs()
         Config.load()
     }
