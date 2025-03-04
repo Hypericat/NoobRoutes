@@ -1,7 +1,7 @@
 package me.odinmain.features
 
 import com.github.wadey3636.noobroutes.features.AutoP3
-import com.github.wadey3636.noobroutes.features.AutoP3Test
+import com.github.wadey3636.noobroutes.features.BlinkKeybind
 import com.github.wadey3636.noobroutes.features.Blink
 import me.odinmain.OdinMain.mc
 import me.odinmain.events.impl.ChatPacketEvent
@@ -44,7 +44,7 @@ object ModuleManager {
 
     val modules: ArrayList<Module> = arrayListOf(
         ClickGUIModule,
-        AutoP3Test,
+        BlinkKeybind,
         Blink,
         AutoP3
     )
@@ -116,6 +116,7 @@ object ModuleManager {
 
     @SubscribeEvent
     fun activateModuleKeyBinds(event: InputEvent.Keyboard) {
+
         for (module in modules) {
             for (setting in module.settings) {
                 if (setting is KeybindSetting && setting.value.key == event.keycode) {

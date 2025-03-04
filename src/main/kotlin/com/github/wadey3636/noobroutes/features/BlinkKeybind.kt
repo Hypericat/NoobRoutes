@@ -9,11 +9,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import net.minecraft.network.Packet
 
-object AutoP3Test: Module(
-    name = "Gay",
+object BlinkKeybind: Module(
+    name = "Blink Keybind",
     Keyboard.KEY_NONE,
     category = Category.RENDER,
-    description = "Gay0"
+    description = "A keybinding for Blink (Non-preset actions)"
 ) {
     private val cancelledPackets = mutableListOf<Packet<*>>()
     override fun onDisable() {
