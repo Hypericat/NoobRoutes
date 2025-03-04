@@ -13,8 +13,13 @@ import me.odinmain.utils.skyblock.modMessage
 import net.minecraft.util.Vec3
 import org.lwjgl.input.Keyboard
 import me.odinmain.config.DataManager
+import me.odinmain.features.settings.impl.BooleanSetting
 import me.odinmain.features.settings.impl.StringSetting
 import me.odinmain.utils.LookVec
+import me.odinmain.utils.render.Color
+import me.odinmain.utils.render.Renderer
+import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 enum class RingTypes {
     WALK,
@@ -45,9 +50,18 @@ object AutoP3: Module (
     ).setPrettyPrinting().create()
 
     private val route by StringSetting("Route", "", description = "Route to use")
+    private val editMode by BooleanSetting("Edit Mode", true, description = "Disables ring actions")
+    private val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
+    private val renderIndex by BooleanSetting("Render Index", true, description = "Disables ring actions")
     var rings = mutableMapOf<String, MutableList<Ring>>()
 
-
+    @SubscribeEvent
+    fun onRender(event: RenderWorldLastEvent) {
+        rings[route]?.forEachIndexed { i, ring ->
+            if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
+            Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
+        }
+    }
 
 
     fun addRing(args: Array<out String>?) {

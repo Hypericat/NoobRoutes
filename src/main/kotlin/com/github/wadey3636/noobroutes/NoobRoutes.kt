@@ -2,14 +2,10 @@ package com.github.wadey3636.noobroutes
 
 import com.github.wadey3636.noobroutes.commands.AutoP3Command
 import com.github.wadey3636.noobroutes.commands.NoobRoutesCommand
-import com.github.wadey3636.noobroutes.features.AutoP3
-import com.github.wadey3636.noobroutes.features.AutoP3Test
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import me.odinmain.OdinMain
 import me.odinmain.OdinMain.mc
-import me.odinmain.config.Config
 import me.odinmain.features.ModuleManager
-import me.odinmain.features.impl.render.ClickGUIModule
 import me.odinmain.font.OdinFont
 import me.odinmain.ui.clickgui.ClickGUI
 import me.odinmain.utils.clock.Executor
@@ -22,7 +18,6 @@ import net.minecraft.init.Blocks
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
-import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
