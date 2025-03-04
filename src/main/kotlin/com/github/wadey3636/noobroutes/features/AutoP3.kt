@@ -1,10 +1,12 @@
 package com.github.wadey3636.noobroutes.features
 
+import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.adapters.RingsMapTypeAdapter
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import com.sun.org.apache.xpath.internal.operations.Bool
 import me.odinmain.OdinMain.logger
 import me.odinmain.OdinMain.mc
 import me.odinmain.features.Category
@@ -18,6 +20,7 @@ import me.odinmain.features.settings.impl.StringSetting
 import me.odinmain.utils.LookVec
 import me.odinmain.utils.render.Color
 import me.odinmain.utils.render.Renderer
+import me.odinmain.utils.rotation
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -35,7 +38,8 @@ data class Ring (
     val direction: LookVec = LookVec(mc.thePlayer?.rotationYaw ?: 0f, mc.thePlayer?.rotationPitch ?: 0f),
     val walk: Boolean = false,
     val look: Boolean = false,
-    val center: Boolean = false
+    val center: Boolean = false,
+    var should: Boolean = false
 )
 
 object AutoP3: Module (
@@ -53,21 +57,40 @@ object AutoP3: Module (
     private val editMode by BooleanSetting("Edit Mode", true, description = "Disables ring actions")
     private val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
     private val renderIndex by BooleanSetting("Render Index", true, description = "Disables ring actions")
-    var rings = mutableMapOf<String, MutableList<Ring>>()
+    val frame by BooleanSetting("Check per Frame", false, description = "check each frame if the player is in a ring. Routes are easier to setup with per frame but possibly less consistent on low fps. Per tick is harder to setup but 100% consistent. Everything done on frame can also be done on tick")
+    private var rings = mutableMapOf<String, MutableList<Ring>>()
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         rings[route]?.forEachIndexed { i, ring ->
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
             Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
+            if (editMode) return
+            if (AutoP3Utils.distanceToRing(ring.coords) < 0.5 && AutoP3Utils.ringCheckY(ring.coords) && ring.should) {
+                executeRing(ring)
+                ring.should = false
+            }
+            else if(AutoP3Utils.distanceToRing(ring.coords) > 0.5 || !AutoP3Utils.ringCheckY(ring.coords)) ring.should = true
         }
     }
 
+    private fun executeRing(ring: Ring) {
+        if (ring.look) mc.thePlayer.rotationYaw = ring.direction.yaw
+        if (ring.center && mc.thePlayer.onGround) mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord) //Wadey Wd does not like it if mess with y coord. this is safer then just setting pos to ring coord
+        when(ring.type) {
+            RingTypes.WALK -> {
+                AutoP3Utils.startWalk(ring.direction.yaw)
+                modMessage("started Walking")
+            }
+            else -> modMessage("how tf did u manage to get a ring like this")
+        }
+    }
 
     fun addRing(args: Array<out String>?) {
         if (args.isNullOrEmpty()) return modMessage("need args stoopid")
         when(args[0]) {
             "add" -> addNormalRing(args)
+            "delete" -> deleteNormalRing()
             "blink" -> modMessage("coming soon")
         }
     }
@@ -77,6 +100,16 @@ object AutoP3: Module (
         logger.info(route)
         if (route.isEmpty()) return
         rings[route]?.add(Ring(RingTypes.WALK)) ?: run { rings[route] = mutableListOf(Ring(RingTypes.WALK)) }
+        saveRings()
+    }
+
+    private fun deleteNormalRing() {
+        if (rings[route].isNullOrEmpty()) return
+        val playerEyeVec = mc.thePlayer.positionVector.add(Vec3(0.0, mc.thePlayer.eyeHeight.toDouble(),0.0))
+        val deleteList = rings[route]?.sortedBy{it.coords.distanceTo(playerEyeVec)}
+        if (deleteList?.get(0)?.coords?.distanceTo(playerEyeVec)!! > 3) return
+        rings[route]?.remove(deleteList[0])
+        modMessage("deleted a ring")
         saveRings()
     }
 
