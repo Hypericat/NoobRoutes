@@ -55,6 +55,7 @@ class NoobRoutes {
             RenderUtils,
             ClickGUI,
             AutoP3Utils
+
         )
         Modules.forEach {
             MinecraftForge.EVENT_BUS.register(it)
