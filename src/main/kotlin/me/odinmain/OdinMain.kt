@@ -1,5 +1,6 @@
 package me.odinmain
 
+import com.github.wadey3636.noobroutes.features.AutoP3
 import kotlinx.coroutines.*
 
 import me.odinmain.config.Config
@@ -67,7 +68,7 @@ object OdinMain {
                 Config.load()
             }.join()
         }
-
+        AutoP3.loadRings()
         ClickGUI.init()
         RoundedRect.initShaders()
 

@@ -64,11 +64,10 @@ class NoobRoutes {
 
     @Mod.EventHandler
     fun loadComplete(event: FMLLoadCompleteEvent) {
-        ModuleManager.addModules()
-        OdinMain.loadComplete()
-
         File(mc.mcDataDir, "config/noobroutes").takeIf { !it.exists() }?.mkdirs()
-        Config.load()
+        OdinMain.loadComplete()
+        ModuleManager.addModules()
+
     }
 
 }
