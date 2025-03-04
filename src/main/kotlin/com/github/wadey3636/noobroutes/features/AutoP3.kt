@@ -21,6 +21,7 @@ import me.odinmain.utils.LookVec
 import me.odinmain.utils.render.Color
 import me.odinmain.utils.render.Renderer
 import me.odinmain.utils.rotation
+import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -77,6 +78,7 @@ object AutoP3: Module (
     private fun executeRing(ring: Ring) {
         if (ring.look) mc.thePlayer.rotationYaw = ring.direction.yaw
         if (ring.center && mc.thePlayer.onGround) mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord) //Wadey Wd does not like it if mess with y coord. this is safer then just setting pos to ring coord
+        AutoP3Utils.unPressKeys()
         when(ring.type) {
             RingTypes.WALK -> {
                 AutoP3Utils.startWalk(ring.direction.yaw)

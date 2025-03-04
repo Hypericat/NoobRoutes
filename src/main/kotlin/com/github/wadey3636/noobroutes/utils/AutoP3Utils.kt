@@ -1,7 +1,6 @@
 package com.github.wadey3636.noobroutes.utils
 
 import com.github.wadey3636.noobroutes.features.AutoP3
-import kotlinx.coroutines.Job
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import me.odinmain.OdinMain.mc
@@ -11,9 +10,23 @@ import me.odinmain.utils.render.RenderUtils.renderZ
 import me.odinmain.utils.skyblock.modMessage
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.util.Vec3
+import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 
 object AutoP3Utils {
+
+    private val keyBindings = listOf(
+        mc.gameSettings.keyBindForward,
+        mc.gameSettings.keyBindLeft,
+        mc.gameSettings.keyBindRight,
+        mc.gameSettings.keyBindBack
+    )
+
+    fun unPressKeys() {
+        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
+        modMessage("unpressing")
+    }
+
     private var walking = false
     private var direction = 0F
 
@@ -24,13 +37,12 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun walk(event: TickEvent.ClientTickEvent) {
-
         if (!walking) return
-        if (mc.thePlayer.movementInput.moveForward != 0F || mc.thePlayer.movementInput.moveStrafe != 0F) {
+        if (event.phase == TickEvent.Phase.END) return
+        if (keyBindings.any { it.isKeyDown }) {
             walking = false
             return
         }
-        if (event.phase == TickEvent.Phase.START) return
         val speed = mc.thePlayer.capabilities.walkSpeed
         mc.thePlayer.motionX = speed * 2.806 * Utils.xPart(direction)
         mc.thePlayer.motionZ = speed * 2.806 * Utils.zPart(direction)
