@@ -2,6 +2,9 @@ package com.github.wadey3636.noobroutes
 
 import com.github.wadey3636.noobroutes.commands.AutoP3Command
 import com.github.wadey3636.noobroutes.commands.NoobRoutesCommand
+import com.github.wadey3636.noobroutes.features.AutoP3
+import com.github.wadey3636.noobroutes.features.AutoP3Test
+import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import me.odinmain.OdinMain
 import me.odinmain.OdinMain.mc
 import me.odinmain.config.Config
@@ -50,7 +53,8 @@ class NoobRoutes {
             Renderer,
             RenderUtils2D,
             RenderUtils,
-            ClickGUI
+            ClickGUI,
+            AutoP3Utils
         )
         Modules.forEach {
             MinecraftForge.EVENT_BUS.register(it)

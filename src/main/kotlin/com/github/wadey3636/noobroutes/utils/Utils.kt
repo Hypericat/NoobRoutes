@@ -5,11 +5,11 @@ import kotlin.math.sin
 
 object Utils {
 
-    fun xPart(yaw: Double): Double {
+    fun xPart(yaw: Float): Double {
         return -sin(yaw * Math.PI /180)
     }
 
-    fun zPart(yaw: Double): Double {
+    fun zPart(yaw: Float): Double {
         return cos(yaw * Math.PI /180)
     }
 }
