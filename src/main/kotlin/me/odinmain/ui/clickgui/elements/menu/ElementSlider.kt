@@ -12,6 +12,7 @@ import me.odinmain.ui.clickgui.util.ColorUtil.textColor
 import me.odinmain.ui.clickgui.util.HoverHandler
 import me.odinmain.ui.util.MouseUtils.isAreaHovered
 import me.odinmain.ui.util.MouseUtils.mouseX
+import me.odinmain.ui.util.shader.RoundedRect
 import me.odinmain.utils.floor
 import me.odinmain.utils.render.*
 import org.lwjgl.input.Keyboard
@@ -65,7 +66,8 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
 
         roundedRectangle(x + 6f, y + 28f, w - 12f, 7f, sliderBGColor, 2.5f)
         dropShadow(x + 6f, y + 28f, w - 12f, 7f, 10f, 0.75f)
-        if (x + percentage * (w - 12f) > x + 6) roundedRectangle(x + 6f, y + 28f, sliderPercentage * (w - 12f), 7f, color, 3f)
+        //if (x + percentage * (w - 12f) > x + 6) roundedRectangle(x + 6f, y + 28f, sliderPercentage * (w - 12f), 7f, color, 3f)
+        circle(x + 6f + sliderPercentage * (w - 12f), y + 28f + 3f, 5f, color)
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {

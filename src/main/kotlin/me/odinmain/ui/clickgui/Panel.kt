@@ -74,7 +74,7 @@ class Panel(
         var startY = scrollOffset + HEIGHT
         scale(1f / scaleFactor, 1f / scaleFactor, 1f)
         dropShadow(x, y, WIDTH, if (extended) (length + 5f).coerceAtLeast(HEIGHT) else 50f, ColorUtil.moduleButtonColor, 5f, 3f, 3f, 3f, 3f)
-        roundedRectangle(x, y, WIDTH, HEIGHT, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, 0f, 5f, 5f, 0f, 0f, 0f)
+        roundedRectangle(x, y, WIDTH, HEIGHT, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, 0f, 10f, 10f, 0f, 0f, 0f)
         var additionalOffset = 0.0
         val imageSize = 25
         when(category){
@@ -94,7 +94,7 @@ class Panel(
         text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT / 2f, ColorUtil.textColor, 15f, type = OdinFont.BOLD, TextAlign.Middle)
 
         //Drawing the minus sign top right of the panel
-        roundedRectangle(x + WIDTH * 0.85, y + HEIGHT / 2.5, 20, 3, Color.WHITE, radius = 2f)
+        roundedRectangle(x + WIDTH * 0.85 + 5, y + HEIGHT / 2.55, 15, 3, Color.WHITE, radius = 2f)
 
         roundedRectangle(x + 2, y + HEIGHT - 2, WIDTH - 4, 2, ColorUtil.clickGUIColor.brighter(1.65f))
 
