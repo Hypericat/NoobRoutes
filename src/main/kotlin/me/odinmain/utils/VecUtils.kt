@@ -16,6 +16,8 @@ import kotlin.math.*
 
 data class Vec2(val x: Int, val z: Int)
 
+data class LookVec(val yaw: Float, val pitch: Float)
+
 data class PositionLook(val pos: Vec3, val yaw: Float, val pitch: Float)
 
 fun BlockPos.add(vec: Vec2): BlockPos = this.add(vec.x, 0, vec.z)

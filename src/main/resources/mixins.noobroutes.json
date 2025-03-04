@@ -1,6 +1,6 @@
 {
   "package": "${basePackage}.mixin",
-  "plugin": "com.github.wadey3636.noobroutes.init.AutoDiscoveryMixinPlugin",
+  "plugin": "${basePackage}.init.AutoDiscoveryMixinPlugin",
   "refmap": "mixins.${modid}.refmap.json",
   "minVersion": "0.7",
   "compatibilityLevel": "JAVA_8",

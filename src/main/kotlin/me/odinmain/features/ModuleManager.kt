@@ -1,5 +1,8 @@
 package me.odinmain.features
 
+import com.github.wadey3636.noobroutes.features.AutoP3
+import com.github.wadey3636.noobroutes.features.AutoP3Test
+import com.github.wadey3636.noobroutes.features.Blink
 import me.odinmain.OdinMain.mc
 import me.odinmain.events.impl.ChatPacketEvent
 import me.odinmain.events.impl.InputEvent
@@ -40,7 +43,10 @@ object ModuleManager {
     val huds = arrayListOf<HudElement>()
 
     val modules: ArrayList<Module> = arrayListOf(
-        ClickGUIModule
+        ClickGUIModule,
+        AutoP3Test,
+        Blink,
+        AutoP3
     )
 
     init {

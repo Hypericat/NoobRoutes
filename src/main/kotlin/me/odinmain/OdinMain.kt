@@ -1,12 +1,11 @@
 package me.odinmain
 
+import com.github.wadey3636.noobroutes.features.AutoP3
 import kotlinx.coroutines.*
 
 import me.odinmain.config.Config
 import me.odinmain.events.EventDispatcher
 import me.odinmain.features.ModuleManager
-import me.odinmain.features.impl.render.ClickGUIModule
-
 import me.odinmain.font.OdinFont
 import me.odinmain.ui.clickgui.ClickGUI
 import me.odinmain.ui.util.shader.RoundedRect
@@ -16,7 +15,6 @@ import me.odinmain.utils.render.HighlightRenderer
 import me.odinmain.utils.render.RenderUtils
 import me.odinmain.utils.render.RenderUtils2D
 import me.odinmain.utils.render.Renderer
-import me.odinmain.utils.sendDataToServer
 import me.odinmain.utils.skyblock.KuudraUtils
 import me.odinmain.utils.skyblock.LocationUtils
 import me.odinmain.utils.skyblock.PlayerUtils
@@ -25,9 +23,6 @@ import me.odinmain.utils.skyblock.dungeon.DungeonUtils
 import me.odinmain.utils.skyblock.dungeon.ScanUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.apache.logging.log4j.LogManager
@@ -38,15 +33,15 @@ import kotlin.coroutines.EmptyCoroutineContext
 object OdinMain {
     val mc: Minecraft = Minecraft.getMinecraft()
 
+
     const val VERSION = "@VER@"
     val scope = CoroutineScope(SupervisorJob() + EmptyCoroutineContext)
     val logger: Logger = LogManager.getLogger("NoobRoutes")
 
     var display: GuiScreen? = null
-    val isLegitVersion: Boolean
-        get() = Loader.instance().activeModList.none { it.modId == "odclient" }
 
     fun init() {
+        /*
         listOf(
             LocationUtils, ServerUtils, PlayerUtils,
             RenderUtils, Renderer, DungeonUtils, KuudraUtils,
@@ -57,10 +52,15 @@ object OdinMain {
             this
         ).forEach { MinecraftForge.EVENT_BUS.register(it) }
 
+         */
         OdinFont.init()
+
 
     }
 
+    fun postInit() {
+        File(mc.mcDataDir, "config/noobroutes").takeIf { !it.exists() }?.mkdirs()
+    }
 
     fun loadComplete() {
         runBlocking(Dispatchers.IO) {
@@ -68,9 +68,10 @@ object OdinMain {
                 Config.load()
             }.join()
         }
+        AutoP3.loadRings()
         ClickGUI.init()
         RoundedRect.initShaders()
-        OdinFont.init()
+
     }
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {

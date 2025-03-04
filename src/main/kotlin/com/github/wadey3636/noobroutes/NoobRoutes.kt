@@ -1,6 +1,10 @@
 package com.github.wadey3636.noobroutes
 
+import com.github.wadey3636.noobroutes.commands.AutoP3Command
 import com.github.wadey3636.noobroutes.commands.NoobRoutesCommand
+import com.github.wadey3636.noobroutes.features.AutoP3
+import com.github.wadey3636.noobroutes.features.AutoP3Test
+import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import me.odinmain.OdinMain
 import me.odinmain.OdinMain.mc
 import me.odinmain.config.Config
@@ -21,6 +25,7 @@ import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import java.io.File
 
 
@@ -28,6 +33,7 @@ import java.io.File
 class NoobRoutes {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
+
         try {
             val resource: net.minecraft.client.resources.IResource = Minecraft.getMinecraft().resourceManager
                 .getResource(net.minecraft.util.ResourceLocation("test:test.txt"))
@@ -36,6 +42,7 @@ class NoobRoutes {
             throw java.lang.RuntimeException(e)
         }
         ClientCommandHandler.instance.registerCommand(NoobRoutesCommand())
+        ClientCommandHandler.instance.registerCommand(AutoP3Command())
         println("Dirt: ${Blocks.dirt.unlocalizedName}")
 	    // Below is a demonstration of an access-transformed class access.
 	    println("Color State: " + GlStateManager.Color());
@@ -45,19 +52,27 @@ class NoobRoutes {
             Executor,
             Renderer,
             RenderUtils2D,
-            RenderUtils
+            RenderUtils,
+            ClickGUI,
+            AutoP3Utils
+
         )
         Modules.forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }
+        OdinFont.init()
     }
     @Mod.EventHandler
-    fun loadComplete(event: FMLLoadCompleteEvent) {
-        ModuleManager.addModules()
-        OdinMain.loadComplete()
+    fun postInit(event: FMLPostInitializationEvent) {
+        OdinMain.postInit()
+    }
 
+    @Mod.EventHandler
+    fun loadComplete(event: FMLLoadCompleteEvent) {
         File(mc.mcDataDir, "config/noobroutes").takeIf { !it.exists() }?.mkdirs()
-        Config.load()
+        OdinMain.loadComplete()
+        ModuleManager.addModules()
+
     }
 
 }

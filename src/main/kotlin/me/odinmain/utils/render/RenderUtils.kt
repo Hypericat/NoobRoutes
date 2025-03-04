@@ -278,7 +278,7 @@ object RenderUtils {
         Cylinder().draw(baseRadius.toFloat(), topRadius.toFloat(), height.toFloat(), slices.toInt(), stacks.toInt())
 
         postDraw()
-        GL11.glLineWidth(1f)
+        GL11.glLineWidth(1.0f)
         GlStateManager.enableCull()
         if (!depth) resetDepth()
         GlStateManager.popMatrix()
