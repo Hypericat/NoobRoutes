@@ -190,9 +190,22 @@ fun resetScissor(scissor: Scissor) {
 }
 
 fun drawDynamicTexture(dynamicTexture: DynamicTexture, x: Number, y: Number, w: Number, h: Number) {
+
+    val isBlendEnabled = GL11.glIsEnabled(GL11.GL_BLEND)
+    val isAlphaEnabled = GL11.glIsEnabled(GL11.GL_ALPHA_TEST)
+    GlStateManager.pushMatrix()
+
+    if (!isBlendEnabled) GlStateManager.enableBlend()
+    if (!isAlphaEnabled) GlStateManager.enableAlpha()
+
     dynamicTexture.updateDynamicTexture()
     GlStateManager.bindTexture(dynamicTexture.glTextureId)
     drawTexturedModalRect(x.toInt(), y.toInt(), w.toInt(), h.toInt())
+
+    if (!isBlendEnabled) GlStateManager.disableBlend()
+    if (!isAlphaEnabled) GlStateManager.disableAlpha()
+
+    GlStateManager.popMatrix()
 }
 
 fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = OdinFont.REGULAR, shadow: Boolean = false) {

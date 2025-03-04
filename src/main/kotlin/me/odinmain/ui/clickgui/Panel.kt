@@ -1,6 +1,6 @@
 package me.odinmain.ui.clickgui
 
-import me.odinmain.OdinMain.logger
+
 import me.odinmain.features.Category
 import me.odinmain.features.ModuleManager.modules
 import me.odinmain.features.impl.render.ClickGUIModule
@@ -10,6 +10,7 @@ import me.odinmain.ui.clickgui.animations.impl.LinearAnimation
 import me.odinmain.ui.clickgui.elements.ModuleButton
 import me.odinmain.ui.clickgui.util.ColorUtil
 import me.odinmain.ui.clickgui.util.ColorUtil.brighter
+import me.odinmain.ui.clickgui.util.ColorUtil.darker
 import me.odinmain.ui.util.MouseUtils.isAreaHovered
 import me.odinmain.ui.util.MouseUtils.mouseX
 import me.odinmain.ui.util.MouseUtils.mouseY
@@ -19,6 +20,7 @@ import me.odinmain.utils.render.RenderUtils.loadBufferedImage
 import me.odinmain.utils.round
 import net.minecraft.client.renderer.texture.DynamicTexture
 import kotlin.math.floor
+
 
 /**
  * Renders all the panels.
@@ -32,6 +34,7 @@ import kotlin.math.floor
 class Panel(
     var category: Category,
 ) {
+
     private val renderIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/render.png"))
     private val floor7Icon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/movement.png"))
     val displayName = category.name.lowercase().capitalizeFirst()
@@ -61,7 +64,7 @@ class Panel(
     }
 
     fun draw() {
-        logger.info(moduleButtons.size)
+
         if (dragging) {
             x = floor(x2 + mouseX)
             y = floor(y2 + mouseY)
@@ -77,10 +80,10 @@ class Panel(
         when(category){
             Category.RENDER -> {
                 additionalOffset = 4.0
-                drawDynamicTexture(renderIcon, x + WIDTH * 0.08 - imageSize / 2 - additionalOffset, y + HEIGHT / 2 - imageSize / 2, imageSize, imageSize)
+                drawDynamicTexture(renderIcon, x + WIDTH * 0.08 - imageSize / 2 + additionalOffset, y + HEIGHT / 2 - imageSize / 2 - 2, imageSize, imageSize)
             }
             Category.FLOOR7 -> {
-                drawDynamicTexture(floor7Icon, x + WIDTH * 0.08  - imageSize / 2 - additionalOffset, y + HEIGHT / 2  - imageSize / 2, imageSize, imageSize)
+                drawDynamicTexture(floor7Icon, x + WIDTH * 0.08  - imageSize / 2 + additionalOffset, y + HEIGHT / 2  - imageSize / 2, imageSize, imageSize)
             }
             else -> {
 
@@ -88,10 +91,10 @@ class Panel(
 
         }
 
-        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 - additionalOffset, y + HEIGHT / 2f, ColorUtil.textColor, 15f, type = OdinFont.BOLD, TextAlign.Middle)
+        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT / 2f, ColorUtil.textColor, 15f, type = OdinFont.BOLD, TextAlign.Middle)
 
         //Drawing the minus sign top right of the panel
-        roundedRectangle(x + WIDTH * 0.85, y + HEIGHT / 2.5, 20, 5, Color.WHITE)
+        roundedRectangle(x + WIDTH * 0.85, y + HEIGHT / 2.5, 20, 3, Color.WHITE, radius = 2f)
 
         roundedRectangle(x + 2, y + HEIGHT - 2, WIDTH - 4, 2, ColorUtil.clickGUIColor.brighter(1.65f))
 
@@ -104,10 +107,7 @@ class Panel(
             length = startY + 5f
         }
 
-        val lastColor =
-            if (extended) moduleButtons.lastOrNull()?.color ?: ColorUtil.moduleButtonColor
-            else ColorUtil.moduleButtonColor
-        roundedRectangle(x, y + startY, WIDTH, 10f, lastColor, lastColor, lastColor, 0f, 0f, 0f, 10f, 10f, 4f)
+        roundedRectangle(x, y + startY, WIDTH, 10f, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, 0f, 0f, 0f, 10f, 10f, 4f)
         resetScissor(s)
         scale(scaleFactor, scaleFactor, 1f)
     }
@@ -122,10 +122,10 @@ class Panel(
     }
 
     fun mouseClicked(mouseButton: Int): Boolean {
-        /*if (isHoveredOverExtendToggle && mouseButton == 0) {
+        if (isHoveredOverExtendToggle) {
             extended = !extended
             return true
-        } else */
+        }
         if (isHovered) {
             if (mouseButton == 0) {
                 x2 = x - mouseX
@@ -141,7 +141,10 @@ class Panel(
                 it.mouseClicked(mouseButton)
             }
         }
+
         return false
+
+
     }
 
     fun mouseReleased(state: Int) {
@@ -169,8 +172,8 @@ class Panel(
     private val isHovered
         get() = isAreaHovered(x, y, WIDTH, HEIGHT)
 
-    //private val isHoveredOverExtendToggle
-       // get() = isAreaHovered((x + WIDTH / 1.2).toFloat(), (y + HEIGHT / 2.25).toFloat(), 25f, HEIGHT)
+    private val isHoveredOverExtendToggle
+        get() = isAreaHovered(x + WIDTH * 0.85f - 10, y, 50f, HEIGHT)
 
 
     private val isMouseOverExtended

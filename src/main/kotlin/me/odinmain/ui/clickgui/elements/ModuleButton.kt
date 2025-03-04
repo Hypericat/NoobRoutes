@@ -12,6 +12,7 @@ import me.odinmain.ui.clickgui.animations.impl.EaseInOut
 import me.odinmain.ui.clickgui.elements.menu.*
 import me.odinmain.ui.clickgui.util.ColorUtil.brighter
 import me.odinmain.ui.clickgui.util.ColorUtil.clickGUIColor
+import me.odinmain.ui.clickgui.util.ColorUtil.darkerIf
 import me.odinmain.ui.clickgui.util.ColorUtil.moduleButtonColor
 import me.odinmain.ui.clickgui.util.ColorUtil.textColor
 import me.odinmain.ui.clickgui.util.HoverHandler
@@ -43,7 +44,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
     private val colorAnim = ColorAnimation(150)
 
     val color: Color
-        get() = colorAnim.get(clickGUIColor, moduleButtonColor, module.enabled).brighter(1 + hover.percent() / 500f)
+        get() = colorAnim.get(clickGUIColor, Color.WHITE, module.enabled).darkerIf(hover.percent() > 0, 0.7f)
 
     val width = Panel.WIDTH
     val height = 32f
@@ -52,7 +53,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
 
     private val extendAnim = EaseInOut(250)
     private val hoverHandler = HoverHandler(1000, 200)
-    private val hover = HoverHandler(250)
+    private val hover = HoverHandler(50)
     private val bannableIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/bannableIcon.png"))
     private val fpsHeavyIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/fpsHeavyIcon.png"))
     private val newFeatureIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/newFeatureIcon.png"))
@@ -101,12 +102,14 @@ class ModuleButton(val module: Module, val panel: Panel) {
         hoverHandler.handle(x, y, width, height - 1)
         hover.handle(x, y, width, height - 1)
 
+
         if (hoverHandler.percent() > 0) {
             ClickGUI.setDescription(module.description, x + width + 10f, y, hoverHandler)
         }
 
-        roundedRectangle(x, y, width, height, color)
-        text(module.name, x + width / 2, y + height / 2, textColor, 14f, OdinFont.REGULAR, TextAlign.Middle)
+
+        roundedRectangle(x, y, width, height, moduleButtonColor)
+        text(module.name, x + width / 2, y + height / 2, color, 14f, OdinFont.REGULAR, TextAlign.Middle)
         val textWidth = getTextWidth(module.name, 18f)
 
         if (textWidth < width - 80) {// too long text, not drawing symbol

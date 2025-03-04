@@ -9,6 +9,7 @@ import me.odinmain.utils.skyblock.modMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import net.minecraft.network.Packet
+import me.odinmain.OdinMain.logger
 
 object BlinkKeybind: Module(
     name = "Blink Keybind",
@@ -19,7 +20,15 @@ object BlinkKeybind: Module(
     private val cancelledPackets = mutableListOf<Packet<*>>()
     override fun onDisable() {
         super.onDisable()
-        cancelledPackets.forEach { PacketUtils.sendPacket(it) }
+        try {
+            cancelledPackets.forEach { PacketUtils.sendPacket(it) }
+        } catch (e: IllegalStateException) {
+            logger.error("Failed to send blink packets", e)
+            cancelledPackets.forEach {
+                logger.error(it)
+            }
+
+        }
         cancelledPackets.clear()
     }
 

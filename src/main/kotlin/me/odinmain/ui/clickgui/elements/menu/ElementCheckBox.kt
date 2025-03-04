@@ -13,6 +13,7 @@ import me.odinmain.ui.clickgui.util.ColorUtil.clickGUIColor
 import me.odinmain.ui.clickgui.util.ColorUtil.darker
 import me.odinmain.ui.clickgui.util.ColorUtil.darkerIf
 import me.odinmain.ui.clickgui.util.ColorUtil.elementBackground
+import me.odinmain.ui.clickgui.util.ColorUtil.saturation
 import me.odinmain.ui.clickgui.util.ColorUtil.textColor
 import me.odinmain.ui.clickgui.util.HoverHandler
 import me.odinmain.ui.util.MouseUtils.isAreaHovered
@@ -46,21 +47,23 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
         text(name, x + 6f, y + h / 2f, textColor, 12f, OdinFont.REGULAR)
 
         hover.handle(x + w - 43f, y + 4f, 34f, 20f)
-        val color = colorAnim.get(clickGUIColor, buttonColor, setting.enabled).brighter(1 + hover.percent() / 500f)
+        val color = colorAnim.get(clickGUIColor, buttonColor, setting.enabled).darkerIf(hover.percent() > 0, 1.2f)
 
         if (!ClickGUIModule.switchType) {
+            //render check box
             dropShadow(x + w - 30f, y + 5f, 21f, 20f, 10f, 0.75f)
             roundedRectangle(x + w - 30f, y + 5f, 21f, 20f, color, 5f)
             rectangleOutline(x + w - 30f, y + 5f, 21f, 20f, clickGUIColor, 5f, 3f)
         } else {
+            //render switch
             dropShadow(x + w - 43f, y + 4f, 34f, 20f, 10f, 0.75f)
 
-            roundedRectangle(x + w - 43f, y + 4f, 34f, 20f, buttonColor, 9f)
+            roundedRectangle(x + w - 43f, y + 8f, 34f, 8f, color.darker(0.7f).saturation(0.7f), 9f)
             if (setting.enabled || linearAnimation.isAnimating()) roundedRectangle(x + w - 43f, y + 4f, linearAnimation.get(34f, 9f, setting.enabled), 20f, color, 9f)
 
-            if (isHovered) rectangleOutline(x + w - 43f, y + 4f, 34f, 20f, color.darker(.85f), 9f, 3f)
+            //if (isHovered) rectangleOutline(x + w - 43f, y + 4f, 34f, 20f, color.darker(.85f), 9f, 3f)
             circle(x + w - linearAnimation.get(33f, 17f, !setting.enabled), y + 14f, 6f,
-                Color(220, 220, 220).darkerIf(isHovered, 0.9f)
+                color.darkerIf(isHovered, 0.9f)
             )
         }
     }

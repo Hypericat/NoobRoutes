@@ -40,6 +40,12 @@ object ColorUtil {
     fun Color.darkerIf(condition: Boolean, factor: Float = 0.7f): Color {
         return if (condition) darker(factor) else this
     }
+    fun Color.saturationIf(condition: Boolean, factor: Float = 1f): Color {
+        return if (condition) saturation(factor) else this
+    }
+    fun Color.saturation(factor: Float = 1f): Color {
+        return Color(hue, factor, brightness, alpha)
+    }
 
     fun Color.hsbMax(): Color {
         return Color(hue, 1f, 1f)

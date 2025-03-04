@@ -31,28 +31,12 @@ object Blink: Module (
         if (event.packet !is C03PacketPlayer) return
         if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook) {
             if(cancelled > 0) cancelled--
-            modMessage(cancelled)
+            //modMessage(cancelled)
             return
         }
         if (!event.isCanceled) event.isCanceled = true
         cancelled++
-        modMessage(cancelled)
+        //modMessage(cancelled)
     }
 
-    @SubscribeEvent
-    fun onRender(event: RenderWorldLastEvent) {
-        drawCylinder(
-            pos = mc.thePlayer.renderVec,
-            baseRadius = 0.5,
-            topRadius = 0.5,
-            height = 0.01,
-            slices = 24,
-            stacks = 1,
-            rot1 = 90,
-            rot2 = 0,
-            rot3 = 0,
-            color = Color.RED,
-            depth = true,
-        )
-    }
 }
