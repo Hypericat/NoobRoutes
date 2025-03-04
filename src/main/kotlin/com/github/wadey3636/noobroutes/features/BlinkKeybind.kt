@@ -4,6 +4,7 @@ import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.odinmain.events.impl.PacketEvent
 import me.odinmain.features.Category
 import me.odinmain.features.Module
+import me.odinmain.ui.clickgui.ClickGUI
 import me.odinmain.utils.skyblock.modMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard

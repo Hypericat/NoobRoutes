@@ -5,3 +5,7 @@ build/
 .gradle/
 
 .kotlin/sessions/kotlin-compiler-13481470077453315023.salive
+.github/workflows/build.yml
+.github/workflows/gradle-wrapper-validation.yml
+gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties

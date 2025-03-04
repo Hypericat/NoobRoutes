@@ -9,12 +9,15 @@ import me.odinmain.ui.clickgui.SearchBar.currentSearch
 import me.odinmain.ui.clickgui.animations.impl.LinearAnimation
 import me.odinmain.ui.clickgui.elements.ModuleButton
 import me.odinmain.ui.clickgui.util.ColorUtil
+import me.odinmain.ui.clickgui.util.ColorUtil.brighter
 import me.odinmain.ui.util.MouseUtils.isAreaHovered
 import me.odinmain.ui.util.MouseUtils.mouseX
 import me.odinmain.ui.util.MouseUtils.mouseY
 import me.odinmain.utils.capitalizeFirst
 import me.odinmain.utils.render.*
+import me.odinmain.utils.render.RenderUtils.loadBufferedImage
 import me.odinmain.utils.round
+import net.minecraft.client.renderer.texture.DynamicTexture
 import kotlin.math.floor
 
 /**
@@ -29,6 +32,8 @@ import kotlin.math.floor
 class Panel(
     var category: Category,
 ) {
+    private val renderIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/render.png"))
+    private val floor7Icon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/movement.png"))
     val displayName = category.name.lowercase().capitalizeFirst()
 
     private var dragging = false
@@ -65,10 +70,30 @@ class Panel(
         scrollOffset = scrollAnimation.get(scrollOffset, scrollTarget).round(0).toFloat()
         var startY = scrollOffset + HEIGHT
         scale(1f / scaleFactor, 1f / scaleFactor, 1f)
-        dropShadow(x, y, WIDTH, if (extended) (length + 5f).coerceAtLeast(HEIGHT) else 40f, ColorUtil.moduleButtonColor, 15f, 10f, 10f, 10f, 10f)
-        roundedRectangle(x, y, WIDTH, HEIGHT, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, 0f, 15f, 15f, 0f, 0f, 0f)
+        dropShadow(x, y, WIDTH, if (extended) (length + 5f).coerceAtLeast(HEIGHT) else 50f, ColorUtil.moduleButtonColor, 5f, 3f, 3f, 3f, 3f)
+        roundedRectangle(x, y, WIDTH, HEIGHT, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, 0f, 5f, 5f, 0f, 0f, 0f)
+        var additionalOffset = 0.0
+        val imageSize = 25
+        when(category){
+            Category.RENDER -> {
+                additionalOffset = 4.0
+                drawDynamicTexture(renderIcon, x + WIDTH * 0.08 - imageSize / 2 - additionalOffset, y + HEIGHT / 2 - imageSize / 2, imageSize, imageSize)
+            }
+            Category.FLOOR7 -> {
+                drawDynamicTexture(floor7Icon, x + WIDTH * 0.08  - imageSize / 2 - additionalOffset, y + HEIGHT / 2  - imageSize / 2, imageSize, imageSize)
+            }
+            else -> {
 
-        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH / 2f, y + HEIGHT / 2f, ColorUtil.textColor, 20f, type = OdinFont.BOLD, TextAlign.Middle)
+            }
+
+        }
+
+        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 - additionalOffset, y + HEIGHT / 2f, ColorUtil.textColor, 15f, type = OdinFont.BOLD, TextAlign.Middle)
+
+        //Drawing the minus sign top right of the panel
+        roundedRectangle(x + WIDTH * 0.85, y + HEIGHT / 2.5, 20, 5, Color.WHITE)
+
+        roundedRectangle(x + 2, y + HEIGHT - 2, WIDTH - 4, 2, ColorUtil.clickGUIColor.brighter(1.65f))
 
         val s = scissor(x, y + HEIGHT, WIDTH, 5000f)
         if (extended && moduleButtons.isNotEmpty()) {
@@ -97,6 +122,10 @@ class Panel(
     }
 
     fun mouseClicked(mouseButton: Int): Boolean {
+        /*if (isHoveredOverExtendToggle && mouseButton == 0) {
+            extended = !extended
+            return true
+        } else */
         if (isHovered) {
             if (mouseButton == 0) {
                 x2 = x - mouseX
@@ -139,6 +168,10 @@ class Panel(
 
     private val isHovered
         get() = isAreaHovered(x, y, WIDTH, HEIGHT)
+
+    //private val isHoveredOverExtendToggle
+       // get() = isAreaHovered((x + WIDTH / 1.2).toFloat(), (y + HEIGHT / 2.25).toFloat(), 25f, HEIGHT)
+
 
     private val isMouseOverExtended
         get() = extended && isAreaHovered(x, y, WIDTH, length.coerceAtLeast(HEIGHT))

@@ -42,8 +42,6 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
         else isAreaHovered(x + w - 43f, y + 4f, 34f, 20f)
 
     override fun draw() {
-        logger.info("Drawing Switch")
-
         roundedRectangle(x, y, w, h, elementBackground)
         text(name, x + 6f, y + h / 2f, textColor, 12f, OdinFont.REGULAR)
 

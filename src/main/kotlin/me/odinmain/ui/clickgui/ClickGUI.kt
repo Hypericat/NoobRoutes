@@ -124,10 +124,7 @@ object ClickGUI : Screen() {
         }
         super.keyTyped(typedChar, keyCode)
     }
-    //@SubscribeEvent
-    fun onRender(event: RenderWorldLastEvent) {
-        draw()
-    }
+
 
     override fun initGui() {
         open = true

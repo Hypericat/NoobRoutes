@@ -67,7 +67,6 @@ object OdinFont {
                 currentHeight += getTextHeight((size + 7) / 8)
             }
             else line += "$word "
-
         }
         text(line, x, currentHeight , color, size, type = type, shadow = shadow)
     }
