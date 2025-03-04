@@ -9,6 +9,7 @@ import me.odinmain.ui.clickgui.SearchBar.currentSearch
 import me.odinmain.ui.clickgui.animations.impl.LinearAnimation
 import me.odinmain.ui.clickgui.elements.ModuleButton
 import me.odinmain.ui.clickgui.util.ColorUtil
+import me.odinmain.ui.clickgui.util.ColorUtil.brighter
 import me.odinmain.ui.util.MouseUtils.isAreaHovered
 import me.odinmain.ui.util.MouseUtils.mouseX
 import me.odinmain.ui.util.MouseUtils.mouseY
@@ -65,12 +66,12 @@ class Panel(
         scrollOffset = scrollAnimation.get(scrollOffset, scrollTarget).round(0).toFloat()
         var startY = scrollOffset + HEIGHT
         scale(1f / scaleFactor, 1f / scaleFactor, 1f)
-        dropShadow(x, y, WIDTH, if (extended) (length + 5f).coerceAtLeast(HEIGHT) else 40f, ColorUtil.moduleButtonColor, 15f, 3f, 3f, 3f, 3f)
-        roundedRectangle(x, y, WIDTH, HEIGHT, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, 0f, 5f, 5f, 5f, 5f, 0f)
+        dropShadow(x, y, WIDTH, if (extended) (length + 5f).coerceAtLeast(HEIGHT) else 40f, ColorUtil.moduleButtonColor, 3f, 3f, 3f, 3f, 3f)
+        roundedRectangle(x, y, WIDTH, HEIGHT, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, 0f, 5f, 5f, 0f, 0f, 0f)
 
         text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH / 4f, y + HEIGHT / 2f, ColorUtil.textColor, 15f, type = OdinFont.BOLD, TextAlign.Middle)
         roundedRectangle(x + WIDTH / 1.2, y + HEIGHT / 2.25, 20, 5, Color.WHITE)
-        roundedRectangle(x + WIDTH / 2, y + HEIGHT, WIDTH / 2, 5, ClickGUIModule.color)
+        roundedRectangle(x, y + HEIGHT - 5, WIDTH, 5, ColorUtil.clickGUIColor.brighter(1.65f))
         val s = scissor(x, y + HEIGHT, WIDTH, 5000f)
         if (extended && moduleButtons.isNotEmpty()) {
             for (button in moduleButtons.filter { it.module.name.contains(currentSearch, true) }) {
