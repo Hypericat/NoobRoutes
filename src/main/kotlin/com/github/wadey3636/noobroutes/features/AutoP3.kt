@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import com.sun.org.apache.xpath.internal.operations.Bool
 import me.odinmain.OdinMain.logger
 import me.odinmain.OdinMain.mc
 import me.odinmain.features.Category
@@ -20,15 +19,15 @@ import me.odinmain.features.settings.impl.StringSetting
 import me.odinmain.utils.LookVec
 import me.odinmain.utils.render.Color
 import me.odinmain.utils.render.Renderer
-import me.odinmain.utils.rotation
-import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 enum class RingTypes {
     WALK,
     MOTION,
-    HCLIP
+    HCLIP,
+    STOP,
+    LOOK
 }
 
 
@@ -89,23 +88,36 @@ object AutoP3: Module (
     }
 
     fun addRing(args: Array<out String>?) {
+        if (route.isEmpty()) return modMessage("error complain to wadey(dc is wadey3636)")
         if (args.isNullOrEmpty()) return modMessage("need args stoopid")
         when(args[0]) {
             "add" -> addNormalRing(args)
-            "delete" -> deleteNormalRing()
+            "delete" -> deleteNormalRing(args)
             "blink" -> modMessage("coming soon")
         }
     }
 
     private fun addNormalRing(args: Array<out String>?) {
-        modMessage("added")
-        logger.info(route)
-        if (route.isEmpty()) return
-        rings[route]?.add(Ring(RingTypes.WALK)) ?: run { rings[route] = mutableListOf(Ring(RingTypes.WALK)) }
+        val ringType: RingTypes
+        when(args?.get(1)?.lowercase()) { //dear kotlin, if u check the line above u see that i am checking wether args[1] is null. Pls stop complaining about args[1] possibly being null
+            "walk" -> {
+                modMessage("added walk")
+                ringType = RingTypes.WALK
+            }
+            else -> return modMessage("thats not a ring type stoopid")
+        }
+        val look = args.any { it == "look" }
+        val center = args.any {it == "center"}
+        val walk = args.any {it == "walk"}
+        actuallyAddRing(Ring(ringType, look = look, center = center, walk = walk))
         saveRings()
     }
 
-    private fun deleteNormalRing() {
+    private fun actuallyAddRing(ring: Ring) {
+        rings[route]?.add(ring) ?: run { rings[route] = mutableListOf(ring) }
+    }
+
+    private fun deleteNormalRing(args: Array<out String>) {
         if (rings[route].isNullOrEmpty()) return
         val playerEyeVec = mc.thePlayer.positionVector.add(Vec3(0.0, mc.thePlayer.eyeHeight.toDouble(),0.0))
         val deleteList = rings[route]?.sortedBy{it.coords.distanceTo(playerEyeVec)}
