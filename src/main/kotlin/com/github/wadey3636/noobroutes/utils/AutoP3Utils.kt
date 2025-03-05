@@ -4,10 +4,13 @@ import com.github.wadey3636.noobroutes.features.AutoP3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import me.odinmain.OdinMain.mc
+import me.odinmain.events.impl.PacketEvent
 import me.odinmain.utils.render.RenderUtils.renderX
 import me.odinmain.utils.render.RenderUtils.renderY
 import me.odinmain.utils.render.RenderUtils.renderZ
+import me.odinmain.utils.skyblock.modMessage
 import net.minecraft.client.settings.KeyBinding
+import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import org.lwjgl.input.Keyboard
@@ -24,6 +27,8 @@ object AutoP3Utils {
 
     private var hasUnpressed = false
 
+    var awaitingTick = false
+
     fun unPressKeys() {
         Keyboard.enableRepeatEvents(false)
         keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
@@ -31,11 +36,22 @@ object AutoP3Utils {
     }
 
     private var walking = false
-    private var direction = 0F
+    var direction = 0F
 
     fun startWalk(dir: Float) {
         walking = true
         direction  = dir
+    }
+
+    @SubscribeEvent
+    fun awaitTick(event: PacketEvent) {
+        if(!awaitingTick || event.packet !is C03PacketPlayer) return
+        awaitingTick = false
+        val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
+        mc.thePlayer.motionX = speed * Utils.xPart(direction)
+        mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+
+
     }
 
     @SubscribeEvent
@@ -46,9 +62,9 @@ object AutoP3Utils {
             walking = false
         }
         keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
-        val speed = mc.thePlayer.capabilities.walkSpeed
-        mc.thePlayer.motionX = speed * 2.806 * Utils.xPart(direction)
-        mc.thePlayer.motionZ = speed * 2.806 * Utils.zPart(direction)
+        val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
+        mc.thePlayer.motionX = speed * Utils.xPart(direction)
+        mc.thePlayer.motionZ = speed * Utils.zPart(direction)
     }
 
     fun distanceToRing(coords: Vec3): Double {

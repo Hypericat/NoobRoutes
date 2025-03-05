@@ -87,6 +87,13 @@ object AutoP3: Module (
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
             }
+            RingTypes.HCLIP -> {
+                mc.thePlayer.motionX = 0.0
+                mc.thePlayer.motionZ = 0.0
+                if(mc.thePlayer.onGround) mc.thePlayer.jump()
+                AutoP3Utils.awaitingTick = true
+                AutoP3Utils.direction = ring.direction.yaw
+            }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
     }
@@ -132,12 +139,11 @@ object AutoP3: Module (
 
     private fun deleteNormalRing(args: Array<out String>) {
         if (rings[route].isNullOrEmpty()) return
-        modMessage(args.size)
         if (args.size >= 2) {
             try {
-                if ((args.get(1).toInt()) <= (rings[route]?.size?.minus(1) ?: return modMessage("Error Deleting Ring"))) {
-                    rings[route]?.removeAt(args.get(1).toInt())
-                    modMessage("Removed Ring ${args.get(1).toInt()}")
+                if ((args[1].toInt()) <= (rings[route]?.size?.minus(1) ?: return modMessage("Error Deleting Ring"))) {
+                    rings[route]?.removeAt(args[1].toInt())
+                    modMessage("Removed Ring ${args[1].toInt()}")
                     return
                 } else {
                     modMessage("Invalid Index")
