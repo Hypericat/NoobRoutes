@@ -5,6 +5,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import me.odinmain.OdinMain.mc
 import me.odinmain.events.impl.PacketEvent
+import me.odinmain.utils.multiply
 import me.odinmain.utils.render.RenderUtils.renderX
 import me.odinmain.utils.render.RenderUtils.renderY
 import me.odinmain.utils.render.RenderUtils.renderZ
@@ -50,8 +51,6 @@ object AutoP3Utils {
         val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
         mc.thePlayer.motionX = speed * Utils.xPart(direction)
         mc.thePlayer.motionZ = speed * Utils.zPart(direction)
-
-
     }
 
     @SubscribeEvent
