@@ -31,7 +31,7 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
     Element<NumberSetting<*>>(parent, setting, ElementType.SLIDER) {
 
     override val isHovered: Boolean
-        get() = isAreaHovered(x, y, w - 12f, h)
+        get() = isAreaHovered(x, y, w - 15f, h)
 
     private val handler = HoverHandler(0, 150)
 
@@ -60,14 +60,18 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
             setting.valueDouble = newVal
         }
         roundedRectangle(x, y, w, h, elementBackground)
+        roundedRectangle(x, y, w, h, elementBackground)
+        roundedRectangle(x + w, y, 2, h, clickGUIColor, 0f, edgeSoftness = 0)
 
         text(name, x + TEXTOFFSET, y + h / 2f - 3f, textColor, 12f, OdinFont.REGULAR)
         text(getDisplay(), x + w - TEXTOFFSET, y + h / 2f - 3f, textColor, 12f, OdinFont.REGULAR, TextAlign.Right)
 
         roundedRectangle(x + TEXTOFFSET, y + 28f, w - 15f, 7f, sliderBGColor, 2.5f)
         dropShadow(x + TEXTOFFSET, y + 28f, w - 15f, 7f, 10f, 0.75f)
-        //if (x + percentage * (w - 12f) > x + 6) roundedRectangle(x + 6f, y + 28f, sliderPercentage * (w - 12f), 7f, color, 3f)
-        circle(x + TEXTOFFSET + sliderPercentage * (w - 15f), y + 28f + 3f, 5f, color)
+        if (x + percentage * (w - 15f) > x + 6) {
+            roundedRectangle(x + TEXTOFFSET, y + 28f, sliderPercentage * (w - 15f), 7f, color, 3f)
+            circle(x + TEXTOFFSET + sliderPercentage * (w - 15f), y + 28f + 3f, 5f, color)
+        }
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {
