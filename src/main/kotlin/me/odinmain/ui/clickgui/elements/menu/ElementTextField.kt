@@ -2,6 +2,7 @@ package me.odinmain.ui.clickgui.elements.menu
 
 import me.odinmain.features.settings.impl.StringSetting
 import me.odinmain.font.OdinFont
+import me.odinmain.ui.clickgui.ClickGUI.TEXTOFFSET
 import me.odinmain.ui.clickgui.animations.impl.ColorAnimation
 import me.odinmain.ui.clickgui.elements.*
 import me.odinmain.ui.clickgui.util.ColorUtil
@@ -46,7 +47,7 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
             }
 
             text(display, x + w - 10, y + 16f, textColor, 12f, OdinFont.REGULAR, TextAlign.Right)
-            text(name,  x + 6f, y + h / 2, textColor, 12f)
+            text(name,  x + TEXTOFFSET, y + h / 2, textColor, 12f)
         } else {
             val width = getTextWidth(display, 12f)
             if (isHovered || listening) {

@@ -4,6 +4,7 @@ import me.odinmain.features.impl.render.ClickGUIModule
 import me.odinmain.features.settings.impl.HudSetting
 import me.odinmain.font.OdinFont
 import me.odinmain.ui.clickgui.ClickGUI
+import me.odinmain.ui.clickgui.ClickGUI.TEXTOFFSET
 import me.odinmain.ui.clickgui.animations.impl.ColorAnimation
 import me.odinmain.ui.clickgui.animations.impl.LinearAnimation
 import me.odinmain.ui.clickgui.elements.*
@@ -50,7 +51,7 @@ class ElementHud(parent: ModuleButton, setting: HudSetting) : Element<HudSetting
 
     override fun draw() {
         roundedRectangle(x, y, w, h, ColorUtil.elementBackground)
-        text(name, x + 6f, y + 18f, textColor, 12f, OdinFont.REGULAR)
+        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, OdinFont.REGULAR)
 
         var offset = 30f
         if (setting.displayToggle) {

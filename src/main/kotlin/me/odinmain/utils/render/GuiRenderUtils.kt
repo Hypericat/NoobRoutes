@@ -7,6 +7,7 @@ import me.odinmain.ui.clickgui.util.ColorUtil
 import me.odinmain.ui.util.shader.RoundedRect
 import me.odinmain.utils.*
 import me.odinmain.utils.render.RenderUtils.drawTexturedModalRect
+import me.odinmain.utils.render.RenderUtils.loadBufferedImage
 import me.odinmain.utils.render.TextAlign.Left
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -16,6 +17,7 @@ import org.lwjgl.opengl.GL11
 
 val matrix = UMatrixStack.Compat
 val scaleFactor get() = ScaledResolution(mc).scaleFactor.toFloat()
+private val arrowIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/arrow.png"))
 
 data class Box(var x: Number, var y: Number, var w: Number, var h: Number)
 data class BoxWithClass<T : Number>(var x: T, var y: T, var w: T, var h: T)
@@ -143,6 +145,7 @@ fun rotate(degrees: Float, xPos: Float, yPos: Float, zPos: Float, xAxis: Float, 
 fun scale(x: Number, y: Number, z: Number = 1f) = GlStateManager.scale(x.toDouble(), y.toDouble(), z.toDouble())
 
 fun dropShadow(x: Number, y: Number, w: Number, h: Number, shadowColor: Color, shadowSoftness: Number, topL: Number, topR: Number, botL: Number, botR: Number) {
+    return //removed for now
     translate(0f, 0f, -100f)
 
     matrix.runLegacyMethod(matrix.get()) {
@@ -187,6 +190,17 @@ fun resetScissor(scissor: Scissor) {
     GL11.glScissor(nextScissor.x.toInt(), nextScissor.y.toInt(), nextScissor.w.toInt(), nextScissor.h.toInt())
     GL11.glDisable(GL11.GL_SCISSOR_TEST)
     scissorList.removeLast()
+}
+
+fun drawArrow(xpos: Float, ypos: Float, rotation: Float = 90f, scale: Float = 1f, color: Color = Color.WHITE) {
+    GlStateManager.pushMatrix()
+    GlStateManager.translate(xpos, ypos, 0f)
+    GlStateManager.rotate(rotation, 0f, 0f, 1f)
+    GlStateManager.scale(scale, scale, 1f)
+    GlStateManager.translate(-xpos, -ypos, 0f)
+    GlStateManager.color(color.redFloat, color.greenFloat, color.blueFloat, color.alphaFloat)
+    drawDynamicTexture(arrowIcon, xpos - 25 / 2 * scale, ypos - 25 / 2 * scale, 25 * scale, 25 * scale)
+    GlStateManager.popMatrix()
 }
 
 fun drawDynamicTexture(dynamicTexture: DynamicTexture, x: Number, y: Number, w: Number, h: Number) {

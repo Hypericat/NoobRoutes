@@ -22,10 +22,7 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.input.Mouse
 import kotlin.math.sign
 import me.odinmain.OdinMain.logger
-import net.minecraft.client.renderer.Tessellator
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.floor
+import me.odinmain.ui.clickgui.util.ColorUtil.moduleButtonColorAlpha
 
 /**
  * Renders all the modules.
@@ -37,7 +34,7 @@ import kotlin.math.floor
  * @see [Panel]
  */
 object ClickGUI : Screen() {
-
+    const val TEXTOFFSET = 9f
 
     private val panels: ArrayList<Panel> = arrayListOf()
 
@@ -67,7 +64,7 @@ object ClickGUI : Screen() {
         if (anim.isAnimating()) {
             //translate(0f, floor(anim.get(-10f, 0f, !open)))
             val alpha = anim.get(0.7f, 1f, !open)
-            ColorUtil.moduleButtonColor.alpha = alpha
+            ColorUtil.moduleButtonColor.alpha = alpha * moduleButtonColorAlpha
             ColorUtil.clickGUIColor.alpha = alpha
             Color.WHITE.alpha = alpha
         }

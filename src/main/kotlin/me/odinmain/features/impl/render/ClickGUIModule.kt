@@ -23,6 +23,8 @@ object  ClickGUIModule: Module(
     val blur by BooleanSetting("Blur", false, description = "Toggles the background blur for the gui. Requires the menu to be reopened")
     val enableNotification by BooleanSetting("Enable notifications", true, description = "Shows you a notification in chat when you toggle an option with a keybind.")
     val color by ColorSetting("Gui Color", Color(57, 191, 60), allowAlpha = false, description = "Color theme in the gui.")
+
+
     val switchType by BooleanSetting("Switch Type", true, description = "Switches the type of the settings in the gui.")
     val forceHypixel by BooleanSetting("Force Hypixel", false, description = "Forces the hypixel check to be on (not recommended).")
 

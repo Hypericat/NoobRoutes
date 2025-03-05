@@ -2,6 +2,7 @@ package me.odinmain.ui.clickgui.elements.menu
 
 import me.odinmain.features.settings.impl.ColorSetting
 import me.odinmain.font.OdinFont
+import me.odinmain.ui.clickgui.ClickGUI.TEXTOFFSET
 import me.odinmain.ui.clickgui.animations.impl.ColorAnimation
 import me.odinmain.ui.clickgui.animations.impl.EaseInOut
 import me.odinmain.ui.clickgui.elements.*
@@ -58,7 +59,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         hover.handle(x + w - 41, y + 5, 31.5f, 19f)
 
         roundedRectangle(x, y, w, h, elementBackground)
-        text(name, x + 6f, y + 18f, textColor, 12f, OdinFont.REGULAR)
+        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, OdinFont.REGULAR)
         dropShadow(x + w - 40f, y + 5f, 31f, 19f, 10f, 0.75f)
         roundedRectangle(x + w - 40f, y + 5f, 31f, 19f, color.brighter(1 + hover.percent() / 500f), 5f)
         rectangleOutline(x + w - 40f, y + 5f, 31f, 19f, color.darker().withAlpha(1f), 5f, 1.5f)

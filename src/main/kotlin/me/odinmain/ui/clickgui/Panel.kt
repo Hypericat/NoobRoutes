@@ -11,6 +11,8 @@ import me.odinmain.ui.clickgui.elements.ModuleButton
 import me.odinmain.ui.clickgui.util.ColorUtil
 import me.odinmain.ui.clickgui.util.ColorUtil.brighter
 import me.odinmain.ui.clickgui.util.ColorUtil.darker
+import me.odinmain.ui.clickgui.util.ColorUtil.titlePanelColor
+import me.odinmain.ui.clickgui.util.ColorUtil.withAlpha
 import me.odinmain.ui.util.MouseUtils.isAreaHovered
 import me.odinmain.ui.util.MouseUtils.mouseX
 import me.odinmain.ui.util.MouseUtils.mouseY
@@ -35,8 +37,11 @@ class Panel(
     var category: Category,
 ) {
 
+
+
     private val renderIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/render.png"))
     private val floor7Icon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/movement.png"))
+
     val displayName = category.name.lowercase().capitalizeFirst()
 
     private var dragging = false
@@ -74,7 +79,8 @@ class Panel(
         var startY = scrollOffset + HEIGHT
         scale(1f / scaleFactor, 1f / scaleFactor, 1f)
         dropShadow(x, y, WIDTH, if (extended) (length + 5f).coerceAtLeast(HEIGHT) else 50f, ColorUtil.moduleButtonColor, 5f, 3f, 3f, 3f, 3f)
-        roundedRectangle(x, y, WIDTH, HEIGHT, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, 0f, 10f, 10f, 0f, 0f, 0f)
+
+        roundedRectangle(x, y, WIDTH, HEIGHT, titlePanelColor, titlePanelColor, titlePanelColor, 0f, 10f, 10f, 0f, 0f, 0f)
         var additionalOffset = 0.0
         val imageSize = 25
         when(category){
@@ -93,10 +99,12 @@ class Panel(
 
         text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT / 2f, ColorUtil.textColor, 15f, type = OdinFont.BOLD, TextAlign.Middle)
 
-        //Drawing the minus sign top right of the panel
-        roundedRectangle(x + WIDTH * 0.85 + 5, y + HEIGHT / 2.55, 15, 3, Color.WHITE, radius = 2f)
 
-        roundedRectangle(x + 2, y + HEIGHT - 2, WIDTH - 4, 2, ColorUtil.clickGUIColor.brighter(1.65f))
+
+        //draw minus sign
+        roundedRectangle(x + WIDTH * 0.85 + 5, y + HEIGHT * 0.4 , 20, 5, Color.WHITE, radius = 1.5f)
+
+
 
         val s = scissor(x, y + HEIGHT, WIDTH, 5000f)
         if (extended && moduleButtons.isNotEmpty()) {
@@ -106,8 +114,8 @@ class Panel(
             }
             length = startY + 5f
         }
-
-        roundedRectangle(x, y + startY, WIDTH, 10f, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, 0f, 0f, 0f, 10f, 10f, 4f)
+        //draw bottom
+        roundedRectangle(x, y + startY, WIDTH, 10f, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, 0f, 0f, 0f, 10f, 10f, 0f)
         resetScissor(s)
         scale(scaleFactor, scaleFactor, 1f)
     }
@@ -173,7 +181,7 @@ class Panel(
         get() = isAreaHovered(x, y, WIDTH, HEIGHT)
 
     private val isHoveredOverExtendToggle
-        get() = isAreaHovered(x + WIDTH * 0.85f - 10, y, 50f, HEIGHT)
+        get() = isAreaHovered(x + WIDTH * 0.85f - 10, y, 50f, HEIGHT - 2f)
 
 
     private val isMouseOverExtended

@@ -1,25 +1,23 @@
 package me.odinmain.ui.clickgui.elements.menu
 
-import me.odinmain.OdinMain.logger
 import me.odinmain.features.impl.render.ClickGUIModule
 import me.odinmain.features.settings.impl.BooleanSetting
 import me.odinmain.font.OdinFont
+import me.odinmain.ui.clickgui.ClickGUI.TEXTOFFSET
 import me.odinmain.ui.clickgui.animations.impl.ColorAnimation
 import me.odinmain.ui.clickgui.animations.impl.LinearAnimation
 import me.odinmain.ui.clickgui.elements.*
 import me.odinmain.ui.clickgui.util.ColorUtil.brighter
+import me.odinmain.ui.clickgui.util.ColorUtil.brighterIf
 import me.odinmain.ui.clickgui.util.ColorUtil.buttonColor
 import me.odinmain.ui.clickgui.util.ColorUtil.clickGUIColor
 import me.odinmain.ui.clickgui.util.ColorUtil.darker
 import me.odinmain.ui.clickgui.util.ColorUtil.darkerIf
 import me.odinmain.ui.clickgui.util.ColorUtil.elementBackground
-import me.odinmain.ui.clickgui.util.ColorUtil.saturation
 import me.odinmain.ui.clickgui.util.ColorUtil.textColor
 import me.odinmain.ui.clickgui.util.HoverHandler
 import me.odinmain.ui.util.MouseUtils.isAreaHovered
 import me.odinmain.utils.render.*
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * Renders all the modules.
@@ -42,35 +40,32 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
         if (!ClickGUIModule.switchType) isAreaHovered(x + w - 30f, y + 5f, 21f, 20f)
         else isAreaHovered(x + w - 43f, y + 4f, 34f, 20f)
 
-    override fun draw() {
-        roundedRectangle(x, y, w, h, elementBackground)
-        text(name, x + 6f, y + h / 2f, textColor, 12f, OdinFont.REGULAR)
+        override fun draw() {
+            roundedRectangle(x, y, w, h, elementBackground)
+            text(name, x + TEXTOFFSET, y + h / 2f, textColor, 12f, OdinFont.REGULAR)
 
-        hover.handle(x + w - 43f, y + 4f, 34f, 20f)
-        val color = colorAnim.get(clickGUIColor, buttonColor.brighter(1.3f), setting.enabled).darkerIf(hover.percent() > 0, 1.2f)
-        val color2 = buttonColor.darkerIf(hover.percent() > 0, 1.2f)
-
-        if (!ClickGUIModule.switchType) {
-            //render check box
-            dropShadow(x + w - 30f, y + 5f, 21f, 20f, 10f, 0.75f)
-            roundedRectangle(x + w - 30f, y + 5f, 21f, 20f, color, 5f)
-            rectangleOutline(x + w - 30f, y + 5f, 21f, 20f, clickGUIColor, 5f, 3f)
-        } else {
-            //render switch
-            dropShadow(x + w - 43f, y + 4f, 34f, 20f, 10f, 0.75f)
+            hover.handle(x + w - 43f, y + 4f, 34f, 20f)
+            val color = colorAnim.get(clickGUIColor.darkerIf(hover.percent() > 0, 0.7f), buttonColor.brighter(1.3f).brighterIf(hover.percent() > 0, 1.3f), setting.enabled)
 
 
-            roundedRectangle(x + w - 38f, y + 10f, 26f, 8f, color2.brighter(1.3f), 5f, edgeSoftness = 1)
-            if (setting.enabled || linearAnimation.isAnimating()) roundedRectangle(x + w - 40f, y + 10f, linearAnimation.get(30f, 9f, setting.enabled), 8f, color, 5f)
+            if (!ClickGUIModule.switchType) {
+                //render check box
+                dropShadow(x + w - 30f, y + 5f, 21f, 20f, 10f, 0.75f)
+                roundedRectangle(x + w - 30f, y + 5f, 21f, 20f, color, 5f)
+                rectangleOutline(x + w - 30f, y + 5f, 21f, 20f, clickGUIColor, 5f, 3f)
+            } else {
+                //render switch
+                dropShadow(x + w - 43f, y + 4f, 34f, 20f, 10f, 0.75f)
+                roundedRectangle(x + w - 43f, y + 4f, 34f, 20f, buttonColor, 9f)
 
-            //if (isHovered) rectangleOutline(x + w - 43f, y + 4f, 34f, 20f, color.darker(.85f), 9f, 3f)
+                if (setting.enabled || linearAnimation.isAnimating()) roundedRectangle(x + w - 43f, y + 4f, linearAnimation.get(34f, 9f, setting.enabled), 20f, color, 9f)
 
-            //renders the circle
-            circle(x + w - linearAnimation.get(33f, 17f, !setting.enabled), y + 14f, 5f,
-                color
-            )
+                if (isHovered) rectangleOutline(x + w - 43f, y + 4f, 34f, 20f, color.darker(.85f), 9f, 3f)
+                circle(x + w - linearAnimation.get(33f, 17f, !setting.enabled), y + 14f, 6f,
+                    Color(220, 220, 220).darkerIf(isHovered, 0.9f)
+                )
+            }
         }
-    }
 
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (mouseButton == 0 && isHovered) {

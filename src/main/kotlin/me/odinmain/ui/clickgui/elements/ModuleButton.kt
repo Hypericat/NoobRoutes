@@ -10,8 +10,10 @@ import me.odinmain.ui.clickgui.Panel
 import me.odinmain.ui.clickgui.animations.impl.ColorAnimation
 import me.odinmain.ui.clickgui.animations.impl.EaseInOut
 import me.odinmain.ui.clickgui.elements.menu.*
+import me.odinmain.ui.clickgui.util.ColorUtil
 import me.odinmain.ui.clickgui.util.ColorUtil.brighter
 import me.odinmain.ui.clickgui.util.ColorUtil.clickGUIColor
+import me.odinmain.ui.clickgui.util.ColorUtil.darker
 import me.odinmain.ui.clickgui.util.ColorUtil.darkerIf
 import me.odinmain.ui.clickgui.util.ColorUtil.moduleButtonColor
 import me.odinmain.ui.clickgui.util.ColorUtil.textColor
@@ -44,7 +46,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
     private val colorAnim = ColorAnimation(150)
 
     val color: Color
-        get() = colorAnim.get(clickGUIColor, Color.WHITE, module.enabled).darkerIf(hover.percent() > 0, 0.7f)
+        get() = colorAnim.get(clickGUIColor, Color.WHITE, module.enabled).darkerIf(isButtonHovered && !isExtendButtonHovered, 0.7f)
 
     val width = Panel.WIDTH
     val height = 32f
@@ -53,7 +55,6 @@ class ModuleButton(val module: Module, val panel: Panel) {
 
     private val extendAnim = EaseInOut(250)
     private val hoverHandler = HoverHandler(1000, 200)
-    private val hover = HoverHandler(50)
     private val bannableIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/bannableIcon.png"))
     private val fpsHeavyIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/fpsHeavyIcon.png"))
     private val newFeatureIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/newFeatureIcon.png"))
@@ -100,7 +101,6 @@ class ModuleButton(val module: Module, val panel: Panel) {
         var offs = height
 
         hoverHandler.handle(x, y, width, height - 1)
-        hover.handle(x, y, width, height - 1)
 
 
         if (hoverHandler.percent() > 0) {
@@ -109,6 +109,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
 
 
         roundedRectangle(x, y, width, height, moduleButtonColor)
+
         text(module.name, x + width / 2, y + height / 2, color, 14f, OdinFont.REGULAR, TextAlign.Middle)
         val textWidth = getTextWidth(module.name, 18f)
 
@@ -122,17 +123,22 @@ class ModuleButton(val module: Module, val panel: Panel) {
             }
         }
 
-
-        if (!extendAnim.isAnimating() && !extended || menuElements.isEmpty()) return offs
-
+        if (!extendAnim.isAnimating() && !extended || menuElements.isEmpty()) {
+            drawArrow(x + width * 0.9f, y + height * 0.5f, rotation = 0f, scale = 0.9f)
+            return offs
+        }
+        val extendedAnimPercent = extendAnim.get(0f, 1f, !extended)
+        drawArrow(x + width * 0.9f, y + height * 0.5f, scale = 0.9f, rotation = extendedAnimPercent * 90f)
         var drawY = offs
         offs = height + floor(extendAnim.get(0f, getSettingHeight(), !extended))
 
         val scissor = scissor(x, y, width, offs)
         for (i in 0 until menuElements.size) {
-            menuElements[i].y = drawY
+            val currentY = drawY
+            menuElements[i].y = currentY
             drawY += menuElements[i].render()
         }
+        roundedRectangle(x, y + height, 2, drawY - height, clickGUIColor.brighter(1.65f), edgeSoftness = 0f)
         resetScissor(scissor)
 
 
@@ -140,7 +146,15 @@ class ModuleButton(val module: Module, val panel: Panel) {
     }
 
     fun mouseClicked(mouseButton: Int): Boolean {
-        if (isButtonHovered) {
+        if (isExtendButtonHovered) {
+            if (extendAnim.start()) extended = !extended
+            if (!extended) {
+                menuElements.forEach {
+                    it.listening = false
+                }
+            }
+        }
+        if (isButtonHovered && !isExtendButtonHovered) {
             if (mouseButton == 0) {
                 if (colorAnim.start()) module.toggle()
                 return true
@@ -185,6 +199,9 @@ class ModuleButton(val module: Module, val panel: Panel) {
 
     private val isButtonHovered: Boolean
         get() = isAreaHovered(x, y, width, height - 1)
+
+    private val isExtendButtonHovered: Boolean
+        get() = isAreaHovered(x + width * 0.9f,  y, width * 0.1f, height - 1)
 
     private val isMouseUnderButton: Boolean
         get() = extended && isAreaHovered(x, y + height, width)

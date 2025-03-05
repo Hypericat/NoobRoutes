@@ -2,6 +2,7 @@ package me.odinmain.ui.clickgui.elements.menu
 
 import me.odinmain.features.settings.impl.DropdownSetting
 import me.odinmain.font.OdinFont
+import me.odinmain.ui.clickgui.ClickGUI.TEXTOFFSET
 import me.odinmain.ui.clickgui.animations.impl.LinearAnimation
 import me.odinmain.ui.clickgui.elements.*
 import me.odinmain.ui.clickgui.util.ColorUtil.elementBackground
@@ -32,7 +33,7 @@ class ElementDropdown(parent: ModuleButton, setting: DropdownSetting) : Element<
 
     override fun draw() {
         roundedRectangle(x, y, w, h, elementBackground)
-        text(name, x + 6f, y + h / 2f, textColor, 12f, OdinFont.REGULAR)
+        text(name, x + TEXTOFFSET, y + h / 2f, textColor, 12f, OdinFont.REGULAR)
 
         val rotation = linearAnimation.get(180f, 90f, !setting.value)
         rotate(rotation, x + w - 20f, y + 15f, 0f, 0f, 0f, 1f)

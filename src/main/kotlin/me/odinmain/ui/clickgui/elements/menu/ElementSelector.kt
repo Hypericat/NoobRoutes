@@ -2,6 +2,7 @@ package me.odinmain.ui.clickgui.elements.menu
 
 import me.odinmain.features.settings.impl.SelectorSetting
 import me.odinmain.font.OdinFont
+import me.odinmain.ui.clickgui.ClickGUI.TEXTOFFSET
 import me.odinmain.ui.clickgui.animations.impl.EaseInOut
 import me.odinmain.ui.clickgui.elements.*
 import me.odinmain.ui.clickgui.util.ColorUtil.brighter
@@ -57,7 +58,7 @@ class ElementSelector(parent: ModuleButton, setting: SelectorSetting) :
         dropShadow(x + w - 20f - width, y + 4f, width + 12f, 22f, 10f, 0.75f)
         roundedRectangle(x + w - 20f - width, y + 4f, width + 12f, 22f, color, 5f)
 
-        text(name, x + 6f, y + 16f, textColor, 12f, OdinFont.REGULAR)
+        text(name, x + TEXTOFFSET, y + 16f, textColor, 12f, OdinFont.REGULAR)
         text(display, x + w - 14f - width, y + 8f, textColor, 12f, OdinFont.REGULAR, TextAlign.Left, TextPos.Top)
 
         if (!extended && !settingAnim.isAnimating()) return
@@ -66,8 +67,8 @@ class ElementSelector(parent: ModuleButton, setting: SelectorSetting) :
 
         val scissor = scissor(x, y, w, h)
 
-        roundedRectangle(x + 6, y + 37f, w - 12f, size * 32f, buttonColor, 5f)
-        dropShadow(x + 6, y + 37f, w - 12f, size * 32f, 10f, 0.75f)
+        roundedRectangle(x + TEXTOFFSET, y + 37f, w - 12f, size * 32f, buttonColor, 5f)
+        dropShadow(x + TEXTOFFSET, y + 37f, w - 12f, size * 32f, 10f, 0.75f)
 
         for (i in 0 until size) {
             val y = y + 38 + 32 * i

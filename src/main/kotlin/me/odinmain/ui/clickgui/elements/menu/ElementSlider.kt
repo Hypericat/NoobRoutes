@@ -2,6 +2,7 @@ package me.odinmain.ui.clickgui.elements.menu
 
 import me.odinmain.features.settings.impl.NumberSetting
 import me.odinmain.font.OdinFont
+import me.odinmain.ui.clickgui.ClickGUI.TEXTOFFSET
 import me.odinmain.ui.clickgui.elements.Element
 import me.odinmain.ui.clickgui.elements.ElementType
 import me.odinmain.ui.clickgui.elements.ModuleButton
@@ -12,7 +13,6 @@ import me.odinmain.ui.clickgui.util.ColorUtil.textColor
 import me.odinmain.ui.clickgui.util.HoverHandler
 import me.odinmain.ui.util.MouseUtils.isAreaHovered
 import me.odinmain.ui.util.MouseUtils.mouseX
-import me.odinmain.ui.util.shader.RoundedRect
 import me.odinmain.utils.floor
 import me.odinmain.utils.render.*
 import org.lwjgl.input.Keyboard
@@ -50,24 +50,24 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
     }
 
     override fun draw() {
-        handler.handle(x, y, w - 12f, h)
+        handler.handle(x, y, w - 15f, h)
         val percentage = ((setting.valueDouble - setting.min) / (setting.max - setting.min)).toFloat()
 
         if (listening) {
-            sliderPercentage = ((mouseX - (x + 6f)) / (w - 12f)).coerceIn(0f, 1f)
+            sliderPercentage = ((mouseX - (x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f)
             val diff = setting.max - setting.min
-            val newVal = setting.min + ((mouseX - (x + 6f)) / (w - 12f)).coerceIn(0f, 1f) * diff
+            val newVal = setting.min + ((mouseX - (x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f) * diff
             setting.valueDouble = newVal
         }
         roundedRectangle(x, y, w, h, elementBackground)
 
-        text(name, x + 6f, y + h / 2f - 3f, textColor, 12f, OdinFont.REGULAR)
-        text(getDisplay(), x + w - 6f, y + h / 2f - 3f, textColor, 12f, OdinFont.REGULAR, TextAlign.Right)
+        text(name, x + TEXTOFFSET, y + h / 2f - 3f, textColor, 12f, OdinFont.REGULAR)
+        text(getDisplay(), x + w - TEXTOFFSET, y + h / 2f - 3f, textColor, 12f, OdinFont.REGULAR, TextAlign.Right)
 
-        roundedRectangle(x + 6f, y + 28f, w - 12f, 7f, sliderBGColor, 2.5f)
-        dropShadow(x + 6f, y + 28f, w - 12f, 7f, 10f, 0.75f)
+        roundedRectangle(x + TEXTOFFSET, y + 28f, w - 15f, 7f, sliderBGColor, 2.5f)
+        dropShadow(x + TEXTOFFSET, y + 28f, w - 15f, 7f, 10f, 0.75f)
         //if (x + percentage * (w - 12f) > x + 6) roundedRectangle(x + 6f, y + 28f, sliderPercentage * (w - 12f), 7f, color, 3f)
-        circle(x + 6f + sliderPercentage * (w - 12f), y + 28f + 3f, 5f, color)
+        circle(x + TEXTOFFSET + sliderPercentage * (w - 15f), y + 28f + 3f, 5f, color)
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {

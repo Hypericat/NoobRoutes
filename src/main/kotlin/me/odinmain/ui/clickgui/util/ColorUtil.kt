@@ -1,17 +1,24 @@
 package me.odinmain.ui.clickgui.util
 
 import me.odinmain.features.impl.render.ClickGUIModule
+import me.odinmain.ui.clickgui.util.ColorUtil.brighter
 import me.odinmain.utils.render.Color
 
 object ColorUtil {
 
     inline val clickGUIColor: Color
         get() = ClickGUIModule.color
+    val buttonColorAlpha = 0.35f
+    val moduleButtonColorAlpha = 0.42f
+    val elementBackgroundAlpha = 0.43f
+    val titlePanelColorAlpha = 0.6f
 
-    val buttonColor = Color(38, 38, 38)
 
-    val moduleButtonColor = Color(26, 26, 26)
-    val elementBackground = Color(37, 38, 38, 0.7f)
+    val buttonColor = Color(38, 38, 38, buttonColorAlpha)
+    val moduleButtonColor = Color(26, 26, 26, moduleButtonColorAlpha)
+    val elementBackground = Color(0,0,0, elementBackgroundAlpha)
+    val titlePanelColor: Color = Color(12, 12, 12, titlePanelColorAlpha)
+
     val textColor = Color(239, 239, 239)
 
     /**
@@ -33,8 +40,16 @@ object ColorUtil {
         return Color(hue, saturation, (brightness * factor.coerceAtLeast(1f)).coerceAtMost(1f), alpha)
     }
 
+    fun Color.brighterIf(condition: Boolean, factor: Float = 1.3f): Color {
+        return if (condition) brighter(factor) else this
+    }
+
+
     fun Color.darker(factor: Float = 0.7f): Color {
         return Color(hue, saturation, brightness * factor, alpha)
+    }
+    fun Color.setBrightness(brightness: Float = 1f): Color {
+        return Color(hue, saturation, brightness, alpha)
     }
 
     fun Color.darkerIf(condition: Boolean, factor: Float = 0.7f): Color {
