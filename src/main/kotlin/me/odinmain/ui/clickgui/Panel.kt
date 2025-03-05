@@ -107,6 +107,7 @@ class Panel(
 
         val s = scissor(x, y + HEIGHT, WIDTH, 5000f)
         if (extended && moduleButtons.isNotEmpty()) {
+            roundedRectangle(x, y + HEIGHT - 2, WIDTH, 2, ColorUtil.clickGUIColor.brighter(1.65f))
             for (button in moduleButtons.filter { it.module.name.contains(currentSearch, true) }) {
                 button.y = startY
                 startY += button.draw()
