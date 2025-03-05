@@ -76,12 +76,16 @@ object AutoP3: Module (
 
     private fun executeRing(ring: Ring) {
         if (ring.look) mc.thePlayer.rotationYaw = ring.direction.yaw
-        if (ring.center && mc.thePlayer.onGround) mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord) //Wadey Wd does not like it if mess with y coord. this is safer then just setting pos to ring coord
+        if (ring.center && mc.thePlayer.onGround) mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord)
         AutoP3Utils.unPressKeys()
         when(ring.type) {
             RingTypes.WALK -> {
                 AutoP3Utils.startWalk(ring.direction.yaw)
                 modMessage("started Walking")
+            }
+            RingTypes.STOP -> {
+                mc.thePlayer.motionX = 0.0
+                mc.thePlayer.motionZ = 0.0
             }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
@@ -104,6 +108,14 @@ object AutoP3: Module (
             "walk" -> {
                 modMessage("added walk")
                 ringType = RingTypes.WALK
+            }
+            "hclip" -> {
+                modMessage("added hclip")
+                ringType = RingTypes.HCLIP
+            }
+            "stop" -> {
+                modMessage("added stop")
+                ringType = RingTypes.STOP
             }
             else -> return modMessage("thats not a ring type stoopid")
         }

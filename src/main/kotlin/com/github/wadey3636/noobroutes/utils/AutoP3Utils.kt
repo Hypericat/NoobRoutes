@@ -7,9 +7,9 @@ import me.odinmain.OdinMain.mc
 import me.odinmain.utils.render.RenderUtils.renderX
 import me.odinmain.utils.render.RenderUtils.renderY
 import me.odinmain.utils.render.RenderUtils.renderZ
-import me.odinmain.utils.skyblock.modMessage
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.util.Vec3
+import net.minecraftforge.fml.common.gameevent.InputEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 
@@ -22,9 +22,12 @@ object AutoP3Utils {
         mc.gameSettings.keyBindBack
     )
 
+    private var hasUnpressed = false
+
     fun unPressKeys() {
+        Keyboard.enableRepeatEvents(false)
         keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
-        modMessage("unpressing")
+        walking = false
     }
 
     private var walking = false
@@ -38,11 +41,11 @@ object AutoP3Utils {
     @SubscribeEvent
     fun walk(event: TickEvent.ClientTickEvent) {
         if (!walking) return
-        if (event.phase == TickEvent.Phase.END) return
-        if (keyBindings.any { it.isKeyDown }) {
+        if (event.phase != TickEvent.Phase.START) return
+        if(!mc.thePlayer.onGround) {
             walking = false
-            return
         }
+        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
         val speed = mc.thePlayer.capabilities.walkSpeed
         mc.thePlayer.motionX = speed * 2.806 * Utils.xPart(direction)
         mc.thePlayer.motionZ = speed * 2.806 * Utils.zPart(direction)
@@ -57,4 +60,23 @@ object AutoP3Utils {
         if(AutoP3.frame) return coords.yCoord <= mc.thePlayer.renderY && coords.yCoord + 1 > mc.thePlayer.renderY
         return coords.yCoord <= mc.thePlayer.posY && coords.yCoord + 1 > mc.thePlayer.posY
     }
+
+    @SubscribeEvent
+    fun onKeyInput(event: InputEvent.KeyInputEvent) {
+        if (!walking) return
+        val keyCode = Keyboard.getEventKey()
+        if (keyCode != Keyboard.KEY_W && keyCode != Keyboard.KEY_A && keyCode != Keyboard.KEY_S && keyCode != Keyboard.KEY_D ) return
+        val isPressed = Keyboard.getEventKeyState()
+        if (!isPressed) {
+            hasUnpressed = true
+        }
+        else if (hasUnpressed) {
+            walking = false
+            hasUnpressed = false
+        }
+    }
+
+
+
+
 }
