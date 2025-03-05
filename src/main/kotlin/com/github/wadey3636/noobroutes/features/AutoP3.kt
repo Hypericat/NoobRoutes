@@ -54,9 +54,9 @@ object AutoP3: Module (
     ).setPrettyPrinting().create()
 
     private val route by StringSetting("Route", "", description = "Route to use")
-    private val editMode by BooleanSetting("Edit Mode", true, description = "Disables ring actions")
+    private val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
     private val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
-    private val renderIndex by BooleanSetting("Render Index", true, description = "Disables ring actions")
+    private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
     val frame by BooleanSetting("Check per Frame", false, description = "check each frame if the player is in a ring. Routes are easier to setup with per frame but possibly less consistent on low fps. Per tick is harder to setup but 100% consistent. Everything done on frame can also be done on tick")
     private var rings = mutableMapOf<String, MutableList<Ring>>()
 
@@ -65,7 +65,7 @@ object AutoP3: Module (
         rings[route]?.forEachIndexed { i, ring ->
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
             Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
-            if (editMode) return
+            if (editMode) return@forEachIndexed
             if (AutoP3Utils.distanceToRing(ring.coords) < 0.5 && AutoP3Utils.ringCheckY(ring.coords) && ring.should) {
                 executeRing(ring)
                 ring.should = false
@@ -93,6 +93,7 @@ object AutoP3: Module (
         when(args[0]) {
             "add" -> addNormalRing(args)
             "delete" -> deleteNormalRing(args)
+            "remove" -> deleteNormalRing(args)
             "blink" -> modMessage("coming soon")
         }
     }
@@ -119,6 +120,23 @@ object AutoP3: Module (
 
     private fun deleteNormalRing(args: Array<out String>) {
         if (rings[route].isNullOrEmpty()) return
+        modMessage(args.size)
+        if (args.size >= 2) {
+            try {
+                if ((args.get(1).toInt()) <= (rings[route]?.size?.minus(1) ?: return modMessage("Error Deleting Ring"))) {
+                    rings[route]?.removeAt(args.get(1).toInt())
+                    modMessage("Removed Ring ${args.get(1).toInt()}")
+                    return
+                } else {
+                    modMessage("Invalid Index")
+                    return
+                }
+            } catch (e: NumberFormatException) {
+                modMessage("Invalid Index")
+                return
+            }
+        }
+
         val playerEyeVec = mc.thePlayer.positionVector.add(Vec3(0.0, mc.thePlayer.eyeHeight.toDouble(),0.0))
         val deleteList = rings[route]?.sortedBy{it.coords.distanceTo(playerEyeVec)}
         if (deleteList?.get(0)?.coords?.distanceTo(playerEyeVec)!! > 3) return

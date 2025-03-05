@@ -36,6 +36,10 @@ object BlinkKeybind: Module(
     }
 
     override fun onEnable() {
+        if (mc.currentScreen is ClickGUI) {
+            onDisable()
+            return modMessage("Enable using the Keybind")
+        }
         cancelledPackets.clear()
         ticks = 0
         super.onEnable()

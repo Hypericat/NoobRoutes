@@ -11,6 +11,7 @@ import me.odinmain.ui.clickgui.elements.ModuleButton
 import me.odinmain.ui.clickgui.util.ColorUtil
 import me.odinmain.ui.clickgui.util.ColorUtil.brighter
 import me.odinmain.ui.clickgui.util.ColorUtil.darker
+import me.odinmain.ui.clickgui.util.ColorUtil.darkerIf
 import me.odinmain.ui.clickgui.util.ColorUtil.titlePanelColor
 import me.odinmain.ui.clickgui.util.ColorUtil.withAlpha
 import me.odinmain.ui.util.MouseUtils.isAreaHovered
@@ -36,11 +37,8 @@ import kotlin.math.floor
 class Panel(
     var category: Category,
 ) {
-
-
-
     private val renderIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/render.png"))
-    private val floor7Icon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/movement.png"))
+    private val floor7Icon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/wither.png"))
 
     val displayName = category.name.lowercase().capitalizeFirst()
 
@@ -89,6 +87,7 @@ class Panel(
                 drawDynamicTexture(renderIcon, x + WIDTH * 0.08 - imageSize / 2 + additionalOffset, y + HEIGHT / 2 - imageSize / 2 - 2, imageSize, imageSize)
             }
             Category.FLOOR7 -> {
+                additionalOffset = 4.0
                 drawDynamicTexture(floor7Icon, x + WIDTH * 0.08  - imageSize / 2 + additionalOffset, y + HEIGHT / 2  - imageSize / 2, imageSize, imageSize)
             }
             else -> {
@@ -102,7 +101,7 @@ class Panel(
 
 
         //draw minus sign
-        roundedRectangle(x + WIDTH * 0.85 + 5, y + HEIGHT * 0.4 , 20, 5, Color.WHITE, radius = 1.5f)
+        roundedRectangle(x + WIDTH * 0.85 + 5, y + HEIGHT * 0.4 , 20, 5, Color.WHITE.darkerIf(isHoveredOverExtendToggle, 0.7f), radius = 1.5f)
 
 
 
@@ -181,7 +180,7 @@ class Panel(
         get() = isAreaHovered(x, y, WIDTH, HEIGHT)
 
     private val isHoveredOverExtendToggle
-        get() = isAreaHovered(x + WIDTH * 0.85f - 10, y, 50f, HEIGHT - 2f)
+        get() = isAreaHovered(x + WIDTH * 0.85f - 5f, y, WIDTH * 0.15f + 5f, HEIGHT - 2f)
 
 
     private val isMouseOverExtended

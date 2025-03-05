@@ -65,7 +65,6 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         rectangleOutline(x + w - 40f, y + 5f, 31f, 19f, color.darker().withAlpha(1f), 5f, 1.5f)
 
         if (!extended && !anim.isAnimating()) return
-
         val scissor = scissor(x, y, w, h + 1)
 
         // SATURATION AND BRIGHTNESS
