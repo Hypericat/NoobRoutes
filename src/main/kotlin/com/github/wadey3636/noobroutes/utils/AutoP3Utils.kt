@@ -5,7 +5,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import me.odinmain.OdinMain.mc
 import me.odinmain.events.impl.PacketEvent
-import me.odinmain.utils.multiply
 import me.odinmain.utils.render.RenderUtils.renderX
 import me.odinmain.utils.render.RenderUtils.renderY
 import me.odinmain.utils.render.RenderUtils.renderZ
@@ -27,7 +26,7 @@ object AutoP3Utils {
     )
 
     private var hasUnpressed = false
-
+    var walkAfter = false
     var awaitingTick = false
 
     fun unPressKeys() {
@@ -41,7 +40,9 @@ object AutoP3Utils {
     var direction = 0F
 
     fun startWalk(dir: Float) {
-        walking = true
+        if(mc.thePlayer.onGround) walking = true
+        else if (!mc.thePlayer.onGround) motioning  = true
+        hasUnpressed = false
         direction  = dir
     }
 
@@ -52,6 +53,10 @@ object AutoP3Utils {
         val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
         mc.thePlayer.motionX = speed * Utils.xPart(direction)
         mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+        if (!walkAfter) return
+        if(mc.thePlayer.onGround) walking = true
+        else if (!mc.thePlayer.onGround) motioning  = true
+        walkAfter = false
     }
 
     @SubscribeEvent

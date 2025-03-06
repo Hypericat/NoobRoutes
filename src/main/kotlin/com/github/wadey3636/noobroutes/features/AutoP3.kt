@@ -54,7 +54,7 @@ object AutoP3: Module (
     ).setPrettyPrinting().create()
 
     private val route by StringSetting("Route", "", description = "Route to use")
-    private val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
+    val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
     private val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
     private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
     val frame by BooleanSetting("Check per Frame", false, description = "check each frame if the player is in a ring. Routes are easier to setup with per frame but possibly less consistent on low fps. Per tick is harder to setup but 100% consistent. Everything done on frame can also be done on tick")
@@ -77,6 +77,7 @@ object AutoP3: Module (
     private fun executeRing(ring: Ring) {
         if (ring.look) mc.thePlayer.rotationYaw = ring.direction.yaw
         if (ring.center && mc.thePlayer.onGround) mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord)
+        if (ring.walk) AutoP3Utils.walkAfter = true
         AutoP3Utils.unPressKeys()
         when(ring.type) {
             RingTypes.WALK -> {
@@ -105,7 +106,8 @@ object AutoP3: Module (
             "add" -> addNormalRing(args)
             "delete" -> deleteNormalRing(args)
             "remove" -> deleteNormalRing(args)
-            "blink" -> modMessage("coming soon")
+            "blink" -> Blink.blinkCommand(args)
+            else -> modMessage("not an option")
         }
     }
 
@@ -128,7 +130,7 @@ object AutoP3: Module (
         }
         val look = args.any { it == "look" }
         val center = args.any {it == "center"}
-        val walk = args.any {it == "walk"}
+        val walk = args.any {it == "walk"} && ringType != RingTypes.WALK
         actuallyAddRing(Ring(ringType, look = look, center = center, walk = walk))
         saveRings()
     }
@@ -178,7 +180,6 @@ object AutoP3: Module (
             modMessage("error saving")
             logger.error("error saving rings", e)
         }
-
     }
 
     fun loadRings(){
