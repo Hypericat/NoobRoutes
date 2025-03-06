@@ -24,7 +24,8 @@ open class Element<S : Setting<*>>(val parent: ModuleButton, val setting: S, typ
         inline get() = parent.width
 
     var h: Float = when (type) {
-        ElementType.SLIDER -> 40f
+        ElementType.SLIDER -> 55f
+
         else -> DEFAULT_HEIGHT
     }
 
