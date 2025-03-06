@@ -26,8 +26,6 @@ class ElementDropdown(parent: ModuleButton, setting: DropdownSetting) : Element<
 ) {
     private val linearAnimation = LinearAnimation<Float>(200)
 
-    private val hover = HoverHandler(0, 150)
-
     override val isHovered: Boolean get() =
         isAreaHovered(x, y, w, h)
 
@@ -35,14 +33,12 @@ class ElementDropdown(parent: ModuleButton, setting: DropdownSetting) : Element<
         roundedRectangle(x, y, w, h, elementBackground)
         text(name, x + TEXTOFFSET, y + h / 2f, textColor, 12f, OdinFont.REGULAR)
 
-        val rotation = linearAnimation.get(180f, 90f, !setting.value)
-        rotate(rotation, x + w - 20f, y + 15f, 0f, 0f, 0f, 1f)
-        drawDynamicTexture(arrow, x + w - 35f, y, 30f, 30f)
-        rotate(-rotation, x + w - 20f, y + 15f, 0f, 0f, 0f, 1f)
+        val rotation = linearAnimation.get(90f, 0f  , !setting.value)
+        drawArrow(x + w - 12f, y + 16, rotation, scale = 0.8f)
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {
-        if (mouseButton == 0 && isHovered) {
+        if (isHovered) {
             if (linearAnimation.start()) {
                 setting.enabled = !setting.enabled
                 parent.updateElements()
@@ -52,7 +48,4 @@ class ElementDropdown(parent: ModuleButton, setting: DropdownSetting) : Element<
         return false
     }
 
-    companion object {
-        val arrow = DynamicTexture(RenderUtils.loadBufferedImage("/assets/odinmain/clickgui/arrow.png"))
-    }
 }

@@ -98,16 +98,17 @@ class Panel(
 
         text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT / 2f, ColorUtil.textColor, 15f, type = OdinFont.BOLD, TextAlign.Middle)
 
-
-
+        //draw Panel Line
+        if (extended && moduleButtons.isNotEmpty()) roundedRectangle(x, y + HEIGHT - 2, WIDTH, 2, ColorUtil.clickGUIColor.brighter(1.65f))
         //draw minus sign
         roundedRectangle(x + WIDTH * 0.85 + 5, y + HEIGHT * 0.4 , 20, 5, Color.WHITE.darkerIf(isHoveredOverExtendToggle, 0.7f), radius = 1.5f)
 
 
 
+
         val s = scissor(x, y + HEIGHT, WIDTH, 5000f)
         if (extended && moduleButtons.isNotEmpty()) {
-            roundedRectangle(x, y + HEIGHT - 2, WIDTH, 2, ColorUtil.clickGUIColor.brighter(1.65f))
+
             for (button in moduleButtons.filter { it.module.name.contains(currentSearch, true) }) {
                 button.y = startY
                 startY += button.draw()
@@ -115,7 +116,39 @@ class Panel(
             length = startY + 5f
         }
         //draw bottom
-        roundedRectangle(x, y + startY, WIDTH, 10f, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, ColorUtil.moduleButtonColor, 0f, 0f, 0f, 10f, 10f, 0f)
+        if (extended) {
+            roundedRectangle(
+                x,
+                y + startY,
+                WIDTH,
+                10f,
+                ColorUtil.moduleButtonColor,
+                ColorUtil.moduleButtonColor,
+                ColorUtil.moduleButtonColor,
+                0f,
+                0f,
+                0f,
+                10f,
+                10f,
+                0f
+            )
+        } else {
+            roundedRectangle(
+                x,
+                y + startY,
+                WIDTH,
+                10f,
+                titlePanelColor,
+                titlePanelColor,
+                titlePanelColor,
+                0f,
+                0f,
+                0f,
+                10f,
+                10f,
+                0f
+            )
+        }
         resetScissor(s)
         scale(scaleFactor, scaleFactor, 1f)
     }

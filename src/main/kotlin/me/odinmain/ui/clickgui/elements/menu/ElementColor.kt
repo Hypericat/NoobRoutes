@@ -56,19 +56,18 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
     override fun draw() {
         h = floor(anim.get(36f, if (setting.allowAlpha) 285f else 255f, !extended))
 
-        hover.handle(x + w - 41, y + 5, 31.5f, 19f)
+        hover.handle(x + w - 41, y, 31.5f, 19f)
 
         roundedRectangle(x, y, w, h, elementBackground)
         text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, OdinFont.REGULAR)
-        dropShadow(x + w - 40f, y + 5f, 31f, 19f, 10f, 0.75f)
-        roundedRectangle(x + w - 40f, y + 5f, 31f, 19f, color.brighter(1 + hover.percent() / 500f), 5f)
-        rectangleOutline(x + w - 40f, y + 5f, 31f, 19f, color.darker().withAlpha(1f), 5f, 1.5f)
+        roundedRectangle(x + w - 40f, y + 9, 31f, 19f, color.brighter(1 + hover.percent() / 500f), 5f)
+        rectangleOutline(x + w - 40f, y + 9, 31f, 19f, color.darker().withAlpha(1f), 5f, 1.5f)
 
         if (!extended && !anim.isAnimating()) return
-        val scissor = scissor(x, y, w, h + 1)
+        val scissor = scissor(x + 2, y, w - 4, h + 1)
 
         // SATURATION AND BRIGHTNESS
-        dropShadow(x + 10f, y + 38f, w - 20f, 170f, 10f, 0.5f)
+
         drawHSBBox(x + 10f, y + 38f, w - 20f, 170f, color.hsbMax())
 
         val sbPointer = Pair((x + 10f + setting.saturation * 220), (y + 38f + (1 - setting.brightness) * 170))
@@ -190,5 +189,5 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
     }
 
     override val isHovered: Boolean
-        get() = isAreaHovered(x + w - 41, y + 5, 31.5f, 19f)
+        get() = isAreaHovered(x + w - 41, y + 9, 31.5f, 19f)
 }

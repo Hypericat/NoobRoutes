@@ -6,6 +6,7 @@ import me.odinmain.ui.clickgui.animations.impl.EaseInOut
 import me.odinmain.ui.clickgui.elements.*
 import me.odinmain.ui.clickgui.util.ColorUtil.buttonColor
 import me.odinmain.ui.clickgui.util.ColorUtil.clickGUIColor
+import me.odinmain.ui.clickgui.util.ColorUtil.darker
 import me.odinmain.ui.clickgui.util.ColorUtil.darkerIf
 import me.odinmain.ui.clickgui.util.ColorUtil.elementBackground
 import me.odinmain.ui.util.MouseUtils
@@ -37,7 +38,7 @@ class ElementDual(parent: ModuleButton, setting: DualSetting) : Element<DualSett
         roundedRectangle(x + 7f, y + 3f, w - 14f, 28f, buttonColor, 5f)
 
         val pos = posAnim.get(8f, w / 2, !setting.enabled)
-        roundedRectangle(x + pos, y + 3f, w / 2 - 6f, 28f, clickGUIColor, 5f)
+        roundedRectangle(x + pos, y + 3f, w / 2 - 6f, 28f, clickGUIColor.darker(0.8f), 5f)
 
         text(setting.left, x + w / 4 + 6f, y + 1f + h / 2, Color.WHITE.darkerIf(isLeftHovered), 12f, OdinFont.REGULAR, TextAlign.Middle)
         text(setting.right, x + w * 3 / 4 - 3f,y + 1f + h / 2, Color.WHITE.darkerIf(isRightHovered), 12f, OdinFont.REGULAR, TextAlign.Middle)
