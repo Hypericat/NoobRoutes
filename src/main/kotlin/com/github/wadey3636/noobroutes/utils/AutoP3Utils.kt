@@ -37,6 +37,7 @@ object AutoP3Utils {
     }
 
     private var walking = false
+    private var motioning = false
     var direction = 0F
 
     fun startWalk(dir: Float) {
@@ -59,11 +60,27 @@ object AutoP3Utils {
         if (event.phase != TickEvent.Phase.START) return
         if(!mc.thePlayer.onGround) {
             walking = false
+            motioning = true
         }
         keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
         val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
         mc.thePlayer.motionX = speed * Utils.xPart(direction)
         mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+    }
+
+    @SubscribeEvent
+    fun motion(event: TickEvent.ClientTickEvent) {
+        if (!motioning) return
+        if (event.phase != TickEvent.Phase.START) return
+        modMessage("motioning")
+        if(mc.thePlayer.onGround) {
+            motioning = false
+            walking = true
+        }
+        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
+        val addedSpeed = mc.thePlayer.capabilities.walkSpeed * 0.0509
+        mc.thePlayer.motionX += addedSpeed * Utils.xPart(direction)
+        mc.thePlayer.motionZ += addedSpeed * Utils.zPart(direction)
     }
 
     fun distanceToRing(coords: Vec3): Double {
@@ -78,7 +95,7 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun onKeyInput(event: InputEvent.KeyInputEvent) {
-        if (!walking) return
+        if (!walking && !motioning) return
         val keyCode = Keyboard.getEventKey()
         if (keyCode != Keyboard.KEY_W && keyCode != Keyboard.KEY_A && keyCode != Keyboard.KEY_S && keyCode != Keyboard.KEY_D ) return
         val isPressed = Keyboard.getEventKeyState()
@@ -87,6 +104,7 @@ object AutoP3Utils {
         }
         else if (hasUnpressed) {
             walking = false
+            motioning = false
             hasUnpressed = false
         }
     }
