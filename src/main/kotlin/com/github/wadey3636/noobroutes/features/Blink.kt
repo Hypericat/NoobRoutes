@@ -2,6 +2,7 @@ package com.github.wadey3636.noobroutes.features
 
 
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
+import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.odinmain.events.impl.PacketEvent
 import me.odinmain.features.Category
 import me.odinmain.features.Module
@@ -31,6 +32,8 @@ object Blink: Module (
     private val blinkStarts = mutableListOf<BlinkWaypoints>()
 
     private var cancelled = 0
+
+    private var lastBlink = System.currentTimeMillis()
 
     private var recording = false
     private var recordingLength = 0
@@ -84,16 +87,38 @@ object Blink: Module (
     }
 
     private fun startRecording(waypoint: BlinkWaypoints) {
+        modMessage("started recording")
+        recording = true
+        recordedPackets.clear()
+        recordingLength = waypoint.length
+    }
 
+    fun doBlink(ring: Ring) {
+        if (cancelled < ring.blinkPackets.size || System.currentTimeMillis() - lastBlink < 500) {
+            mc.thePlayer.motionX = 0.0
+            mc.thePlayer.motionZ = 0.0
+            return
+        }
+        modMessage("blinking")
+        lastBlink = System.currentTimeMillis()
+        cancelled += ring.blinkPackets.size
+        ring.blinkPackets.forEach { PacketUtils.sendPacket(it) }
+        val lastPacket = ring.blinkPackets.size - 1
+        mc.thePlayer.setPosition(ring.blinkPackets[lastPacket].positionX, ring.blinkPackets[lastPacket].positionY, ring.blinkPackets[lastPacket].positionZ)
+        mc.thePlayer.setVelocity(0.0, ring.endY, 0.0)
     }
 
     @SubscribeEvent
     fun recorder(event: PacketEvent) {
         if (!recording || (event.packet !is C04PacketPlayerPosition && event.packet !is C06PacketPlayerPosLook)) return
+        modMessage("recording ${recordedPackets.size}")
         if (event.packet is C04PacketPlayerPosition) recordedPackets.add(event.packet)
         else if (event.packet is C06PacketPlayerPosLook) recordedPackets.add(C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)) //i need the else if because otherwise kotlin doesnt know know its a c06
         if (recordedPackets.size >= recordingLength) {
+            modMessage("finished recording")
             recording = false
+            AutoP3.actuallyAddRing(Ring(RingTypes.BLINK, Vec3(recordedPackets[0].positionX, recordedPackets[0].positionY, recordedPackets[0].positionZ),  blinkPackets = recordedPackets, endY = mc.thePlayer.motionY))
+            AutoP3.saveRings()
         }
     }
 

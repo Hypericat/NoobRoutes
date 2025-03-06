@@ -19,6 +19,7 @@ import me.odinmain.features.settings.impl.StringSetting
 import me.odinmain.utils.LookVec
 import me.odinmain.utils.render.Color
 import me.odinmain.utils.render.Renderer
+import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -27,7 +28,8 @@ enum class RingTypes {
     MOTION,
     HCLIP,
     STOP,
-    LOOK
+    LOOK,
+    BLINK
 }
 
 
@@ -39,7 +41,9 @@ data class Ring (
     val walk: Boolean = false,
     val look: Boolean = false,
     val center: Boolean = false,
-    var should: Boolean = false
+    var should: Boolean = false,
+    val blinkPackets: List<C04PacketPlayerPosition> = emptyList(),
+    val endY: Double = 0.0
 )
 
 object AutoP3: Module (
@@ -68,7 +72,7 @@ object AutoP3: Module (
             if (editMode) return@forEachIndexed
             if (AutoP3Utils.distanceToRing(ring.coords) < 0.5 && AutoP3Utils.ringCheckY(ring.coords) && ring.should) {
                 executeRing(ring)
-                ring.should = false
+                if (ring.type != RingTypes.BLINK) ring.should = false
             }
             else if(AutoP3Utils.distanceToRing(ring.coords) > 0.5 || !AutoP3Utils.ringCheckY(ring.coords)) ring.should = true
         }
@@ -94,6 +98,9 @@ object AutoP3: Module (
                 if(mc.thePlayer.onGround) mc.thePlayer.jump()
                 AutoP3Utils.awaitingTick = true
                 AutoP3Utils.direction = ring.direction.yaw
+            }
+            RingTypes.BLINK -> {
+                Blink.doBlink(ring)
             }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
@@ -135,7 +142,7 @@ object AutoP3: Module (
         saveRings()
     }
 
-    private fun actuallyAddRing(ring: Ring) {
+    fun actuallyAddRing(ring: Ring) {
         rings[route]?.add(ring) ?: run { rings[route] = mutableListOf(ring) }
     }
 
@@ -165,7 +172,7 @@ object AutoP3: Module (
         saveRings()
     }
 
-    private fun saveRings(){
+    fun saveRings(){
         try {
             val jsonArray = JsonArray().apply {
                 rings.forEach { (routeName, ringList) ->
