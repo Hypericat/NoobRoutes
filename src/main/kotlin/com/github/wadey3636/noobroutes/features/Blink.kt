@@ -3,9 +3,13 @@ package com.github.wadey3636.noobroutes.features
 
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
+import me.odinmain.events.impl.MotionUpdateEvent
 import me.odinmain.events.impl.PacketEvent
 import me.odinmain.features.Category
 import me.odinmain.features.Module
+import me.odinmain.features.settings.impl.BooleanSetting
+import me.odinmain.features.settings.impl.DualSetting
+import me.odinmain.features.settings.impl.NumberSetting
 import me.odinmain.utils.render.Color
 import me.odinmain.utils.render.Renderer
 import me.odinmain.utils.render.TextAlign
@@ -16,9 +20,11 @@ import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.sin
@@ -29,10 +35,17 @@ object Blink: Module (
     category = Category.RENDER,
     description = "Blink"
     ) {
+    private val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink")
+    private val maxBlinks by NumberSetting(name = "max blinks per instance", description = "too much blink on an instance bans apperantly", min = 100f, max = 300f, default = 120f)
+    val showEnd by BooleanSetting("Render End", default = true, description = "renders waypoint where blink ends")
+    val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes")
+
     data class BlinkWaypoints (val coords: Vec3 = mc.thePlayer.positionVector, val length: Int, var active: Boolean = false)
     private val blinkStarts = mutableListOf<BlinkWaypoints>()
 
     private var cancelled = 0
+
+    private var blinksInstance = 0
 
     private var lastBlink = System.currentTimeMillis()
 
@@ -74,11 +87,27 @@ object Blink: Module (
         cancelled++
     }
 
+    @SubscribeEvent
+    fun worldLoad(event: WorldEvent.Load) {
+        blinksInstance = 0
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent) {
         val resolution = ScaledResolution(mc)
         text(cancelled.toString(), resolution.scaledWidth / 2, resolution.scaledHeight / 2.3, Color.WHITE, 13, align = TextAlign.Middle)
+    }
+
+    @SubscribeEvent
+    fun renderMovement(event:RenderWorldLastEvent) {
+        if (movementPackets.isEmpty()) return
+        val vec3List: List<Vec3> = movementPackets.map { packet -> Vec3(packet.positionX, packet.positionY, packet.positionZ) }
+        Renderer.draw3DLine(vec3List, Color.WHITE, lineWidth = 1.5F)
+        val firstPacket = movementPackets.first()
+        val xPos = firstPacket.positionX
+        val yPos = firstPacket.positionY
+        val zPos = firstPacket.positionZ
+        Renderer.drawBox(AxisAlignedBB(xPos+0.3, yPos, zPos+0.3, xPos-0.3, yPos+1.8, zPos-0.3), Color.GREEN, fillAlpha = 0, outlineWidth = 1.5F)
     }
 
     @SubscribeEvent
@@ -103,16 +132,21 @@ object Blink: Module (
 
     @SubscribeEvent
     fun movement(event: PacketEvent.Send) {
+        if (movementPackets.isEmpty() || event.packet !is C03PacketPlayer) return
         if (skip) {
             skip = false
             return
         }
-        if (movementPackets.isEmpty() || event.packet !is C03PacketPlayer) return
-        mc.thePlayer.moveEntity(movementPackets[0].positionX - mc.thePlayer.posX, movementPackets[0].positionY - mc.thePlayer.posY, movementPackets[0].positionZ - mc.thePlayer.posZ)
+        if (event.isCanceled) return
         skip = true
+        event.isCanceled = true
         PacketUtils.sendPacket(movementPackets[0])
+        if (movementPackets.size == 1) {
+            mc.thePlayer.motionY = endY
+            mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)
+            lastBlink = System.currentTimeMillis()
+        }
         movementPackets.removeFirst()
-        if (movementPackets.isEmpty()) mc.thePlayer.motionY = endY
     }
 
     @SubscribeEvent
@@ -122,19 +156,22 @@ object Blink: Module (
     }
 
     fun doBlink(ring: Ring) {
-        if (System.currentTimeMillis() - lastBlink >= 500) {
+        if (movementPackets.isNotEmpty()) return
+
+        if (System.currentTimeMillis() - lastBlink >= 500 && (blinksInstance + ring.blinkPackets.size > maxBlinks || !blink)) {
             movementPackets = ring.blinkPackets.toMutableList()
             endY = ring.endY
             lastBlink = System.currentTimeMillis()
             return
         }
 
-        if (cancelled < ring.blinkPackets.size || System.currentTimeMillis() - lastBlink < 500) {
+        if (cancelled < ring.blinkPackets.size || blinksInstance + ring.blinkPackets.size > maxBlinks || System.currentTimeMillis() - lastBlink < 500) {
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
             return
         }
         modMessage("blinking")
+        blinksInstance += ring.blinkPackets.size
         lastBlink = System.currentTimeMillis()
         cancelled += ring.blinkPackets.size
         ring.blinkPackets.forEach { PacketUtils.sendPacket(it) }
