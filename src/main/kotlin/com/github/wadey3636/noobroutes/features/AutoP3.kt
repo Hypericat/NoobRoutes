@@ -70,11 +70,11 @@ object AutoP3: Module (
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
             Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
             if (editMode) return@forEachIndexed
-            if (AutoP3Utils.distanceToRing(ring.coords) < 0.5 && AutoP3Utils.ringCheckY(ring.coords) && ring.should) {
+            if (AutoP3Utils.distanceToRing(ring.coords) < 0.5 && AutoP3Utils.ringCheckY(ring) && ring.should) {
                 executeRing(ring)
                 if (ring.type != RingTypes.BLINK) ring.should = false
             }
-            else if(AutoP3Utils.distanceToRing(ring.coords) > 0.5 || !AutoP3Utils.ringCheckY(ring.coords)) ring.should = true
+            else if(AutoP3Utils.distanceToRing(ring.coords) > 0.5 || !AutoP3Utils.ringCheckY(ring)) ring.should = true
         }
     }
 
@@ -108,8 +108,7 @@ object AutoP3: Module (
 
     fun addRing(args: Array<out String>?) {
         if (route.isEmpty()) return modMessage("error complain to wadey(dc is wadey3636)")
-        if (args.isNullOrEmpty()) return modMessage("need args stoopid")
-        when(args[0]) {
+        when(args?.get(0)) {
             "add" -> addNormalRing(args)
             "delete" -> deleteNormalRing(args)
             "remove" -> deleteNormalRing(args)

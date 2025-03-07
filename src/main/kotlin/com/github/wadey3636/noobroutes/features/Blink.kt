@@ -15,10 +15,12 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.sin
 
@@ -35,6 +37,10 @@ object Blink: Module (
 
     private var lastBlink = System.currentTimeMillis()
 
+    private var movementPackets = mutableListOf<C04PacketPlayerPosition>()
+    private var endY = 0.0
+    private var skip = false
+
     private var recording = false
     private var recordingLength = 0
     private val recordedPackets = mutableListOf<C04PacketPlayerPosition>()
@@ -46,10 +52,13 @@ object Blink: Module (
                 try {
                     val length = args[2].toInt()
                     blinkStarts.add(BlinkWaypoints(length = length))
-                    modMessage(blinkStarts.size)
                 } catch (e: Exception) {
                     modMessage("need length arg")
                 }
+            }
+            "clear" -> {
+                blinkStarts.clear()
+                modMessage("cleared waypoints. If u want to delete blinks just use /noob delete")
             }
             else -> modMessage("not an option")
         }
@@ -78,11 +87,11 @@ object Blink: Module (
         blinkStarts.forEach {
             Renderer.drawCylinder(it.coords.add(Vec3(0.0, 0.5 * sin(System.currentTimeMillis().toDouble()/300) + 0.5 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.WHITE, depth = true)
             if (AutoP3.editMode) return
-            if (AutoP3Utils.distanceToRing(it.coords) < 0.5 && AutoP3Utils.ringCheckY(it.coords) && it.active) {
+            if (AutoP3Utils.distanceToRing(it.coords) < 0.5 && mc.thePlayer.posY == it.coords.yCoord && it.active) {
                 startRecording(it)
                 it.active = false
             }
-            else if(AutoP3Utils.distanceToRing(it.coords) > 0.5 || !AutoP3Utils.ringCheckY(it.coords)) it.active = true
+            else if(AutoP3Utils.distanceToRing(it.coords) > 0.5 || mc.thePlayer.posY != it.coords.yCoord) it.active = true
         }
     }
 
@@ -93,7 +102,34 @@ object Blink: Module (
         recordingLength = waypoint.length
     }
 
+    @SubscribeEvent
+    fun movement(event: PacketEvent.Send) {
+        if (skip) {
+            skip = false
+            return
+        }
+        if (movementPackets.isEmpty() || event.packet !is C03PacketPlayer) return
+        mc.thePlayer.moveEntity(movementPackets[0].positionX - mc.thePlayer.posX, movementPackets[0].positionY - mc.thePlayer.posY, movementPackets[0].positionZ - mc.thePlayer.posZ)
+        skip = true
+        PacketUtils.sendPacket(movementPackets[0])
+        movementPackets.removeFirst()
+        if (movementPackets.isEmpty()) mc.thePlayer.motionY = endY
+    }
+
+    @SubscribeEvent
+    fun onS08(event: PacketEvent.Receive) {
+        if (movementPackets.isEmpty() || event.packet !is S08PacketPlayerPosLook) return
+        movementPackets.clear()
+    }
+
     fun doBlink(ring: Ring) {
+        if (System.currentTimeMillis() - lastBlink >= 500) {
+            movementPackets = ring.blinkPackets.toMutableList()
+            endY = ring.endY
+            lastBlink = System.currentTimeMillis()
+            return
+        }
+
         if (cancelled < ring.blinkPackets.size || System.currentTimeMillis() - lastBlink < 500) {
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
@@ -121,5 +157,4 @@ object Blink: Module (
             AutoP3.saveRings()
         }
     }
-
 }

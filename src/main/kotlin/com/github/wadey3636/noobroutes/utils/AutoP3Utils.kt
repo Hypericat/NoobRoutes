@@ -1,6 +1,8 @@
 package com.github.wadey3636.noobroutes.utils
 
 import com.github.wadey3636.noobroutes.features.AutoP3
+import com.github.wadey3636.noobroutes.features.Ring
+import com.github.wadey3636.noobroutes.features.RingTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import me.odinmain.OdinMain.mc
@@ -93,9 +95,9 @@ object AutoP3Utils {
         return (coords.xCoord-mc.thePlayer.posX).pow(2)+(coords.zCoord-mc.thePlayer.posZ).pow(2).pow(0.5)
     }
 
-    fun ringCheckY(coords: Vec3): Boolean {
-        if(AutoP3.frame) return coords.yCoord <= mc.thePlayer.renderY && coords.yCoord + 1 > mc.thePlayer.renderY
-        return coords.yCoord <= mc.thePlayer.posY && coords.yCoord + 1 > mc.thePlayer.posY
+    fun ringCheckY(ring: Ring): Boolean {
+        if(AutoP3.frame) return (ring.coords.yCoord <= mc.thePlayer.renderY && ring.coords.yCoord + 1 > mc.thePlayer.renderY && ring.type != RingTypes.BLINK) || (ring.coords.yCoord == mc.thePlayer.renderY)
+        return (ring.coords.yCoord <= mc.thePlayer.posY && ring.coords.yCoord + 1 > mc.thePlayer.posY && ring.type != RingTypes.BLINK) || (ring.coords.yCoord == mc.thePlayer.posY)
     }
 
     @SubscribeEvent
