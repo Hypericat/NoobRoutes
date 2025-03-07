@@ -108,8 +108,7 @@ object AutoP3: Module (
 
     fun addRing(args: Array<out String>?) {
         if (route.isEmpty()) return modMessage("error complain to wadey(dc is wadey3636)")
-        if (args.isNullOrEmpty()) return modMessage("need args stoopid")
-        when(args[0]) {
+        when(args?.get(0)) {
             "add" -> addNormalRing(args)
             "delete" -> deleteNormalRing(args)
             "remove" -> deleteNormalRing(args)

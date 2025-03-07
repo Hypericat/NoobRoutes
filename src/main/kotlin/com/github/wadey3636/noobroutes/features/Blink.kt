@@ -46,10 +46,13 @@ object Blink: Module (
                 try {
                     val length = args[2].toInt()
                     blinkStarts.add(BlinkWaypoints(length = length))
-                    modMessage(blinkStarts.size)
                 } catch (e: Exception) {
                     modMessage("need length arg")
                 }
+            }
+            "clear" -> {
+                blinkStarts.clear()
+                modMessage("cleared waypoints. If u want to delete blinks just use /noob delete")
             }
             else -> modMessage("not an option")
         }
