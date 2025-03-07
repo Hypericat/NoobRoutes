@@ -24,7 +24,10 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import java.io.File
 
 
-@Mod(modid = "noobroutes", useMetadata = true)
+
+const val MODID = "noobroutes"
+
+@Mod(modid = MODID, useMetadata = true)
 class NoobRoutes {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
