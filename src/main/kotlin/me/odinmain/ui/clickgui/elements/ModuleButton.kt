@@ -177,8 +177,20 @@ class ModuleButton(val module: Module, val panel: Panel) {
                 }
             }
         }
+
         return false
     }
+
+    fun mouseClickedAnywhere(mouseButton: Int): Boolean {
+        for (i in menuElements.size - 1 downTo 0) {
+            if (menuElements[i].mouseClickedAnywhere(mouseButton)) {
+                updateElements()
+                return true
+            }
+        }
+        return false
+    }
+
 
     fun mouseReleased(state: Int) {
         if (extended) {

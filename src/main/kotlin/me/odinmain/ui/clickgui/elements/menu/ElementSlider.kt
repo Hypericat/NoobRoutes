@@ -5,11 +5,13 @@ import me.odinmain.features.settings.impl.NumberSetting
 import me.odinmain.font.OdinFont
 import me.odinmain.ui.clickgui.ClickGUI.TEXTOFFSET
 import me.odinmain.ui.clickgui.animations.impl.ColorAnimation
+import me.odinmain.ui.clickgui.animations.impl.LinearAnimation
 import me.odinmain.ui.clickgui.elements.Element
 import me.odinmain.ui.clickgui.elements.ElementType
 import me.odinmain.ui.clickgui.elements.ModuleButton
 import me.odinmain.ui.clickgui.elements.menu.ElementTextField.Companion.keyBlackList
 import me.odinmain.ui.clickgui.util.ColorUtil.brighter
+import me.odinmain.ui.clickgui.util.ColorUtil.buttonColor
 import me.odinmain.ui.clickgui.util.ColorUtil.clickGUIColor
 import me.odinmain.ui.clickgui.util.ColorUtil.darkerIf
 import me.odinmain.ui.clickgui.util.ColorUtil.elementBackground
@@ -64,8 +66,10 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
 
     override fun draw() {
         handler.handle(x, y + 21.5f, w - 15f, 33.5f)
-        val percentage = ((setting.valueDouble - setting.min) / (setting.max - setting.min)).toFloat()
-        rectangleOutline(x + w - TEXTOFFSET - 30, y  + 5f, 32f, 21.5f, colorAnim.get(textColor.darkerIf(isHoveredBox, 0.8f), clickGUIColor.darkerIf(isHoveredBox, 0.8f), !listeningText), 4f, 3f)
+
+
+        roundedRectangle(x + w - TEXTOFFSET - 30, y  + 5f, 32f, 21.5f, buttonColor, 4f, edgeSoftness = 1f)
+        rectangleOutline(x + w - TEXTOFFSET - 30, y  + 5f, 32f, 21.5f, colorAnim.get(buttonColor.darkerIf(isHoveredBox, 0.8f), clickGUIColor.darkerIf(isHoveredBox, 0.8f), !listeningText), 4f, 3f)
 
         if (listening) {
             sliderPercentage = ((mouseX - (x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f)
@@ -81,23 +85,31 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
         text(getDisplay(), x + w - TEXTOFFSET, y + h / 2f - 10f, textColor.darkerIf(isHoveredBox), 12f, OdinFont.REGULAR, TextAlign.Right)
 
         //draw slider
-        roundedRectangle(x + TEXTOFFSET, y + 37f, w - 17f, 7f, sliderBGColor, 2.5f)
+        roundedRectangle(x + TEXTOFFSET, y + 37f, w - 17f, 7f, sliderBGColor, 3f)
         roundedRectangle(x + TEXTOFFSET, y + 37f, sliderPercentage * (w - 17f), 7f, color, 3f)
-        circle(x + TEXTOFFSET + sliderPercentage * (w - 17f), y + 37f + 3f, 5f, color)
+        //circle(x + TEXTOFFSET + sliderPercentage * (w - 17f), y + 37f + 3f, 5f, color)
+
 
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {
+
         if (isHoveredBox && mouseButton == 0) {
-            modMessage("clicked box")
+            if (listeningText) {
+                textUnlisten()
+                return true
+            }
             listeningText = true
             listeningTextField = setting.valueInt.toString()
             return true
         }
-        if (listeningText) {
+        if (listeningText && mouseButton == 0) {
             textUnlisten()
             listeningText = false
-            return false
+            if (isHovered) {
+                listening = true
+            }
+            return true
         }
 
         if (mouseButton == 0 && isHovered) {
@@ -114,6 +126,8 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
     private fun textUnlisten() {
         if (listeningTextField.isEmpty()) {
             setting.valueDouble = setting.min
+            sliderPercentage = ((setting.valueDouble - setting.min) / (setting.max - setting.min)).toFloat()
+            listeningText = false
             return
         }
         setting.valueDouble = try {
@@ -135,21 +149,39 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
     }
     var listeningTextField: String = ""
 
+    override fun mouseClickedAnywhere(mouseButton: Int): Boolean {
+        if (mouseButton == 0 && listeningText && !isHovered && !isHoveredBox) {
+            textUnlisten()
+            return true
+        }
+        return false
+    }
+
+
     override fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
         modMessage(listeningText)
         if (listeningText) {
-            if (listeningTextField.length >= 3) return true
             var text = listeningTextField
             when (keyCode) {
                 Keyboard.KEY_ESCAPE, Keyboard.KEY_NUMPADENTER, Keyboard.KEY_RETURN -> {
                     textUnlisten()
                     return true
                 }
-                Keyboard.KEY_BACK -> {
+                Keyboard.KEY_DELETE -> {
                     listeningTextField = handleText(text.dropLast(1))
                     return true
                 }
+
+                Keyboard.KEY_BACK -> {
+                    listeningTextField = if (Keyboard.isKeyDown(Keyboard.KEY_RCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
+                        ""
+                    } else {
+                        handleText(text.dropLast(1))
+                    }
+                    return true
+                }
                 in keyWhiteList -> {
+                    if (listeningTextField.length >= 3) return true
                     text += typedChar.toString()
                     listeningTextField = handleText(text)
                     return true
@@ -181,6 +213,16 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
         Keyboard.KEY_6,
         Keyboard.KEY_7,
         Keyboard.KEY_8,
-        Keyboard.KEY_9
+        Keyboard.KEY_9,
+        Keyboard.KEY_NUMPAD0,
+        Keyboard.KEY_NUMPAD1,
+        Keyboard.KEY_NUMPAD2,
+        Keyboard.KEY_NUMPAD3,
+        Keyboard.KEY_NUMPAD4,
+        Keyboard.KEY_NUMPAD5,
+        Keyboard.KEY_NUMPAD6,
+        Keyboard.KEY_NUMPAD7,
+        Keyboard.KEY_NUMPAD8,
+        Keyboard.KEY_NUMPAD9
     )
 }

@@ -4,6 +4,7 @@ import me.odinmain.features.settings.impl.StringSetting
 import me.odinmain.font.OdinFont
 import me.odinmain.ui.clickgui.ClickGUI.TEXTOFFSET
 import me.odinmain.ui.clickgui.animations.impl.ColorAnimation
+import me.odinmain.ui.clickgui.animations.impl.LinearAnimation
 import me.odinmain.ui.clickgui.elements.*
 import me.odinmain.ui.clickgui.util.ColorUtil
 import me.odinmain.ui.clickgui.util.ColorUtil.brighter
@@ -30,6 +31,7 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
 
     private val colorAnim = ColorAnimation(100)
     private val hover = HoverHandler(0, 150)
+
 
     private val buttonColor: Color
         inline get() = ColorUtil.buttonColor.brighter(1 + hover.percent() / 500f)
@@ -67,6 +69,7 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
                 text(display, x + w / 2f, y + h / 2f, textColor, 12f, OdinFont.REGULAR, TextAlign.Middle)
             }
         }
+
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {
@@ -75,6 +78,14 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
             return true
         } else if (listening) {
             if (colorAnim.start()) listening = false
+        }
+        return false
+    }
+
+    override fun mouseClickedAnywhere(mouseButton: Int): Boolean {
+        if (mouseButton == 0 && !isHovered) {
+            if (colorAnim.start()) listening = false
+            return true
         }
         return false
     }

@@ -182,10 +182,9 @@ class Panel(
                 it.mouseClicked(mouseButton)
             }
         }
-
-        return false
-
-
+        return moduleButtons.filter { it.module.name.contains(currentSearch, true) }.reversed().any {
+            it.mouseClickedAnywhere(mouseButton)
+        }
     }
 
     fun mouseReleased(state: Int) {

@@ -54,6 +54,8 @@ open class Element<S : Setting<*>>(val parent: ModuleButton, val setting: S, typ
 
     protected open fun draw() {}
 
+    open fun mouseClickedAnywhere(mouseButton: Int): Boolean = false
+
     open fun mouseClicked(mouseButton: Int): Boolean = isAreaHovered(x, y, w, h)
     open fun mouseReleased(state: Int) {}
 

@@ -14,7 +14,7 @@ object ColorUtil {
     val titlePanelColorAlpha = 0.6f
 
 
-    val buttonColor = Color(38, 38, 38, buttonColorAlpha)
+    val buttonColor = Color(28, 28, 28, buttonColorAlpha)
     val moduleButtonColor = Color(26, 26, 26, moduleButtonColorAlpha)
     val elementBackground = Color(0,0,0, elementBackgroundAlpha)
     val titlePanelColor: Color = Color(12, 12, 12, titlePanelColorAlpha)
