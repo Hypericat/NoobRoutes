@@ -19,6 +19,7 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 
 object EventDispatcher {
 
@@ -30,6 +31,7 @@ object EventDispatcher {
         if (inDungeons && this is EntityItem && this.entityItem?.unformattedName?.containsOneOf(dungeonItemDrops, true) != false && mc.thePlayer.getDistanceToEntity(this) <= 6)
             SecretPickupEvent.Item(this).postAndCatch()
     }
+
 
     /**
      * Dispatches [SecretPickupEvent.Interact]
