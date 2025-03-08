@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import gg.essential.elementa.utils.getStringSplitToWidthTruncated
 import me.odinmain.OdinMain.logger
 import me.odinmain.OdinMain.mc
 import me.odinmain.features.Category
@@ -22,6 +21,7 @@ import me.odinmain.utils.LookVec
 import me.odinmain.utils.render.Color
 import me.odinmain.utils.render.Renderer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -32,7 +32,8 @@ enum class RingTypes {
     HCLIP,
     STOP,
     BLINK,
-    TERM
+    TERM,
+    LEAP
 }
 
 
@@ -66,7 +67,9 @@ object AutoP3: Module (
     private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
     val frame by BooleanSetting("Check per Frame", false, description = "check each frame if the player is in a ring. Routes are easier to setup with per frame but possibly less consistent on low fps. Per tick is harder to setup but 100% consistent. Everything done on frame can also be done on tick")
     private var rings = mutableMapOf<String, MutableList<Ring>>()
-    private var waiting = false
+    private var waitingTerm = false
+    private var waitingLeap = false
+    private var leaped = 0
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
@@ -85,7 +88,9 @@ object AutoP3: Module (
             }
             else if(AutoP3Utils.distanceToRing(ring.coords) > 0.5 || !AutoP3Utils.ringCheckY(ring)) ring.should = true
         }
-        waiting = rings[route]?.any { it.type == RingTypes.TERM && !it.should } == true
+        waitingTerm = rings[route]?.any { it.type == RingTypes.TERM && !it.should } == true
+        waitingLeap = rings[route]?.any { it.type == RingTypes.LEAP && !it.should } == true
+        if (!waitingLeap) leaped = 0
     }
 
     private fun executeRing(ring: Ring) {
@@ -120,14 +125,32 @@ object AutoP3: Module (
                 mc.thePlayer.motionZ = 0.0
                 AutoP3Utils.direction = ring.direction.yaw
             }
+            RingTypes.LEAP -> {
+                mc.thePlayer.motionX = 0.0
+                mc.thePlayer.motionZ = 0.0
+                AutoP3Utils.direction = ring.direction.yaw
+            }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
     }
 
     @SubscribeEvent
     fun awaitingOpen(event: PacketEvent.Receive) {
-        if (!waiting || event.packet !is S2DPacketOpenWindow) return
+        if (!waitingTerm || event.packet !is S2DPacketOpenWindow) return
         AutoP3Utils.walking = true
+    }
+
+    @SubscribeEvent
+    fun awaitingLeap(event: PacketEvent.Receive) {
+        if (!waitingLeap || event.packet !is S18PacketEntityTeleport) return
+        val x = event.packet.x.toDouble()
+        val y = event.packet.y.toDouble()
+        val z = event.packet.z.toDouble()
+        if (mc.thePlayer.getDistance(x,y,z) < 2) leaped++
+        if (leaped == 4) {
+            modMessage("everyone leaped")
+            AutoP3Utils.walking = true
+        }
     }
 
     fun addRing(args: Array<out String>?) {
@@ -159,6 +182,10 @@ object AutoP3: Module (
             "term" -> {
                 modMessage("added await term")
                 ringType = RingTypes.TERM
+            }
+            "leap" -> {
+                modMessage("added await leap")
+                ringType  =RingTypes.LEAP
             }
             else -> return modMessage("thats not a ring type stoopid")
         }
