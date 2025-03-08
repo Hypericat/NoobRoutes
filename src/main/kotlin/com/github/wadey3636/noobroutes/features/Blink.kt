@@ -10,6 +10,7 @@ import me.odinmain.features.Module
 import me.odinmain.features.settings.impl.BooleanSetting
 import me.odinmain.features.settings.impl.DualSetting
 import me.odinmain.features.settings.impl.NumberSetting
+import me.odinmain.utils.Vec2
 import me.odinmain.utils.render.Color
 import me.odinmain.utils.render.Renderer
 import me.odinmain.utils.render.TextAlign
@@ -18,6 +19,7 @@ import me.odinmain.utils.skyblock.modMessage
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.AxisAlignedBB
@@ -32,10 +34,11 @@ import kotlin.math.sin
 object Blink: Module (
     name = "Blink",
     Keyboard.KEY_NONE,
-    category = Category.RENDER,
+    category = Category.FLOOR7,
     description = "Blink"
     ) {
     private val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink")
+    private val mode by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Motion", right = "Packet")
     private val maxBlinks by NumberSetting(name = "max blinks per instance", description = "too much blink on an instance bans apperantly", min = 100f, max = 300f, default = 120f)
     val showEnd by BooleanSetting("Render End", default = true, description = "renders waypoint where blink ends")
     val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes")
@@ -46,6 +49,9 @@ object Blink: Module (
     private var cancelled = 0
 
     private var blinksInstance = 0
+
+    var rotate: Float? = null
+    private var awaitingRotation = false
 
     private var lastBlink = System.currentTimeMillis()
 
@@ -77,8 +83,27 @@ object Blink: Module (
     }
 
     @SubscribeEvent
-    fun canceller(event: PacketEvent) {
+    fun canceller(event: PacketEvent.Send) {
         if (event.packet !is C03PacketPlayer) return
+        if (awaitingRotation) {
+            awaitingRotation = false
+            return
+        }
+        if (rotate != null) {
+            if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook) {
+                event.isCanceled = true
+                awaitingRotation = true
+                PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.positionX, event.packet.positionY, event.packet.positionZ, rotate!!, 0F, event.packet.isOnGround))
+            }
+            else {
+                event.isCanceled = true
+                awaitingRotation = true
+                PacketUtils.sendPacket(C05PacketPlayerLook(rotate!!, 0F, event.packet.isOnGround))
+            }
+            rotate = null
+            if(cancelled > 0) cancelled--
+            return
+        }
         if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook) {
             if(cancelled > 0) cancelled--
             return
@@ -101,6 +126,7 @@ object Blink: Module (
     @SubscribeEvent
     fun renderMovement(event:RenderWorldLastEvent) {
         if (movementPackets.isEmpty()) return
+        if (!mode) return
         val vec3List: List<Vec3> = movementPackets.map { packet -> Vec3(packet.positionX, packet.positionY, packet.positionZ) }
         Renderer.draw3DLine(vec3List, Color.WHITE, lineWidth = 1.5F)
         val firstPacket = movementPackets.first()
@@ -139,8 +165,8 @@ object Blink: Module (
         }
         if (event.isCanceled) return
         skip = true
-        event.isCanceled = true
         PacketUtils.sendPacket(movementPackets[0])
+        if (!mode) mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)
         if (movementPackets.size == 1) {
             mc.thePlayer.motionY = endY
             mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)

@@ -28,7 +28,6 @@ enum class RingTypes {
     MOTION,
     HCLIP,
     STOP,
-    LOOK,
     BLINK
 }
 
@@ -49,7 +48,7 @@ data class Ring (
 object AutoP3: Module (
     name = "AutoP3",
     Keyboard.KEY_NONE,
-    category = Category.RENDER,
+    category = Category.FLOOR7,
     description = "AutoP3"
 ) {
     val gson = GsonBuilder().registerTypeAdapter(
@@ -84,7 +83,10 @@ object AutoP3: Module (
     }
 
     private fun executeRing(ring: Ring) {
-        if (ring.look) mc.thePlayer.rotationYaw = ring.direction.yaw
+        if (ring.look) {
+            mc.thePlayer.rotationYaw = ring.direction.yaw
+            Blink.rotate = ring.direction.yaw
+        }
         if (ring.center && mc.thePlayer.onGround) mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord)
         if (ring.walk) AutoP3Utils.walkAfter = true
         AutoP3Utils.unPressKeys()

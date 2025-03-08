@@ -85,7 +85,7 @@ object AutoP3Utils {
             walking = true
         }
         keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
-        val addedSpeed = mc.thePlayer.capabilities.walkSpeed * 0.0509
+        val addedSpeed = mc.thePlayer.capabilities.walkSpeed * 0.05096001172887317
         mc.thePlayer.motionX += addedSpeed * Utils.xPart(direction)
         mc.thePlayer.motionZ += addedSpeed * Utils.zPart(direction)
     }
