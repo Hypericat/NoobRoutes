@@ -1,6 +1,4 @@
 package com.github.wadey3636.noobroutes.features
-
-
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.odinmain.events.impl.MotionUpdateEvent
@@ -61,7 +59,7 @@ object Blink: Module (
 
     private var recording = false
     private var recordingLength = 0
-    private val recordedPackets = mutableListOf<C04PacketPlayerPosition>()
+    private var recordedPackets = mutableListOf<C04PacketPlayerPosition>()
 
     fun blinkCommand(args: Array<out String>) {
         if (args.size < 2) return modMessage("need args")
@@ -85,6 +83,7 @@ object Blink: Module (
     @SubscribeEvent
     fun worldLoad(event: WorldEvent.Load) {
         blinksInstance = 0
+        cancelled = 0
     }
 
     @SubscribeEvent
@@ -112,6 +111,7 @@ object Blink: Module (
             Renderer.drawCylinder(it.coords.add(Vec3(0.0, 0.5 * sin(System.currentTimeMillis().toDouble()/300) + 0.5 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.WHITE, depth = true)
             if (AutoP3.editMode) return
             if (AutoP3Utils.distanceToRing(it.coords) < 0.5 && mc.thePlayer.posY == it.coords.yCoord && it.active) {
+                recordedPackets = mutableListOf<C04PacketPlayerPosition>()
                 startRecording(it)
                 it.active = false
             }
@@ -121,9 +121,10 @@ object Blink: Module (
 
     private fun startRecording(waypoint: BlinkWaypoints) {
         modMessage("started recording")
-        recording = true
-        recordedPackets.clear()
+        recordedPackets = mutableListOf<C04PacketPlayerPosition>()
         recordingLength = waypoint.length
+        recording = true
+
     }
 
     @SubscribeEvent
@@ -133,6 +134,7 @@ object Blink: Module (
             skip = false
             return
         }
+        event.isCanceled = true
         skip = true
         PacketUtils.sendPacket(movementPackets[0])
         if (!mode) mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)
@@ -168,7 +170,6 @@ object Blink: Module (
         modMessage("blinking")
         blinksInstance += ring.blinkPackets.size
         lastBlink = System.currentTimeMillis()
-        cancelled += ring.blinkPackets.size
         ring.blinkPackets.forEach { PacketUtils.sendPacket(it) }
         val lastPacket = ring.blinkPackets.size - 1
         mc.thePlayer.setPosition(ring.blinkPackets[lastPacket].positionX, ring.blinkPackets[lastPacket].positionY, ring.blinkPackets[lastPacket].positionZ)
@@ -181,10 +182,10 @@ object Blink: Module (
         modMessage("recording ${recordedPackets.size}")
         if (event.packet is C04PacketPlayerPosition) recordedPackets.add(event.packet)
         else if (event.packet is C06PacketPlayerPosLook) recordedPackets.add(C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)) //i need the else if because otherwise kotlin doesnt know know its a c06
-        if (recordedPackets.size >= recordingLength) {
+        if (recordedPackets.size == recordingLength) {
             modMessage("finished recording")
             recording = false
-            AutoP3.actuallyAddRing(Ring(RingTypes.BLINK, Vec3(recordedPackets[0].positionX, recordedPackets[0].positionY, recordedPackets[0].positionZ),  blinkPackets = recordedPackets, endY = mc.thePlayer.motionY))
+            AutoP3.actuallyAddRing(Ring(RingTypes.BLINK, coords = Vec3(recordedPackets[0].positionX, recordedPackets[0].positionY, recordedPackets[0].positionZ),  blinkPackets = recordedPackets, endY = mc.thePlayer.motionY))
             AutoP3.saveRings()
         }
     }
@@ -192,6 +193,7 @@ object Blink: Module (
     @SubscribeEvent
     fun canceller(event: PacketEvent.Send) {
         if (event.packet !is C03PacketPlayer) return
+        if (skip) return
         if (awaitingRotation) {
             awaitingRotation = false
             return
@@ -211,11 +213,11 @@ object Blink: Module (
             if(cancelled > 0) cancelled--
             return
         }
-        if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook) {
+        if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook || movementPackets.isNotEmpty()) {
             if(cancelled > 0) cancelled--
             return
         }
-        if (!event.isCanceled) event.isCanceled = true
+        event.isCanceled = true
         cancelled++
     }
 }

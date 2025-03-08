@@ -80,7 +80,7 @@ object AutoP3: Module (
             AutoP3Utils.renderRing(ring)
             if (ring.type == RingTypes.BLINK) {
                 val vec3List: List<Vec3> = ring.blinkPackets.map { packet -> Vec3(packet.positionX, packet.positionY, packet.positionZ) }
-                if (Blink.showEnd) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
+                if (Blink.showEnd && ring.blinkPackets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
                 if (Blink.showLine) Renderer.draw3DLine(vec3List, Color.GREEN, lineWidth = 1F, depth = true)
             }
             if (editMode) return@forEachIndexed
@@ -109,10 +109,12 @@ object AutoP3: Module (
                 modMessage("started Walking")
             }
             RingTypes.STOP -> {
+                modMessage("stopping")
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
             }
             RingTypes.HCLIP -> {
+                modMessage("hclipping")
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
                 if(mc.thePlayer.onGround) mc.thePlayer.jump()
