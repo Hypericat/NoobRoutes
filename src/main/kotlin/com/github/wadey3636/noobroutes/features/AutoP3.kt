@@ -20,11 +20,13 @@ import me.odinmain.features.settings.impl.StringSetting
 import me.odinmain.utils.LookVec
 import me.odinmain.utils.render.Color
 import me.odinmain.utils.render.Renderer
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import javax.swing.text.html.parser.Entity
 
 enum class RingTypes {
     WALK,
@@ -146,7 +148,7 @@ object AutoP3: Module (
         val x = event.packet.x.toDouble()
         val y = event.packet.y.toDouble()
         val z = event.packet.z.toDouble()
-        if (mc.thePlayer.getDistance(x,y,z) < 2) leaped++
+        if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistance(x,y,z) < 2) leaped++
         if (leaped == 4) {
             modMessage("everyone leaped")
             AutoP3Utils.walking = true
