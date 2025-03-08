@@ -65,7 +65,7 @@ object AutoP3: Module (
 
     private val route by StringSetting("Route", "", description = "Route to use")
     val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
-    private val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
+    val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
     private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
     val frame by BooleanSetting("Check per Frame", false, description = "check each frame if the player is in a ring. Routes are easier to setup with per frame but possibly less consistent on low fps. Per tick is harder to setup but 100% consistent. Everything done on frame can also be done on tick")
     private var rings = mutableMapOf<String, MutableList<Ring>>()
@@ -77,7 +77,7 @@ object AutoP3: Module (
     fun onRender(event: RenderWorldLastEvent) {
         rings[route]?.forEachIndexed { i, ring ->
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
-            Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
+            AutoP3Utils.renderRing(ring)
             if (ring.type == RingTypes.BLINK) {
                 val vec3List: List<Vec3> = ring.blinkPackets.map { packet -> Vec3(packet.positionX, packet.positionY, packet.positionZ) }
                 if (Blink.showEnd) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)

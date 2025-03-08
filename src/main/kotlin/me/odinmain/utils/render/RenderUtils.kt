@@ -265,8 +265,9 @@ object RenderUtils {
     ) {
         GlStateManager.pushMatrix()
         GlStateManager.disableCull()
-        GL11.glLineWidth(2.0f)
+        GL11.glLineWidth(3.0F)
         preDraw()
+        GL11.glLineWidth(3.0F)
         depth(depth)
 
         color.bind()
@@ -275,10 +276,14 @@ object RenderUtils {
         GlStateManager.rotate(rot2.toFloat(), 0f, 0f, 1f)
         GlStateManager.rotate(rot3.toFloat(), 0f, 1f, 0f)
 
+        GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE)
+
         Cylinder().draw(baseRadius.toFloat(), topRadius.toFloat(), height.toFloat(), slices.toInt(), stacks.toInt())
 
+        GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL)
+
         postDraw()
-        GL11.glLineWidth(1.0f)
+        GL11.glLineWidth(1.0F)
         GlStateManager.enableCull()
         if (!depth) resetDepth()
         GlStateManager.popMatrix()

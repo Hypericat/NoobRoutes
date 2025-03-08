@@ -1,15 +1,18 @@
 package com.github.wadey3636.noobroutes.utils
 
 import com.github.wadey3636.noobroutes.features.AutoP3
+import com.github.wadey3636.noobroutes.features.AutoP3.depth
 import com.github.wadey3636.noobroutes.features.Ring
 import com.github.wadey3636.noobroutes.features.RingTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import me.odinmain.OdinMain.mc
 import me.odinmain.events.impl.PacketEvent
+import me.odinmain.utils.render.Color
 import me.odinmain.utils.render.RenderUtils.renderX
 import me.odinmain.utils.render.RenderUtils.renderY
 import me.odinmain.utils.render.RenderUtils.renderZ
+import me.odinmain.utils.render.Renderer
 import me.odinmain.utils.skyblock.modMessage
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C03PacketPlayer
@@ -17,6 +20,7 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
+import kotlin.math.sin
 
 object AutoP3Utils {
 
@@ -114,6 +118,15 @@ object AutoP3Utils {
             motioning = false
             hasUnpressed = false
         }
+    }
+
+    fun renderRing(ring: Ring) {
+        //kotlin is disrespecting my carefully setup order of operations
+        Renderer.drawCylinder(ring.coords.add(Vec3(0.0, (0.45 * sin(System.currentTimeMillis().toDouble()/300)) + 0.528 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = AutoP3.depth)
+        Renderer.drawCylinder(ring.coords.add(Vec3(0.0, (-0.45 * sin(System.currentTimeMillis().toDouble()/300)) + 0.528 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = AutoP3.depth)
+        Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.503, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
+        Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.DARK_GRAY, depth = depth)
+        Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 1.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.DARK_GRAY, depth = depth)
     }
 
 
