@@ -83,36 +83,6 @@ object Blink: Module (
     }
 
     @SubscribeEvent
-    fun canceller(event: PacketEvent.Send) {
-        if (event.packet !is C03PacketPlayer) return
-        if (awaitingRotation) {
-            awaitingRotation = false
-            return
-        }
-        if (rotate != null) {
-            if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook) {
-                event.isCanceled = true
-                awaitingRotation = true
-                PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.positionX, event.packet.positionY, event.packet.positionZ, rotate!!, 0F, event.packet.isOnGround))
-            }
-            else {
-                event.isCanceled = true
-                awaitingRotation = true
-                PacketUtils.sendPacket(C05PacketPlayerLook(rotate!!, 0F, event.packet.isOnGround))
-            }
-            rotate = null
-            if(cancelled > 0) cancelled--
-            return
-        }
-        if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook) {
-            if(cancelled > 0) cancelled--
-            return
-        }
-        if (!event.isCanceled) event.isCanceled = true
-        cancelled++
-    }
-
-    @SubscribeEvent
     fun worldLoad(event: WorldEvent.Load) {
         blinksInstance = 0
     }
@@ -163,7 +133,6 @@ object Blink: Module (
             skip = false
             return
         }
-        if (event.isCanceled) return
         skip = true
         PacketUtils.sendPacket(movementPackets[0])
         if (!mode) mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)
@@ -218,5 +187,35 @@ object Blink: Module (
             AutoP3.actuallyAddRing(Ring(RingTypes.BLINK, Vec3(recordedPackets[0].positionX, recordedPackets[0].positionY, recordedPackets[0].positionZ),  blinkPackets = recordedPackets, endY = mc.thePlayer.motionY))
             AutoP3.saveRings()
         }
+    }
+
+    @SubscribeEvent
+    fun canceller(event: PacketEvent.Send) {
+        if (event.packet !is C03PacketPlayer) return
+        if (awaitingRotation) {
+            awaitingRotation = false
+            return
+        }
+        if (rotate != null) {
+            if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook) {
+                event.isCanceled = true
+                awaitingRotation = true
+                PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.positionX, event.packet.positionY, event.packet.positionZ, rotate!!, 0F, event.packet.isOnGround))
+            }
+            else {
+                event.isCanceled = true
+                awaitingRotation = true
+                PacketUtils.sendPacket(C05PacketPlayerLook(rotate!!, 0F, event.packet.isOnGround))
+            }
+            rotate = null
+            if(cancelled > 0) cancelled--
+            return
+        }
+        if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook) {
+            if(cancelled > 0) cancelled--
+            return
+        }
+        if (!event.isCanceled) event.isCanceled = true
+        cancelled++
     }
 }

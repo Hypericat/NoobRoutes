@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import gg.essential.elementa.utils.getStringSplitToWidthTruncated
 import me.odinmain.OdinMain.logger
 import me.odinmain.OdinMain.mc
 import me.odinmain.features.Category
@@ -14,12 +15,14 @@ import me.odinmain.utils.skyblock.modMessage
 import net.minecraft.util.Vec3
 import org.lwjgl.input.Keyboard
 import me.odinmain.config.DataManager
+import me.odinmain.events.impl.PacketEvent
 import me.odinmain.features.settings.impl.BooleanSetting
 import me.odinmain.features.settings.impl.StringSetting
 import me.odinmain.utils.LookVec
 import me.odinmain.utils.render.Color
 import me.odinmain.utils.render.Renderer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -28,7 +31,8 @@ enum class RingTypes {
     MOTION,
     HCLIP,
     STOP,
-    BLINK
+    BLINK,
+    TERM
 }
 
 
@@ -62,6 +66,7 @@ object AutoP3: Module (
     private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
     val frame by BooleanSetting("Check per Frame", false, description = "check each frame if the player is in a ring. Routes are easier to setup with per frame but possibly less consistent on low fps. Per tick is harder to setup but 100% consistent. Everything done on frame can also be done on tick")
     private var rings = mutableMapOf<String, MutableList<Ring>>()
+    private var waiting = false
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
@@ -80,6 +85,7 @@ object AutoP3: Module (
             }
             else if(AutoP3Utils.distanceToRing(ring.coords) > 0.5 || !AutoP3Utils.ringCheckY(ring)) ring.should = true
         }
+        waiting = rings[route]?.any { it.type == RingTypes.TERM && !it.should } == true
     }
 
     private fun executeRing(ring: Ring) {
@@ -109,8 +115,19 @@ object AutoP3: Module (
             RingTypes.BLINK -> {
                 Blink.doBlink(ring)
             }
+            RingTypes.TERM -> {
+                mc.thePlayer.motionX = 0.0
+                mc.thePlayer.motionZ = 0.0
+                AutoP3Utils.direction = ring.direction.yaw
+            }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
+    }
+
+    @SubscribeEvent
+    fun awaitingOpen(event: PacketEvent.Receive) {
+        if (!waiting || event.packet !is S2DPacketOpenWindow) return
+        AutoP3Utils.walking = true
     }
 
     fun addRing(args: Array<out String>?) {
@@ -138,6 +155,10 @@ object AutoP3: Module (
             "stop" -> {
                 modMessage("added stop")
                 ringType = RingTypes.STOP
+            }
+            "term" -> {
+                modMessage("added await term")
+                ringType = RingTypes.TERM
             }
             else -> return modMessage("thats not a ring type stoopid")
         }

@@ -37,7 +37,7 @@ object AutoP3Utils {
         walking = false
     }
 
-    private var walking = false
+    var walking = false
     private var motioning = false
     var direction = 0F
 
