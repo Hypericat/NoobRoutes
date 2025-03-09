@@ -46,10 +46,10 @@ loom {
         pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
         // If you don't want mixins, remove this lines
         mixinConfig("mixins.$modid.json")
-	    if (transformerFile.exists()) {
-			println("Installing access transformer")
-		    accessTransformer(transformerFile)
-	    }
+        if (transformerFile.exists()) {
+            println("Installing access transformer")
+            accessTransformer(transformerFile)
+        }
     }
     // If you don't want mixins, remove these lines
     mixin {
@@ -82,30 +82,37 @@ val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
 }
 
+
 dependencies {
-    implementation("gg.essential:loader-launchwrapper:1.1.3")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
-    implementation("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation("com.mojang:brigadier:1.2.9")
-    implementation("gg.essential:loader-launchwrapper:1.1.3")
-    implementation("com.github.Stivais:Commodore:bea320fe0a")
+    // Move these from implementation to shadowImpl to ensure they're included in the final jar
+    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+
+    // Keep your existing shadowImpl
+    shadowImpl(kotlin("stdlib-jdk8"))
+
+    // Keep the rest of your dependencies as they are
+    compileOnly("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all")
+    shadowImpl("gg.essential:loader-launchwrapper:1.1.3")
+    shadowImpl("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5")
+    shadowImpl("com.mojang:brigadier:1.2.9")
+    shadowImpl("com.github.Stivais:Commodore:bea320fe0a")
     minecraft("com.mojang:minecraft:1.8.9")
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
-    //implementation("gg.essential:essential-universal:0.10.0.+")
-    shadowImpl(kotlin("stdlib-jdk8"))
 
-    // If you don't want mixins, remove these lines
+    // Keep your mixin configuration
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
     }
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
 
-    // If you don't want to log in with your real minecraft account, remove this line
     runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
-
 }
+
+//implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+//implementation("gg.essential:essential-universal:0.10.0.+")
+
 
 // Tasks:
 
@@ -122,8 +129,8 @@ tasks.withType(org.gradle.jvm.tasks.Jar::class) {
         // If you don't want mixins, remove these lines
         this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
         this["MixinConfigs"] = "mixins.$modid.json"
-	    if (transformerFile.exists())
-			this["FMLAT"] = "${modid}_at.cfg"
+        if (transformerFile.exists())
+            this["FMLAT"] = "${modid}_at.cfg"
     }
 }
 
@@ -166,5 +173,29 @@ tasks.shadowJar {
     fun relocate(name: String) = relocate(name, "$baseGroup.deps.$name")
 }
 
-tasks.assemble.get().dependsOn(tasks.remapJar)
+tasks {
+    processResources {
+        filesMatching("mcmod.info") {
+            expand(
+                "modid" to modid,
+                "version" to project.version,
+                "mcversion" to mcVersion
+            )
+        }
+    }
+}
+tasks.jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes(
+            "Manifest-Version" to "1.0",
+            "ModSide" to "CLIENT",
+            "FMLCorePlugin" to "${baseGroup}.init.AutoDiscoveryMixinPlugin",
+            "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker",
+            "TweakOrder" to "0"
+        )
+    }
+}
 
+
+tasks.assemble.get().dependsOn(tasks.remapJar)
