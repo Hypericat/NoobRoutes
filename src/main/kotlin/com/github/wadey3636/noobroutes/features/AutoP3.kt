@@ -158,7 +158,7 @@ object AutoP3: Module (
     }
 
     fun addRing(args: Array<out String>?) {
-        if (route.isEmpty()) return modMessage("Add some arguments dumbasd")
+        if (route.isEmpty()) return modMessage("Add some arguments dumbass")
         when(args?.get(0)) {
             "add" -> addNormalRing(args)
             "delete" -> deleteNormalRing(args)
