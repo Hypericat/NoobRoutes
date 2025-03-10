@@ -39,6 +39,7 @@ object AutoP3Utils {
         Keyboard.enableRepeatEvents(false)
         keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
         walking = false
+        motioning = false
     }
 
     var walking = false
