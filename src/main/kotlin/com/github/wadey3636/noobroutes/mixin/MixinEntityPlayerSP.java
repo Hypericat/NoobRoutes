@@ -1,8 +1,8 @@
 package com.github.wadey3636.noobroutes.mixin;
 
-import me.odinmain.events.impl.MotionUpdateEvent;
+import me.defnotstolen.events.impl.MotionUpdateEvent;
 import com.mojang.authlib.GameProfile;
-import me.odinmain.utils.Utils;
+import me.defnotstolen.utils.Utils;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;

@@ -3,15 +3,15 @@ package com.github.wadey3636.noobroutes
 import com.github.wadey3636.noobroutes.commands.AutoP3Command
 import com.github.wadey3636.noobroutes.commands.NoobRoutesCommand
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
-import me.odinmain.OdinMain
-import me.odinmain.OdinMain.mc
-import me.odinmain.features.ModuleManager
-import me.odinmain.font.OdinFont
-import me.odinmain.ui.clickgui.ClickGUI
-import me.odinmain.utils.clock.Executor
-import me.odinmain.utils.render.RenderUtils
-import me.odinmain.utils.render.RenderUtils2D
-import me.odinmain.utils.render.Renderer
+import me.defnotstolen.Core
+import me.defnotstolen.Core.mc
+import me.defnotstolen.features.ModuleManager
+import me.defnotstolen.font.OdinFont
+import me.defnotstolen.ui.clickgui.ClickGUI
+import me.defnotstolen.utils.clock.Executor
+import me.defnotstolen.utils.render.RenderUtils
+import me.defnotstolen.utils.render.RenderUtils2D
+import me.defnotstolen.utils.render.Renderer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -45,7 +45,7 @@ class NoobRoutes {
 	    // Below is a demonstration of an access-transformed class access.
 	    println("Color State: " + GlStateManager.Color());
         val Modules = listOf(
-            OdinMain,
+            Core,
             ModuleManager,
             Executor,
             Renderer,
@@ -62,13 +62,13 @@ class NoobRoutes {
     }
     @Mod.EventHandler
     fun postInit(event: FMLPostInitializationEvent) {
-        OdinMain.postInit()
+        Core.postInit()
     }
 
     @Mod.EventHandler
     fun loadComplete(event: FMLLoadCompleteEvent) {
         File(mc.mcDataDir, "config/noobroutes").takeIf { !it.exists() }?.mkdirs()
-        OdinMain.loadComplete()
+        Core.loadComplete()
         ModuleManager.addModules()
 
     }

@@ -6,14 +6,14 @@ import com.github.wadey3636.noobroutes.features.Ring
 import com.github.wadey3636.noobroutes.features.RingTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import me.odinmain.OdinMain.mc
-import me.odinmain.events.impl.PacketEvent
-import me.odinmain.utils.render.Color
-import me.odinmain.utils.render.RenderUtils.renderX
-import me.odinmain.utils.render.RenderUtils.renderY
-import me.odinmain.utils.render.RenderUtils.renderZ
-import me.odinmain.utils.render.Renderer
-import me.odinmain.utils.skyblock.modMessage
+import me.defnotstolen.Core.mc
+import me.defnotstolen.events.impl.PacketEvent
+import me.defnotstolen.utils.render.Color
+import me.defnotstolen.utils.render.RenderUtils.renderX
+import me.defnotstolen.utils.render.RenderUtils.renderY
+import me.defnotstolen.utils.render.RenderUtils.renderZ
+import me.defnotstolen.utils.render.Renderer
+import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.util.Vec3
@@ -50,6 +50,7 @@ object AutoP3Utils {
     var direction = 0F
     var yeeting = false
     var yeetTicks = 0
+    private var skip = false
 
     fun startWalk(dir: Float) {
         if(mc.thePlayer.onGround) walking = true
@@ -65,9 +66,13 @@ object AutoP3Utils {
         val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
         mc.thePlayer.motionX = speed * Utils.xPart(direction)
         mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+        lastMotion = speed
         if (!walkAfter) return
         if(mc.thePlayer.onGround) walking = true
-        else if (!mc.thePlayer.onGround) motioning  = true
+        else {
+            skip = true
+            motioning  = true
+        }
         walkAfter = false
     }
 
@@ -122,6 +127,10 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun motion(event: TickEvent.ClientTickEvent) {
+        if (skip) {
+            skip = false
+            return
+        }
         if (!motioning) return
         if (event.phase != TickEvent.Phase.START) return
         modMessage("motioning")

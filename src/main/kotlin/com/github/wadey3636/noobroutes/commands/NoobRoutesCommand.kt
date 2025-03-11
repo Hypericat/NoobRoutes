@@ -2,9 +2,8 @@ package com.github.wadey3636.noobroutes.commands
 
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
-import me.odinmain.OdinMain.display
-import me.odinmain.OdinMain.mc
-import me.odinmain.ui.clickgui.ClickGUI
+import me.defnotstolen.Core.display
+import me.defnotstolen.ui.clickgui.ClickGUI
 import org.apache.logging.log4j.LogManager
 
 class NoobRoutesCommand : CommandBase() {

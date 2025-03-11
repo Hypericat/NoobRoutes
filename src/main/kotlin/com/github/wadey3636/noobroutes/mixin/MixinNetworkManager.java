@@ -32,7 +32,7 @@ public class MixinNetworkManager {
 package com.github.wadey3636.noobroutes.mixin;
 
 import io.netty.channel.ChannelHandlerContext;
-import me.odinmain.events.impl.PacketEvent;
+import me.defnotstolen.events.impl.PacketEvent;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraftforge.common.MinecraftForge;

@@ -1,19 +1,17 @@
 package com.github.wadey3636.noobroutes.features
 
 import com.github.wadey3636.noobroutes.utils.PacketUtils
-import me.odinmain.events.impl.PacketEvent
-import me.odinmain.features.Category
-import me.odinmain.features.Module
-import me.odinmain.ui.clickgui.ClickGUI
-import me.odinmain.utils.skyblock.modMessage
+import me.defnotstolen.events.impl.PacketEvent
+import me.defnotstolen.features.Category
+import me.defnotstolen.features.Module
+import me.defnotstolen.ui.clickgui.ClickGUI
+import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import net.minecraft.network.Packet
-import me.odinmain.OdinMain.logger
-import me.odinmain.utils.render.Color
-import me.odinmain.utils.render.TextAlign
-import me.odinmain.utils.render.TextPos
-import me.odinmain.utils.render.text
+import me.defnotstolen.utils.render.Color
+import me.defnotstolen.utils.render.TextAlign
+import me.defnotstolen.utils.render.text
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S38PacketPlayerListItem

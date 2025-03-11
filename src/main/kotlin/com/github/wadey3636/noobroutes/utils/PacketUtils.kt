@@ -1,6 +1,6 @@
 package com.github.wadey3636.noobroutes.utils
 
-import me.odinmain.OdinMain.mc
+import me.defnotstolen.Core.mc
 import net.minecraft.network.Packet
 
 object PacketUtils {

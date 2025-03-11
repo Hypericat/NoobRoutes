@@ -7,27 +7,26 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import me.odinmain.OdinMain.logger
-import me.odinmain.OdinMain.mc
-import me.odinmain.features.Category
-import me.odinmain.features.Module
-import me.odinmain.utils.skyblock.modMessage
+import me.defnotstolen.Core.logger
+import me.defnotstolen.Core.mc
+import me.defnotstolen.features.Category
+import me.defnotstolen.features.Module
+import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.util.Vec3
 import org.lwjgl.input.Keyboard
-import me.odinmain.config.DataManager
-import me.odinmain.events.impl.PacketEvent
-import me.odinmain.features.settings.impl.BooleanSetting
-import me.odinmain.features.settings.impl.StringSetting
-import me.odinmain.utils.LookVec
-import me.odinmain.utils.render.Color
-import me.odinmain.utils.render.Renderer
+import me.defnotstolen.config.DataManager
+import me.defnotstolen.events.impl.PacketEvent
+import me.defnotstolen.features.settings.impl.BooleanSetting
+import me.defnotstolen.features.settings.impl.StringSetting
+import me.defnotstolen.utils.LookVec
+import me.defnotstolen.utils.render.Color
+import me.defnotstolen.utils.render.Renderer
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import javax.swing.text.html.parser.Entity
 
 enum class RingTypes {
     WALK,

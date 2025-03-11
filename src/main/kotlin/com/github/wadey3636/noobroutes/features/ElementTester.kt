@@ -1,9 +1,9 @@
 package com.github.wadey3636.noobroutes.features
 
-import me.odinmain.features.Category
-import me.odinmain.features.Module
-import me.odinmain.features.settings.impl.*
-import me.odinmain.utils.render.Color
+import me.defnotstolen.features.Category
+import me.defnotstolen.features.Module
+import me.defnotstolen.features.settings.impl.*
+import me.defnotstolen.utils.render.Color
 
 object ElementTester : Module(
     name = "Element Tester",
