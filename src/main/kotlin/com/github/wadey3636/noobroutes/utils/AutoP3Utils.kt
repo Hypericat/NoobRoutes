@@ -18,6 +18,7 @@ import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.gameevent.InputEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 import kotlin.math.sin
@@ -30,6 +31,8 @@ object AutoP3Utils {
         mc.gameSettings.keyBindRight,
         mc.gameSettings.keyBindBack
     )
+
+    private var lastMotion = 0.0
 
     private var hasUnpressed = false
     var walkAfter = false
@@ -45,10 +48,12 @@ object AutoP3Utils {
     var walking = false
     private var motioning = false
     var direction = 0F
+    var yeeting = false
+    var yeetTicks = 0
 
     fun startWalk(dir: Float) {
         if(mc.thePlayer.onGround) walking = true
-        else if (!mc.thePlayer.onGround) motioning  = true
+        else motioning  = true
         hasUnpressed = false
         direction  = dir
     }
@@ -67,10 +72,44 @@ object AutoP3Utils {
     }
 
     @SubscribeEvent
+    fun yeet(event: ClientTickEvent) {
+        if (!yeeting || event.phase != TickEvent.Phase.START) return
+        if (yeetTicks == 1) {
+            if (mc.thePlayer.onGround) mc.thePlayer.jump()
+            val speed = mc.thePlayer.capabilities.walkSpeed * 6.0
+            mc.thePlayer.motionX = speed * Utils.xPart(direction)
+            mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+        }
+        if (yeetTicks == 2) {
+            mc.thePlayer.motionX *= 0.7
+            mc.thePlayer.motionZ *= 0.7
+        }
+        if (yeetTicks >= 2) {
+            yeeting = false
+            if (mc.thePlayer.onGround) {
+                walking = true
+                val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
+                mc.thePlayer.motionX = speed * Utils.xPart(direction)
+                mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+                return
+            }
+            else {
+                motioning = true
+                mc.thePlayer.motionX *= 0.91
+                mc.thePlayer.motionZ *= 0.91
+                lastMotion = (mc.thePlayer.motionX.pow(2) + mc.thePlayer.motionZ.pow(2)).pow(0.5)
+            }
+
+
+        }
+        yeetTicks++
+
+    }
+
+    @SubscribeEvent
     fun walk(event: TickEvent.ClientTickEvent) {
-        if (!walking) return
-        if (event.phase != TickEvent.Phase.START) return
-        if(!mc.thePlayer.onGround) {
+        if (!walking || event.phase != TickEvent.Phase.START) return
+        if (!mc.thePlayer.onGround) {
             walking = false
             motioning = true
         }
@@ -78,6 +117,7 @@ object AutoP3Utils {
         val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
         mc.thePlayer.motionX = speed * Utils.xPart(direction)
         mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+        lastMotion = speed
     }
 
     @SubscribeEvent
@@ -85,14 +125,19 @@ object AutoP3Utils {
         if (!motioning) return
         if (event.phase != TickEvent.Phase.START) return
         modMessage("motioning")
+        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
         if(mc.thePlayer.onGround) {
             motioning = false
             walking = true
+            val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
+            mc.thePlayer.motionX = speed * Utils.xPart(direction)
+            mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+            return
         }
-        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
-        val addedSpeed = mc.thePlayer.capabilities.walkSpeed * 0.05096001172887317
-        mc.thePlayer.motionX += addedSpeed * Utils.xPart(direction)
-        mc.thePlayer.motionZ += addedSpeed * Utils.zPart(direction)
+        val speed = lastMotion * 0.91 + mc.thePlayer.capabilities.walkSpeed * 0.05096001172887317
+        mc.thePlayer.motionX = speed * Utils.xPart(direction)
+        mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+        lastMotion = speed
     }
 
     fun distanceToRing(coords: Vec3): Double {
@@ -107,7 +152,7 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun onKeyInput(event: InputEvent.KeyInputEvent) {
-        if (!walking && !motioning) return
+        if (!walking && !motioning && !yeeting) return
         val keyCode = Keyboard.getEventKey()
         if (keyCode != Keyboard.KEY_W && keyCode != Keyboard.KEY_A && keyCode != Keyboard.KEY_S && keyCode != Keyboard.KEY_D ) return
         val isPressed = Keyboard.getEventKeyState()
@@ -117,6 +162,7 @@ object AutoP3Utils {
         else if (hasUnpressed) {
             walking = false
             motioning = false
+            yeeting = false
             hasUnpressed = false
         }
     }

@@ -1,6 +1,7 @@
 package com.github.wadey3636.noobroutes.features
 
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
+import com.github.wadey3636.noobroutes.utils.Utils
 import com.github.wadey3636.noobroutes.utils.adapters.RingsMapTypeAdapter
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
@@ -30,7 +31,7 @@ import javax.swing.text.html.parser.Entity
 
 enum class RingTypes {
     WALK,
-    MOTION,
+    YEET,
     HCLIP,
     STOP,
     BLINK,
@@ -134,6 +135,14 @@ object AutoP3: Module (
                 mc.thePlayer.motionZ = 0.0
                 AutoP3Utils.direction = ring.direction.yaw
             }
+            RingTypes.YEET -> {
+                val speed = mc.thePlayer.capabilities.walkSpeed * 0.1
+                mc.thePlayer.motionX = speed * -Utils.xPart(ring.direction.yaw)
+                mc.thePlayer.motionZ = speed * -Utils.zPart(ring.direction.yaw)
+                AutoP3Utils.direction = ring.direction.yaw
+                AutoP3Utils.yeetTicks = 1
+                AutoP3Utils.yeeting = true
+            }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
     }
@@ -189,7 +198,11 @@ object AutoP3: Module (
             }
             "leap" -> {
                 modMessage("added await leap")
-                ringType  =RingTypes.LEAP
+                ringType = RingTypes.LEAP
+            }
+            "yeet" -> {
+                modMessage("yeet added")
+                ringType = RingTypes.YEET
             }
             else -> return modMessage("thats not a ring type stoopid")
         }
