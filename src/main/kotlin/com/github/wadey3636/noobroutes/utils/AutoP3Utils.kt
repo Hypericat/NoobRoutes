@@ -143,7 +143,11 @@ object AutoP3Utils {
             mc.thePlayer.motionZ = speed * Utils.zPart(direction)
             return
         }
-        val speed = lastMotion * 0.91 + mc.thePlayer.capabilities.walkSpeed * 0.05096001172887317
+        //val speed = lastMotion * 0.91 + mc.thePlayer.capabilities.walkSpeed * 0.05096001172887317
+        //val speed = lastMotion * 0.91 + mc.thePlayer.capabilities.walkSpeed * 0.04637370673274585
+        modMessage("walk speed ${mc.thePlayer.capabilities.walkSpeed} value ${AutoP3.motionValue/100000}")
+        val speed = lastMotion * 0.91 + mc.thePlayer.capabilities.walkSpeed * AutoP3.motionValue/100000
+        modMessage("speed $speed")
         mc.thePlayer.motionX = speed * Utils.xPart(direction)
         mc.thePlayer.motionZ = speed * Utils.zPart(direction)
         lastMotion = speed
