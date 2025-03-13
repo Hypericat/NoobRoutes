@@ -2,6 +2,7 @@ package com.github.wadey3636.noobroutes.utils
 
 import com.github.wadey3636.noobroutes.features.AutoP3
 import com.github.wadey3636.noobroutes.features.AutoP3.depth
+import com.github.wadey3636.noobroutes.features.AutoP3.motionValue
 import com.github.wadey3636.noobroutes.features.Ring
 import com.github.wadey3636.noobroutes.features.RingTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -32,7 +33,9 @@ object AutoP3Utils {
         mc.gameSettings.keyBindBack
     )
 
-    private var lastMotion = 0.0
+    private var xSpeed = 0.0
+    private var zSpeed = 0.0
+    private var air = 0
 
     private var hasUnpressed = false
     var walkAfter = false
@@ -42,19 +45,15 @@ object AutoP3Utils {
         Keyboard.enableRepeatEvents(false)
         keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
         walking = false
-        motioning = false
     }
 
     var walking = false
-    private var motioning = false
     var direction = 0F
     var yeeting = false
     var yeetTicks = 0
-    private var skip = false
 
     fun startWalk(dir: Float) {
-        if(mc.thePlayer.onGround) walking = true
-        else motioning  = true
+        walking = true
         hasUnpressed = false
         direction  = dir
     }
@@ -66,13 +65,10 @@ object AutoP3Utils {
         val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
         mc.thePlayer.motionX = speed * Utils.xPart(direction)
         mc.thePlayer.motionZ = speed * Utils.zPart(direction)
-        lastMotion = speed
+        xSpeed = speed * Utils.xPart(direction)
+        zSpeed = speed * Utils.zPart(direction)
         if (!walkAfter) return
-        if(mc.thePlayer.onGround) walking = true
-        else {
-            skip = true
-            motioning  = true
-        }
+        walking  =true
         walkAfter = false
     }
 
@@ -91,18 +87,20 @@ object AutoP3Utils {
         }
         if (yeetTicks >= 2) {
             yeeting = false
+            walking = true
             if (mc.thePlayer.onGround) {
-                walking = true
                 val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
                 mc.thePlayer.motionX = speed * Utils.xPart(direction)
                 mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+                xSpeed = speed * Utils.xPart(direction)
+                zSpeed = speed * Utils.zPart(direction)
                 return
             }
             else {
-                motioning = true
                 mc.thePlayer.motionX *= 0.91
                 mc.thePlayer.motionZ *= 0.91
-                lastMotion = (mc.thePlayer.motionX.pow(2) + mc.thePlayer.motionZ.pow(2)).pow(0.5)
+                xSpeed = mc.thePlayer.motionX
+                zSpeed = mc.thePlayer.motionZ
             }
 
 
@@ -111,7 +109,7 @@ object AutoP3Utils {
 
     }
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     fun walk(event: TickEvent.ClientTickEvent) {
         if (!walking || event.phase != TickEvent.Phase.START) return
         if (!mc.thePlayer.onGround) {
@@ -122,9 +120,9 @@ object AutoP3Utils {
         val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
         mc.thePlayer.motionX = speed * Utils.xPart(direction)
         mc.thePlayer.motionZ = speed * Utils.zPart(direction)
-        lastMotion = speed
+        xSpeed = speed * Utils.xPart(direction)
+        zSpeed = speed * Utils.zPart(direction)
     }
-
     @SubscribeEvent
     fun motion(event: TickEvent.ClientTickEvent) {
         if (skip) {
@@ -145,13 +143,62 @@ object AutoP3Utils {
         }
         //val speed = lastMotion * 0.91 + mc.thePlayer.capabilities.walkSpeed * 0.05096001172887317
         //val speed = lastMotion * 0.91 + mc.thePlayer.capabilities.walkSpeed * 0.04637370673274585
-        modMessage("walk speed ${mc.thePlayer.capabilities.walkSpeed} value ${AutoP3.motionValue/100000}")
-        val speed = lastMotion * 0.91 + mc.thePlayer.capabilities.walkSpeed * AutoP3.motionValue/100000
-        modMessage("speed $speed")
-        mc.thePlayer.motionX = speed * Utils.xPart(direction)
-        mc.thePlayer.motionZ = speed * Utils.zPart(direction)
-        lastMotion = speed
+        modMessage("walk speed ${mc.thePlayer.capabilities.walkSpeed} value ${AutoP3.motionValue}")
+        xSpeed = xSpeed * 0.91 + mc.thePlayer.capabilities.walkSpeed * AutoP3.motionValue/10000 * Utils.xPart(direction)
+        zSpeed = xSpeed * 0.91 + mc.thePlayer.capabilities.walkSpeed * AutoP3.motionValue/10000 * Utils.zPart(direction)
+        modMessage("x $xSpeed y $zSpeed")
+        mc.thePlayer.motionX = xSpeed
+        mc.thePlayer.motionZ = zSpeed
+    }*/
+
+    /*@SubscribeEvent
+    fun motion(event: TickEvent.ClientTickEvent) {
+        if (skip) {
+            skip = false
+            return
+        }
+        if (!motioning) return
+        if (event.phase != TickEvent.Phase.START) return
+        modMessage("motioning")
+        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
+        if(mc.thePlayer.onGround) {
+            motioning = false
+            walking = true
+            val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
+            mc.thePlayer.motionX = speed * Utils.xPart(direction)
+            mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+            return
+        }
+        modMessage("walk speed ${mc.thePlayer.capabilities.walkSpeed} value ${AutoP3.motionValue}")
+        mc.thePlayer.motionX += mc.thePlayer.capabilities.walkSpeed * AutoP3.motionValue/10000 * Utils.xPart(direction)
+        mc.thePlayer.motionZ += mc.thePlayer.capabilities.walkSpeed * AutoP3.motionValue/10000 * Utils.xPart(direction)
+    }*/
+
+    @SubscribeEvent
+    fun movement(event: ClientTickEvent) {
+        if (!walking || event.phase != TickEvent.Phase.START) return
+
+        if (mc.thePlayer.onGround) air = 0
+        else air++
+
+        if (air <= 1)  {
+            val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
+            xSpeed = speed * Utils.xPart(direction)
+            zSpeed = speed * Utils.zPart(direction)
+            mc.thePlayer.motionX = speed * Utils.xPart(direction)
+            mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+        }
+        else {
+            xSpeed = xSpeed * 0.91 + motionValue/10000 * mc.thePlayer.capabilities.walkSpeed * Utils.xPart(direction)
+            zSpeed = zSpeed * 0.91 + motionValue/10000 * mc.thePlayer.capabilities.walkSpeed * Utils.zPart(direction)
+            mc.thePlayer.motionX = xSpeed
+            mc.thePlayer.motionZ = zSpeed
+        }
     }
+
+
+
+
 
     fun distanceToRing(coords: Vec3): Double {
         if(AutoP3.frame) return (coords.xCoord-mc.thePlayer.renderX).pow(2)+(coords.zCoord-mc.thePlayer.renderZ).pow(2).pow(0.5)
@@ -165,7 +212,7 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun onKeyInput(event: InputEvent.KeyInputEvent) {
-        if (!walking && !motioning && !yeeting) return
+        if (!walking && !yeeting) return
         val keyCode = Keyboard.getEventKey()
         if (keyCode != Keyboard.KEY_W && keyCode != Keyboard.KEY_A && keyCode != Keyboard.KEY_S && keyCode != Keyboard.KEY_D ) return
         val isPressed = Keyboard.getEventKeyState()
@@ -174,7 +221,6 @@ object AutoP3Utils {
         }
         else if (hasUnpressed) {
             walking = false
-            motioning = false
             yeeting = false
             hasUnpressed = false
         }
