@@ -24,6 +24,8 @@ import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.network.play.server.S14PacketEntity.S15PacketEntityRelMove
+import net.minecraft.network.play.server.S14PacketEntity.S17PacketEntityLookMove
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -157,9 +159,11 @@ object AutoP3: Module (
     @SubscribeEvent
     fun awaitingLeap(event: PacketEvent.Receive) {
         if (!waitingLeap || event.packet !is S18PacketEntityTeleport) return
-        val x = event.packet.x.toDouble()
-        val y = event.packet.y.toDouble()
-        val z = event.packet.z.toDouble()
+        val entity  = mc.theWorld.getEntityByID(event.packet.entityId)
+        if (entity !is EntityPlayer) return
+        val x = event.packet.x/32.0 //dont fucking ask why its like this
+        val y = event.packet.y/32.0
+        val z = event.packet.z/32.0
         if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistance(x,y,z) < 2) leaped++
         if (leaped == 4) {
             modMessage("everyone leaped")

@@ -156,6 +156,8 @@ object Blink: Module (
 
         if (System.currentTimeMillis() - lastBlink >= 500 && (blinksInstance + ring.blinkPackets.size > maxBlinks || !blink)) {
             movementPackets = ring.blinkPackets.toMutableList()
+            mc.thePlayer.motionX = 0.0
+            mc.thePlayer.motionY = 0.0
             endY = ring.endY
             lastBlink = System.currentTimeMillis()
             return
