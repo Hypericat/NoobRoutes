@@ -120,6 +120,7 @@ object Blink: Module (
     private fun startRecording(waypoint: BlinkWaypoints) {
         modMessage("started recording")
         recordedPackets = mutableListOf<C04PacketPlayerPosition>()
+        recordedPackets.add(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, mc.thePlayer.onGround))
         recordingLength = waypoint.length
         recording = true
 
@@ -175,11 +176,18 @@ object Blink: Module (
     }
 
     @SubscribeEvent
-    fun recorder(event: PacketEvent) {
-        if (!recording || (event.packet !is C04PacketPlayerPosition && event.packet !is C06PacketPlayerPosLook)) return
+    fun recorder(event: PacketEvent.Send) {
+        if (!recording || event.packet !is C03PacketPlayer) return
+        if (event.isCanceled) return
         modMessage("recording ${recordedPackets.size}")
-        if (event.packet is C04PacketPlayerPosition) recordedPackets.add(event.packet)
-        else if (event.packet is C06PacketPlayerPosLook) recordedPackets.add(C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)) //i need the else if because otherwise kotlin doesnt know know its a c06
+        if (event.packet is C04PacketPlayerPosition) {
+            if (recordedPackets.last() == C04PacketPlayerPosition(event.packet.positionX, event.packet.positionX, event.packet.positionX, event.packet.isOnGround)) return
+            recordedPackets.add(event.packet)
+        }
+        else if (event.packet is C06PacketPlayerPosLook) {
+            if (recordedPackets.last() == C04PacketPlayerPosition(event.packet.positionX, event.packet.positionX, event.packet.positionX, event.packet.isOnGround)) return
+            recordedPackets.add(C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround))
+        }
         if (recordedPackets.size == recordingLength) {
             modMessage("finished recording")
             recording = false
