@@ -219,7 +219,7 @@ object Blink: Module (
             if(cancelled > 0) cancelled--
             return
         }
-        if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook || movementPackets.isNotEmpty()) {
+        if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook || movementPackets.isNotEmpty() || (mc.thePlayer.getDistance(63.5, 127.0, 35.5) < 1.5 && event.packet is C05PacketPlayerLook)) {
             if(cancelled > 0) cancelled--
             return
         }
