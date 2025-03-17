@@ -15,6 +15,7 @@ import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.util.Vec3
 import org.lwjgl.input.Keyboard
 import me.defnotstolen.config.DataManager
+import me.defnotstolen.events.impl.ChatPacketEvent
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.settings.impl.BooleanSetting
 import me.defnotstolen.features.settings.impl.NumberSetting
@@ -24,6 +25,7 @@ import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S14PacketEntity.S15PacketEntityRelMove
 import net.minecraft.network.play.server.S14PacketEntity.S17PacketEntityLookMove
 import net.minecraft.network.play.server.S18PacketEntityTeleport
@@ -76,9 +78,11 @@ object AutoP3: Module (
     private var waitingTerm = false
     private var waitingLeap = false
     private var leaped = 0
+    var inBoss = false
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
+        if(!inBoss) return
         rings[route]?.forEachIndexed { i, ring ->
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
             AutoP3Utils.renderRing(ring)
@@ -97,6 +101,12 @@ object AutoP3: Module (
         waitingTerm = rings[route]?.any { it.type == RingTypes.TERM && !it.should } == true
         waitingLeap = rings[route]?.any { it.type == RingTypes.LEAP && !it.should } == true
         if (!waitingLeap) leaped = 0
+    }
+
+    @SubscribeEvent
+    fun onStart(event: PacketEvent.Receive) {
+        if (event.packet !is S08PacketPlayerPosLook) return
+        if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) inBoss = true
     }
 
     private fun executeRing(ring: Ring) {
@@ -178,13 +188,14 @@ object AutoP3: Module (
             "delete" -> deleteNormalRing(args)
             "remove" -> deleteNormalRing(args)
             "blink" -> Blink.blinkCommand(args)
+            "start" -> inBoss = true
             else -> modMessage("not an option")
         }
     }
 
     private fun addNormalRing(args: Array<out String>?) {
         val ringType: RingTypes
-        when(args?.get(1)?.lowercase()) { //dear kotlin, if u check the line above u see that i am checking wether args[1] is null. Pls stop complaining about args[1] possibly being null
+        when(args?.get(1)?.lowercase()) {
             "walk" -> {
                 modMessage("added walk")
                 ringType = RingTypes.WALK

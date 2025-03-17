@@ -1,4 +1,5 @@
 package com.github.wadey3636.noobroutes.features
+import com.github.wadey3636.noobroutes.features.AutoP3.inBoss
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.defnotstolen.events.impl.PacketEvent
@@ -86,12 +87,14 @@ object Blink: Module (
 
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent) {
+        if(!inBoss) return
         val resolution = ScaledResolution(mc)
         text(cancelled.toString(), resolution.scaledWidth / 2, resolution.scaledHeight / 2.3, Color.WHITE, 13, align = TextAlign.Middle)
     }
 
     @SubscribeEvent
     fun renderMovement(event:RenderWorldLastEvent) {
+        if(!inBoss) return
         if (movementPackets.isEmpty()) return
         if (!mode) return
         val vec3List: List<Vec3> = movementPackets.map { packet -> Vec3(packet.positionX, packet.positionY, packet.positionZ) }
@@ -105,6 +108,7 @@ object Blink: Module (
 
     @SubscribeEvent
     fun blinkWaypoints(event: RenderWorldLastEvent) {
+        if(!inBoss) return
         blinkStarts.forEach {
             Renderer.drawCylinder(it.coords.add(Vec3(0.0, 0.5 * sin(System.currentTimeMillis().toDouble()/300) + 0.5 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.WHITE, depth = true)
             if (AutoP3.editMode) return
@@ -200,6 +204,7 @@ object Blink: Module (
 
     @SubscribeEvent
     fun canceller(event: PacketEvent.Send) {
+        if(!inBoss) return
         if (event.packet !is C03PacketPlayer) return
         if (skip) return
         if (awaitingRotation) {
