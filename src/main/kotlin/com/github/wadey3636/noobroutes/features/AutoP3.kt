@@ -75,8 +75,8 @@ object AutoP3: Module (
     val frame by BooleanSetting("Check per Frame", false, description = "check each frame if the player is in a ring. Routes are easier to setup with per frame but possibly less consistent on low fps. Per tick is harder to setup but 100% consistent. Everything done on frame can also be done on tick")
     val motionValue by NumberSetting(name = "motion value", description = "how much yeet to put into the motion", min = 0f, max = 1000f, default = 100f)
     private var rings = mutableMapOf<String, MutableList<Ring>>()
-    private var waitingTerm = false
-    private var waitingLeap = false
+    var waitingTerm = false
+    var waitingLeap = false
     private var leaped = 0
     var inBoss = false
 
