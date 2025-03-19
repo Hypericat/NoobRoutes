@@ -1,6 +1,7 @@
 package com.github.wadey3636.noobroutes.features
 
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
+import com.github.wadey3636.noobroutes.utils.AutoP3Utils.motionAfter
 import com.github.wadey3636.noobroutes.utils.Utils
 import com.github.wadey3636.noobroutes.utils.adapters.RingsMapTypeAdapter
 import com.google.gson.GsonBuilder
@@ -40,7 +41,8 @@ enum class RingTypes {
     STOP,
     BLINK,
     TERM,
-    LEAP
+    LEAP,
+    MOTION
 }
 
 
@@ -120,7 +122,7 @@ object AutoP3: Module (
         when(ring.type) {
             RingTypes.WALK -> {
                 AutoP3Utils.startWalk(ring.direction.yaw)
-                modMessage("started Walking")
+                modMessage("walking")
             }
             RingTypes.STOP -> {
                 modMessage("stopping")
@@ -139,22 +141,31 @@ object AutoP3: Module (
                 Blink.doBlink(ring)
             }
             RingTypes.TERM -> {
+                modMessage("waiting")
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
                 AutoP3Utils.direction = ring.direction.yaw
             }
             RingTypes.LEAP -> {
+                modMessage("waiting")
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
                 AutoP3Utils.direction = ring.direction.yaw
             }
             RingTypes.YEET -> {
-                val speed = mc.thePlayer.capabilities.walkSpeed * 0.1
-                mc.thePlayer.motionX = speed * -Utils.xPart(ring.direction.yaw)
-                mc.thePlayer.motionZ = speed * -Utils.zPart(ring.direction.yaw)
+                modMessage("yeeting")
                 AutoP3Utils.direction = ring.direction.yaw
-                AutoP3Utils.yeetTicks = 1
+                AutoP3Utils.yeetTicks = 0
                 AutoP3Utils.yeeting = true
+            }
+            RingTypes.MOTION -> {
+                modMessage("motioning")
+                mc.thePlayer.motionX = 0.0
+                mc.thePlayer.motionZ = 0.0
+                if(mc.thePlayer.onGround) mc.thePlayer.jump()
+                AutoP3Utils.awaitingTick = true
+                AutoP3Utils.direction = ring.direction.yaw
+                motionAfter = true
             }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
@@ -219,6 +230,10 @@ object AutoP3: Module (
             "yeet" -> {
                 modMessage("yeet added")
                 ringType = RingTypes.YEET
+            }
+            "motion" -> {
+                modMessage("motion added")
+                ringType = RingTypes.MOTION
             }
             else -> return modMessage("thats not a ring type stoopid")
         }

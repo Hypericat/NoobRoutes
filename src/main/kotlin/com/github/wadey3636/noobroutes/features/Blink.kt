@@ -159,6 +159,7 @@ object Blink: Module (
         if (movementPackets.isNotEmpty()) return
 
         if (System.currentTimeMillis() - lastBlink >= 500 && (blinksInstance + ring.blinkPackets.size > maxBlinks || !blink)) {
+            modMessage("no blink for u")
             movementPackets = ring.blinkPackets.toMutableList()
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionY = 0.0
@@ -172,13 +173,14 @@ object Blink: Module (
             mc.thePlayer.motionZ = 0.0
             return
         }
-        modMessage("blinking")
+        modMessage("blinking with ${ring.blinkPackets.size} of those suckers")
         blinksInstance += ring.blinkPackets.size
         lastBlink = System.currentTimeMillis()
         ring.blinkPackets.forEach { PacketUtils.sendPacket(it) }
         val lastPacket = ring.blinkPackets.size - 1
         mc.thePlayer.setPosition(ring.blinkPackets[lastPacket].positionX, ring.blinkPackets[lastPacket].positionY, ring.blinkPackets[lastPacket].positionZ)
         mc.thePlayer.setVelocity(0.0, ring.endY, 0.0)
+        modMessage("there are $cancelled hot C04s wanting to message u but only ${maxBlinks - blinksInstance} on this instance")
     }
 
     @SubscribeEvent
