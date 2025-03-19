@@ -83,6 +83,14 @@ object Blink: Module (
     fun worldLoad(event: WorldEvent.Load) {
         blinksInstance = 0
         cancelled = 0
+        inBoss = false
+    }
+
+    @SubscribeEvent
+    fun worldUnLoad(event: WorldEvent.Unload) {
+        blinksInstance = 0
+        cancelled = 0
+        inBoss = false
     }
 
     @SubscribeEvent
