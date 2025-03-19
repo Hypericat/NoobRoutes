@@ -45,7 +45,8 @@ object ModuleManager {
         BlinkKeybind,
         Blink,
         AutoP3,
-        ElementTester
+        ElementTester,
+        Simulation
     )
 
     init {
