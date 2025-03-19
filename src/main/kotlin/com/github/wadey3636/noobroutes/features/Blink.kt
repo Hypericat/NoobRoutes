@@ -35,8 +35,8 @@ object Blink: Module (
     description = "Blink"
     ) {
     private val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink")
-    private val mode by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Motion", right = "Packet")
-    private val maxBlinks by NumberSetting(name = "max blinks per instance", description = "too much blink on an instance bans apperantly", min = 100f, max = 300f, default = 120f)
+    private val mode by DualSetting(name = "movement mode", description = "how movement should look", default = false, left = "Motion", right = "Packet")
+    private val maxBlinks by NumberSetting(name = "max blinks per instance", description = "too much blink on an instance bans apparently", min = 100, max = 300, default = 120)
     val showEnd by BooleanSetting("Render End", default = true, description = "renders waypoint where blink ends")
     val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes")
 

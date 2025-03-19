@@ -75,7 +75,7 @@ object AutoP3: Module (
     val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
     private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
     val frame by BooleanSetting("Check per Frame", false, description = "check each frame if the player is in a ring. Routes are easier to setup with per frame but possibly less consistent on low fps. Per tick is harder to setup but 100% consistent. Everything done on frame can also be done on tick")
-    val motionValue by NumberSetting(name = "motion value", description = "how much yeet to put into the motion", min = 0f, max = 1000f, default = 100f)
+    val motionValue by NumberSetting(name = "motion value", description = "how much yeet to put into the motion", min = 0f, max = 1000f, default = 509f)
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     var waitingTerm = false
     var waitingLeap = false
