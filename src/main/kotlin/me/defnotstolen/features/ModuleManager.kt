@@ -46,7 +46,8 @@ object ModuleManager {
         Blink,
         AutoP3,
         ElementTester,
-        Simulation
+        Simulation,
+        CoreClip
     )
 
     init {
