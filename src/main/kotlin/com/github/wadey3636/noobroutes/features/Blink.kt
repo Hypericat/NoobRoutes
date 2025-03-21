@@ -50,6 +50,8 @@ object Blink: Module (
     var rotate: Float? = null
     private var awaitingRotation = false
 
+    private var c03AfterS08 = 0
+
     private var lastBlink = System.currentTimeMillis()
 
     private var movementPackets = mutableListOf<C04PacketPlayerPosition>()
@@ -213,6 +215,12 @@ object Blink: Module (
     }
 
     @SubscribeEvent
+    fun s08(event: PacketEvent.Receive) {
+        if (!inBoss) return
+        if (event.packet is S08PacketPlayerPosLook) c03AfterS08 = 2
+    }
+
+    @SubscribeEvent
     fun canceller(event: PacketEvent.Send) {
         if(!inBoss) return
         if (event.packet !is C03PacketPlayer) return
@@ -236,8 +244,13 @@ object Blink: Module (
             if(cancelled > 0) cancelled--
             return
         }
+        if (c03AfterS08 > 0) {
+            c03AfterS08--
+            if (cancelled > 0) cancelled--
+            return
+        }
         if (mc.thePlayer.posX != mc.thePlayer.lastTickPosX || mc.thePlayer.posY != mc.thePlayer.lastTickPosY || mc.thePlayer.posZ != mc.thePlayer.lastTickPosZ || !mc.thePlayer.onGround || mc.thePlayer.motionX != 0.0 || mc.thePlayer.motionZ != 0.0 || movementPackets.isNotEmpty() || (mc.thePlayer.getDistance(63.5, 127.0, 35.5) < 1.5 && event.packet is C05PacketPlayerLook)) {
-            if(cancelled > 0) cancelled--
+            if (cancelled > 0) cancelled--
             return
         }
         event.isCanceled = true
