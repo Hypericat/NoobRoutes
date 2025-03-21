@@ -21,6 +21,6 @@ class AutoP3Command: CommandBase() {
         return true
     }
     override fun getCommandAliases(): List<String> {
-        return listOf("autop3")
+        return listOf("noobp3")
     }
 }
