@@ -22,6 +22,7 @@ object Simulation : Module(
     private var inLava = false
 
 
+
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
 
@@ -46,6 +47,5 @@ object Simulation : Module(
 
             }
         }
-
     }
 }
