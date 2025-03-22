@@ -50,7 +50,8 @@ object ModuleManager {
         CoreClip,
         LavaClip,
         HClip,
-        StormClip
+        StormClip,
+        Trail
     )
 
     init {

@@ -20,8 +20,12 @@ object HClip: Module(
 
     private var goNext = false
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
+    override fun onKeybind() {
+        toggle()
+    }
+
+    override fun onEnable() {
+        super.onEnable()
         if (mc.thePlayer == null) return
         if (goNext) return
         mc.thePlayer.motionX = 0.0

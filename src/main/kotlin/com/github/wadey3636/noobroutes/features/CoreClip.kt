@@ -49,6 +49,7 @@ object CoreClip : Module(
         if (clipping == "in") mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 55.301)
         else mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 53.699)
         clipping = null
+        AutoP3Utils.rePressKeys()
     }
 
     private fun isClose(number1: Double, number2: Double): Boolean {
