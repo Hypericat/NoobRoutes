@@ -44,7 +44,7 @@ class ElementHud(parent: ModuleButton, setting: HudSetting) : Element<HudSetting
             else isAreaHovered(x + w - 30f, y + 5f, 21f, 20f)
         }
 
-    private val movementIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/MovementIcon.png"))
+    private val movementIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/MovementIcon.png"))
     private val colorAnim = ColorAnimation(250)
     private val hover = HoverHandler(0, 150)
     private val linearAnimation = LinearAnimation<Float>(200)

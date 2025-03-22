@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL11
 
 val matrix = UMatrixStack.Compat
 val scaleFactor get() = ScaledResolution(mc).scaleFactor.toFloat()
-private val arrowIcon = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/arrow.png"))
+private val arrowIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/arrow.png"))
 
 data class Box(var x: Number, var y: Number, var w: Number, var h: Number)
 data class BoxWithClass<T : Number>(var x: T, var y: T, var w: T, var h: T)

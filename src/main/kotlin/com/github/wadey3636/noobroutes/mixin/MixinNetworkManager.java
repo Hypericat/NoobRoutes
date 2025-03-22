@@ -1,8 +1,8 @@
 /*package com.github.wadey3636.noobroutes.mixin;
 
 import io.netty.channel.ChannelHandlerContext;
-import me.odinmain.events.impl.PacketEvent;
-import me.odinmain.utils.ClientUtils;
+import me.defnotstolen.events.impl.PacketEvent;
+import me.defnotstolen.utils.ClientUtils;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraftforge.common.MinecraftForge;
@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static me.odinmain.utils.Utils.postAndCatch;
+import static me.defnotstolen.utils.Utils.postAndCatch;
 
 @Mixin(value = {NetworkManager.class}, priority = 1001)
 public class MixinNetworkManager {

@@ -45,7 +45,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         get() = setting.value
 
     private val hover = HoverHandler(0, 150)
-    private val hueGradiant = DynamicTexture(loadBufferedImage("/assets/odinmain/clickgui/HueGradient.png"))
+    private val hueGradiant = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/HueGradient.png"))
 
     private var hexString = "#FFFFFFFF"
     private var stringBefore = hexString
