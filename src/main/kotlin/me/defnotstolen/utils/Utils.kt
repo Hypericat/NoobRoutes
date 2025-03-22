@@ -50,6 +50,19 @@ inline val String?.noControlCodes: String
 fun String.containsOneOf(vararg options: String, ignoreCase: Boolean = false): Boolean {
     return options.any { this.contains(it, ignoreCase) }
 }
+fun <E> MutableList<E>.coerceMax(max: Int): MutableList<E> {
+    if (this.size > max) {
+        this.subList(max, this.size).clear()
+    }
+    return this
+}
+
+fun <E> MutableList<E>.addLast(element: E): MutableList<E> {
+    this.add(this.size - 1, element)
+    return this
+}
+
+
 
 /**
  * Checks if the current string contains at least one of the specified strings.
