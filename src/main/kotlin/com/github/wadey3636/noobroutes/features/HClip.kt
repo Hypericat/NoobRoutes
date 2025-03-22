@@ -1,6 +1,7 @@
 package com.github.wadey3636.noobroutes.features
 
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
+import com.github.wadey3636.noobroutes.utils.PacketUtils
 import com.github.wadey3636.noobroutes.utils.Utils
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
@@ -18,7 +19,6 @@ object HClip: Module(
     description = "hclips when activating"
 ) {
 
-    private var goNext = false
 
     override fun onKeybind() {
         toggle()
@@ -27,23 +27,16 @@ object HClip: Module(
     override fun onEnable() {
         super.onEnable()
         if (mc.thePlayer == null) return
-        if (goNext) return
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
         AutoP3Utils.unPressKeys()
-        goNext = true
-    }
-
-    @SubscribeEvent
-    fun onC03(event: PacketEvent.Send) {
-        if (!goNext) return
-        if (event.packet !is C03PacketPlayer) return
-        goNext = false
-        val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
-        mc.thePlayer.motionX = speed * Utils.xPart(mc.thePlayer.rotationYaw)
-        mc.thePlayer.motionZ = speed * Utils.zPart(mc.thePlayer.rotationYaw)
-        AutoP3Utils.rePressKeys()
-        toggle()
-        onDisable()
+        PacketUtils.c03ScheduleTask {
+            val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
+            mc.thePlayer.motionX = speed * Utils.xPart(mc.thePlayer.rotationYaw)
+            mc.thePlayer.motionZ = speed * Utils.zPart(mc.thePlayer.rotationYaw)
+            AutoP3Utils.rePressKeys()
+            toggle()
+            onDisable()
+        }
     }
 }

@@ -34,18 +34,18 @@ object Simulation : Module(
             mc.thePlayer.capabilities?.setPlayerWalkSpeed(0.5F)
         }
 
-        if (!lava) return
+        if (!lava || inLava) return
 
         if (mc.thePlayer.isInLava ||
             mc.theWorld.getBlockState(BlockPos(floor(mc.thePlayer.posX), floor(mc.thePlayer.posY), floor(mc.thePlayer.posZ))).block == Blocks.rail
             && mc.thePlayer.posY - floor(mc.thePlayer.posY) < 0.1) {
 
             inLava = true
-            ClientUtils.clientScheduleTask(6) {
-                inLava = false
+            ClientUtils.clientScheduleTask(2) {
                 mc.thePlayer.setVelocity(mc.thePlayer.motionX, 3.5, mc.thePlayer.motionZ)
 
             }
+            ClientUtils.clientScheduleTask(3) { inLava = false }
         }
     }
 }
