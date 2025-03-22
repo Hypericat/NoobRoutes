@@ -8,9 +8,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
  * Class that allows repeating execution of code while being dynamic.
  * @author Stivais
  */
-open class Executor(val delay: () -> Long, private val profileName: String = "Unspecified odin executor", val shouldRun: () -> Boolean = { true }, val func: Executable) {
+open class Executor(val delay: () -> Long, private val profileName: String = "Unspecified NoobRoutes executor", val shouldRun: () -> Boolean = { true }, val func: Executable) {
 
-    constructor(delay: Long, profileName: String = "Unspecified odin executor", shouldRun: () -> Boolean = { true }, func: Executable) : this({ delay }, profileName, shouldRun, func)
+    constructor(delay: Long, profileName: String = "Unspecified NoobRoutes executor", shouldRun: () -> Boolean = { true }, func: Executable) : this({ delay }, profileName, shouldRun, func)
 
     internal val clock = Clock()
     internal var shouldFinish = false
@@ -30,7 +30,7 @@ open class Executor(val delay: () -> Long, private val profileName: String = "Un
     /**
      * Starts an executor that ends after a certain number of times.
      */
-    class LimitedExecutor(delay: Long, repeats: Int, profileName: String = "Unspecified odin executor", shouldRun: () -> Boolean = { true }, func: Executable) : Executor(delay, profileName, shouldRun, func) {
+    class LimitedExecutor(delay: Long, repeats: Int, profileName: String = "Unspecified NoobRoutes executor", shouldRun: () -> Boolean = { true }, func: Executable) : Executor(delay, profileName, shouldRun, func) {
         private val repeats = repeats - 1
         private var totalRepeats = 0
 
