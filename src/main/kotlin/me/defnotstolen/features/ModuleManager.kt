@@ -44,7 +44,7 @@ object ModuleManager {
         ClickGUIModule,
         BlinkKeybind,
         AutoP3,
-        ElementTester,
+        //ElementTester,
         Simulation,
         CoreClip,
         LavaClip,

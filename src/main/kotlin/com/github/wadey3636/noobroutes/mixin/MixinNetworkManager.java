@@ -2,7 +2,7 @@
 
 import io.netty.channel.ChannelHandlerContext;
 import me.odinmain.events.impl.PacketEvent;
-import me.odinmain.utils.ServerUtils;
+import me.odinmain.utils.ClientUtils;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraftforge.common.MinecraftForge;

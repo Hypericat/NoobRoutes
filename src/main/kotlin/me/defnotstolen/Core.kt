@@ -29,7 +29,7 @@ object Core {
     fun init() {
         /*
         listOf(
-            LocationUtils, ServerUtils, PlayerUtils,
+            LocationUtils, ClientUtils, PlayerUtils,
             RenderUtils, Renderer, DungeonUtils, KuudraUtils,
             EventDispatcher, Executor, ModuleManager,
             SkyblockPlayer,

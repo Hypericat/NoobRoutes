@@ -202,6 +202,7 @@ object AutoP3: Module (
         if (route.isEmpty()) return modMessage("Put in a route dumbass")
         when(args?.get(0)) {
             "add" -> addNormalRing(args)
+            "create" -> addNormalRing(args)
             "delete" -> deleteNormalRing(args)
             "remove" -> deleteNormalRing(args)
             "blink" -> Blink.blinkCommand(args)
@@ -211,8 +212,12 @@ object AutoP3: Module (
     }
 
     private fun addNormalRing(args: Array<out String>?) {
+        if (args == null || args.size < 2) {
+            modMessage("Rings: walk, hclip, stop, term, leap, yeet, motion")
+            return
+        }
         val ringType: RingTypes
-        when(args?.get(1)?.lowercase()) {
+        when(args[1].lowercase()) {
             "walk" -> {
                 modMessage("added walk")
                 ringType = RingTypes.WALK

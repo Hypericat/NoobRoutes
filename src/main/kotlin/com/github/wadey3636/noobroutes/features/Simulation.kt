@@ -1,5 +1,6 @@
 package com.github.wadey3636.noobroutes.features
 
+import com.github.wadey3636.noobroutes.utils.ClientUtils
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.impl.BooleanSetting
@@ -18,8 +19,8 @@ object Simulation : Module(
 ) {
     private val speed by BooleanSetting("500 Speed", true, description = "Simulates 500 Speed in singleplayer")
     private val lava by BooleanSetting("Lava Bounce", true, description = "Simulates Lava Bounces in singleplayer")
+    private var inLava = false
 
-    private var waiting = 0
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -34,12 +35,17 @@ object Simulation : Module(
 
         if (!lava) return
 
-        waiting--
-        if (waiting == 0) mc.thePlayer.setVelocity(mc.thePlayer.motionX, 3.5, mc.thePlayer.motionZ)
+        if (mc.thePlayer.isInLava ||
+            mc.theWorld.getBlockState(BlockPos(floor(mc.thePlayer.posX), floor(mc.thePlayer.posY), floor(mc.thePlayer.posZ))).block == Blocks.rail
+            && mc.thePlayer.posY - floor(mc.thePlayer.posY) < 0.1) {
 
-        if (waiting > -4) return
-        if ((mc.thePlayer.isInLava || mc.theWorld.getBlockState(BlockPos(floor(mc.thePlayer.posX), floor(mc.thePlayer.posY), floor(mc.thePlayer.posZ))).block == Blocks.rail) && mc.thePlayer.posY - floor(mc.thePlayer.posY) < 0.1) {
-            waiting = 6
+            inLava = true
+            ClientUtils.clientScheduleTask(6) {
+                inLava = false
+                mc.thePlayer.setVelocity(mc.thePlayer.motionX, 3.5, mc.thePlayer.motionZ)
+
+            }
         }
+
     }
 }

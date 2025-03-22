@@ -316,3 +316,9 @@ fun EntityPlayer?.isOtherPlayer(): Boolean {
 fun EntityLivingBase?.getSBMaxHealth(): Float {
     return this?.getEntityAttribute(SharedMonsterAttributes.maxHealth)?.baseValue?.toFloat() ?: 0f
 }
+
+
+
+
+
+

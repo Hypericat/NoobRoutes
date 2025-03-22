@@ -4,6 +4,8 @@ import com.github.wadey3636.noobroutes.commands.AutoP3Command
 import com.github.wadey3636.noobroutes.commands.NoobRoutesCommand
 import com.github.wadey3636.noobroutes.features.Blink
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
+import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.defnotstolen.Core
 import me.defnotstolen.Core.mc
 import me.defnotstolen.features.ModuleManager
@@ -45,7 +47,7 @@ class NoobRoutes {
         println("Dirt: ${Blocks.dirt.unlocalizedName}")
 	    // Below is a demonstration of an access-transformed class access.
 	    println("Color State: " + GlStateManager.Color());
-        val Modules = listOf(
+        val alwaysActiveObjects = listOf(
             Core,
             ModuleManager,
             Executor,
@@ -54,10 +56,12 @@ class NoobRoutes {
             RenderUtils,
             ClickGUI,
             AutoP3Utils,
-            Blink
+            Blink,
+            ClientUtils,
+            PacketUtils
 
         )
-        Modules.forEach {
+        alwaysActiveObjects.forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }
         OdinFont.init()

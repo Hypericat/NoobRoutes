@@ -38,7 +38,7 @@ object ServerUtils {
     }
 
     init {
-        Executor(2000, "ServerUtils") {
+        Executor(2000, "ClientUtils") {
             sendPing()
         }.register()
     }
