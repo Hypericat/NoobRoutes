@@ -51,6 +51,10 @@ object AutoP3Utils {
         walking = false
     }
 
+    fun rePressKeys() {
+        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, Keyboard.isKeyDown(it.keyCode)) }
+    }
+
     var walking = false
     var direction = 0F
     var yeeting = false

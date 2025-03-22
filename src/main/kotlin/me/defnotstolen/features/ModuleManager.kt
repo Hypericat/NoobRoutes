@@ -47,7 +47,10 @@ object ModuleManager {
         AutoP3,
         ElementTester,
         Simulation,
-        CoreClip
+        CoreClip,
+        LavaClip,
+        HClip,
+        StormClip
     )
 
     init {
