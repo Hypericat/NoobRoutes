@@ -49,7 +49,6 @@ object HClip: Module(
         if (!Keyboard.getEventKeyState()) {
             since = 0
             toggle()
-            onDisable()
         }
     }
 

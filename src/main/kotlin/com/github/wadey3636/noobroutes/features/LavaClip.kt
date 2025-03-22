@@ -51,6 +51,5 @@ object LavaClip: Module(
         event.isCanceled = true
         cancelS12 = false
         toggle()
-        onDisable()
     }
 }

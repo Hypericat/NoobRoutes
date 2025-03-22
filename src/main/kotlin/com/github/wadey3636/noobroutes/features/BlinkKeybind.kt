@@ -41,7 +41,6 @@ object BlinkKeybind: Module(
 
     override fun onEnable() {
         if (mc.currentScreen is ClickGUI) {
-            onDisable()
             toggle()
             return modMessage("Enable using the Keybind")
         }
@@ -56,7 +55,7 @@ object BlinkKeybind: Module(
     @SubscribeEvent
     fun onPacket(event: PacketEvent.Send) {
         if (legit) return
-        if (event.packet.toString().contains("server") || event.packet is S38PacketPlayerListItem || event.packet is FMLProxyPacket) return
+        if (event.packet.toString().contains("server") || event.packet is S38PacketPlayerListItem || event.packet is FMLProxyPacket || event.isCanceled) return
         event.isCanceled = true
         if(event.packet is C03PacketPlayer) ticks++
         cancelledPackets.add(event.packet)
@@ -69,7 +68,6 @@ object BlinkKeybind: Module(
             val passedTime = System.currentTimeMillis() - blinkTime
             if (passedTime > 300) {
                 toggle()
-                onDisable()
                 return
             }
             val height = (sin(passedTime.toDouble() * PI / 300) * (resolution.scaledHeight / 2))
