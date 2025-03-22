@@ -48,7 +48,8 @@ object Trail: Module(
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         if (!mode) {
-            Renderer.draw3DLine(positions, Color.CYAN, depth = true)
+            val positionsUp = positions.map { it.add(Vec3(0.0, 0.01, 0.0)) }
+            Renderer.draw3DLine(positionsUp, Color.CYAN, depth = true)
         }
         else {
             positions.forEach{

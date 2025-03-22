@@ -37,9 +37,9 @@ object Simulation : Module(
         waiting--
         if (waiting == 0) mc.thePlayer.setVelocity(mc.thePlayer.motionX, 3.5, mc.thePlayer.motionZ)
 
-        if (waiting > -4) return
+        if (waiting > -2) return
         if ((mc.thePlayer.isInLava || mc.theWorld.getBlockState(BlockPos(floor(mc.thePlayer.posX), floor(mc.thePlayer.posY), floor(mc.thePlayer.posZ))).block == Blocks.rail) && mc.thePlayer.posY - floor(mc.thePlayer.posY) < 0.1) {
-            waiting = 6
+            waiting = 4
         }
     }
 }
