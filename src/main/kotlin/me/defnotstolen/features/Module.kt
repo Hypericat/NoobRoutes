@@ -76,7 +76,6 @@ abstract class Module(
     }
 
     open fun onKeybind() {
-        toggle()
         if (ClickGUIModule.enableNotification) {
             modMessage("$name ${if (enabled) "§aenabled" else "§cdisabled"}.")
         }

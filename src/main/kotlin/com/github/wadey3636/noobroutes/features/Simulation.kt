@@ -6,6 +6,7 @@ import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.impl.BooleanSetting
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
@@ -19,6 +20,8 @@ object Simulation : Module(
 ) {
     private val speed by BooleanSetting("500 Speed", true, description = "Simulates 500 Speed in singleplayer")
     private val lava by BooleanSetting("Lava Bounce", true, description = "Simulates Lava Bounces in singleplayer")
+    private var force by BooleanSetting("force Singleplayer", false, description = "always does this also on servers (ban in 3, 2, 1, rn)")
+
     private var inLava = false
 
 
@@ -26,7 +29,7 @@ object Simulation : Module(
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
 
-        if (!mc.isSingleplayer) return
+        if (!mc.isSingleplayer && !force) return
         if (mc.thePlayer == null) return
 
         if (speed) {
@@ -47,5 +50,15 @@ object Simulation : Module(
             }
             ClientUtils.clientScheduleTask(3) { inLava = false }
         }
+    }
+
+    @SubscribeEvent
+    fun onUnload(event: WorldEvent.Unload) {
+        force = false
+    }
+
+    @SubscribeEvent
+    fun onLoad(event: WorldEvent.Load) {
+        force = false
     }
 }
