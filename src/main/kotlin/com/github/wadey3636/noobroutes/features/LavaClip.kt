@@ -1,6 +1,7 @@
 package com.github.wadey3636.noobroutes.features
 
 
+import com.github.wadey3636.noobroutes.utils.ClientUtils
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
@@ -25,7 +26,6 @@ object LavaClip: Module(
 )  {
     private val lavaDistance by NumberSetting(name = "Lava Clip distance", description = "how far to clip u", min = 10f, max = 50f, default = 30f)
 
-    private var clipNext = false
     private var cancelS12 = false
 
     @SubscribeEvent
@@ -33,14 +33,10 @@ object LavaClip: Module(
         if (mc.thePlayer == null) return
         if (event.phase != TickEvent.Phase.START) return
 
-        if (clipNext) {
+        if (mc.thePlayer.isInLava) ClientUtils.clientScheduleTask {
             mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - lavaDistance, mc.thePlayer.posZ)
-            clipNext = false
             cancelS12 = true
-            return
-        }
-
-        if (mc.thePlayer.isInLava) clipNext = true
+            }
     }
 
     @SubscribeEvent

@@ -1,5 +1,6 @@
 package com.github.wadey3636.noobroutes.features
 
+import com.github.wadey3636.noobroutes.utils.ClientUtils
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
@@ -19,24 +20,15 @@ object StormClip: Module(
 )  {
     private val clipDistance by NumberSetting(name = "Storm Clip distance", description = "how far to clip u", min = 30f, max = 80f, default = 40f)
 
-    private var goIn: Int? = null
     private var has = false
 
     @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook || has) return
-        if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) goIn = 2
-    }
-
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (goIn == null) return
-        if (event.phase != TickEvent.Phase.END) return
-        goIn = goIn!! - 1
-        if (goIn != 0) return
-        mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - clipDistance, mc.thePlayer.posZ)
-        goIn = null
-        has = true
+        if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) ClientUtils.clientScheduleTask(2) {
+            mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - clipDistance, mc.thePlayer.posZ)
+            has = true
+        }
     }
 
     @SubscribeEvent
