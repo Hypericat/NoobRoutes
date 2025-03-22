@@ -1,7 +1,11 @@
 package com.github.wadey3636.noobroutes.features
+import com.github.wadey3636.noobroutes.features.AutoP3.blink
 import com.github.wadey3636.noobroutes.features.AutoP3.inBoss
+import com.github.wadey3636.noobroutes.features.AutoP3.maxBlinks
+import com.github.wadey3636.noobroutes.features.AutoP3.mode
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
+import me.defnotstolen.Core.mc
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
@@ -28,17 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.sin
 
-object Blink: Module (
-    name = "Blink",
-    Keyboard.KEY_NONE,
-    category = Category.FLOOR7,
-    description = "Blink"
-    ) {
-    private val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink")
-    private val mode by DualSetting(name = "movement mode", description = "how movement should look", default = false, left = "Motion", right = "Packet")
-    private val maxBlinks by NumberSetting(name = "max blinks per instance", description = "too much blink on an instance bans apparently", min = 100, max = 300, default = 120)
-    val showEnd by BooleanSetting("Render End", default = true, description = "renders waypoint where blink ends")
-    val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes")
+object Blink{
 
     data class BlinkWaypoints (val coords: Vec3 = mc.thePlayer.positionVector, val length: Int, var active: Boolean = false)
     private val blinkStarts = mutableListOf<BlinkWaypoints>()

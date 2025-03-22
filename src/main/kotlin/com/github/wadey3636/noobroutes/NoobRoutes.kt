@@ -2,6 +2,7 @@ package com.github.wadey3636.noobroutes
 
 import com.github.wadey3636.noobroutes.commands.AutoP3Command
 import com.github.wadey3636.noobroutes.commands.NoobRoutesCommand
+import com.github.wadey3636.noobroutes.features.Blink
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import me.defnotstolen.Core
 import me.defnotstolen.Core.mc
@@ -52,7 +53,8 @@ class NoobRoutes {
             RenderUtils2D,
             RenderUtils,
             ClickGUI,
-            AutoP3Utils
+            AutoP3Utils,
+            Blink
 
         )
         Modules.forEach {

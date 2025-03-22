@@ -18,9 +18,8 @@ import org.lwjgl.input.Keyboard
 import me.defnotstolen.config.DataManager
 import me.defnotstolen.events.impl.ChatPacketEvent
 import me.defnotstolen.events.impl.PacketEvent
-import me.defnotstolen.features.settings.impl.BooleanSetting
-import me.defnotstolen.features.settings.impl.NumberSetting
-import me.defnotstolen.features.settings.impl.StringSetting
+import me.defnotstolen.features.settings.Setting.Companion.withDependency
+import me.defnotstolen.features.settings.impl.*
 import me.defnotstolen.utils.LookVec
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
@@ -76,6 +75,13 @@ object AutoP3: Module (
     private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
     val frame by BooleanSetting("Check per Frame", false, description = "check each frame if the player is in a ring. Routes are easier to setup with per frame but possibly less consistent on low fps. Per tick is harder to setup but 100% consistent. Everything done on frame can also be done on tick")
     val motionValue by NumberSetting(name = "motion value", description = "how much yeet to put into the motion", min = 0f, max = 1000f, default = 509f)
+    private val blinkShit by DropdownSetting(name = "Blink Settings")
+    val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink").withDependency { blinkShit }
+    val mode by DualSetting(name = "movement mode", description = "how movement should look", default = false, left = "Motion", right = "Packet").withDependency { blinkShit }
+    val maxBlinks by NumberSetting(name = "max blinks per instance", description = "too much blink on an instance bans apparently", min = 100, max = 300, default = 120).withDependency { blinkShit }
+    val showEnd by BooleanSetting("Render End", default = true, description = "renders waypoint where blink ends").withDependency { blinkShit }
+    val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes").withDependency { blinkShit }
+
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     var waitingTerm = false
     var waitingLeap = false
@@ -90,8 +96,8 @@ object AutoP3: Module (
             AutoP3Utils.renderRing(ring)
             if (ring.type == RingTypes.BLINK) {
                 val vec3List: List<Vec3> = ring.blinkPackets.map { packet -> Vec3(packet.positionX, packet.positionY, packet.positionZ) }
-                if (Blink.showEnd && ring.blinkPackets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
-                if (Blink.showLine) Renderer.draw3DLine(vec3List, Color.GREEN, lineWidth = 1F, depth = true)
+                if (showEnd && ring.blinkPackets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
+                if (showLine) Renderer.draw3DLine(vec3List, Color.GREEN, lineWidth = 1F, depth = true)
             }
             if (editMode) return@forEachIndexed
             if (AutoP3Utils.distanceToRing(ring.coords) < 0.5 && AutoP3Utils.ringCheckY(ring) && ring.should) {

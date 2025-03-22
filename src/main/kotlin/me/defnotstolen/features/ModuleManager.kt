@@ -43,7 +43,6 @@ object ModuleManager {
     val modules: ArrayList<Module> = arrayListOf(
         ClickGUIModule,
         BlinkKeybind,
-        Blink,
         AutoP3,
         ElementTester,
         Simulation,
