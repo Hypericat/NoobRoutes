@@ -52,6 +52,7 @@ object BlinkKeybind: Module(
         else blinkTime = System.currentTimeMillis()
         super.onEnable()
     }
+
     @SubscribeEvent
     fun onPacket(event: PacketEvent.Send) {
         if (legit) return

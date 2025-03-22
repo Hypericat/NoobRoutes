@@ -47,6 +47,7 @@ object HClip: Module(
         val key = Keyboard.getEventKey()
         if (key != this.keybinding?.key) return
         if (!Keyboard.getEventKeyState()) {
+            since = 0
             toggle()
             onDisable()
         }
