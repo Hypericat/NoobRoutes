@@ -52,7 +52,8 @@ object ModuleManager {
         StormClip,
         Trail,
         NoTnT,
-        VertJerry
+        VertJerry,
+        SexAura
     )
 
     init {

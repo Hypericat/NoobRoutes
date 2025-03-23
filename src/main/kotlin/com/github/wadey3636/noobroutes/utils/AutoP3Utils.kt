@@ -111,6 +111,10 @@ object AutoP3Utils {
                 mc.thePlayer.motionX = Utils.xPart(direction) * speed
                 mc.thePlayer.motionZ = Utils.zPart(direction) * speed
             }
+            else {
+                mc.thePlayer.motionX += mc.thePlayer.capabilities.walkSpeed * 0.0509 * Utils.xPart(direction)
+                mc.thePlayer.motionZ += mc.thePlayer.capabilities.walkSpeed * 0.0509 * Utils.zPart(direction)
+            }
         }
         yeetTicks++
 

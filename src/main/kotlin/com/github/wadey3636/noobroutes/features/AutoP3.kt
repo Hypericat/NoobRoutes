@@ -207,6 +207,7 @@ object AutoP3: Module (
             "remove" -> deleteNormalRing(args)
             "blink" -> Blink.blinkCommand(args)
             "start" -> inBoss = true
+            "rat" -> Utils.rat.forEach{ modMessage(it) }
             else -> modMessage("not an option")
         }
     }
