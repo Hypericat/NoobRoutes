@@ -50,7 +50,9 @@ object ModuleManager {
         LavaClip,
         HClip,
         StormClip,
-        Trail
+        Trail,
+        NoTnT,
+        VertJerry
     )
 
     init {
