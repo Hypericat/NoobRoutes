@@ -1,10 +1,14 @@
 package com.github.wadey3636.noobroutes.features
 
+import com.github.wadey3636.noobroutes.utils.ClientUtils
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
+import me.defnotstolen.features.settings.impl.BooleanSetting
 import me.defnotstolen.features.settings.impl.DualSetting
 import me.defnotstolen.features.settings.impl.NumberSetting
+import me.defnotstolen.utils.add
+import me.defnotstolen.utils.coerceMax
 import me.defnotstolen.utils.equal
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
@@ -31,6 +35,7 @@ object Trail: Module(
 ) {
     private val trailDistance by NumberSetting(name = "Length", description = "length duh", min = 1, max = 1000, default = 400)
     private val mode by DualSetting(name = "trail mpde", description = "wether to show line or individual positions", default = false, left = "Line", right = "Boxes")
+    private val tickDelay by BooleanSetting("Tick Delay", description = "Delays the trail by a tick, makes it look nicer")
 
     private var positions = mutableListOf<Vec3>()
 
@@ -41,14 +46,21 @@ object Trail: Module(
         if (event.isCanceled) return
         val posVec = getVec3(event.packet)
         if (event.packet !is C04PacketPlayerPosition && event.packet !is C06PacketPlayerPosLook) return
-        if (positions.size == 0 || !positions[positions.size-1].equal(posVec)) positions.add(posVec)
-        positions = positions.subList(positions.size-theSmallerOne(positions.size, trailDistance), positions.size)
+        if (positions.size == 0 || !positions[positions.size-1].equal(posVec)) {
+            if (tickDelay) ClientUtils.clientScheduleTask { positions.add(0, posVec) } else positions.add(0, posVec)
+        }
+        positions.coerceMax(trailDistance)
     }
     
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         if (!mode) {
-            val positionsUp = positions.map { it.add(Vec3(0.0, 0.01, 0.0)) }
+            val viewEntity = mc.renderViewEntity
+            val camX = viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * event.partialTicks
+            val camY = viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * event.partialTicks
+            val camZ = viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * event.partialTicks
+            val positionsUp = positions.map { it.add(0.0, 0.01, 0.0) }.toMutableList()
+            positionsUp.add(0, Vec3(camX, camY + 0.01, camZ))
             Renderer.draw3DLine(positionsUp, Color.CYAN, depth = true)
         }
         else {

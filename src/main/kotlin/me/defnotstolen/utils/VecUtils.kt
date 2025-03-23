@@ -32,6 +32,12 @@ fun Entity.distanceSquaredTo(pos: Vec3): Double =
 fun Entity.xzDistance(entity1: Entity): Double =
     (posX - entity1.posX).pow(2.0) + (posZ - entity1.posZ).pow(2.0)
 
+fun Vec3.add(x: Double, y: Double, z: Double): Vec3 {
+    return this.add(Vec3(x, y, z))
+}
+
+
+
 /**
  * Gets the eye height of the player
  * @return The eye height of the player

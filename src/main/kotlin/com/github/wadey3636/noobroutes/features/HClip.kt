@@ -8,6 +8,7 @@ import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.Setting.Companion.withDependency
 import me.defnotstolen.features.settings.impl.BooleanSetting
 import me.defnotstolen.features.settings.impl.NumberSetting
+import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -23,7 +24,7 @@ object HClip: Module(
 ) {
     private val omni by BooleanSetting("omni", false, description = "should go in a direction based of key inputs")
     private val shouldSpam by BooleanSetting("should repeat", false, description = "should repeatedly hclip if holding the button")
-    private val hclipIntervall by NumberSetting(name = "delay", description = "how long to wait between hclips", min = 2, max = 10, default = 6).withDependency { shouldSpam }
+    private val hclipInterval by NumberSetting(name = "delay", description = "how long to wait between hclips", min = 2, max = 10, default = 6).withDependency { shouldSpam }
 
     private var since = 0
 
@@ -33,12 +34,16 @@ object HClip: Module(
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
+        if (mc.currentScreen != null) {
+            modMessage("Gui Open")
+            toggle()
+        }
         if (!shouldSpam) return
         if (event.phase != TickEvent.Phase.START) return
         since++
-        if (since == hclipIntervall) {
+        if (since == hclipInterval) {
             since = 0
-            onEnable()
+            hclip()
         }
     }
 
@@ -52,8 +57,7 @@ object HClip: Module(
         }
     }
 
-    override fun onEnable() {
-        super.onEnable()
+    private fun hclip() {
         if (mc.thePlayer == null) return
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
@@ -64,6 +68,12 @@ object HClip: Module(
             mc.thePlayer.motionZ = speed * Utils.zPart(mc.thePlayer.rotationYaw + yawChange())
             AutoP3Utils.rePressKeys()
         }
+        if (!shouldSpam) toggle()
+    }
+
+    override fun onEnable() {
+        super.onEnable()
+        hclip()
     }
 
     private fun yawChange(): Int {
