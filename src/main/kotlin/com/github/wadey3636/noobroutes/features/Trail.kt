@@ -35,7 +35,7 @@ object Trail: Module(
 ) {
     private val trailDistance by NumberSetting(name = "Length", description = "length duh", min = 1, max = 1000, default = 400)
     private val mode by DualSetting(name = "trail mpde", description = "wether to show line or individual positions", default = false, left = "Line", right = "Boxes")
-    private val tickDelay by BooleanSetting("Tick Delay", description = "Delays the trail by a tick, makes it look nicer")
+    private val tickDelay by BooleanSetting("Tick Delay", description = "Delays the trail by a tick, makes it look nicer", default = true)
 
     private var positions = mutableListOf<Vec3>()
 
