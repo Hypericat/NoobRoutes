@@ -3,12 +3,17 @@ package com.github.wadey3636.noobroutes.features
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
+import me.defnotstolen.utils.skyblock.modMessage
 import me.defnotstolen.utils.skyblock.sendChatMessage
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.event.world.WorldEvent.Load
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
+import java.util.UUID
 
 object SexAura: Module(
     name = "Sex Aura",
@@ -16,8 +21,9 @@ object SexAura: Module(
     category = Category.RENDER,
     description = "picks up them hoes"
 ) {
-    private val sentList = mutableListOf<EntityPlayer>()
+    private val sentList = mutableListOf<UUID>()
     private var lastMessage = System.currentTimeMillis()
+    private var active = false
 
     private val pickupLines = listOf(
         "Are you WiFi? Because I’m feeling a strong connection… even though you’re clearly out of my league.",
@@ -58,19 +64,47 @@ object SexAura: Module(
         if (event.phase != TickEvent.Phase.END) return
         if (System.currentTimeMillis() - lastMessage < 500) return
         mc.theWorld.playerEntities.forEach {
-            if (it.isUser) return
-            if (it.isSpectator || it.isAirBorne) return
-            if(it.getDistance(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ) > 5) return
-            if (sentList.contains(it)) return
+            if (sentList.contains(it.uniqueID)) return
+            /*
+            if (it.isSpectator ||
+                sentList.contains(it) ||
+                //it.getDistanceToEntity(mc.thePlayer) > 5 ||
+                it.isSpectator ||
+                it.isInvisible ||
+                it.name.startsWith("[NPC]") ||
+                it.name.contains("Hypixel") ||
+                it.name.contains("BOT")) return*/
+            modMessage(
+                """
+                |==== PLAYER DETECTED ====
+                |Name: ${it.name}
+                |UUID: ${it.uniqueID}
+                |motionX: ${it.motionX}
+                |look: ${it.rotationYaw} ${it.rotationPitch}
+                |hp: ${it is EntityOtherPlayerMP && it.health <= 0.0f} 
+                |=====================
+                """.trimMargin()
+            )
             sendPickupLine(it)
-            sentList.add(it)
-            ClientUtils.clientScheduleTask(200) { sentList.remove(it) }
+            sentList.add(it.uniqueID)
+            ClientUtils.clientScheduleTask(2000) { sentList.remove(it.uniqueID) }
         }
 
     }
 
     private fun sendPickupLine(player: EntityPlayer) {
-        sendChatMessage("/msg ${player.name} ${pickupLines.random()}")
+        //sendChatMessage("/msg ${player.name} ${pickupLines.random()}")
         lastMessage = System.currentTimeMillis()
+    }
+
+    @SubscribeEvent
+    fun onLoad(event: WorldEvent.Load) {
+        active = true
+        lastMessage = System.currentTimeMillis() + 1000
+    }
+
+    @SubscribeEvent
+    fun onUnload(event: WorldEvent.Unload) {
+        active = false
     }
 }
