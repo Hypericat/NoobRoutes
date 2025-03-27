@@ -1,26 +1,19 @@
 package com.github.wadey3636.noobroutes.features
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
-import me.defnotstolen.events.impl.PacketEvent
-import me.defnotstolen.events.impl.RenderEntityModelEvent
-import me.defnotstolen.events.impl.ServerTickEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
+import me.defnotstolen.features.settings.impl.BooleanSetting
 import me.defnotstolen.features.settings.impl.NumberSetting
 import me.defnotstolen.utils.skyblock.modMessage
-import me.defnotstolen.utils.skyblock.sendChatMessage
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import me.defnotstolen.utils.skyblock.sendCommand
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.network.play.server.S14PacketEntity
-import net.minecraftforge.client.event.RenderPlayerEvent
+import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.event.world.WorldEvent.Load
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
-import java.util.UUID
 
 object SexAura: Module(
     name = "Sex Aura",
@@ -28,7 +21,8 @@ object SexAura: Module(
     category = Category.RENDER,
     description = "picks up them hoes"
 ) {
-    val pickupRange by NumberSetting(name = "range", description = "how far the bitches can be away", min = 0, max = 15, default = 5)
+    private val pickupRange by NumberSetting(name = "range", description = "how far the bitches can be away", min = 0, max = 15, default = 5)
+    private val actuallySend by BooleanSetting("Im ready", false, description = "wether to actually start the rizz")
     private val sentList = mutableListOf<String>()
     private var lastMessage = System.currentTimeMillis()
 
@@ -70,7 +64,7 @@ object SexAura: Module(
     fun onTick(event: ClientTickEvent) {
         if (mc.theWorld == null || mc.thePlayer == null) return
         if (System.currentTimeMillis() - lastMessage < 1000) return
-        getPlayersInRenderDistance().forEach { player ->
+        getPlayersInRenderDistance().sortedBy {mc.thePlayer.getDistanceToEntity(it)}.forEach { player ->
             if (System.currentTimeMillis() - lastMessage < 1000) return
             sendPickupLine(player)
         }
@@ -78,15 +72,23 @@ object SexAura: Module(
     }
 
     private fun sendPickupLine(player: EntityPlayer) {
-        //sendChatMessage("/msg ${player.name} ${pickupLines.random()}")
-        modMessage("/msg ${player.name} ${pickupLines.random()}")
+        if (actuallySend) sendCommand("msg ${player.name} ${pickupLines.random()}")
+        else modMessage("/msg ${player.name} ${pickupLines.random()}")
         sentList.add(player.name)
         ClientUtils.clientScheduleTask(200) { sentList.remove(player.name) }
         lastMessage = System.currentTimeMillis()
     }
 
+    fun pickupLineByName(args: Array<out String>) {
+        if (args == null || args.size < 2) {
+            modMessage("u gotta put in a name")
+            return
+        }
+        sendCommand("msg ${args[1]} ${pickupLines.random()}")
+    }
+
     private fun getPlayersInRenderDistance(): List<EntityPlayer> {
-        return mc.theWorld?.loadedEntityList?.filterIsInstance<EntityPlayer>() ?.filter {player ->
+        return mc.theWorld?.loadedEntityList?.filterIsInstance<EntityPlayer>()?.filter {player ->
                 player != mc.thePlayer &&
                 !player.isInvisible &&
                 mc.thePlayer.getDistanceToEntity(player) < pickupRange &&

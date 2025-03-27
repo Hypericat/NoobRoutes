@@ -16,7 +16,6 @@ import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.util.Vec3
 import org.lwjgl.input.Keyboard
 import me.defnotstolen.config.DataManager
-import me.defnotstolen.events.impl.ChatPacketEvent
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.settings.Setting.Companion.withDependency
 import me.defnotstolen.features.settings.impl.*
@@ -26,8 +25,6 @@ import me.defnotstolen.utils.render.Renderer
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
-import net.minecraft.network.play.server.S14PacketEntity.S15PacketEntityRelMove
-import net.minecraft.network.play.server.S14PacketEntity.S17PacketEntityLookMove
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -208,6 +205,7 @@ object AutoP3: Module (
             "blink" -> Blink.blinkCommand(args)
             "start" -> inBoss = true
             "rat" -> Utils.rat.forEach{ modMessage(it) }
+            "pickup" -> SexAura.pickupLineByName(args)
             else -> modMessage("not an option")
         }
     }
