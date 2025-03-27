@@ -45,10 +45,13 @@ object AutoP3Utils {
     var motionAfter = false
     private var motioning = false
 
-    fun unPressKeys() {
+    fun unPressKeys(stop: Boolean = true) {
         Keyboard.enableRepeatEvents(false)
         keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
+        if (!stop) return
         walking = false
+        yeeting = false
+        motioning = false
     }
 
     fun rePressKeys() {

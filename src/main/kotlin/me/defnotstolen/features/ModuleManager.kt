@@ -53,7 +53,8 @@ object ModuleManager {
         Trail,
         NoTnT,
         VertJerry,
-        SexAura
+        SexAura,
+        TimerHud
     )
 
     init {

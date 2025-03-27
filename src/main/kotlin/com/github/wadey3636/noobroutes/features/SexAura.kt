@@ -1,12 +1,19 @@
 package com.github.wadey3636.noobroutes.features
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
+import me.defnotstolen.events.impl.PacketEvent
+import me.defnotstolen.events.impl.RenderEntityModelEvent
+import me.defnotstolen.events.impl.ServerTickEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
+import me.defnotstolen.features.settings.impl.NumberSetting
 import me.defnotstolen.utils.skyblock.modMessage
 import me.defnotstolen.utils.skyblock.sendChatMessage
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.network.play.server.S14PacketEntity
+import net.minecraftforge.client.event.RenderPlayerEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.event.world.WorldEvent.Load
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -21,9 +28,9 @@ object SexAura: Module(
     category = Category.RENDER,
     description = "picks up them hoes"
 ) {
-    private val sentList = mutableListOf<UUID>()
+    val pickupRange by NumberSetting(name = "range", description = "how far the bitches can be away", min = 0, max = 15, default = 5)
+    private val sentList = mutableListOf<String>()
     private var lastMessage = System.currentTimeMillis()
-    private var active = false
 
     private val pickupLines = listOf(
         "Are you WiFi? Because I’m feeling a strong connection… even though you’re clearly out of my league.",
@@ -55,56 +62,41 @@ object SexAura: Module(
         "If I had a dollar for every time I thought about you, I’d still be broke because you never cross my mind… SIKE, I’m down horrendous for you.",
         "You could hand me a restraining order, and I'd frame it like a love letter.",
         "Are you my Uber Eats driver? Because I watch your every move, waiting for you to arrive, and I cry when you’re gone.",
-        "Are you a mirage? Because every time I think I have a chance with you, I realize it was just my thirst hallucinating."
+        "Are you a mirage? Because every time I think I have a chance with you, I realize it was just my thirst hallucinating.",
+        "Heet je noor? want je ogen zijn net zo mooi als het noor-derlicht"
     )
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if (mc.thePlayer == null || mc.theWorld == null) return
-        if (event.phase != TickEvent.Phase.END) return
-        if (System.currentTimeMillis() - lastMessage < 500) return
-        mc.theWorld.playerEntities.forEach {
-            if (sentList.contains(it.uniqueID)) return
-            /*
-            if (it.isSpectator ||
-                sentList.contains(it) ||
-                //it.getDistanceToEntity(mc.thePlayer) > 5 ||
-                it.isSpectator ||
-                it.isInvisible ||
-                it.name.startsWith("[NPC]") ||
-                it.name.contains("Hypixel") ||
-                it.name.contains("BOT")) return*/
-            modMessage(
-                """
-                |==== PLAYER DETECTED ====
-                |Name: ${it.name}
-                |UUID: ${it.uniqueID}
-                |motionX: ${it.motionX}
-                |look: ${it.rotationYaw} ${it.rotationPitch}
-                |hp: ${it is EntityOtherPlayerMP && it.health <= 0.0f} 
-                |=====================
-                """.trimMargin()
-            )
-            sendPickupLine(it)
-            sentList.add(it.uniqueID)
-            ClientUtils.clientScheduleTask(2000) { sentList.remove(it.uniqueID) }
+        if (mc.theWorld == null || mc.thePlayer == null) return
+        if (System.currentTimeMillis() - lastMessage < 1000) return
+        getPlayersInRenderDistance().forEach { player ->
+            if (System.currentTimeMillis() - lastMessage < 1000) return
+            sendPickupLine(player)
         }
 
     }
 
     private fun sendPickupLine(player: EntityPlayer) {
         //sendChatMessage("/msg ${player.name} ${pickupLines.random()}")
+        modMessage("/msg ${player.name} ${pickupLines.random()}")
+        sentList.add(player.name)
+        ClientUtils.clientScheduleTask(200) { sentList.remove(player.name) }
         lastMessage = System.currentTimeMillis()
+    }
+
+    private fun getPlayersInRenderDistance(): List<EntityPlayer> {
+        return mc.theWorld?.loadedEntityList?.filterIsInstance<EntityPlayer>() ?.filter {player ->
+                player != mc.thePlayer &&
+                !player.isInvisible &&
+                mc.thePlayer.getDistanceToEntity(player) < pickupRange &&
+                !sentList.contains(player.name) &&
+                        mc.theWorld?.loadedEntityList?.any { it is EntityArmorStand && it.posX == player.posX && it.posZ == player.posZ } == false //idk why its indented
+                }.orEmpty()
     }
 
     @SubscribeEvent
     fun onLoad(event: WorldEvent.Load) {
-        active = true
         lastMessage = System.currentTimeMillis() + 1000
-    }
-
-    @SubscribeEvent
-    fun onUnload(event: WorldEvent.Unload) {
-        active = false
     }
 }

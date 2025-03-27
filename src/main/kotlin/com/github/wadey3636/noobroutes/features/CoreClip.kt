@@ -30,7 +30,7 @@ object CoreClip : Module(
         if (mc.thePlayer.posX !in 52.0..57.0) return
 
         if (isClose(mc.thePlayer.posZ, 53.7)) {
-            AutoP3Utils.unPressKeys()
+            AutoP3Utils.unPressKeys(false)
             mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 53.7624)
             PacketUtils.c03ScheduleTask {
                 mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 55.301)
