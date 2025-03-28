@@ -1,5 +1,6 @@
 package com.github.wadey3636.noobroutes.features
 
+import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
@@ -15,13 +16,18 @@ import me.defnotstolen.utils.render.TextAlign
 import me.defnotstolen.utils.render.roundedRectangle
 import me.defnotstolen.utils.render.text
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.settings.KeyBinding
+import net.minecraft.entity.Entity
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket
 import kotlin.math.PI
 import kotlin.math.sin
+
+data class PlayerHit(val entity: Entity, var lastHit: Long)
 
 object BlinkKeybind: Module(
     name = "Blink Keybind",
@@ -36,6 +42,7 @@ object BlinkKeybind: Module(
     private var blinkTime = System.currentTimeMillis()
     private val cancelledPackets = mutableListOf<Packet<*>>()
     private var skip = 0
+    private val hit = mutableListOf<PlayerHit>()
 
     override fun onDisable() {
         super.onDisable()
@@ -70,8 +77,14 @@ object BlinkKeybind: Module(
         cancelledPackets.add(event.packet)
         if (event.packet is C02PacketUseEntity && pvp) {
             if (event.packet.action != C02PacketUseEntity.Action.ATTACK) return
+            val entity = event.packet.getEntityFromWorld(mc.theWorld)
+            if (hit.any { it.entity == entity && System.currentTimeMillis() - it.lastHit < 500 }) return
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.keyCode, false)
+            ClientUtils.clientScheduleTask { KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.keyCode, Keyboard.isKeyDown(mc.gameSettings.keyBindForward.keyCode)) }
             skip = cancelledPackets.size
             cancelledPackets.forEach { PacketUtils.sendPacket(it) }
+            if (hit.any { it.entity == entity }) hit.find { it.entity == entity }?.lastHit = System.currentTimeMillis()
+            else hit.add(PlayerHit(entity, System.currentTimeMillis()))
             cancelledPackets.clear()
             ticks = 0
         }
@@ -90,5 +103,13 @@ object BlinkKeybind: Module(
             roundedRectangle(0, 0, resolution.scaledWidth, height.toFloat(), Color.BLACK, edgeSoftness = 0)
             roundedRectangle(0, resolution.scaledHeight - height.toFloat(), resolution.scaledWidth, height.toFloat(), Color.BLACK, edgeSoftness = 0)
         }
+    }
+
+    @SubscribeEvent
+    fun onUnload(event: WorldEvent.Unload) {
+        cancelledPackets.clear()
+        ticks = 0
+        hit.clear()
+        toggle()
     }
 }
