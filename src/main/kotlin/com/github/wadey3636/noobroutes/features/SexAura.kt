@@ -13,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 
@@ -63,6 +64,7 @@ object SexAura: Module(
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.END) return
         if (mc.theWorld == null || mc.thePlayer == null) return
         if (System.currentTimeMillis() - lastMessage < 1000) return
         getPlayersInRenderDistance().sortedBy {mc.thePlayer.getDistanceToEntity(it)}.forEach { player ->
