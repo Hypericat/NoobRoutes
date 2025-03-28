@@ -15,6 +15,7 @@ import me.defnotstolen.utils.render.TextAlign
 import me.defnotstolen.utils.render.roundedRectangle
 import me.defnotstolen.utils.render.text
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -29,9 +30,13 @@ object BlinkKeybind: Module(
     description = "A keybinding for Blink (Non-preset actions)"
 ) {
     private val legit by BooleanSetting("Legit", default = false, description = "reduces ban risk of this feature to 0")
+    private val pvp by BooleanSetting("PvP mode", default = false, description = "ure lagging now")
+
     private var ticks = 0
     private var blinkTime = System.currentTimeMillis()
     private val cancelledPackets = mutableListOf<Packet<*>>()
+    private var skip = 0
+
     override fun onDisable() {
         super.onDisable()
         cancelledPackets.forEach { PacketUtils.sendPacket(it) }
@@ -54,11 +59,22 @@ object BlinkKeybind: Module(
 
     @SubscribeEvent
     fun onPacket(event: PacketEvent.Send) {
+        if (skip > 0) {
+            skip--
+            return
+        }
         if (legit) return
         if (event.packet.toString().contains("server") || event.packet is S38PacketPlayerListItem || event.packet is FMLProxyPacket || event.isCanceled) return
         event.isCanceled = true
-        if(event.packet is C03PacketPlayer) ticks++
+        if (event.packet is C03PacketPlayer) ticks++
         cancelledPackets.add(event.packet)
+        if (event.packet is C02PacketUseEntity && pvp) {
+            if (event.packet.action != C02PacketUseEntity.Action.ATTACK) return
+            skip = cancelledPackets.size
+            cancelledPackets.forEach { PacketUtils.sendPacket(it) }
+            cancelledPackets.clear()
+            ticks = 0
+        }
     }
     @SubscribeEvent
     fun onRender(event: RenderGameOverlayEvent) {
