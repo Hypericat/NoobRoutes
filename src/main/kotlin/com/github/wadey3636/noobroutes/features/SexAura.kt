@@ -1,6 +1,7 @@
 package com.github.wadey3636.noobroutes.features
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.impl.BooleanSetting
@@ -84,7 +85,8 @@ object SexAura: Module(
             modMessage("u gotta put in a name")
             return
         }
-        sendCommand("msg ${args[1]} ${pickupLines.random()}")
+        //sendCommand("msg ${args[1]} ${pickupLines.random()}")
+        PacketUtils.sendPacket(C01PacketChatMessage("/msg ${args[1]} ${pickupLines.random()}"))
     }
 
     private fun getPlayersInRenderDistance(): List<EntityPlayer> {
