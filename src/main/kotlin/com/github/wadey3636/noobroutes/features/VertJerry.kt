@@ -10,7 +10,7 @@ import org.lwjgl.input.Keyboard
 object VertJerry: Module(
     name = "Vertical Jerrychine",
     Keyboard.KEY_NONE,
-    category = Category.FLOOR7,
+    category = Category.MOVE,
     description = "makes jerry chine only give vertical velo"
 ) {
     @SubscribeEvent

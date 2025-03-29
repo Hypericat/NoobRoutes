@@ -19,7 +19,7 @@ import kotlin.math.atan2
 object HClip: Module(
     name = "HClip",
     Keyboard.KEY_NONE,
-    category = Category.FLOOR7,
+    category = Category.MOVE,
     description = "hclips when activating"
 ) {
     private val omni by BooleanSetting("omni", false, description = "should go in a direction based of key inputs")

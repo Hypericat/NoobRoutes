@@ -10,7 +10,7 @@ import org.lwjgl.input.Keyboard
 object NoTnT: Module(
     name = "No TnT kb",
     Keyboard.KEY_NONE,
-    category = Category.FLOOR7,
+    category = Category.MOVE,
     description = "cancels tnt kb in f7/m7"
 ) {
     @SubscribeEvent

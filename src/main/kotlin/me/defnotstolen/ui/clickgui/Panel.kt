@@ -37,6 +37,8 @@ class Panel(
 ) {
     private val renderIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/render.png"))
     private val floor7Icon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/wither.png"))
+    private val moveIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/move.png"))
+    private val miscIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/img.png"))
 
     val displayName = category.name.lowercase().capitalizeFirst()
 
@@ -87,6 +89,14 @@ class Panel(
             Category.FLOOR7 -> {
                 additionalOffset = 4.0
                 drawDynamicTexture(floor7Icon, x + WIDTH * 0.08  - imageSize / 2 + additionalOffset, y + HEIGHT / 2  - imageSize / 2, imageSize, imageSize)
+            }
+            Category.MOVE -> {
+                additionalOffset = 4.0
+                drawDynamicTexture(moveIcon, x + WIDTH * 0.08  - imageSize / 2 + additionalOffset, y + HEIGHT / 2  - imageSize / 2, imageSize, imageSize)
+            }
+            Category.MISC -> {
+                additionalOffset = 4.0
+                drawDynamicTexture(miscIcon, x + WIDTH * 0.08  - imageSize / 2 + additionalOffset, y + HEIGHT / 2  - imageSize / 2, imageSize, imageSize)
             }
             else -> {
 

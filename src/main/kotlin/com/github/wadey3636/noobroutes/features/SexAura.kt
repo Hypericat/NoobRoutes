@@ -20,7 +20,7 @@ import org.lwjgl.input.Keyboard
 object SexAura: Module(
     name = "Sex Aura",
     Keyboard.KEY_NONE,
-    category = Category.RENDER,
+    category = Category.MISC,
     description = "picks up them hoes"
 ) {
     private val pickupRange by NumberSetting(name = "range", description = "how far the bitches can be away", min = 0, max = 15, default = 5)

@@ -32,7 +32,7 @@ data class PlayerHit(val entity: Entity, var lastHit: Long)
 object BlinkKeybind: Module(
     name = "Blink Keybind",
     Keyboard.KEY_NONE,
-    category = Category.RENDER,
+    category = Category.MISC,
     description = "A keybinding for Blink (Non-preset actions)"
 ) {
     private val legit by BooleanSetting("Legit", default = false, description = "reduces ban risk of this feature to 0")

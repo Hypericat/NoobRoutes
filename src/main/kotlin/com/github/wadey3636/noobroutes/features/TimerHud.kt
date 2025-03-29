@@ -16,7 +16,7 @@ import org.lwjgl.input.Keyboard
 object TimerHud: Module(
     name = "Stopwatch",
     Keyboard.KEY_NONE,
-    category = Category.RENDER,
+    category = Category.MISC,
     description = "times shit based of a keybind"
 ) {
     private var startTime = System.currentTimeMillis()

@@ -21,7 +21,7 @@ import org.lwjgl.input.Keyboard
 object LavaClip: Module(
     name = "Lava Clip",
     Keyboard.KEY_NONE,
-    category = Category.FLOOR7,
+    category = Category.MOVE,
     description = "clips u down when entering lava"
 )  {
     private val lavaDistance by NumberSetting(name = "Lava Clip distance", description = "how far to clip u", min = 10f, max = 50f, default = 30f)
