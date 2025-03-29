@@ -40,7 +40,8 @@ object LavaClip: Module(
     }
 
     @SubscribeEvent
-    fun onOverlay(event: RenderGameOverlayEvent) {
+    fun onOverlay(event: RenderGameOverlayEvent.Post) {
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         val resolution = ScaledResolution(mc)
         text("Lava CLipping $lavaDistance", resolution.scaledWidth / 2, resolution.scaledHeight / 2.5, Color.RED, 13, align = TextAlign.Middle)
     }

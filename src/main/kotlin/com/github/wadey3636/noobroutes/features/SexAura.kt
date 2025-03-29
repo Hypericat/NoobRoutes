@@ -57,14 +57,14 @@ object SexAura: Module(
         "Are you my mom? Because I desperately seek your approval, and you never give it to me.",
         "If I had a dollar for every time I thought about you, I’d still be broke because you never cross my mind… SIKE, I’m down horrendous for you.",
         "You could hand me a restraining order, and I'd frame it like a love letter.",
-        "Are you my Uber Eats driver? Because I watch your every move, waiting for you to arrive, and I cry when you’re gone.",
+        "Are you my Uber Eats driver? Because I watch your every move, wai4ting for you to arrive, and I cry when you’re gone.",
         "Are you a mirage? Because every time I think I have a chance with you, I realize it was just my thirst hallucinating.",
         "Heet je noor? want je ogen zijn net zo mooi als het noor-derlicht"
     )
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.END) return
+        if (event.phase != TickEvent.Phase.START) return
         if (mc.theWorld == null || mc.thePlayer == null) return
         if (System.currentTimeMillis() - lastMessage < 1000) return
         getPlayersInRenderDistance().sortedBy {mc.thePlayer.getDistanceToEntity(it)}.forEach { player ->

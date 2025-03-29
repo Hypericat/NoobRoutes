@@ -90,7 +90,8 @@ object BlinkKeybind: Module(
         }
     }
     @SubscribeEvent
-    fun onRender(event: RenderGameOverlayEvent) {
+    fun onRender(event: RenderGameOverlayEvent.Post) {
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         val resolution = ScaledResolution(mc)
         if (!legit) text("Blinked for $ticks ticks", resolution.scaledWidth / 2, resolution.scaledHeight / 2.5, Color.WHITE, 10, align = TextAlign.Middle)
         else {

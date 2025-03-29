@@ -90,7 +90,8 @@ object Blink{
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent) {
+    fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if(!inBoss) return
         val resolution = ScaledResolution(mc)
         text(cancelled.toString(), resolution.scaledWidth / 2, resolution.scaledHeight / 2.3, Color.WHITE, 13, align = TextAlign.Middle)

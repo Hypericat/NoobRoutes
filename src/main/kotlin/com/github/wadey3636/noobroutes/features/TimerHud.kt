@@ -40,7 +40,8 @@ object TimerHud: Module(
     }
 
     @SubscribeEvent
-    fun onRender(event: RenderGameOverlayEvent) {
+    fun onRender(event: RenderGameOverlayEvent.Post) {
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         val rounded = "%.2f".format((System.currentTimeMillis() - startTime).toDouble() / 1000) //why is there no toFixed
         val resolution = ScaledResolution(Core.mc)
         text(rounded, resolution.scaledWidth / 1.7, resolution.scaledHeight / 2, Color.WHITE, 13)
