@@ -83,7 +83,7 @@ object SexAura: Module(
     }
 
     fun pickupLineByName(args: Array<out String>) {
-        if (args == null || args.size < 2) {
+        if (args.size < 2) {
             modMessage("u gotta put in a name")
             return
         }
