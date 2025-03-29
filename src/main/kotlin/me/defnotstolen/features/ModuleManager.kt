@@ -54,7 +54,8 @@ object ModuleManager {
         NoTnT,
         VertJerry,
         SexAura,
-        TimerHud
+        TimerHud,
+        InstaAccel
     )
 
     init {
