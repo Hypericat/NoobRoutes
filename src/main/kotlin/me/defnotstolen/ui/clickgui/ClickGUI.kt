@@ -97,7 +97,7 @@ object ClickGUI : Screen() {
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
         if (SearchBar.mouseClicked(mouseButton)) return
         panels.forEach {
-            if (it.mouseClicked(mouseButton)) return@forEach
+            if (it.mouseClicked(mouseButton)) return
         }
     }
 

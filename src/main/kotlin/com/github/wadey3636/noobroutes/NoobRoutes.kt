@@ -34,7 +34,7 @@ const val MODID = "noobroutes"
 class NoobRoutes {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
-
+        //"required-after:essential@[12132+g6e2bf4dc5,)"
         try {
             val resource: net.minecraft.client.resources.IResource = Minecraft.getMinecraft().resourceManager
                 .getResource(net.minecraft.util.ResourceLocation("test:test.txt"))

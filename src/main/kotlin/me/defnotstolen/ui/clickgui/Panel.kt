@@ -38,7 +38,7 @@ class Panel(
     private val renderIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/render.png"))
     private val floor7Icon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/wither.png"))
     private val moveIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/move.png"))
-    private val miscIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/img.png"))
+    private val miscIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/misc.png"))
 
     val displayName = category.name.lowercase().capitalizeFirst()
 
@@ -193,6 +193,7 @@ class Panel(
         return moduleButtons.filter { it.module.name.contains(currentSearch, true) }.reversed().any {
             it.mouseClickedAnywhere(mouseButton)
         }
+
     }
 
     fun mouseReleased(state: Int) {

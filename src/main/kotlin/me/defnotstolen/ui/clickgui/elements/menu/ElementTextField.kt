@@ -82,7 +82,7 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
     }
 
     override fun mouseClickedAnywhere(mouseButton: Int): Boolean {
-        if (mouseButton == 0 && !isHovered) {
+        if (mouseButton == 0 && !isHovered && listening) {
             if (colorAnim.start()) listening = false
             return true
         }

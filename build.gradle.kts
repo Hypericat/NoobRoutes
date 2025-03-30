@@ -34,6 +34,7 @@ loom {
         }
     }
     runConfigs {
+
         "client" {
             if (SystemUtils.IS_OS_MAC_OSX) {
                 // This argument causes a crash on macOS
@@ -66,15 +67,11 @@ sourceSets.main {
     java.srcDir(layout.projectDirectory.dir("src/main/kotlin"))
     kotlin.destinationDirectory.set(java.destinationDirectory)
 }
-
-// Dependencies:
-
 repositories {
     mavenCentral()
 
     maven("https://repo.essential.gg/public")
     maven("https://repo.spongepowered.org/maven/")
-    // If you don't want to log in with your real minecraft account, remove this line
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
 }
 
@@ -84,24 +81,24 @@ val shadowImpl: Configuration by configurations.creating {
 
 
 dependencies {
-    // Move these from implementation to shadowImpl to ensure they're included in the final jar
+
     shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
-
-    // Keep your existing shadowImpl
     shadowImpl(kotlin("stdlib-jdk8"))
 
-    // Keep the rest of your dependencies as they are
-    compileOnly("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all")
+    //compileOnly("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all")
     shadowImpl("gg.essential:loader-launchwrapper:1.1.3")
-    shadowImpl("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5")
+    implementation("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5") {
+        exclude(module = "asm")
+        exclude(module = "asm-commons")
+        exclude(module = "asm-tree")
+        exclude(module = "gson")
+        exclude(module = "vigilance")
+    }
     shadowImpl("com.mojang:brigadier:1.2.9")
-    shadowImpl("com.github.Stivais:Commodore:bea320fe0a")
     minecraft("com.mojang:minecraft:1.8.9")
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
-
-    // Keep your mixin configuration
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
     }
@@ -109,12 +106,6 @@ dependencies {
 
     runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
 }
-
-//implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-//implementation("gg.essential:essential-universal:0.10.0.+")
-
-
-// Tasks:
 
 tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"
@@ -169,7 +160,6 @@ tasks.shadowJar {
         }
     }
 
-    // If you want to include other dependencies and shadow them, you can relocate them in here
     fun relocate(name: String) = relocate(name, "$baseGroup.deps.$name")
 }
 
