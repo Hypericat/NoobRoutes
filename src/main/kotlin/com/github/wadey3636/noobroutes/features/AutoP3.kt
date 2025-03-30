@@ -84,6 +84,7 @@ object AutoP3: Module (
     var waitingLeap = false
     private var leaped = 0
     var inBoss = false
+    private val deletedRings  = mutableListOf<Ring>()
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
@@ -206,8 +207,19 @@ object AutoP3: Module (
             "start" -> inBoss = true
             "rat" -> Utils.rat.forEach{ modMessage(it) }
             "pickup" -> SexAura.pickupLineByName(args)
+            "restore" -> restoreRing()
             else -> modMessage("not an option")
         }
+    }
+
+    private fun restoreRing() {
+        if (deletedRings.isEmpty())  {
+            modMessage("no ring to restore")
+            return
+        }
+        actuallyAddRing(deletedRings.last()!!)
+        modMessage("${deletedRings.last()!!.type} added back")
+        deletedRings.removeLast()
     }
 
     private fun addNormalRing(args: Array<out String>?) {
@@ -251,11 +263,11 @@ object AutoP3: Module (
         val center = args.any {it == "center"}
         val walk = args.any {it == "walk"} && ringType != RingTypes.WALK
         actuallyAddRing(Ring(ringType, look = look, center = center, walk = walk))
-        saveRings()
     }
 
     fun actuallyAddRing(ring: Ring) {
         rings[route]?.add(ring) ?: run { rings[route] = mutableListOf(ring) }
+        saveRings()
     }
 
     private fun deleteNormalRing(args: Array<out String>) {
@@ -263,8 +275,10 @@ object AutoP3: Module (
         if (args.size >= 2) {
             try {
                 if ((args[1].toInt()) <= (rings[route]?.size?.minus(1) ?: return modMessage("Error Deleting Ring"))) {
+                    deletedRings.add(rings[route]?.get(args[1].toInt())!!)
                     rings[route]?.removeAt(args[1].toInt())
                     modMessage("Removed Ring ${args[1].toInt()}")
+                    saveRings()
                     return
                 } else {
                     modMessage("Invalid Index")
@@ -279,6 +293,7 @@ object AutoP3: Module (
         val playerEyeVec = mc.thePlayer.positionVector.add(Vec3(0.0, mc.thePlayer.eyeHeight.toDouble(),0.0))
         val deleteList = rings[route]?.sortedBy{it.coords.distanceTo(playerEyeVec)}
         if (deleteList?.get(0)?.coords?.distanceTo(playerEyeVec)!! > 3) return
+        deletedRings.add(deleteList[0])
         rings[route]?.remove(deleteList[0])
         modMessage("deleted a ring")
         saveRings()

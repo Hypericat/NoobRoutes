@@ -71,6 +71,15 @@ object Blink{
                 blinkStarts.clear()
                 modMessage("cleared waypoints. If u want to delete blinks just use /noob delete")
             }
+            "more" -> {
+                try {
+                    val amount = args[2].toInt()
+                    blinksInstance -= amount
+                    modMessage("u now have ${maxBlinks - blinksInstance} packets left on this instance")
+                } catch (e: Exception) {
+                    modMessage("need length amount to remove")
+                }
+            }
             else -> modMessage("not an option")
         }
     }
@@ -205,7 +214,6 @@ object Blink{
             modMessage("finished recording")
             recording = false
             AutoP3.actuallyAddRing(Ring(RingTypes.BLINK, coords = Vec3(recordedPackets[0].positionX, recordedPackets[0].positionY, recordedPackets[0].positionZ),  blinkPackets = recordedPackets, endY = mc.thePlayer.motionY))
-            AutoP3.saveRings()
         }
     }
 
