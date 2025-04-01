@@ -87,7 +87,7 @@ object SexAura: Module(
         else if (wadeyAccounts.contains(player.name)) {
             modMessage("trying to pickup my pookie bear wadey are we?")
             modMessage("i hope u fucking die a slow and painful death")
-            modMessage("keep ur hands from wadey from now on")
+            modMessage("keep ur hands off Wadey from now on")
         }
         else if (actuallySend) sendCommand("msg ${player.name} ${pickupLines.random()}")
         else modMessage("/msg ${player.name} ${pickupLines.random()}")

@@ -68,7 +68,6 @@ object AutoP3: Module (
         object : TypeToken<MutableMap<String, MutableList<Ring>>>() {}.type,
         RingsMapTypeAdapter()
     ).setPrettyPrinting().create()
-    val resolution = ScaledResolution(Core.mc)
 
     private val route by StringSetting("Route", "", description = "Route to use")
     val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
