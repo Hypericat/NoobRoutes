@@ -103,7 +103,8 @@ object Blink{
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if(!inBoss) return
         val resolution = ScaledResolution(mc)
-        text(cancelled.toString(), resolution.scaledWidth / 2, resolution.scaledHeight / 2.3, Color.WHITE, 13, align = TextAlign.Middle)
+        //text(cancelled.toString(), resolution.scaledWidth / 2, resolution.scaledHeight / 2.3, Color.WHITE, 13, align = TextAlign.Middle)
+        text(cancelled.toString(), AutoP3.moveHud.x, AutoP3.moveHud.y, Color.WHITE, 13, align = TextAlign.Middle)
     }
 
     @SubscribeEvent
@@ -173,7 +174,7 @@ object Blink{
         if (movementPackets.isNotEmpty()) return
 
         if (System.currentTimeMillis() - lastBlink >= 500 && (blinksInstance + ring.blinkPackets.size > maxBlinks || !blink)) {
-            modMessage("no blink for u")
+            modMessage("movementing")
             movementPackets = ring.blinkPackets.toMutableList()
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionY = 0.0
@@ -187,14 +188,15 @@ object Blink{
             mc.thePlayer.motionZ = 0.0
             return
         }
-        modMessage("blinking with ${ring.blinkPackets.size} of those suckers")
+        //modMessage("blinking with ${ring.blinkPackets.size} of those suckers")
         blinksInstance += ring.blinkPackets.size
         lastBlink = System.currentTimeMillis()
         ring.blinkPackets.forEach { PacketUtils.sendPacket(it) }
         val lastPacket = ring.blinkPackets.size - 1
         mc.thePlayer.setPosition(ring.blinkPackets[lastPacket].positionX, ring.blinkPackets[lastPacket].positionY, ring.blinkPackets[lastPacket].positionZ)
         mc.thePlayer.setVelocity(0.0, ring.endY, 0.0)
-        modMessage("there are $cancelled hot C04s wanting to message u but only ${maxBlinks - blinksInstance} on this instance")
+        //modMessage("there are $cancelled hot C04s wanting to message u but only ${maxBlinks - blinksInstance} on this instance")
+        modMessage("§c§l$cancelled§r§f c04s available, used §c${ring.blinkPackets.size}§f,  §7(${maxBlinks - blinksInstance} left on this instance)")
     }
 
     @SubscribeEvent
@@ -252,7 +254,15 @@ object Blink{
             if (cancelled > 0) cancelled--
             return
         }
-        if (mc.thePlayer.posX != mc.thePlayer.lastTickPosX || mc.thePlayer.posY != mc.thePlayer.lastTickPosY || mc.thePlayer.posZ != mc.thePlayer.lastTickPosZ || !mc.thePlayer.onGround || mc.thePlayer.motionX != 0.0 || mc.thePlayer.motionZ != 0.0 || movementPackets.isNotEmpty() || (mc.thePlayer.getDistance(63.5, 127.0, 35.5) < 1.5 && event.packet is C05PacketPlayerLook)) {
+        if (mc.thePlayer.posX != mc.thePlayer.lastTickPosX ||
+            mc.thePlayer.posY != mc.thePlayer.lastTickPosY ||
+            mc.thePlayer.posZ != mc.thePlayer.lastTickPosZ ||
+            !mc.thePlayer.onGround || mc.thePlayer.motionX != 0.0 ||
+            mc.thePlayer.motionZ != 0.0 ||
+            movementPackets.isNotEmpty() ||
+            (mc.thePlayer.getDistance(63.5, 127.0, 35.5) < 1.5 && event.packet is C05PacketPlayerLook) ||
+            System.currentTimeMillis() - lastBlink < 1 //listen if it works it works
+        ) {
             if (cancelled > 0) cancelled--
             return
         }

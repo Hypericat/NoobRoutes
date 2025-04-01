@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import me.defnotstolen.Core
 import me.defnotstolen.Core.logger
 import me.defnotstolen.Core.mc
 import me.defnotstolen.features.Category
@@ -19,9 +20,11 @@ import me.defnotstolen.config.DataManager
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.settings.Setting.Companion.withDependency
 import me.defnotstolen.features.settings.impl.*
+import me.defnotstolen.ui.hud.HudElement
 import me.defnotstolen.utils.LookVec
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
@@ -65,6 +68,7 @@ object AutoP3: Module (
         object : TypeToken<MutableMap<String, MutableList<Ring>>>() {}.type,
         RingsMapTypeAdapter()
     ).setPrettyPrinting().create()
+    val resolution = ScaledResolution(Core.mc)
 
     private val route by StringSetting("Route", "", description = "Route to use")
     val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
@@ -78,6 +82,7 @@ object AutoP3: Module (
     val maxBlinks by NumberSetting(name = "max blinks per instance", description = "too much blink on an instance bans apparently", min = 100, max = 300, default = 120).withDependency { blinkShit }
     val showEnd by BooleanSetting("Render End", default = true, description = "renders waypoint where blink ends").withDependency { blinkShit }
     val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes").withDependency { blinkShit }
+    val moveHud by HudSetting("Move Hud", HudElement(100f, 50f, false, settingName = "Move Hud")).withDependency { blinkShit }
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     var waitingTerm = false
