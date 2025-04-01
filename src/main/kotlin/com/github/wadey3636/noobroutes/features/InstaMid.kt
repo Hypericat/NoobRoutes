@@ -13,6 +13,7 @@ import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C0CPacketInput
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S1BPacketEntityAttach
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
@@ -52,5 +53,11 @@ object InstaMid: Module (
         if (event.packet !is S02PacketChat || event.packet.type.toInt() != 0) return
         val message = event.packet.chatComponent.unformattedText.noControlCodes
         if (message == "[BOSS] Necron: You went further than any human before, congratulations.") KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, true)
+    }
+
+    @SubscribeEvent
+    fun onUnload(event: WorldEvent.Unload) { //incase leave during pickup stage
+        sent = false
+        cancelling = false
     }
 }
