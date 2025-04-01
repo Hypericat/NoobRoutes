@@ -37,7 +37,7 @@ object Blink{
     data class BlinkWaypoints (val coords: Vec3 = mc.thePlayer.positionVector, val length: Int, var active: Boolean = false)
     private val blinkStarts = mutableListOf<BlinkWaypoints>()
 
-    private var cancelled = 0
+    var cancelled = 0
 
     private var blinksInstance = 0
 

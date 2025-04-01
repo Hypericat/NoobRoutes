@@ -1,7 +1,10 @@
 package com.github.wadey3636.noobroutes.utils
 
+import me.defnotstolen.Core.mc
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 object Utils {
 
@@ -41,4 +44,19 @@ object Utils {
         "⣿⣿⣿⣿⣿⣿⣿⣿⣦⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢤⣼⣿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿",
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣦⣤⣤⣤⣶⣦⣿⣿⣶⣾⣿⣥⣤⣤⣬⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
     )
+
+    fun getYawAndPitch(x: Double, y:Double, z:Double): Pair<Float, Float> { //stolen from CGA
+        val dx = x - mc.thePlayer.posX
+        val dy = y - (mc.thePlayer.posY + mc.thePlayer.eyeHeight)
+        val dz = z - mc.thePlayer.posZ
+
+        val horizontalDistance = sqrt(dx * dx + dz * dz )
+
+        val yaw = Math.toDegrees(atan2(-dx, dz))
+        val pitch = -Math.toDegrees(atan2(dy, horizontalDistance))
+
+        val normalizedYaw = if (yaw < -180) yaw + 360 else yaw
+
+        return Pair(normalizedYaw.toFloat(), pitch.toFloat())
+    }
 }

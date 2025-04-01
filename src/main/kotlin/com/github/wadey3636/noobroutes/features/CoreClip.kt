@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.abs
 
-object CoreClip : Module(
+object CoreClip: Module(
     name = "CoreClip",
     Keyboard.KEY_NONE,
     category = Category.FLOOR7,
