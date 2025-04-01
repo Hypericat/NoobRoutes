@@ -1,11 +1,14 @@
 package com.github.wadey3636.noobroutes.features
 
+import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import com.github.wadey3636.noobroutes.utils.Utils
 import me.defnotstolen.Core
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
+import me.defnotstolen.features.settings.Setting.Companion.withDependency
+import me.defnotstolen.features.settings.impl.BooleanSetting
 import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -24,6 +27,9 @@ object Auto4: Module(
     category = Category.FLOOR7,
     description = "does 4th device"
 ) {
+    private val silent by BooleanSetting("silent", true, description = "snaps only serverside")
+    private val fast by BooleanSetting("instant", false, description = "sends the c05 (rotation packet) immediately, not on next tick").withDependency { silent }
+
 
     private val devBlocks = listOf(
         BlockPos(64, 126, 50),
@@ -40,7 +46,7 @@ object Auto4: Module(
     @SubscribeEvent
     fun onPacket(event: PacketEvent.Receive) {
         if (mc.thePlayer == null) return
-        if (mc.thePlayer.getDistance(63.5, 127.0, 35.5) > 1.5 || mc.thePlayer.heldItem.item != Items.bow) return
+        if (mc.thePlayer.getDistance(63.5, 127.0, 35.5) > 1.5 || mc.thePlayer.heldItem?.item != Items.bow) return
         if (event.packet is S23PacketBlockChange && devBlocks.contains(event.packet.blockPosition) && event.packet.blockState.block == Blocks.emerald_block) shoot(event.packet.blockPosition)
         else if (event.packet is S22PacketMultiBlockChange) {
             event.packet.changedBlocks.forEach {block -> if (devBlocks.contains(block.pos) && block.blockState.block == Blocks.emerald_block) shoot(block.pos) }
@@ -49,9 +55,23 @@ object Auto4: Module(
     }
 
     fun shoot(block: BlockPos) {
-        if (Blink.cancelled ==  0) return
-        val rotation = Utils.getYawAndPitch(block.x.toDouble(), block.y.toDouble() + 1.1, block.z.toDouble())
-        PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
-        PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+        val rotation = Utils.getYawAndPitch(block.x.toDouble() + 0.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
+        if (!silent || Blink.cancelled < 1) {
+            mc.thePlayer.rotationYaw = rotation.first
+            mc.thePlayer.rotationPitch = rotation.second
+            ClientUtils.clientScheduleTask { PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem)) }
+        }
+        else if (silent && !fast) {
+            ClientUtils.clientScheduleTask {
+                PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
+                Blink.cancelled--
+                PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+            }
+        }
+        else {
+            PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
+            Blink.cancelled--
+            PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+        }
     }
 }
