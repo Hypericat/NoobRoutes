@@ -43,10 +43,15 @@ object Auto4: Module(
         BlockPos(68, 130, 50)
     )
 
+    private var shotBlocks = mutableListOf<BlockPos>()
+
     @SubscribeEvent
     fun onPacket(event: PacketEvent.Receive) {
         if (mc.thePlayer == null) return
-        if (mc.thePlayer.getDistance(63.5, 127.0, 35.5) > 1.5 || mc.thePlayer.heldItem?.item != Items.bow) return
+        if (mc.thePlayer.getDistance(63.5, 127.0, 35.5) > 1.5 || mc.thePlayer.heldItem?.item != Items.bow) {
+            shotBlocks = mutableListOf<BlockPos>()
+            return
+        }
         if (event.packet is S23PacketBlockChange && devBlocks.contains(event.packet.blockPosition) && event.packet.blockState.block == Blocks.emerald_block) shoot(event.packet.blockPosition)
         else if (event.packet is S22PacketMultiBlockChange) {
             event.packet.changedBlocks.forEach {block -> if (devBlocks.contains(block.pos) && block.blockState.block == Blocks.emerald_block) shoot(block.pos) }
@@ -55,7 +60,7 @@ object Auto4: Module(
     }
 
     fun shoot(block: BlockPos) {
-        val rotation = Utils.getYawAndPitch(block.x.toDouble() + 0.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
+        val rotation = getRotation(block)
         if (!silent || Blink.cancelled < 1) {
             mc.thePlayer.rotationYaw = rotation.first
             mc.thePlayer.rotationPitch = rotation.second
@@ -73,5 +78,17 @@ object Auto4: Module(
             Blink.cancelled--
             PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
         }
+        shotBlocks.add(block)
+    }
+
+    fun getRotation(block: BlockPos): Pair<Float, Float> {
+        if (mc.thePlayer.heldItem.displayName.contains("Terminator")) {
+            return when (block.x) {
+                64 -> Utils.getYawAndPitch(65.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
+                68 -> Utils.getYawAndPitch(67.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
+                else -> if (shotBlocks.any { it.y == block.y && it.x == 64 }) Utils.getYawAndPitch(67.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5) else Utils.getYawAndPitch(65.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
+            }
+        }
+        return Utils.getYawAndPitch(block.x.toDouble() + 0.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
     }
 }
