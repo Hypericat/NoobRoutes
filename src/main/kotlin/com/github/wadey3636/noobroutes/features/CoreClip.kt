@@ -17,15 +17,22 @@ object CoreClip: Module(
     description = "clips u through the gold blocks into core"
 ) {
 
+    private var cd = 0
+
     @SubscribeEvent
     fun atCore(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
         if (mc.thePlayer == null) return
+        if (cd > 0) {
+            cd--
+            return
+        }
         if (mc.thePlayer.posY != 115.0) return
         if (mc.thePlayer.posX !in 52.0..57.0) return
 
         if (isClose(mc.thePlayer.posZ, 53.7)) {
             AutoP3Utils.unPressKeys(false)
+            cd = 3
             mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 53.7624)
             PacketUtils.c03ScheduleTask {
                 mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 55.301)
@@ -33,7 +40,8 @@ object CoreClip: Module(
             }
         }
         else if (isClose(mc.thePlayer.posZ, 55.3)) {
-            AutoP3Utils.unPressKeys()
+            AutoP3Utils.unPressKeys(false)
+            cd = 3
             mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 55.2376)
             PacketUtils.c03ScheduleTask {
                 mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 53.699)

@@ -55,6 +55,7 @@ object Blink{
     private var recording = false
     private var recordingLength = 0
     private var recordedPackets = mutableListOf<C04PacketPlayerPosition>()
+    private lateinit var lastSentC03: C04PacketPlayerPosition
 
     fun blinkCommand(args: Array<out String>) {
         if (args.size < 2) return modMessage("need args")
@@ -82,6 +83,12 @@ object Blink{
             }
             else -> modMessage("not an option")
         }
+    }
+
+    @SubscribeEvent
+    fun onC03(event: PacketEvent.Send) {
+        if (event.packet is C04PacketPlayerPosition) lastSentC03 = event.packet
+        else if (event.packet is C06PacketPlayerPosLook) lastSentC03 = C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)
     }
 
     @SubscribeEvent
@@ -139,7 +146,7 @@ object Blink{
     private fun startRecording(waypoint: BlinkWaypoints) {
         modMessage("started recording")
         recordedPackets = mutableListOf<C04PacketPlayerPosition>()
-        recordedPackets.add(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, mc.thePlayer.onGround))
+        recordedPackets.add(lastSentC03)
         recordingLength = waypoint.length
         recording = true
 
