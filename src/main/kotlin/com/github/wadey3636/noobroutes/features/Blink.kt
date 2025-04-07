@@ -48,7 +48,7 @@ object Blink{
 
     private var lastBlink = System.currentTimeMillis()
 
-    private var movementPackets = mutableListOf<C04PacketPlayerPosition>()
+    var movementPackets = mutableListOf<C04PacketPlayerPosition>()
     private var endY = 0.0
     var skip = false
 
@@ -119,8 +119,8 @@ object Blink{
         if(!inBoss) return
         if (movementPackets.isEmpty()) return
         if (!mode) return
-        val vec3List: List<Vec3> = movementPackets.map { packet -> Vec3(packet.positionX, packet.positionY, packet.positionZ) }
-        Renderer.draw3DLine(vec3List, Color.WHITE, lineWidth = 1.5F)
+        //val vec3List: List<Vec3> = movementPackets.map { packet -> Vec3(packet.positionX, packet.positionY, packet.positionZ) }
+        //Renderer.draw3DLine(vec3List, Color.WHITE, lineWidth = 1.5F)
         val firstPacket = movementPackets.first()
         val xPos = firstPacket.positionX
         val yPos = firstPacket.positionY

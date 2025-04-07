@@ -1,5 +1,6 @@
 package com.github.wadey3636.noobroutes.features
 
+import com.github.wadey3636.noobroutes.features.Blink.movementPackets
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
@@ -55,12 +56,14 @@ object Trail: Module(
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         if (!mode) {
-            val viewEntity = mc.renderViewEntity
-            val camX = viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * event.partialTicks
-            val camY = viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * event.partialTicks
-            val camZ = viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * event.partialTicks
             val positionsUp = positions.map { it.add(0.0, 0.01, 0.0) }.toMutableList()
-            positionsUp.add(0, Vec3(camX, camY + 0.01, camZ))
+            if (movementPackets.isEmpty() || !AutoP3.mode)  {
+                val viewEntity = mc.renderViewEntity
+                val camX = viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * event.partialTicks
+                val camY = viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * event.partialTicks
+                val camZ = viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * event.partialTicks
+                positionsUp.add(0, Vec3(camX, camY + 0.01, camZ))
+            }
             Renderer.draw3DLine(positionsUp, Color.CYAN, depth = true)
         }
         else {
