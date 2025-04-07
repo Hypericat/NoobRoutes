@@ -31,6 +31,7 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 enum class RingTypes {
@@ -179,7 +180,7 @@ object AutoP3: Module (
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun awaitingOpen(event: PacketEvent.Receive) {
         if (!waitingTerm || event.packet !is S2DPacketOpenWindow) return
         AutoP3Utils.walking = true

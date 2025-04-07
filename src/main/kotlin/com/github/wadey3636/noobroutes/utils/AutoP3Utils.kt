@@ -19,6 +19,7 @@ import me.defnotstolen.utils.render.Renderer
 import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
@@ -86,6 +87,14 @@ object AutoP3Utils {
             motioning = true
             motionAfter = false
         }
+    }
+
+    @SubscribeEvent
+    fun onS08(event: PacketEvent.Receive) {
+        if (event.packet !is S08PacketPlayerPosLook) return
+        walking = false
+        yeeting = false
+        motioning = false
     }
 
     @SubscribeEvent

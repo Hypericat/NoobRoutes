@@ -6,6 +6,7 @@ import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
@@ -31,7 +32,7 @@ object PacketUtils {
     }
 
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onTick(event: PacketEvent.Send) {
         if (event.packet !is C03PacketPlayer) return
         scheduledTasks.removeAll {

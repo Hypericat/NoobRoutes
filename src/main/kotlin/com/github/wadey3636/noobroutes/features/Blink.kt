@@ -50,7 +50,7 @@ object Blink{
 
     private var movementPackets = mutableListOf<C04PacketPlayerPosition>()
     private var endY = 0.0
-    private var skip = false
+    var skip = false
 
     private var recording = false
     private var recordingLength = 0

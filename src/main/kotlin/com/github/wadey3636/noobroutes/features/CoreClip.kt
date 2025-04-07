@@ -1,7 +1,10 @@
 package com.github.wadey3636.noobroutes.features
 
+import com.github.wadey3636.noobroutes.features.Blink.skip
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
+import com.github.wadey3636.noobroutes.utils.AutoP3Utils.walking
 import com.github.wadey3636.noobroutes.utils.PacketUtils
+import me.defnotstolen.events.impl.MotionUpdateEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -18,6 +21,7 @@ object CoreClip: Module(
 ) {
 
     private var cd = 0
+    private var doWalk = false
 
     @SubscribeEvent
     fun atCore(event: ClientTickEvent) {
@@ -30,27 +34,26 @@ object CoreClip: Module(
         if (mc.thePlayer.posY != 115.0) return
         if (mc.thePlayer.posX !in 52.0..57.0) return
 
-        if (isClose(mc.thePlayer.posZ, 53.7)) {
-            AutoP3Utils.unPressKeys(false)
-            cd = 3
-            mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 53.7624)
-            PacketUtils.c03ScheduleTask {
-                mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 55.301)
-                AutoP3Utils.rePressKeys()
-            }
-        }
-        else if (isClose(mc.thePlayer.posZ, 55.3)) {
-            AutoP3Utils.unPressKeys(false)
-            cd = 3
-            mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 55.2376)
-            PacketUtils.c03ScheduleTask {
-                mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 53.699)
-                AutoP3Utils.rePressKeys()
-            }
-        }
+        if (isClose(mc.thePlayer.posZ, 53.7)) doClip(53.7624, 55.301)
+        else if (isClose(mc.thePlayer.posZ, 55.3)) doClip(55.2376, 53.699)
     }
 
     private fun isClose(number1: Double, number2: Double): Boolean {
         return abs(number1 - number2) < 0.0001F
+    }
+
+    private fun doClip(coord1: Double, coord2: Double) {
+        doWalk = walking
+        AutoP3Utils.unPressKeys()
+        mc.thePlayer.motionZ = 0.0
+        cd = 3
+        mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, coord1)
+        skip = true
+        PacketUtils.c03ScheduleTask {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, coord2)}
+        PacketUtils.c03ScheduleTask(1) {
+            walking = doWalk
+            AutoP3Utils.rePressKeys()
+            skip = false
+        }
     }
 }
