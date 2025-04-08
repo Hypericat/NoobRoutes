@@ -64,7 +64,7 @@ object Auto4: Module(
         if (!silent || Blink.cancelled < 1) {
             mc.thePlayer.rotationYaw = rotation.first
             mc.thePlayer.rotationPitch = rotation.second
-            ClientUtils.clientScheduleTask { PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem)) }
+            ClientUtils.clientScheduleTask(1) { PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem)) }
         }
         else if (silent && !fast) {
             ClientUtils.clientScheduleTask {

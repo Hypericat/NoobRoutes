@@ -65,8 +65,8 @@ object AutoP3Utils {
     var yeetTicks = 0
 
     fun startWalk(dir: Float) {
-        walking = true
         direction  = dir
+        walking = true
     }
 
     @SubscribeEvent
