@@ -2,6 +2,7 @@ package com.github.wadey3636.noobroutes.features
 
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils.motionAfter
+import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.Utils
 import com.github.wadey3636.noobroutes.utils.adapters.RingsMapTypeAdapter
 import com.google.gson.GsonBuilder
@@ -18,6 +19,7 @@ import net.minecraft.util.Vec3
 import org.lwjgl.input.Keyboard
 import me.defnotstolen.config.DataManager
 import me.defnotstolen.events.impl.PacketEvent
+import me.defnotstolen.events.impl.TerminalOpenedEvent
 import me.defnotstolen.features.settings.Setting.Companion.withDependency
 import me.defnotstolen.features.settings.impl.*
 import me.defnotstolen.ui.hud.HudElement
@@ -180,10 +182,10 @@ object AutoP3: Module (
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-    fun awaitingOpen(event: PacketEvent.Receive) {
-        if (!waitingTerm || event.packet !is S2DPacketOpenWindow) return
-        AutoP3Utils.walking = true
+    @SubscribeEvent
+    fun awaitingOpen(event: TerminalOpenedEvent) {
+        if (!waitingTerm) return
+        ClientUtils.clientScheduleTask { AutoP3Utils.walking = true }
     }
 
     @SubscribeEvent
@@ -191,7 +193,7 @@ object AutoP3: Module (
         if (!waitingLeap || event.packet !is S18PacketEntityTeleport) return
         val entity  = mc.theWorld.getEntityByID(event.packet.entityId)
         if (entity !is EntityPlayer) return
-        val x = event.packet.x/32.0 //dont fucking ask why its like this
+        val x = event.packet.x/32.0 //don't fucking ask why its like this
         val y = event.packet.y/32.0
         val z = event.packet.z/32.0
         if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistance(x,y,z) < 2) leaped++

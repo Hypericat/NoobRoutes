@@ -145,7 +145,7 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
         }
         return number
     }
-    var listeningTextField: String = ""
+    private var listeningTextField: String = ""
 
     override fun mouseClickedAnywhere(mouseButton: Int): Boolean {
         if (mouseButton == 0 && listeningText && !isHovered && !isHoveredBox) {
@@ -157,7 +157,6 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
 
 
     override fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
-        modMessage(listeningText)
         if (listeningText) {
             var text = listeningTextField
             when (keyCode) {

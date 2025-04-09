@@ -23,6 +23,7 @@ import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
@@ -39,6 +40,17 @@ object Trail: Module(
     private val tickDelay by BooleanSetting("Tick Delay", description = "Delays the trail by a tick, makes it look nicer", default = true)
 
     private var positions = mutableListOf<Vec3>()
+
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        positions.clear()
+    }
+
+    override fun onDisable() {
+        super.onDisable()
+        positions.clear()
+    }
 
     @SubscribeEvent
     fun onTick(event: PacketEvent.Send) {
