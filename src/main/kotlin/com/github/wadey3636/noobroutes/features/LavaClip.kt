@@ -48,7 +48,7 @@ object LavaClip: Module(
 
     @SubscribeEvent
     fun onS12(event: PacketEvent.Receive) {
-        if (!cancelS12 || event.packet !is S12PacketEntityVelocity) return
+        if (!cancelS12 || event.packet !is S12PacketEntityVelocity || (event.packet.motionY != 28000 && event.packet.motionY != 26000)) return
         event.isCanceled = true
         cancelS12 = false
         toggle()

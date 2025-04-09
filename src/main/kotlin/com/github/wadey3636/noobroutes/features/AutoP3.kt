@@ -251,10 +251,12 @@ object AutoP3: Module (
             "term" -> {
                 modMessage("added await term")
                 ringType = RingTypes.TERM
+                AutoP3Utils.direction = mc.thePlayer.rotationYaw
             }
             "leap" -> {
                 modMessage("added await leap")
                 ringType = RingTypes.LEAP
+                AutoP3Utils.direction = mc.thePlayer.rotationYaw
             }
             "yeet" -> {
                 modMessage("yeet added")
