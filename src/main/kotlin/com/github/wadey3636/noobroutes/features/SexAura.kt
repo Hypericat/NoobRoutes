@@ -27,7 +27,7 @@ object SexAura: Module(
     private val actuallySend by BooleanSetting("Im ready", false, description = "wether to actually start the rizz")
     private val sentList = mutableListOf<String>()
     private var lastMessage = System.currentTimeMillis()
-    private val noobAccounts = listOf("Noob0105", "ILickToes69420", "ISniffToes69420", "ISuckToes69420", "The69ToHis420", "ryealuwu")
+    val noobAccounts = listOf("Noob0105", "ILickToes69420", "ISniffToes69420", "ISuckToes69420", "The69ToHis420", "ryealuwu")
     private val wadeyAccounts = listOf("Wadey36")
 
     private val pickupLines = listOf(

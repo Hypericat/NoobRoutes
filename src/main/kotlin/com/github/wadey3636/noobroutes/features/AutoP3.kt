@@ -26,6 +26,7 @@ import me.defnotstolen.ui.hud.HudElement
 import me.defnotstolen.utils.LookVec
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
+import me.defnotstolen.utils.skyblock.sendCommand
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
@@ -85,6 +86,7 @@ object AutoP3: Module (
     val showEnd by BooleanSetting("Render End", default = true, description = "renders waypoint where blink ends").withDependency { blinkShit }
     val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes").withDependency { blinkShit }
     val moveHud by HudSetting("Move Hud", HudElement(100f, 50f, false, settingName = "Move Hud")).withDependency { blinkShit }
+    val toggleSG by BooleanSetting("SG toggle", default = false, description = "Disable Secret guide in boss").withDependency { SexAura.noobAccounts.contains(mc.thePlayer?.name ?: "No") }
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     var waitingTerm = false
@@ -119,7 +121,10 @@ object AutoP3: Module (
     @SubscribeEvent
     fun onStart(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook) return
-        if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) inBoss = true
+        if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) {
+            inBoss = true
+            if (toggleSG) sendCommand("sg toggle", clientSide = true)
+        }
     }
 
     private fun executeRing(ring: Ring) {

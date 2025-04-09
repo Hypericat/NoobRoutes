@@ -3,6 +3,7 @@ import com.github.wadey3636.noobroutes.features.AutoP3.blink
 import com.github.wadey3636.noobroutes.features.AutoP3.inBoss
 import com.github.wadey3636.noobroutes.features.AutoP3.maxBlinks
 import com.github.wadey3636.noobroutes.features.AutoP3.mode
+import com.github.wadey3636.noobroutes.features.AutoP3.toggleSG
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.defnotstolen.Core.mc
@@ -17,6 +18,7 @@ import me.defnotstolen.utils.render.Renderer
 import me.defnotstolen.utils.render.TextAlign
 import me.defnotstolen.utils.render.text
 import me.defnotstolen.utils.skyblock.modMessage
+import me.defnotstolen.utils.skyblock.sendCommand
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
@@ -102,6 +104,7 @@ object Blink{
     fun worldUnLoad(event: WorldEvent.Unload) {
         blinksInstance = 0
         cancelled = 0
+        if (toggleSG && inBoss) sendCommand("sg toggle", clientSide = true)
         inBoss = false
     }
 
@@ -109,7 +112,7 @@ object Blink{
     fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         if(!inBoss) return
-        val resolution = ScaledResolution(mc)
+        //val resolution = ScaledResolution(mc)
         //text(cancelled.toString(), resolution.scaledWidth / 2, resolution.scaledHeight / 2.3, Color.WHITE, 13, align = TextAlign.Middle)
         text(cancelled.toString(), AutoP3.moveHud.x, AutoP3.moveHud.y, Color.WHITE, 13, align = TextAlign.Middle)
     }
