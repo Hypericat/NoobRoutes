@@ -197,10 +197,16 @@ object AutoP3: Module (
         val y = event.packet.y/32.0
         val z = event.packet.z/32.0
         if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistance(x,y,z) < 2) leaped++
-        if (leaped == 4) {
+        if (leaped == leapPlayers()) {
             modMessage("everyone leaped")
             AutoP3Utils.walking = true
         }
+    }
+
+    fun leapPlayers(): Int {
+        return if (mc.thePlayer.getDistance(2.5, 109.0, 102.5) < 5) 3 //ee3 spot (core)
+        else if (mc.thePlayer.posY >= 120) 1 //premine leap
+        else 4
     }
 
     fun addRing(args: Array<out String>?) {

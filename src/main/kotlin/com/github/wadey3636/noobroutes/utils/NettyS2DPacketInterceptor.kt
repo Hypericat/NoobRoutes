@@ -2,11 +2,8 @@ package com.github.wadey3636.noobroutes.utils
 
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
-import io.netty.handler.codec.MessageToMessageDecoder
-import me.defnotstolen.Core.logger
 import me.defnotstolen.events.impl.TerminalOpenedEvent
 import me.defnotstolen.utils.postAndCatch
-import net.minecraft.network.Packet
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
