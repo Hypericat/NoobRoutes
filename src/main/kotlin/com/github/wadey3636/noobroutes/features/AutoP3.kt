@@ -185,7 +185,7 @@ object AutoP3: Module (
     @SubscribeEvent
     fun awaitingOpen(event: TerminalOpenedEvent) {
         if (!waitingTerm) return
-        ClientUtils.clientScheduleTask { AutoP3Utils.walking = true }
+        AutoP3Utils.walking = true
     }
 
     @SubscribeEvent

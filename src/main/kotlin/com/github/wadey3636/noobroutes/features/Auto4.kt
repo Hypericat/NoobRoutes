@@ -28,7 +28,7 @@ object Auto4: Module(
     description = "does 4th device"
 ) {
     private val silent by BooleanSetting("silent", true, description = "snaps only serverside")
-    private val fast by BooleanSetting("instant", false, description = "sends the c05 (rotation packet) immediately, not on next tick").withDependency { silent }
+    private val shit by BooleanSetting("code stuff", false, description = "off is wadey, on is noob").withDependency { silent }
 
 
     private val devBlocks = listOf(
@@ -66,7 +66,7 @@ object Auto4: Module(
             mc.thePlayer.rotationPitch = rotation.second
             ClientUtils.clientScheduleTask(1) { PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem)) }
         }
-        else if (silent && !fast) {
+        else if (!shit){
             ClientUtils.clientScheduleTask {
                 PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
                 Blink.cancelled--
@@ -74,9 +74,10 @@ object Auto4: Module(
             }
         }
         else {
-            PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
-            Blink.cancelled--
-            PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+            PacketUtils.c03ScheduleTask(true) {
+                PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
+                PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+            }
         }
         shotBlocks.add(block)
     }

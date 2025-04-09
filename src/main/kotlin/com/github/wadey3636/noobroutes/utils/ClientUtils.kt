@@ -1,7 +1,6 @@
 package com.github.wadey3636.noobroutes.utils
 
 import me.defnotstolen.Core.mc
-import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
