@@ -16,7 +16,7 @@ class AutoP3Command: CommandBase() {
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
         if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Blink, Start")
-        AutoP3.addRing(args)
+        AutoP3.handleNoobCommand(args)
     }
 
     override fun canCommandSenderUseCommand(sender: ICommandSender?): Boolean {

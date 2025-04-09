@@ -2,14 +2,13 @@ package com.github.wadey3636.noobroutes.features
 
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils.motionAfter
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.SecretGuideIntegration
 import com.github.wadey3636.noobroutes.utils.Utils
 import com.github.wadey3636.noobroutes.utils.adapters.RingsMapTypeAdapter
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import me.defnotstolen.Core
 import me.defnotstolen.Core.logger
 import me.defnotstolen.Core.mc
 import me.defnotstolen.features.Category
@@ -27,14 +26,11 @@ import me.defnotstolen.utils.LookVec
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
 import me.defnotstolen.utils.skyblock.sendCommand
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S18PacketEntityTeleport
-import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 enum class RingTypes {
@@ -214,7 +210,7 @@ object AutoP3: Module (
         else 4
     }
 
-    fun addRing(args: Array<out String>?) {
+    fun handleNoobCommand(args: Array<out String>?) {
         if (route.isEmpty()) return modMessage("Put in a route dumbass")
         when(args?.get(0)) {
             "add" -> addNormalRing(args)
@@ -226,9 +222,29 @@ object AutoP3: Module (
             "rat" -> Utils.rat.forEach{ modMessage(it) }
             "pickup" -> SexAura.pickupLineByName(args)
             "restore" -> restoreRing()
+            "test" -> testFunctions(args)
             else -> modMessage("not an option")
         }
     }
+
+    private fun testFunctions(args: Array<out String>) {
+        if (args == null || args.size < 2) {
+            modMessage("Test: sgToggle")
+            return
+        }
+        when(args[1].lowercase()) {
+            "sgtoggle" -> {
+                SecretGuideIntegration.setSecretGuideAura(false)
+            }
+            else -> {
+                modMessage("All tests passed")
+            }
+        }
+
+
+
+    }
+
 
     private fun restoreRing() {
         if (deletedRings.isEmpty())  {
