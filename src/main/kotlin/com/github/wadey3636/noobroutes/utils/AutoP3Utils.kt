@@ -65,7 +65,9 @@ object AutoP3Utils {
     var yeetTicks = 0
 
     fun startWalk(dir: Float) {
-        direction  = dir
+        direction = dir
+        xSpeed = mc.thePlayer.motionX
+        zSpeed = mc.thePlayer.motionZ
         walking = true
     }
 

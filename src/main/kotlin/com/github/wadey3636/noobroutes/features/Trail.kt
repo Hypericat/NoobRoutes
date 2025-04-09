@@ -47,7 +47,7 @@ object Trail: Module(
         if (event.isCanceled) return
         val posVec = getVec3(event.packet)
         if (event.packet !is C04PacketPlayerPosition && event.packet !is C06PacketPlayerPosLook) return
-        if (positions.size == 0 || !positions[positions.size-1].equal(posVec)) {
+        if (positions.isEmpty() || !positions[positions.size-1].equal(posVec)) {
             if (tickDelay) ClientUtils.clientScheduleTask { positions.add(0, posVec) } else positions.add(0, posVec)
         }
         positions.coerceMax(trailDistance)

@@ -33,10 +33,10 @@ object LavaClip: Module(
         if (mc.thePlayer == null) return
         if (event.phase != TickEvent.Phase.END) return
 
-        if (mc.thePlayer.isInLava) ClientUtils.clientScheduleTask {
-            mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - lavaDistance, mc.thePlayer.posZ)
+        if (mc.thePlayer.isInLava) {
             cancelS12 = true
-            }
+            ClientUtils.clientScheduleTask {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - lavaDistance, mc.thePlayer.posZ)}
+        }
     }
 
     @SubscribeEvent

@@ -180,7 +180,7 @@ object AutoP3: Module (
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     fun awaitingOpen(event: PacketEvent.Receive) {
         if (!waitingTerm || event.packet !is S2DPacketOpenWindow) return
         AutoP3Utils.walking = true
