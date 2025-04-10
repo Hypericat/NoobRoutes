@@ -6,6 +6,7 @@ import com.github.wadey3636.noobroutes.features.AutoP3.mode
 import com.github.wadey3636.noobroutes.features.AutoP3.toggleSG
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
+import com.github.wadey3636.noobroutes.utils.SecretGuideIntegration
 import me.defnotstolen.Core.mc
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
@@ -97,6 +98,7 @@ object Blink{
     fun worldLoad(event: WorldEvent.Load) {
         blinksInstance = 0
         cancelled = 0
+        SecretGuideIntegration.setSecretGuideAura(true)
         inBoss = false
     }
 
@@ -104,7 +106,7 @@ object Blink{
     fun worldUnLoad(event: WorldEvent.Unload) {
         blinksInstance = 0
         cancelled = 0
-        if (toggleSG && inBoss) sendCommand("sg toggle", clientSide = true)
+        SecretGuideIntegration.setSecretGuideAura(true)
         inBoss = false
     }
 

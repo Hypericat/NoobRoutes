@@ -57,7 +57,8 @@ object ModuleManager {
         TimerHud,
         InstaAccel,
         InstaMid,
-        Auto4
+        Auto4,
+        LeverAura
     )
 
     init {

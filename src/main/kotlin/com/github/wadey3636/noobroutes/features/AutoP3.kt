@@ -118,7 +118,7 @@ object AutoP3: Module (
     fun onStart(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook) return
         if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) {
-            if (toggleSG && !inBoss) sendCommand("sg toggle", clientSide = true)
+            if (toggleSG && !inBoss) SecretGuideIntegration.setSecretGuideAura(false)
             inBoss = true
         }
     }

@@ -1,15 +1,22 @@
 package com.github.wadey3636.noobroutes.features
 
+import com.github.wadey3636.noobroutes.utils.BlockUtils.clickLever
+import com.github.wadey3636.noobroutes.utils.BlockUtils.collisionRayTrace
+import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.impl.NumberSetting
-import me.defnotstolen.utils.distanceSquaredTo
+import me.defnotstolen.utils.toVec3
+import net.minecraft.block.BlockLever
+import net.minecraft.block.BlockLever.EnumOrientation
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
+import net.minecraft.util.MovingObjectPosition
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
-import kotlin.math.pow
 
 data class Lever (val coords: BlockPos, var lastClick: Long)
 
@@ -38,11 +45,18 @@ object LeverAura: Module(
         Lever(BlockPos(60, 134, 142), System.currentTimeMillis()),
         Lever(BlockPos(58, 136, 142), System.currentTimeMillis()),
         Lever(BlockPos(58, 133, 142), System.currentTimeMillis())
+        //Lever(BlockPos(210, 62, 226), System.currentTimeMillis())
     )
 
     @SubscribeEvent
     fun doShit(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || !AutoP3.inBoss) return
-
+        val eyePos = mc.thePlayer.getPositionEyes(0f)
+        levers.forEach { lever ->
+            if (eyePos.distanceTo(lever.coords.toVec3()) > range) return@forEach
+            if (System.currentTimeMillis() - lever.lastClick < cooldown) return@forEach
+            clickLever(lever.coords)
+            lever.lastClick = System.currentTimeMillis()
+        }
     }
 }
