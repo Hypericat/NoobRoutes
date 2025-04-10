@@ -1,6 +1,6 @@
 package com.github.wadey3636.noobroutes.commands
 
-import com.github.wadey3636.noobroutes.features.AutoP3
+import com.github.wadey3636.noobroutes.features.floor7.AutoP3
 import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender

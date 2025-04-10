@@ -1,6 +1,12 @@
 package me.defnotstolen.features
 
-import com.github.wadey3636.noobroutes.features.*
+import com.github.wadey3636.noobroutes.features.floor7.*
+import com.github.wadey3636.noobroutes.features.misc.BlinkKeybind
+import com.github.wadey3636.noobroutes.features.misc.SexAura
+import com.github.wadey3636.noobroutes.features.misc.TimerHud
+import com.github.wadey3636.noobroutes.features.move.*
+import com.github.wadey3636.noobroutes.features.puzzle.WaterBoard
+import com.github.wadey3636.noobroutes.features.render.Trail
 import me.defnotstolen.Core.mc
 import me.defnotstolen.events.impl.ChatPacketEvent
 import me.defnotstolen.events.impl.InputEvent
@@ -58,8 +64,8 @@ object ModuleManager {
         InstaAccel,
         InstaMid,
         Auto4,
-        LeverAura
-        //AutoWater
+        LeverAura,
+        //WaterBoard
     )
 
     init {

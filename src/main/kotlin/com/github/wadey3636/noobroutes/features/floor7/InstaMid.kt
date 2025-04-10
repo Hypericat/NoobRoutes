@@ -1,6 +1,6 @@
-package com.github.wadey3636.noobroutes.features
+package com.github.wadey3636.noobroutes.features.floor7
 
-import com.github.wadey3636.noobroutes.features.AutoP3.inBoss
+import com.github.wadey3636.noobroutes.features.floor7.AutoP3.inBoss
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category

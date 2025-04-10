@@ -1,5 +1,6 @@
-package com.github.wadey3636.noobroutes.features
+package com.github.wadey3636.noobroutes.features.move
 
+import com.github.wadey3636.noobroutes.features.floor7.AutoP3
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module

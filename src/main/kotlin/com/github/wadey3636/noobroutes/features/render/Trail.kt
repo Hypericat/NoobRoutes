@@ -1,6 +1,7 @@
-package com.github.wadey3636.noobroutes.features
+package com.github.wadey3636.noobroutes.features.render
 
 import com.github.wadey3636.noobroutes.features.Blink.movementPackets
+import com.github.wadey3636.noobroutes.features.floor7.AutoP3
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
@@ -14,19 +15,14 @@ import me.defnotstolen.utils.equal
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
 import me.defnotstolen.utils.render.Renderer.drawBox
-import me.defnotstolen.utils.render.Renderer.drawCylinder
-import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
-import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 
 object Trail: Module(

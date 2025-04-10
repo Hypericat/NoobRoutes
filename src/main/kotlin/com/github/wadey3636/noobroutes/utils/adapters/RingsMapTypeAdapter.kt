@@ -1,7 +1,7 @@
 package com.github.wadey3636.noobroutes.utils.adapters
 
-import com.github.wadey3636.noobroutes.features.Ring
-import com.github.wadey3636.noobroutes.features.RingTypes
+import com.github.wadey3636.noobroutes.features.floor7.Ring
+import com.github.wadey3636.noobroutes.features.floor7.RingTypes
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
@@ -109,14 +109,16 @@ class RingsMapTypeAdapter : TypeAdapter<MutableMap<String, MutableList<Ring>>>()
                     }
                 }
 
-                ringList.add(Ring(
+                ringList.add(
+                    Ring(
                     type = type,
                     coords = Vec3(x, y, z),
                     direction = LookVec(yaw, pitch),
                     walk = walk,
                     look = look,
                     center = center
-                ))
+                )
+                )
 
                 reader.endObject()
             }

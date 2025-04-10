@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.features
+package com.github.wadey3636.noobroutes.features.move
 
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.PacketUtils

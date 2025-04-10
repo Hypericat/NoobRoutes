@@ -4,5 +4,6 @@ enum class Category {
     RENDER,
     FLOOR7,
     MOVE,
-    MISC
+    MISC,
+    PUZZLE
 }

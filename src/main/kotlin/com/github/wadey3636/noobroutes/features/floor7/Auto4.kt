@@ -1,18 +1,16 @@
-package com.github.wadey3636.noobroutes.features
+package com.github.wadey3636.noobroutes.features.floor7
 
+import com.github.wadey3636.noobroutes.features.Blink
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import com.github.wadey3636.noobroutes.utils.Utils
-import me.defnotstolen.Core
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.Setting.Companion.withDependency
 import me.defnotstolen.features.settings.impl.BooleanSetting
-import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
-import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S22PacketMultiBlockChange

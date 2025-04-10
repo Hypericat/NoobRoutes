@@ -1,6 +1,6 @@
 package me.defnotstolen
 
-import com.github.wadey3636.noobroutes.features.AutoP3
+import com.github.wadey3636.noobroutes.features.floor7.AutoP3
 import kotlinx.coroutines.*
 
 import me.defnotstolen.config.Config

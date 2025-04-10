@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.features
+package com.github.wadey3636.noobroutes.features.move
 
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
@@ -9,7 +9,6 @@ import me.defnotstolen.features.settings.impl.NumberSetting
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.TextAlign
 import me.defnotstolen.utils.render.text
-import me.defnotstolen.utils.runOnMCThread
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraftforge.client.event.RenderGameOverlayEvent
