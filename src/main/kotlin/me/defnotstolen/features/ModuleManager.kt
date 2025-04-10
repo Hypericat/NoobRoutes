@@ -59,6 +59,7 @@ object ModuleManager {
         InstaMid,
         Auto4,
         LeverAura
+        //AutoWater
     )
 
     init {

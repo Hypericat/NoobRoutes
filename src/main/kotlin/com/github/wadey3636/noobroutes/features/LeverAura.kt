@@ -1,19 +1,11 @@
 package com.github.wadey3636.noobroutes.features
 
 import com.github.wadey3636.noobroutes.utils.BlockUtils.clickLever
-import com.github.wadey3636.noobroutes.utils.BlockUtils.collisionRayTrace
-import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.impl.NumberSetting
 import me.defnotstolen.utils.toVec3
-import net.minecraft.block.BlockLever
-import net.minecraft.block.BlockLever.EnumOrientation
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraft.util.MovingObjectPosition
-import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
@@ -26,7 +18,7 @@ object LeverAura: Module(
     category = Category.FLOOR7,
     description = "does levers (duh)"
 ) {
-    private val range by NumberSetting(name = "range", description = "how much reach the aura should have", min = 5f, max = 6.5f, default = 6f)
+    private val range by NumberSetting(name = "range", description = "how much reach the aura should have", min = 5f, max = 6.5f, default = 6f, increment = 0.1f)
     private val cooldown by NumberSetting(name = "cooldown", description = "how long to wait beetween presses (miliseconds)", min = 50, max = 10000, default = 1000)
 
 
