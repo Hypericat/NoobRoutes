@@ -57,6 +57,7 @@ object LeverAura: Module(
             if (System.currentTimeMillis() - lever.lastClick < cooldown) return@forEach
             clickLever(lever.coords)
             lever.lastClick = System.currentTimeMillis()
+            return
         }
     }
 }
