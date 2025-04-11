@@ -1,10 +1,9 @@
-package com.github.wadey3636.noobroutes.features
+package com.github.wadey3636.noobroutes.features.misc
 
 import me.defnotstolen.Core
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.utils.render.Color
-import me.defnotstolen.utils.render.TextAlign
 import me.defnotstolen.utils.render.text
 import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.client.gui.ScaledResolution

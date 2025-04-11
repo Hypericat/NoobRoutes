@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.features
+package com.github.wadey3636.noobroutes.features.floor7
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import me.defnotstolen.events.impl.PacketEvent
@@ -8,8 +8,6 @@ import me.defnotstolen.features.settings.impl.NumberSetting
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 
 object StormClip: Module(
@@ -26,7 +24,9 @@ object StormClip: Module(
     @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook || has) return
-        if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) ClientUtils.clientScheduleTask(delayTicks) {
+        if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) ClientUtils.clientScheduleTask(
+            delayTicks
+        ) {
             mc.thePlayer.setPosition(73.5, 221.5 - clipDistance, 14.5)
             has = true
         }

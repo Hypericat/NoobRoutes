@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.features
+package com.github.wadey3636.noobroutes.features.floor7
 
 import com.github.wadey3636.noobroutes.utils.BlockUtils.clickLever
 import me.defnotstolen.features.Category

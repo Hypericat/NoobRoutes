@@ -1,12 +1,12 @@
 package com.github.wadey3636.noobroutes.utils
 
-import com.github.wadey3636.noobroutes.features.AutoP3
-import com.github.wadey3636.noobroutes.features.AutoP3.depth
-import com.github.wadey3636.noobroutes.features.AutoP3.motionValue
-import com.github.wadey3636.noobroutes.features.AutoP3.waitingLeap
-import com.github.wadey3636.noobroutes.features.AutoP3.waitingTerm
-import com.github.wadey3636.noobroutes.features.Ring
-import com.github.wadey3636.noobroutes.features.RingTypes
+import com.github.wadey3636.noobroutes.features.floor7.AutoP3
+import com.github.wadey3636.noobroutes.features.floor7.AutoP3.depth
+import com.github.wadey3636.noobroutes.features.floor7.AutoP3.motionValue
+import com.github.wadey3636.noobroutes.features.floor7.AutoP3.waitingLeap
+import com.github.wadey3636.noobroutes.features.floor7.AutoP3.waitingTerm
+import com.github.wadey3636.noobroutes.features.floor7.Ring
+import com.github.wadey3636.noobroutes.features.floor7.RingTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import me.defnotstolen.Core.mc

@@ -1,10 +1,9 @@
-package com.github.wadey3636.noobroutes.features
+package com.github.wadey3636.noobroutes.features.floor7
 
 import com.github.wadey3636.noobroutes.features.Blink.skip
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils.walking
 import com.github.wadey3636.noobroutes.utils.PacketUtils
-import me.defnotstolen.events.impl.MotionUpdateEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

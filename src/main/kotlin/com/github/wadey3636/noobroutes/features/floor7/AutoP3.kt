@@ -1,5 +1,7 @@
-package com.github.wadey3636.noobroutes.features
+package com.github.wadey3636.noobroutes.features.floor7
 
+import com.github.wadey3636.noobroutes.features.Blink
+import com.github.wadey3636.noobroutes.features.misc.SexAura
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils.motionAfter
 import com.github.wadey3636.noobroutes.utils.SecretGuideIntegration
@@ -25,7 +27,6 @@ import me.defnotstolen.ui.hud.HudElement
 import me.defnotstolen.utils.LookVec
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
-import me.defnotstolen.utils.skyblock.sendCommand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
