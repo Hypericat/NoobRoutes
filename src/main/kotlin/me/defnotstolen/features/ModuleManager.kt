@@ -1,6 +1,7 @@
 package me.defnotstolen.features
 
 import com.github.wadey3636.noobroutes.features.floor7.*
+import com.github.wadey3636.noobroutes.features.misc.AuraTest
 import com.github.wadey3636.noobroutes.features.misc.BlinkKeybind
 import com.github.wadey3636.noobroutes.features.misc.SexAura
 import com.github.wadey3636.noobroutes.features.misc.TimerHud
@@ -67,7 +68,8 @@ object ModuleManager {
         Auto4,
         LeverAura,
         WaterBoard,
-        TicTacToe
+        TicTacToe,
+        AuraTest
     )
 
     init {

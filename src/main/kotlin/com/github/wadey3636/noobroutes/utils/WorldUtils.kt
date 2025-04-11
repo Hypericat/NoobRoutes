@@ -8,7 +8,6 @@ import net.minecraft.block.BlockLever.EnumOrientation
 import net.minecraft.block.BlockSkull
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.*
 
 

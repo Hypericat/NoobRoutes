@@ -7,18 +7,12 @@ import com.github.wadey3636.noobroutes.utils.Utils
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import me.defnotstolen.events.impl.PacketEvent
-import me.defnotstolen.events.impl.ServerTickEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
-import me.defnotstolen.utils.equal
-import me.defnotstolen.utils.render.Color
-import me.defnotstolen.utils.render.RenderUtils
 import me.defnotstolen.utils.skyblock.devMessage
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import me.defnotstolen.utils.skyblock.dungeon.Puzzle
-import me.defnotstolen.utils.skyblock.dungeon.tiles.Room
 import me.defnotstolen.utils.skyblock.getBlockAt
 import me.defnotstolen.utils.skyblock.modMessage
 import me.defnotstolen.utils.toBlockPos
@@ -28,8 +22,6 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.entity.player.PlayerUseItemEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard

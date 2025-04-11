@@ -9,6 +9,7 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
 import net.minecraft.util.Vec3
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -27,6 +28,13 @@ object AuraManager {
 
 
     }
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load){
+        clickCooldown = 20
+
+    }
+
 
     @SubscribeEvent
     fun auraQueue(event: ClientTickEvent){

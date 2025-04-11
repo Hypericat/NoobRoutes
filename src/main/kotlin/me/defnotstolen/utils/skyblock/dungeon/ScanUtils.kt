@@ -12,6 +12,9 @@ import me.defnotstolen.utils.equalsOneOf
 import me.defnotstolen.utils.postAndCatch
 import me.defnotstolen.utils.skyblock.Island
 import me.defnotstolen.utils.skyblock.LocationUtils
+import me.defnotstolen.utils.skyblock.PlayerUtils.posX
+import me.defnotstolen.utils.skyblock.PlayerUtils.posZ
+import me.defnotstolen.utils.skyblock.devMessage
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.inBoss
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.inDungeons
 import me.defnotstolen.utils.skyblock.dungeon.tiles.*
@@ -21,6 +24,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
@@ -67,13 +71,12 @@ object ScanUtils {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.END || mc.theWorld == null || mc.thePlayer == null) return
-
         if ((!inDungeons && !LocationUtils.currentArea.isArea(Island.SinglePlayer)) || inBoss) {
             currentRoom?.let { RoomEnterEvent(null).postAndCatch() }
             return
         } // We want the current room to register as null if we are not in a dungeon
 
-        val roomCenter = getRoomCenter(mc.thePlayer.posX.toInt(), mc.thePlayer.posZ.toInt())
+        val roomCenter = getRoomCenter(posX.toInt(), posZ.toInt())
         if (roomCenter == lastRoomPos && LocationUtils.currentArea.isArea(Island.SinglePlayer)) return // extra SinglePlayer caching for invalid placed rooms
         lastRoomPos = roomCenter
 
@@ -153,10 +156,11 @@ object ScanUtils {
         return if (chunk.getBlock(vec2.x, height, vec2.z) == Blocks.gold_block) height - 1 else height
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun enterDungeonRoom(event: RoomEnterEvent) {
         currentRoom = event.room
         if (passedRooms.none { it.data.name == currentRoom?.data?.name }) passedRooms.add(currentRoom ?: return)
+        devMessage("${event.room?.data?.name} - ${event.room?.rotation} || clay: ${event.room?.clayPos}")
     }
 
     @SubscribeEvent

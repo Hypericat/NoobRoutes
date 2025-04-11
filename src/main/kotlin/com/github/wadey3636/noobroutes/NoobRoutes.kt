@@ -15,6 +15,7 @@ import me.defnotstolen.utils.clock.Executor
 import me.defnotstolen.utils.render.RenderUtils
 import me.defnotstolen.utils.render.RenderUtils2D
 import me.defnotstolen.utils.render.Renderer
+import me.defnotstolen.utils.skyblock.LocationUtils
 import me.defnotstolen.utils.skyblock.dungeon.ScanUtils
 import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.client.Minecraft
@@ -49,9 +50,6 @@ class NoobRoutes {
         }
         ClientCommandHandler.instance.registerCommand(NoobRoutesCommand())
         ClientCommandHandler.instance.registerCommand(AutoP3Command())
-        println("Dirt: ${Blocks.dirt.unlocalizedName}")
-        // Below is a demonstration of an access-transformed class access.
-        println("Color State: " + GlStateManager.Color());
         val alwaysActiveObjects = listOf(
             Core,
             ModuleManager,
@@ -67,7 +65,8 @@ class NoobRoutes {
             NettyS2DPacketInterceptor,
             ScanUtils,
             AuraManager,
-            Utils
+            Utils,
+            LocationUtils
 
         )
         alwaysActiveObjects.forEach {

@@ -78,10 +78,14 @@ object TicTacToe : Module(
     }
 
     private var lastClick = 0L
+
+    @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         val move = bestMove
         if (event.phase != TickEvent.Phase.START || move == null) return
         val eyePos = mc.thePlayer.getPositionEyes(0f)
+
+
         if (eyePos.distanceTo(move.toVec3()) > reach || System.currentTimeMillis() - lastClick < 500) return
         AuraManager.auraBlock(move)
 
