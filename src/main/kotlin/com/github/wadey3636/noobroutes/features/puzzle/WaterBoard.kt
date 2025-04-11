@@ -1,9 +1,8 @@
 package com.github.wadey3636.noobroutes.features.puzzle
 
-import com.github.wadey3636.noobroutes.utils.getBlockStateAt
+import com.github.wadey3636.noobroutes.utils.BlockUtils.getaabb
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import me.defnotstolen.events.impl.RoomEnterEvent
 import me.defnotstolen.events.impl.ServerTickEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
@@ -14,10 +13,7 @@ import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import me.defnotstolen.utils.skyblock.getBlockAt
 import me.defnotstolen.utils.skyblock.modMessage
 import me.defnotstolen.utils.toBlockPos
-import net.minecraft.block.BlockLever
-import net.minecraft.block.BlockLever.EnumOrientation
 import net.minecraft.init.Blocks
-import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -33,10 +29,10 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
     init {
         val isr = WaterBoard::class.java.getResourceAsStream("/waterSolutions.json")?.let { InputStreamReader(it, StandardCharsets.UTF_8) }
         waterSolutions = JsonParser().parse(isr).asJsonObject
-        //execute(500) {
+        execute(500) {
 
-        //if (enabled) scan()
-        //}
+        if (enabled) scan()
+        }
     }
 
     private var solutions = HashMap<LeverBlock, Array<Double>>()
@@ -47,6 +43,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
     fun scan() = with (DungeonUtils.currentRoom) {
         modMessage("1")
+        modMessage(this?.data?.name)
         if (this?.data?.name != "Water Board" || patternIdentifier != -1) return@with
         val extendedSlots = WoolColor.entries.joinToString("") { if (it.isExtended) it.ordinal.toString() else "" }.takeIf { it.length == 3 } ?: return
 
@@ -103,16 +100,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
             .sortedBy { (lever, time) -> time + if (lever == LeverBlock.WATER) 0.01 else 0.0 }
 
         val firstBlock = solutionList.firstOrNull()?.first?.relativePosition ?: return
-        val orientation = getBlockStateAt(firstBlock.toBlockPos()).properties[BlockLever.FACING] as EnumOrientation
-        val aabb = when(orientation) {
-            EnumOrientation.EAST -> AxisAlignedBB(0.0, 0.2, 0.315, 0.375, 0.8, 0.6875)
-            EnumOrientation.WEST -> AxisAlignedBB(0.625, 0.2, 0.315, 1.0, 0.8, 0.6875)
-            EnumOrientation.SOUTH -> AxisAlignedBB(0.3125, 0.2, 0.0, 0.6875, 0.8, 0.375)
-            EnumOrientation.NORTH -> AxisAlignedBB(0.3125, 0.2, 0.625, 0.6875, 0.8, 1.0)
-            EnumOrientation.UP_Z, EnumOrientation.UP_X -> AxisAlignedBB(0.25, 0.0, 0.25, 0.75, 0.6, 0.75)
-            EnumOrientation.DOWN_X, EnumOrientation.DOWN_Z -> AxisAlignedBB(0.25, 0.4, 0.25, 0.75, 1.0, 0.75)
-            else -> return
-        }
+        val aabb = getaabb(firstBlock.toBlockPos())
         RenderUtils.drawFilledAABB(aabb.addCoord(firstBlock.xCoord, firstBlock.yCoord, firstBlock.zCoord), color = Color.GREEN, depth = false)
 
     }
