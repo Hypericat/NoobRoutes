@@ -2,6 +2,7 @@ package com.github.wadey3636.noobroutes.utils
 
 import me.defnotstolen.Core.mc
 import net.minecraft.block.Block
+import net.minecraft.block.BlockButton
 import net.minecraft.block.BlockLever
 import net.minecraft.block.BlockLever.EnumOrientation
 import net.minecraft.block.BlockSkull
@@ -9,7 +10,6 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.*
-import kotlin.collections.get
 
 
 /**
@@ -116,7 +116,7 @@ object BlockUtils {
         return point == null || !(point.xCoord >= minX) || !(point.xCoord <= maxX) || !(point.yCoord >= minY) || !(point.yCoord <= maxY)
     }
 
-    fun getaabb(block: BlockPos): AxisAlignedBB {
+    fun getAABB(block: BlockPos): AxisAlignedBB? {
         val blockState = mc.theWorld.getBlockState(block)
         return when (blockState.block) {
             Blocks.chest -> AxisAlignedBB(0.0625, 0.0, 0.0625, 0.9375, 0.875, 0.9375)
@@ -144,10 +144,23 @@ object BlockUtils {
 
             }
             Blocks.redstone_block -> AxisAlignedBB(0.0,0.0,0.0, 1.0,1.0,1.0)
-            else -> AxisAlignedBB(0.0,0.0,0.0, 1.0,1.0,1.0)
+            Blocks.stone_button  -> {
+                val enumfacing = blockState.getValue(BlockButton.FACING) as EnumFacing
+                val flag = blockState.getValue(BlockButton.POWERED) as Boolean
+                val f2 = (if (flag) 1 else 2).toDouble() / 16.0
+                when (enumfacing) {
+                    EnumFacing.EAST -> AxisAlignedBB(0.0, 0.375, 0.3125, f2, 0.625, 0.6875)
+                    EnumFacing.WEST -> AxisAlignedBB(1.0 - f2, 0.375, 0.3125, 1.0, 0.625, 0.6875)
+                    EnumFacing.SOUTH -> AxisAlignedBB(0.3125, 0.375, 0.0, 0.6875, 0.625, f2)
+                    EnumFacing.NORTH -> AxisAlignedBB(0.3125, 0.375, 1.0f - f2, 0.6875, 0.625, 1.0)
+                    EnumFacing.UP -> AxisAlignedBB(0.3125, 0.0, 0.375, 0.6875, 0.0f + f2, 0.625)
+                    EnumFacing.DOWN -> AxisAlignedBB(0.3125, 1.0f - f2, 0.375, 0.6875, 1.0, 0.625)
+                }
+            }
+            else -> null
         }
     }
-
+/*
     fun clickLever(lever: BlockPos) {
         val orientation = mc.theWorld.getBlockState(lever).properties[BlockLever.FACING] as EnumOrientation
         val aabb = when(orientation) {
@@ -178,4 +191,6 @@ object BlockUtils {
             )
         )
     }
+
+ */
 }

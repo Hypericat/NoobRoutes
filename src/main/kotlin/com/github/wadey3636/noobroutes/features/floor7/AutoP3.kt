@@ -27,6 +27,7 @@ import me.defnotstolen.ui.hud.HudElement
 import me.defnotstolen.utils.LookVec
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
+import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
@@ -230,12 +231,15 @@ object AutoP3: Module (
 
     private fun testFunctions(args: Array<out String>) {
         if (args == null || args.size < 2) {
-            modMessage("Test: sgToggle")
+            modMessage("Test: sgToggle, roomName")
             return
         }
         when(args[1].lowercase()) {
             "sgtoggle" -> {
                 SecretGuideIntegration.setSecretGuideAura(false)
+            }
+            "roomname" -> {
+                modMessage(DungeonUtils.currentRoomName)
             }
             else -> {
                 modMessage("All tests passed")

@@ -5,6 +5,7 @@ import com.github.wadey3636.noobroutes.features.misc.BlinkKeybind
 import com.github.wadey3636.noobroutes.features.misc.SexAura
 import com.github.wadey3636.noobroutes.features.misc.TimerHud
 import com.github.wadey3636.noobroutes.features.move.*
+import com.github.wadey3636.noobroutes.features.puzzle.TicTacToe
 import com.github.wadey3636.noobroutes.features.puzzle.WaterBoard
 import com.github.wadey3636.noobroutes.features.render.Trail
 import me.defnotstolen.Core.mc
@@ -65,7 +66,8 @@ object ModuleManager {
         InstaMid,
         Auto4,
         LeverAura,
-        WaterBoard
+        WaterBoard,
+        TicTacToe
     )
 
     init {

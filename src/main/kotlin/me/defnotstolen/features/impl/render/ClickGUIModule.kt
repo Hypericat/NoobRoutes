@@ -27,7 +27,7 @@ object  ClickGUIModule: Module(
 
     val switchType by BooleanSetting("Switch Type", true, description = "Switches the type of the settings in the gui.")
     val forceHypixel by BooleanSetting("Force Hypixel", false, description = "Forces the hypixel check to be on (not recommended).")
-
+    val devMode by BooleanSetting("Dev Mode", false, description = "Enables dev debug messages")
 
     val action by ActionSetting("Open Example Hud", description = "Opens an example hud to allow configuration of huds.") {
         Core.display = EditHUDGui

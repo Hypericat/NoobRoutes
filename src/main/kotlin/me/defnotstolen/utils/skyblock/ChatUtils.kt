@@ -1,6 +1,7 @@
 package me.defnotstolen.utils.skyblock
 
 import me.defnotstolen.Core.mc
+import me.defnotstolen.features.impl.render.ClickGUIModule.devMode
 
 import me.defnotstolen.utils.noControlCodes
 import me.defnotstolen.utils.runOnMCThread
@@ -41,6 +42,17 @@ fun modMessage(message: Any?, prefix: String = "§8§l-<§r§aNoob Routes§r§8�
     val chatComponent = ChatComponentText("$prefix$message")
     chatStyle?.let { chatComponent.setChatStyle(it) } // Set chat style using setChatStyle method
     runOnMCThread { mc.thePlayer?.addChatMessage(chatComponent) }
+}
+
+/**
+ * Sends a client-side message with an optional prefix if devMode is true.
+ *
+ * @param message Message to be sent.
+ * @param prefix If `true`, adds a prefix to the message.
+ * @param chatStyle Optional chat style to be applied to the message.
+ */
+fun devMessage(message: Any?, prefix: String = "§8§l-<§r§aNoob Routes§r§8§l>-§r ", chatStyle: ChatStyle? = null) {
+    if (devMode) modMessage(message, prefix, chatStyle)
 }
 
 

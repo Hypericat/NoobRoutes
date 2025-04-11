@@ -1,7 +1,7 @@
 package com.github.wadey3636.noobroutes.features.puzzle
 
-import com.github.wadey3636.noobroutes.utils.BlockUtils.clickLever
-import com.github.wadey3636.noobroutes.utils.BlockUtils.getaabb
+
+import com.github.wadey3636.noobroutes.utils.AuraManager
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.Utils
 import com.google.gson.JsonObject
@@ -12,6 +12,7 @@ import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.RenderUtils
+import me.defnotstolen.utils.skyblock.devMessage
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
@@ -41,7 +42,6 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         val isr = WaterBoard::class.java.getResourceAsStream("/waterSolutions.json")?.let { InputStreamReader(it, StandardCharsets.UTF_8) }
         waterSolutions = JsonParser().parse(isr).asJsonObject
         execute(500) {
-
         if (enabled) scan()
         }
     }
@@ -53,12 +53,11 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
 
     fun scan() = with (DungeonUtils.currentRoom) {
-        modMessage("1")
-        modMessage(this?.data?.name)
+
+        //devMessage(this?.data?.name)
         if (this?.data?.name != "Water Board" || patternIdentifier != -1) return@with
         val extendedSlots = WoolColor.entries.joinToString("") { if (it.isExtended) it.ordinal.toString() else "" }.takeIf { it.length == 3 } ?: return
 
-        modMessage("2")
         patternIdentifier = when {
             getBlockAt(getRealCoords(14, 77, 27)) == Blocks.hardened_clay -> 0 // right block == clay
             getBlockAt(getRealCoords(16, 78, 27)) == Blocks.emerald_block -> 1 // left block == emerald
@@ -67,7 +66,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
             else -> return@with modMessage("§cFailed to get Water Board pattern. Was the puzzle already started?")
         }
 
-        modMessage("$patternIdentifier || ${WoolColor.entries.filter { it.isExtended }.joinToString(", ") { it.name.lowercase() }}")
+        devMessage("$patternIdentifier || ${WoolColor.entries.filter { it.isExtended }.joinToString(", ") { it.name.lowercase() }}")
 
         solutions.clear()
         waterSolutions[true.toString()].asJsonObject[patternIdentifier.toString()].asJsonObject[extendedSlots].asJsonObject.entrySet().forEach { entry ->
@@ -84,7 +83,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
                 }
             ] = entry.value.asJsonArray.map { it.asDouble }.toTypedArray()
         }
-        modMessage(solutions.isEmpty())
+        //devMessage(solutions.isEmpty())
     }
 
 
@@ -132,7 +131,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         solutions.entries
             .flatMap { (lever, times) -> times.filter { it <= 0.0 }.map { lever } }
             .firstOrNull()
-            ?.let { clickLever(it.leverPos.toBlockPos()) }
+            ?.let { AuraManager.auraBlock(it.leverPos.toBlockPos()) }
     }
 
     @SubscribeEvent

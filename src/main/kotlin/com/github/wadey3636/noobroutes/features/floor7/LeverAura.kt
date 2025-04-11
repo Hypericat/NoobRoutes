@@ -1,16 +1,17 @@
 package com.github.wadey3636.noobroutes.features.floor7
 
-import com.github.wadey3636.noobroutes.utils.BlockUtils.clickLever
+import com.github.wadey3636.noobroutes.utils.AuraManager
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.impl.NumberSetting
+import me.defnotstolen.utils.skyblock.devMessage
 import me.defnotstolen.utils.toVec3
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 
-data class Lever (val coords: BlockPos, var lastClick: Long)
+
 
 object LeverAura: Module(
     name = "Lever Aura",
@@ -18,6 +19,7 @@ object LeverAura: Module(
     category = Category.FLOOR7,
     description = "does levers (duh)"
 ) {
+    class Lever (val coords: BlockPos, var lastClick: Long)
     private val range by NumberSetting(name = "range", description = "how much reach the aura should have", min = 5f, max = 6.5f, default = 6f, increment = 0.1f)
     private val cooldown by NumberSetting(name = "cooldown", description = "how long to wait beetween presses (miliseconds)", min = 50, max = 10000, default = 1000)
 
@@ -47,7 +49,7 @@ object LeverAura: Module(
         levers.forEach { lever ->
             if (eyePos.distanceTo(lever.coords.toVec3()) > range) return@forEach
             if (System.currentTimeMillis() - lever.lastClick < cooldown) return@forEach
-            clickLever(lever.coords)
+            AuraManager.auraBlock(lever.coords)
             lever.lastClick = System.currentTimeMillis()
             return
         }

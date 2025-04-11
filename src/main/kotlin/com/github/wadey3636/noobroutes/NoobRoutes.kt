@@ -3,10 +3,7 @@ package com.github.wadey3636.noobroutes
 import com.github.wadey3636.noobroutes.commands.AutoP3Command
 import com.github.wadey3636.noobroutes.commands.NoobRoutesCommand
 import com.github.wadey3636.noobroutes.features.Blink
-import com.github.wadey3636.noobroutes.utils.AutoP3Utils
-import com.github.wadey3636.noobroutes.utils.ClientUtils
-import com.github.wadey3636.noobroutes.utils.NettyS2DPacketInterceptor
-import com.github.wadey3636.noobroutes.utils.PacketUtils
+import com.github.wadey3636.noobroutes.utils.*
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageDecoder
 import me.defnotstolen.Core
@@ -18,6 +15,7 @@ import me.defnotstolen.utils.clock.Executor
 import me.defnotstolen.utils.render.RenderUtils
 import me.defnotstolen.utils.render.RenderUtils2D
 import me.defnotstolen.utils.render.Renderer
+import me.defnotstolen.utils.skyblock.dungeon.ScanUtils
 import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -65,7 +63,9 @@ class NoobRoutes {
             Blink,
             ClientUtils,
             PacketUtils,
-            NettyS2DPacketInterceptor
+            NettyS2DPacketInterceptor,
+            ScanUtils,
+            AuraManager
 
         )
         alwaysActiveObjects.forEach {
