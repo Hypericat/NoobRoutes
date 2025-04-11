@@ -5,6 +5,7 @@ import me.defnotstolen.Core.mc
 import me.defnotstolen.events.impl.InputEvent
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.utils.Vec2
+import me.defnotstolen.utils.skyblock.devMessage
 import me.defnotstolen.utils.skyblock.modMessage
 import me.defnotstolen.utils.toBlockPos
 import net.minecraft.client.settings.KeyBinding
@@ -82,7 +83,6 @@ object Utils {
         val spot = getIdealSpot(coords)
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, true)
         rotateSpot = getYawAndPitch(spot.xCoord, spot.yCoord, spot.zCoord)
-        modMessage("etherwarping")
         if (mc.isSingleplayer)  {
             ClientUtils.clientScheduleTask(2) { mc.thePlayer.setPosition(coords.xCoord + 0.5, coords.yCoord, coords.zCoord + 0.5) }
             WaterBoard.waitingForS08 = false
@@ -92,7 +92,6 @@ object Utils {
     @SubscribeEvent
     fun onC03(event: PacketEvent.Send) {
         if (rotateSpot == null || event.packet !is C03PacketPlayer) return
-        modMessage("rotating")
         val rotateTo = rotateSpot
         rotateSpot = null
         event.isCanceled = true

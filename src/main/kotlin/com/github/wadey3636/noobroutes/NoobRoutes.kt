@@ -31,6 +31,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import java.io.File
+import javax.rmi.CORBA.Util
 
 
 const val MODID = "noobroutes"
@@ -65,7 +66,8 @@ class NoobRoutes {
             PacketUtils,
             NettyS2DPacketInterceptor,
             ScanUtils,
-            AuraManager
+            AuraManager,
+            Utils
 
         )
         alwaysActiveObjects.forEach {

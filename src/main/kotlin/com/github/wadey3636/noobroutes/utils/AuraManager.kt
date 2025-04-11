@@ -70,8 +70,9 @@ object AuraManager {
                 movingObjectPosition.hitVec.zCoord.toFloat()
             )
         )
+        devMessage("sent c08")
         if (removeFirst) queuedBlocks.removeFirst()
-        devMessage(System.currentTimeMillis())
+        //devMessage(System.currentTimeMillis())
     }
 
 

@@ -106,9 +106,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
     @SubscribeEvent
     fun onTick(event: TickEvent){
         if (event.phase != TickEvent.Phase.START || waitingForS08) return
-        devMessage("not checked board")
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board") return
-        devMessage("in board")
         val solutionList = solutions
             .flatMap { (lever, times) -> times.drop(lever.i).map { Pair(lever, it) } }
             .sortedBy { (lever, time) -> time + if (lever == LeverBlock.WATER) 0.01 else 0.0 }
