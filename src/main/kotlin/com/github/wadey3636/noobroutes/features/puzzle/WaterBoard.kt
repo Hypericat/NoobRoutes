@@ -2,9 +2,11 @@ package com.github.wadey3636.noobroutes.features.puzzle
 
 import com.github.wadey3636.noobroutes.utils.BlockUtils.clickLever
 import com.github.wadey3636.noobroutes.utils.BlockUtils.getaabb
+import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.Utils
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.events.impl.ServerTickEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
@@ -20,6 +22,7 @@ import me.defnotstolen.utils.skyblock.modMessage
 import me.defnotstolen.utils.toBlockPos
 import me.defnotstolen.utils.toVec3
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -99,10 +102,10 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         }
     }
      */
-
+    var waitingForS08 = false
     @SubscribeEvent
     fun onTick(event: TickEvent){
-        if (event.phase != TickEvent.Phase.START) return
+        if (event.phase != TickEvent.Phase.START || waitingForS08) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board") return
         val solutionList = solutions
             .flatMap { (lever, times) -> times.drop(lever.i).map { Pair(lever, it) } }
@@ -120,13 +123,21 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
         if (expectedX != null && relativePlayerVec.xCoord != expectedX) {
             val warpTarget = DungeonUtils.currentRoom?.getRealCoords(15, 59, expectedX.toInt())?.toVec3()
-            warpTarget?.let { Utils.etherwarpToBlock(it) }
+            warpTarget?.let {
+                Utils.etherwarpToBlock(it)
+                waitingForS08 = true
+            }
         }
 
         solutions.entries
             .flatMap { (lever, times) -> times.filter { it <= 0.0 }.map { lever } }
             .firstOrNull()
             ?.let { clickLever(it.leverPos.toBlockPos()) }
+    }
+
+    @SubscribeEvent
+    fun onS08(event: PacketEvent.Receive) {
+        if (event.packet is S08PacketPlayerPosLook) ClientUtils.clientScheduleTask { waitingForS08 = false }
     }
 
 
