@@ -24,6 +24,7 @@ import me.defnotstolen.utils.skyblock.modMessage
 import me.defnotstolen.utils.toBlockPos
 import me.defnotstolen.utils.toVec3
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
@@ -55,15 +56,15 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
     fun scan() = with (DungeonUtils.currentRoom) {
 
-        //devMessage(this?.data?.name)
-        if (this?.data?.name != "Water Board" || patternIdentifier != -1) return@with
+        devMessage(DungeonUtils.currentRoomName)
+        if (DungeonUtils.currentRoomName != "Water Board" || patternIdentifier != -1) return@with
         val extendedSlots = WoolColor.entries.joinToString("") { if (it.isExtended) it.ordinal.toString() else "" }.takeIf { it.length == 3 } ?: return
 
         patternIdentifier = when {
-            getBlockAt(getRealCoords(14, 77, 27)) == Blocks.hardened_clay -> 0 // right block == clay
-            getBlockAt(getRealCoords(16, 78, 27)) == Blocks.emerald_block -> 1 // left block == emerald
-            getBlockAt(getRealCoords(14, 78, 27)) == Blocks.diamond_block -> 2 // right block == diamond
-            getBlockAt(getRealCoords(14, 78, 27)) == Blocks.quartz_block  -> 3 // right block == quartz
+            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(14, 77, 27) ?: return) == Blocks.hardened_clay -> 0 // right block == clay
+            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(16, 78, 27) ?: return) == Blocks.emerald_block -> 1 // left block == emerald
+            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(14, 78, 27) ?: return) == Blocks.diamond_block -> 2 // right block == diamond
+            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(14, 78, 27) ?: return) == Blocks.quartz_block  -> 3 // right block == quartz
             else -> return@with modMessage("§cFailed to get Water Board pattern. Was the puzzle already started?")
         }
 
@@ -89,21 +90,27 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
 
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     fun onServerTick(event: ServerTickEvent) {
+        tickCounter++
+    }*/
+
+    @SubscribeEvent
+    fun onNotServer(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
         tickCounter++
     }
     @SubscribeEvent
-    fun waterInteract(event: PacketEvent.Receive) {
-        if (solutions.isEmpty() || event.packet !is S08PacketPlayerPosLook) return
-        LeverBlock.entries.find { it.leverPos.equal(Vec3(event.packet.x, event.packet.y, event.packet.z)) }?.let {
+    fun waterInteract(event: PacketEvent.Send) {
+        if (solutions.isEmpty() || event.packet !is C08PacketPlayerBlockPlacement) return
+        LeverBlock.entries.find { it.leverPos.toBlockPos() == event.packet.position }?.let {
             if (it == LeverBlock.WATER && openedWaterTicks == -1) openedWaterTicks = tickCounter
             it.i++
         }
     }
 
     var waitingForS08 = false
-    @SubscribeEvent
+    @SubscribeEvent 
     fun onTick(event: TickEvent){
         if (event.phase != TickEvent.Phase.START || waitingForS08) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board") return
