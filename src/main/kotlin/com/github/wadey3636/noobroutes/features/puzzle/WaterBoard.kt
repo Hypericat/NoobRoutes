@@ -1,6 +1,8 @@
 package com.github.wadey3636.noobroutes.features.puzzle
 
+import com.github.wadey3636.noobroutes.utils.BlockUtils.clickLever
 import com.github.wadey3636.noobroutes.utils.BlockUtils.getaabb
+import com.github.wadey3636.noobroutes.utils.Utils
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import me.defnotstolen.events.impl.ServerTickEvent
@@ -10,14 +12,20 @@ import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.RenderUtils
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
+import me.defnotstolen.utils.skyblock.dungeon.Puzzle
+import me.defnotstolen.utils.skyblock.dungeon.tiles.Room
 import me.defnotstolen.utils.skyblock.getBlockAt
 import me.defnotstolen.utils.skyblock.modMessage
 import me.defnotstolen.utils.toBlockPos
+import me.defnotstolen.utils.toVec3
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.entity.player.PlayerUseItemEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
@@ -93,16 +101,32 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
      */
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent){
+    fun onTick(event: TickEvent){
+        if (event.phase != TickEvent.Phase.START) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board") return
         val solutionList = solutions
             .flatMap { (lever, times) -> times.drop(lever.i).map { Pair(lever, it) } }
             .sortedBy { (lever, time) -> time + if (lever == LeverBlock.WATER) 0.01 else 0.0 }
 
         val firstBlock = solutionList.firstOrNull()?.first?.relativePosition ?: return
-        val aabb = getaabb(firstBlock.toBlockPos())
-        RenderUtils.drawFilledAABB(aabb.addCoord(firstBlock.xCoord, firstBlock.yCoord, firstBlock.zCoord), color = Color.GREEN, depth = false)
+        val relativePlayerVec = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector) ?: return
 
+        val expectedX = when (firstBlock.xCoord) {
+            5.0, 10.0 -> 10.0
+            15.0 -> 15.0
+            20.0 -> 20.0
+            else -> null
+        }
+
+        if (expectedX != null && relativePlayerVec.xCoord != expectedX) {
+            val warpTarget = DungeonUtils.currentRoom?.getRealCoords(15, 59, expectedX.toInt())?.toVec3()
+            warpTarget?.let { Utils.etherwarpToBlock(it) }
+        }
+
+        solutions.entries
+            .flatMap { (lever, times) -> times.filter { it <= 0.0 }.map { lever } }
+            .firstOrNull()
+            ?.let { clickLever(it.leverPos.toBlockPos()) }
     }
 
 
