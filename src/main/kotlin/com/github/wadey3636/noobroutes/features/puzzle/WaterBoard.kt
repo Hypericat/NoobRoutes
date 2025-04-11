@@ -10,6 +10,7 @@ import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.events.impl.ServerTickEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
+import me.defnotstolen.utils.equal
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.RenderUtils
 import me.defnotstolen.utils.skyblock.devMessage
@@ -92,29 +93,32 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
     fun onServerTick(event: ServerTickEvent) {
         tickCounter++
     }
-    /*
-        fun waterInteract(event: C08PacketPlayerBlockPlacement) {
-        if (solutions.isEmpty()) return
-        LeverBlock.entries.find { it.leverPos.equal(event.position.toVec3()) }?.let {
+    @SubscribeEvent
+    fun waterInteract(event: PacketEvent.Receive) {
+        if (solutions.isEmpty() || event.packet !is S08PacketPlayerPosLook) return
+        LeverBlock.entries.find { it.leverPos.equal(Vec3(event.packet.x, event.packet.y, event.packet.z)) }?.let {
             if (it == LeverBlock.WATER && openedWaterTicks == -1) openedWaterTicks = tickCounter
             it.i++
         }
     }
-     */
+
     var waitingForS08 = false
     @SubscribeEvent
     fun onTick(event: TickEvent){
         if (event.phase != TickEvent.Phase.START || waitingForS08) return
+        devMessage("not checked board")
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board") return
+        devMessage("in board")
         val solutionList = solutions
             .flatMap { (lever, times) -> times.drop(lever.i).map { Pair(lever, it) } }
             .sortedBy { (lever, time) -> time + if (lever == LeverBlock.WATER) 0.01 else 0.0 }
 
         val firstBlock = solutionList.firstOrNull()?.first?.relativePosition ?: return
         val relativePlayerVec = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector) ?: return
-
+        if (relativePlayerVec.yCoord != 59.0) return
+        devMessage("starting etherwarp shit")
         val expectedX = when (firstBlock.xCoord) {
-            5.0, 10.0 -> 10.0
+            5.0, 10.0 -> 9.0
             15.0 -> 15.0
             20.0 -> 20.0
             else -> null

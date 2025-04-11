@@ -30,7 +30,7 @@ import kotlin.math.sin
 
 object AutoP3Utils {
 
-    private val keyBindings = listOf(
+    val keyBindings = listOf(
         mc.gameSettings.keyBindForward,
         mc.gameSettings.keyBindLeft,
         mc.gameSettings.keyBindRight,

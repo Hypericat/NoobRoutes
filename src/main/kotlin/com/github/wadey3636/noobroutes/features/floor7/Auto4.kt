@@ -1,6 +1,7 @@
 package com.github.wadey3636.noobroutes.features.floor7
 
 import com.github.wadey3636.noobroutes.features.Blink
+import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import com.github.wadey3636.noobroutes.utils.Utils
@@ -9,6 +10,7 @@ import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.Setting.Companion.withDependency
 import me.defnotstolen.features.settings.impl.BooleanSetting
+import net.minecraft.client.settings.KeyBinding
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
@@ -17,6 +19,7 @@ import net.minecraft.network.play.server.S22PacketMultiBlockChange
 import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent
 import org.lwjgl.input.Keyboard
 
 object Auto4: Module(
@@ -26,7 +29,8 @@ object Auto4: Module(
     description = "does 4th device"
 ) {
     private val silent by BooleanSetting("silent", true, description = "snaps only serverside")
-    private val shit by BooleanSetting("code stuff", false, description = "off is wadey, on is noob").withDependency { silent }
+    private val shit by BooleanSetting("code stuff", false, description = "off is wadey, on is noob").withDependency { silent && !speedyBoi }
+    private val speedyBoi by BooleanSetting("speedyBoi", false, description = "does shit faster").withDependency { silent }
 
 
     private val devBlocks = listOf(
@@ -64,6 +68,11 @@ object Auto4: Module(
             mc.thePlayer.rotationPitch = rotation.second
             ClientUtils.clientScheduleTask(1) { PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem)) }
         }
+        else if (speedyBoi) {
+            PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
+            Blink.cancelled--
+            PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+        }
         else if (!shit){
             ClientUtils.clientScheduleTask {
                 PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
@@ -89,5 +98,10 @@ object Auto4: Module(
             }
         }
         return Utils.getYawAndPitch(block.x.toDouble() + 0.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
+    }
+
+    @SubscribeEvent
+    fun onKey(event: InputEvent) {
+        if (shotBlocks.size in 1..8) AutoP3Utils.unPressKeys()
     }
 }

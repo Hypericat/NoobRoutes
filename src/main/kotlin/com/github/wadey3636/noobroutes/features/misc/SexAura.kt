@@ -28,7 +28,7 @@ object SexAura: Module(
     private val sentList = mutableListOf<String>()
     private var lastMessage = System.currentTimeMillis()
     val noobAccounts = listOf("Noob0105", "ILickToes69420", "ISniffToes69420", "ISuckToes69420", "The69ToHis420", "ryealuwu")
-    private val wadeyAccounts = listOf("Wadey36")
+    private val wadeyAccounts = listOf("Wadey36","Tahudidu")
 
     private val pickupLines = listOf(
         "Are you WiFi? Because I’m feeling a strong connection… even though you’re clearly out of my league.",

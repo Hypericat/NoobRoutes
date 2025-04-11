@@ -1,9 +1,12 @@
 package com.github.wadey3636.noobroutes.utils
 
+import com.github.wadey3636.noobroutes.features.puzzle.WaterBoard
 import me.defnotstolen.Core.mc
 import me.defnotstolen.events.impl.InputEvent
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.utils.Vec2
+import me.defnotstolen.utils.skyblock.modMessage
+import me.defnotstolen.utils.toBlockPos
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
@@ -79,11 +82,17 @@ object Utils {
         val spot = getIdealSpot(coords)
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, true)
         rotateSpot = getYawAndPitch(spot.xCoord, spot.yCoord, spot.zCoord)
+        modMessage("etherwarping")
+        if (mc.isSingleplayer)  {
+            ClientUtils.clientScheduleTask(2) { mc.thePlayer.setPosition(coords.xCoord + 0.5, coords.yCoord, coords.zCoord + 0.5) }
+            WaterBoard.waitingForS08 = false
+        }
     }
 
     @SubscribeEvent
     fun onC03(event: PacketEvent.Send) {
         if (rotateSpot == null || event.packet !is C03PacketPlayer) return
+        modMessage("rotating")
         val rotateTo = rotateSpot
         rotateSpot = null
         event.isCanceled = true
@@ -99,7 +108,7 @@ object Utils {
             PacketUtils.sendPacket(C05PacketPlayerLook(rotateTo!!.first, rotateTo!!.second, event.packet.isOnGround))
         }
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
-        KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.keyCode))
+        KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, false)
     }
 
     fun getIdealSpot(coords: Vec3): Vec3 {
