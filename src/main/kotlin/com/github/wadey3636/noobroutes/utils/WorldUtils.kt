@@ -4,10 +4,12 @@ import me.defnotstolen.Core.mc
 import net.minecraft.block.Block
 import net.minecraft.block.BlockLever
 import net.minecraft.block.BlockLever.EnumOrientation
+import net.minecraft.block.BlockSkull
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.*
+import kotlin.collections.get
 
 
 /**
@@ -112,6 +114,38 @@ object BlockUtils {
 
     private fun isVecOutsideXYBounds(point: Vec3?, minX: Double, minY: Double, maxX: Double, maxY: Double): Boolean {
         return point == null || !(point.xCoord >= minX) || !(point.xCoord <= maxX) || !(point.yCoord >= minY) || !(point.yCoord <= maxY)
+    }
+
+    fun getaabb(block: BlockPos): AxisAlignedBB {
+        val blockState = mc.theWorld.getBlockState(block)
+        return when (blockState.block) {
+            Blocks.chest -> AxisAlignedBB(0.0625, 0.0, 0.0625, 0.9375, 0.875, 0.9375)
+            Blocks.trapped_chest -> AxisAlignedBB(0.0625, 0.0, 0.0625, 0.9375, 0.875, 0.9375)
+            Blocks.ender_chest -> AxisAlignedBB(0.0625, 0.0, 0.0625, 0.9375, 0.875, 0.9375)
+            Blocks.lever -> {
+                val orientation = blockState.properties[BlockLever.FACING] as EnumOrientation
+                when(orientation) {
+                    EnumOrientation.EAST -> AxisAlignedBB(0.0, 0.2, 0.315, 0.375, 0.8, 0.6875)
+                    EnumOrientation.WEST -> AxisAlignedBB(0.625, 0.2, 0.315, 1.0, 0.8, 0.6875)
+                    EnumOrientation.SOUTH -> AxisAlignedBB(0.3125, 0.2, 0.0, 0.6875, 0.8, 0.375)
+                    EnumOrientation.NORTH -> AxisAlignedBB(0.3125, 0.2, 0.625, 0.6875, 0.8, 1.0)
+                    EnumOrientation.UP_Z, EnumOrientation.UP_X -> AxisAlignedBB(0.25, 0.0, 0.25, 0.75, 0.6, 0.75)
+                    EnumOrientation.DOWN_X, EnumOrientation.DOWN_Z -> AxisAlignedBB(0.25, 0.4, 0.25, 0.75, 1.0, 0.75)
+                }
+            }
+            Blocks.skull -> {
+                when (blockState.properties[BlockSkull.FACING] as EnumFacing) {
+                    EnumFacing.NORTH -> AxisAlignedBB(0.25, 0.25, 0.5, 0.75, 0.75, 1.0)
+                    EnumFacing.SOUTH -> AxisAlignedBB(0.25, 0.25, 0.0, 0.75, 0.75, 0.5)
+                    EnumFacing.WEST -> AxisAlignedBB(0.5, 0.25, 0.25, 1.0, 0.75, 0.75)
+                    EnumFacing.EAST -> AxisAlignedBB(0.0, 0.25, 0.25, 0.5, 0.75, 0.75)
+                    else -> AxisAlignedBB(0.25, 0.0, 0.25, 0.75, 0.5, 0.75)
+                }
+
+            }
+            Blocks.redstone_block -> AxisAlignedBB(0.0,0.0,0.0, 1.0,1.0,1.0)
+            else -> AxisAlignedBB(0.0,0.0,0.0, 1.0,1.0,1.0)
+        }
     }
 
     fun clickLever(lever: BlockPos) {
