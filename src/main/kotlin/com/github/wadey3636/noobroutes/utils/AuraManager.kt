@@ -134,12 +134,14 @@ object AuraManager {
         if (removeFirst) queuedEntityClicks.removeFirst()
         if (mc.thePlayer.getPositionEyes(0f).distanceTo(Vec3(entityAura.entity.posX, entityAura.entity.posY, entityAura.entity.posZ)) < 5) {
             if (entityAura.action == Action.INTERACT) {
+                devMessage("entity packet sent")
                 PacketUtils.sendPacket(C02PacketUseEntity(entityAura.entity, Action.INTERACT))
             } else if (entityAura.action == Action.INTERACT_AT) {
                 val expandValue: Double = entityAura.entity.collisionBorderSize.toDouble()
                 val eyePos = mc.thePlayer.getPositionEyes(0f)
                 val movingObjectPosition = entityAura.entity.entityBoundingBox.expand(expandValue, expandValue, expandValue).calculateIntercept(eyePos, getEntityCenter(entityAura.entity)) ?: return
                 PacketUtils.sendPacket(C02PacketUseEntity(entityAura.entity, Vec3(movingObjectPosition.hitVec.xCoord, movingObjectPosition.hitVec.yCoord, movingObjectPosition.hitVec.zCoord)))
+                devMessage("entity packet sent")
             }
             return
         }

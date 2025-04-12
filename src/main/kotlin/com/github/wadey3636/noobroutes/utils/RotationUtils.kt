@@ -39,8 +39,8 @@ object RotationUtils {
     /**
      * sets angle to a vec3
      */
-    fun setAngleToVec3(vec3: Vec3){
-        val angles = getYawAndPitch(vec3.xCoord, vec3.yCoord, vec3.zCoord, true)
+    fun setAngleToVec3(vec3: Vec3, sneaking: Boolean = false){
+        val angles = getYawAndPitch(vec3.xCoord, vec3.yCoord, vec3.zCoord, sneaking)
         setAngles(angles.first, angles.second)
 
     }

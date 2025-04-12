@@ -11,6 +11,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import me.defnotstolen.Core
 import me.defnotstolen.Core.logger
 import me.defnotstolen.Core.mc
 import me.defnotstolen.features.Category
@@ -28,6 +29,7 @@ import me.defnotstolen.utils.LookVec
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
+import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
@@ -231,7 +233,7 @@ object AutoP3: Module (
 
     private fun testFunctions(args: Array<out String>) {
         if (args == null || args.size < 2) {
-            modMessage("Test: sgToggle, roomName")
+            modMessage("Test: sgToggle, roomName, relativePos")
             return
         }
         when(args[1].lowercase()) {
@@ -240,6 +242,9 @@ object AutoP3: Module (
             }
             "roomname" -> {
                 modMessage(DungeonUtils.currentRoomName)
+            }
+            "relativepos" -> {
+                modMessage(DungeonUtils.currentRoom?.getRelativeCoords(mc.objectMouseOver.blockPos))
             }
             else -> {
                 modMessage("All tests passed")

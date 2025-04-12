@@ -8,16 +8,18 @@ import com.github.wadey3636.noobroutes.utils.RotationUtils
 import com.github.wadey3636.noobroutes.utils.Utils.isClose
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import me.defnotstolen.Core
 import me.defnotstolen.events.impl.S08Event
 import me.defnotstolen.events.impl.ServerTickEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
+import me.defnotstolen.features.impl.render.ClickGUIModule.devMode
+import me.defnotstolen.features.impl.render.ClickGUIModule.forceHypixel
 import me.defnotstolen.utils.add
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
 import me.defnotstolen.utils.skyblock.*
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
+import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.currentRoom
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import me.defnotstolen.utils.toBlockPos
@@ -55,16 +57,16 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
     private var tickCounter = 0
 
 
-    fun scan() = with (DungeonUtils.currentRoom) {
+    fun scan() = with (currentRoom) {
 
         if (DungeonUtils.currentRoomName != "Water Board" || patternIdentifier != -1) return@with
         val extendedSlots = WoolColor.entries.joinToString("") { if (it.isExtended) it.ordinal.toString() else "" }.takeIf { it.length == 3 } ?: return
 
         patternIdentifier = when {
-            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(14, 77, 27) ?: return) == Blocks.hardened_clay -> 0 // right block == clay
-            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(16, 78, 27) ?: return) == Blocks.emerald_block -> 1 // left block == emerald
-            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(14, 78, 27) ?: return) == Blocks.diamond_block -> 2 // right block == diamond
-            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(14, 78, 27) ?: return) == Blocks.quartz_block  -> 3 // right block == quartz
+            getBlockAt(currentRoom?.getRealCoords(14, 77, 27) ?: return) == Blocks.hardened_clay -> 0 // right block == clay
+            getBlockAt(currentRoom?.getRealCoords(16, 78, 27) ?: return) == Blocks.emerald_block -> 1 // left block == emerald
+            getBlockAt(currentRoom?.getRealCoords(14, 78, 27) ?: return) == Blocks.diamond_block -> 2 // right block == diamond
+            getBlockAt(currentRoom?.getRealCoords(14, 78, 27) ?: return) == Blocks.quartz_block  -> 3 // right block == quartz
             else -> return@with modMessage("§cFailed to get Water Board pattern. Was the puzzle already started?")
         }
 
@@ -85,7 +87,6 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
                 }
             ] = entry.value.asJsonArray.map { it.asDouble }.toTypedArray()
         }
-        //devMessage(solutions.isEmpty())
     }
 
 
@@ -105,18 +106,19 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
     var waitingForS08 = false
     var warped = false
-    var chested = false
+    var openedChest = false
     @SubscribeEvent
     fun onTick(event: TickEvent){
         if (event.phase != TickEvent.Phase.START || waitingForS08) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board") return
+        val currRoom = currentRoom ?: return
         val solutionList = solutions
             .flatMap { (lever, times) -> times.drop(lever.i).map { Pair(lever, it) } }
             .sortedBy { (lever, time) -> time + if (lever == LeverBlock.WATER) 0.01 else 0.0 }
 
         val firstBlock = solutionList.firstOrNull()?.first?.relativePosition
         if (firstBlock != null) {
-            val relativePlayerZ = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector)?.zCoord ?: return
+            val relativePlayerZ = currRoom.getRelativeCoords(mc.thePlayer.positionVector).zCoord
             if (mc.thePlayer.posY != 59.0) return
             val expectedZ = when (firstBlock.zCoord) {
                 5.0, 10.0 -> 8.5
@@ -125,13 +127,12 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
                 else -> null
             }
 
-            if (expectedZ != null && !isClose(relativePlayerZ, expectedZ)) {
-                val warpTarget = DungeonUtils.currentRoom?.getRealCoords(Vec3(15.5, 59.0, expectedZ))
-                warpTarget?.let {
-                    etherwarpToTopBlock(it)
-                    waitingForS08 = true
+            if (expectedZ != null && !isClose(relativePlayerZ, expectedZ.toDouble())) {
+                devMessage("expectedZ: $expectedZ, relativePlayerZ: $relativePlayerZ")
+                val warpTarget = BlockPos(15, 58, (expectedZ + 0.5).toInt())
+                    devMessage(warpTarget)
+                    etherwarpToTopBlock(warpTarget)
                     return
-                }
             }
 
             val next = solutionList.firstOrNull() ?: return
@@ -147,49 +148,49 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
                 return
             }
         }
-        else { //if first block is null
+        else {
             if (solutions.all { (lever, times) -> lever.i >= times.size } && !warped) {
-                etherwarpToTopBlock(DungeonUtils.currentRoom?.getRealCoords(Vec3(15.5, 59.0, 21.5))!!)
-                waitingForS08 = true
+                etherwarpToTopBlock(BlockPos(15, 58, 22))
+
                 warped = true
             }
 
             if (
-                getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 15) ?: return) == Blocks.air &&
-                getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 16) ?: return) == Blocks.air &&
-                getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 17) ?: return) == Blocks.air &&
-                getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 18) ?: return) == Blocks.air &&
-                getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 19) ?: return) == Blocks.air &&
-                getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 22) ?: return) == Blocks.chest &&
-                warped && !chested
+                getBlockAt(currRoom.getRealCoords(15, 56, 15)) == Blocks.air &&
+                getBlockAt(currRoom.getRealCoords(15, 56, 16)) == Blocks.air &&
+                getBlockAt(currRoom.getRealCoords(15, 56, 17)) == Blocks.air &&
+                getBlockAt(currRoom.getRealCoords(15, 56, 18)) == Blocks.air &&
+                getBlockAt(currRoom.getRealCoords(15, 56, 19)) == Blocks.air &&
+                getBlockAt(currRoom.getRealCoords(15, 56, 22)) == Blocks.chest &&
+                warped && !openedChest
             ) {
-                AuraManager.auraBlock(DungeonUtils.currentRoom?.getRealCoords(15, 56, 22)!!)
+                AuraManager.auraBlock(currRoom.getRealCoords(15, 56, 22))
                 devMessage("sent for chest")
-                chested = true
+                openedChest = true
             }
         }
     }
 
     @SubscribeEvent
     fun onS08(event: S08Event) {
-        ClientUtils.clientScheduleTask { waitingForS08 = false }
+        devMessage("waiting s08: $waitingForS08")
+        ClientUtils.clientScheduleTask(1) { waitingForS08 = false }
     }
 
     @SubscribeEvent
     fun onUnload(event: WorldEvent.Unload) {
         warped = false
-        chested = false
+        openedChest = false
         reset()
     }
 
     @SubscribeEvent
     fun onLoad(event: WorldEvent.Load) {
         warped = false
-        chested = false
+        openedChest = false
         reset()
     }
 
-    fun reset() {
         LeverBlock.entries.forEach { it.i = 0 }
         patternIdentifier = -1
         solutions.clear()
@@ -205,7 +206,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         RED(BlockPos(15, 56, 15));
 
         inline val isExtended: Boolean get() =
-            DungeonUtils.currentRoom?.let { getBlockAt(it.getRealCoords(relativePosition)) == Blocks.wool } == true
+            currentRoom?.let { getBlockAt(it.getRealCoords(relativePosition)) == Blocks.wool } == true
     }
     private enum class LeverBlock(val relativePosition: Vec3, var i: Int = 0) {
         QUARTZ(Vec3(20.0, 61.0, 20.0)),
@@ -218,34 +219,38 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         NONE(Vec3(0.0, 0.0, 0.0));
 
         inline val leverPos: Vec3
-            get() = DungeonUtils.currentRoom?.getRealCoords(relativePosition) ?: Vec3(0.0, 0.0, 0.0)
+            get() = currentRoom?.getRealCoords(relativePosition) ?: Vec3(0.0, 0.0, 0.0)
     }
 
 
-    private fun etherwarpToTopBlock(coords: Vec3) {
-        KeyBinding.setKeyBindState(Core.mc.gameSettings.keyBindSneak.keyCode, true)
-        RotationUtils.setAngleToVec3(coords)
+    private fun etherwarpToTopBlock(coords: BlockPos) {
+        val currRoom = currentRoom ?: return
+        waitingForS08 = true
+        val target = currRoom.getRealCoords(coords).toVec3().add(0.5, 1.0, 0.5)
+        if (devMode) {
+            blocks.add(currRoom.getRealCoords(coords))
+            blockRays.add(Pair(target, mc.thePlayer.positionVector.add(0.0, 1.54,0.0)))
+        }
+
+
+        KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, true)
+        RotationUtils.setAngleToVec3(target, true)
         ClientUtils.clientScheduleTask(1) {
-            PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(Core.mc.thePlayer.heldItem))
-            KeyBinding.setKeyBindState(Core.mc.gameSettings.keyBindSneak.keyCode, false)
-        }
-
-        //blockRays.add(Pair(coords.toVec3().add(-0.5, 1.0, 0.5), mc.thePlayer.positionVector.add(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0)))
-        if (LocationUtils.currentArea.isArea(Island.SinglePlayer))  {
-            devMessage("Single Player Gaming")
-            ClientUtils.clientScheduleTask(5) {
-                Core.mc.thePlayer.setPosition(coords.xCoord, coords.yCoord, coords.zCoord)
-                Core.mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
+            PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.keyCode))
+            if (LocationUtils.currentArea.isArea(Island.SinglePlayer) && forceHypixel) {
+                mc.thePlayer.setPosition(target.xCoord, target.yCoord, target.zCoord)
+                mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
+                waitingForS08 = false
             }
-            ClientUtils.clientScheduleTask(7) {waitingForS08 = false}
-
         }
     }
-    val blockRays = mutableListOf<Pair<Vec3, Vec3>>()
-
+    private val blockRays = mutableListOf<Pair<Vec3, Vec3>>()
+    private val blocks = mutableListOf<BlockPos>()
     @SubscribeEvent
     fun renderWorld(event: RenderWorldLastEvent){
-        blockRays.forEach { Renderer.draw3DLine(listOf(it.first, it.second), Color.GREEN) }
+        blockRays.forEach { Renderer.draw3DLine(listOf(it.first, it.second), Color.BLUE) }
+        blocks.forEach { Renderer.drawBlock(it, Color.GREEN) }
     }
 
 
