@@ -114,60 +114,60 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
             .flatMap { (lever, times) -> times.drop(lever.i).map { Pair(lever, it) } }
             .sortedBy { (lever, time) -> time + if (lever == LeverBlock.WATER) 0.01 else 0.0 }
 
-        val firstBlock = solutionList.firstOrNull()?.first?.relativePosition ?: return
-        val relativePlayerZ = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector)?.zCoord ?: return
-        if (mc.thePlayer.posY != 59.0) return
-        val expectedZ = when (firstBlock.zCoord) {
-            5.0, 10.0 -> 8.5
-            15.0 -> 14.5
-            20.0 -> 19.5
-            else -> null
-        }
+        val firstBlock = solutionList.firstOrNull()?.first?.relativePosition
+        if (firstBlock != null) {
+            val relativePlayerZ = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector)?.zCoord ?: return
+            if (mc.thePlayer.posY != 59.0) return
+            val expectedZ = when (firstBlock.zCoord) {
+                5.0, 10.0 -> 8.5
+                15.0 -> 14.5
+                20.0 -> 19.5
+                else -> null
+            }
 
-        if (expectedZ != null && !isClose(relativePlayerZ, expectedZ)) {
-            val warpTarget = DungeonUtils.currentRoom?.getRealCoords(15, 58, expectedZ.toInt())?.toVec3()
-            warpTarget?.let {
-                etherwarpToTopBlock(it.toBlockPos())
-                waitingForS08 = true
+            if (expectedZ != null && !isClose(relativePlayerZ, expectedZ)) {
+                val warpTarget = DungeonUtils.currentRoom?.getRealCoords(Vec3(15.5, 59.0, expectedZ))
+                warpTarget?.let {
+                    etherwarpToTopBlock(it)
+                    waitingForS08 = true
+                    return
+                }
+            }
+
+            val next = solutionList.firstOrNull() ?: return
+            val (lever, time) = next
+            val timeInTicks = (time * 20).toInt()
+
+            if ((openedWaterTicks == -1 && timeInTicks == 0) || (openedWaterTicks != -1 && tickCounter >= openedWaterTicks + timeInTicks)) {
+                AuraManager.auraBlock(lever.leverPos.toBlockPos())
+                if (lever == LeverBlock.WATER && openedWaterTicks == -1) {
+                    openedWaterTicks = tickCounter
+                }
+                lever.i++
                 return
             }
         }
-
-        val next = solutionList.firstOrNull() ?: return
-        val (lever, time) = next
-        val timeInTicks = (time * 20).toInt()
-
-        val shouldClickNow = (openedWaterTicks == -1 && timeInTicks == 0) || (openedWaterTicks != -1 && tickCounter >= openedWaterTicks + timeInTicks)
-
-        if (shouldClickNow) {
-            AuraManager.auraBlock(lever.leverPos.toBlockPos())
-            if (lever == LeverBlock.WATER && openedWaterTicks == -1) {
-                openedWaterTicks = tickCounter
+        else { //if first block is null
+            if (solutions.all { (lever, times) -> lever.i >= times.size } && !warped) {
+                etherwarpToTopBlock(DungeonUtils.currentRoom?.getRealCoords(Vec3(15.5, 59.0, 21.5))!!)
+                waitingForS08 = true
+                warped = true
             }
-            lever.i++
-            return
-        }
 
-        if (solutions.all { (lever, times) -> lever.i >= times.size } && !warped) {
-            etherwarpToTopBlock(DungeonUtils.currentRoom?.getRealCoords(15, 58, 22)!!)
-            waitingForS08 = true
-            warped = true
+            if (
+                getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 15) ?: return) == Blocks.air &&
+                getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 16) ?: return) == Blocks.air &&
+                getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 17) ?: return) == Blocks.air &&
+                getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 18) ?: return) == Blocks.air &&
+                getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 19) ?: return) == Blocks.air &&
+                getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 22) ?: return) == Blocks.chest &&
+                warped && !chested
+            ) {
+                AuraManager.auraBlock(DungeonUtils.currentRoom?.getRealCoords(15, 56, 22)!!)
+                devMessage("sent for chest")
+                chested = true
+            }
         }
-
-        if (
-            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 15) ?: return) == Blocks.air &&
-            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 16) ?: return) == Blocks.air &&
-            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 17) ?: return) == Blocks.air &&
-            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 18) ?: return) == Blocks.air &&
-            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 19) ?: return) == Blocks.air &&
-            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 22) ?: return) == Blocks.chest &&
-            warped && !chested
-        ) {
-            AuraManager.auraBlock(DungeonUtils.currentRoom?.getRealCoords(15, 56, 22)!!)
-            devMessage("sent for chest")
-            chested = true
-        }
-
     }
 
     @SubscribeEvent
@@ -222,9 +222,9 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
     }
 
 
-    private fun etherwarpToTopBlock(coords: BlockPos) {
+    private fun etherwarpToTopBlock(coords: Vec3) {
         KeyBinding.setKeyBindState(Core.mc.gameSettings.keyBindSneak.keyCode, true)
-        RotationUtils.setAngleToVec3(coords.toVec3().add(-0.5, 1.0, 0.5))
+        RotationUtils.setAngleToVec3(coords)
         ClientUtils.clientScheduleTask(1) {
             PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(Core.mc.thePlayer.heldItem))
             KeyBinding.setKeyBindState(Core.mc.gameSettings.keyBindSneak.keyCode, false)
@@ -233,14 +233,12 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         //blockRays.add(Pair(coords.toVec3().add(-0.5, 1.0, 0.5), mc.thePlayer.positionVector.add(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0)))
         if (LocationUtils.currentArea.isArea(Island.SinglePlayer))  {
             devMessage("Single Player Gaming")
-            /*
             ClientUtils.clientScheduleTask(5) {
-                Core.mc.thePlayer.setPosition(coords.x - 0.5, coords.y.toDouble() + 1, coords.z + 0.5)
+                Core.mc.thePlayer.setPosition(coords.xCoord, coords.yCoord, coords.zCoord)
                 Core.mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
             }
             ClientUtils.clientScheduleTask(7) {waitingForS08 = false}
 
-             */
         }
     }
     val blockRays = mutableListOf<Pair<Vec3, Vec3>>()
