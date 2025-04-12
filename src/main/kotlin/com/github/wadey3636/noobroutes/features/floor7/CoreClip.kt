@@ -4,6 +4,7 @@ import com.github.wadey3636.noobroutes.features.Blink.skip
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils.walking
 import com.github.wadey3636.noobroutes.utils.PacketUtils
+import com.github.wadey3636.noobroutes.utils.Utils.isClose
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -35,10 +36,6 @@ object CoreClip: Module(
 
         if (isClose(mc.thePlayer.posZ, 53.7)) doClip(53.7624, 55.301)
         else if (isClose(mc.thePlayer.posZ, 55.3)) doClip(55.2376, 53.699)
-    }
-
-    private fun isClose(number1: Double, number2: Double): Boolean {
-        return abs(number1 - number2) < 0.0001F
     }
 
     private fun doClip(coord1: Double, coord2: Double) {

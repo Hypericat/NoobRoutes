@@ -3,10 +3,16 @@ package com.github.wadey3636.noobroutes.features.puzzle
 
 import com.github.wadey3636.noobroutes.utils.AuraManager
 import com.github.wadey3636.noobroutes.utils.ClientUtils
-import com.github.wadey3636.noobroutes.utils.Utils
+import com.github.wadey3636.noobroutes.utils.PacketUtils
+import com.github.wadey3636.noobroutes.utils.Utils.getYawAndPitch
+import com.github.wadey3636.noobroutes.utils.Utils.isClose
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.sun.security.ntlm.Client
+import me.defnotstolen.Core
 import me.defnotstolen.events.impl.PacketEvent
+import me.defnotstolen.events.impl.S08Event
+import me.defnotstolen.events.impl.ServerTickEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.utils.skyblock.devMessage
@@ -17,16 +23,26 @@ import me.defnotstolen.utils.skyblock.getBlockAt
 import me.defnotstolen.utils.skyblock.modMessage
 import me.defnotstolen.utils.toBlockPos
 import me.defnotstolen.utils.toVec3
+import net.minecraft.client.settings.KeyBinding
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
+import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
+import net.minecraft.network.play.server.S22PacketMultiBlockChange
+import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
+
+//based on odin
 
 
 object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, description = "Automatic Waterboard Solver") {
@@ -48,7 +64,6 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
     fun scan() = with (DungeonUtils.currentRoom) {
 
-        devMessage(DungeonUtils.currentRoomName)
         if (DungeonUtils.currentRoomName != "Water Board" || patternIdentifier != -1) return@with
         val extendedSlots = WoolColor.entries.joinToString("") { if (it.isExtended) it.ordinal.toString() else "" }.takeIf { it.length == 3 } ?: return
 
@@ -82,27 +97,23 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
 
 
-    /*@SubscribeEvent
+    @SubscribeEvent
     fun onServerTick(event: ServerTickEvent) {
+        if (mc.isSingleplayer) return
         tickCounter++
-    }*/
+    }
 
     @SubscribeEvent
     fun onNotServer(event: TickEvent.ClientTickEvent) {
+        if (!mc.isSingleplayer) return
         if (event.phase != TickEvent.Phase.START) return
         tickCounter++
     }
-    @SubscribeEvent
-    fun waterInteract(event: PacketEvent.Send) {
-        if (solutions.isEmpty() || event.packet !is C08PacketPlayerBlockPlacement) return
-        LeverBlock.entries.find { it.leverPos.toBlockPos() == event.packet.position }?.let {
-            if (it == LeverBlock.WATER && openedWaterTicks == -1) openedWaterTicks = tickCounter
-            it.i++
-        }
-    }
 
     var waitingForS08 = false
-    @SubscribeEvent 
+    var warped = false
+    var chested = false
+    @SubscribeEvent
     fun onTick(event: TickEvent){
         if (event.phase != TickEvent.Phase.START || waitingForS08) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board") return
@@ -111,36 +122,77 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
             .sortedBy { (lever, time) -> time + if (lever == LeverBlock.WATER) 0.01 else 0.0 }
 
         val firstBlock = solutionList.firstOrNull()?.first?.relativePosition ?: return
-        val relativePlayerVec = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector) ?: return
-        if (relativePlayerVec.yCoord != 59.0) return
-        devMessage("starting etherwarp shit")
-        val expectedX = when (firstBlock.xCoord) {
-            5.0, 10.0 -> 9.0
-            15.0 -> 15.0
-            20.0 -> 20.0
+        val relativePlayerZ = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector)?.zCoord ?: return
+        if (mc.thePlayer.posY != 59.0) return
+        val expectedZ = when (firstBlock.zCoord) {
+            5.0, 10.0 -> 8.5
+            15.0 -> 14.5
+            20.0 -> 19.5
             else -> null
         }
 
-        if (expectedX != null && relativePlayerVec.xCoord != expectedX) {
-            val warpTarget = DungeonUtils.currentRoom?.getRealCoords(15, 59, expectedX.toInt())?.toVec3()
+        if (expectedZ != null && !isClose(relativePlayerZ, expectedZ)) {
+            val warpTarget = DungeonUtils.currentRoom?.getRealCoords(15, 58, expectedZ.toInt())?.toVec3()
             warpTarget?.let {
-                Utils.etherwarpToBlock(it)
+                etherwarpToTopBlock(it.toBlockPos())
                 waitingForS08 = true
+                return
             }
         }
 
-        solutions.entries
-            .flatMap { (lever, times) -> times.filter { it <= 0.0 }.map { lever } }
-            .firstOrNull()
-            ?.let { AuraManager.auraBlock(it.leverPos.toBlockPos()) }
+        val next = solutionList.firstOrNull() ?: return
+        val (lever, time) = next
+        val timeInTicks = (time * 20).toInt()
+
+        val shouldClickNow = (openedWaterTicks == -1 && timeInTicks == 0) || (openedWaterTicks != -1 && tickCounter >= openedWaterTicks + timeInTicks)
+
+        if (shouldClickNow) {
+            AuraManager.auraBlock(lever.leverPos.toBlockPos())
+            if (lever == LeverBlock.WATER && openedWaterTicks == -1) {
+                openedWaterTicks = tickCounter
+            }
+            lever.i++
+        }
+
+        if (solutions.all { (lever, times) -> lever.i >= times.size } && !warped) {
+            etherwarpToTopBlock(DungeonUtils.currentRoom?.getRealCoords(15, 58, 22)!!)
+            warped = true
+        }
+
+        if (
+            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 15) ?: return) == Blocks.air &&
+            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 16) ?: return) == Blocks.air &&
+            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 17) ?: return) == Blocks.air &&
+            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 18) ?: return) == Blocks.air &&
+            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 19) ?: return) == Blocks.air &&
+            getBlockAt(DungeonUtils.currentRoom?.getRealCoords(15, 56, 22) ?: return) == Blocks.chest &&
+            warped && !chested
+        ) {
+            AuraManager.auraBlock(DungeonUtils.currentRoom?.getRealCoords(15, 56, 22)!!)
+            devMessage("sent for chest")
+            chested = true
+        }
+
     }
 
     @SubscribeEvent
-    fun onS08(event: PacketEvent.Receive) {
-        if (event.packet is S08PacketPlayerPosLook) ClientUtils.clientScheduleTask { waitingForS08 = false }
+    fun onS08(event: S08Event) {
+        ClientUtils.clientScheduleTask { waitingForS08 = false }
     }
 
+    @SubscribeEvent
+    fun onUnload(event: WorldEvent.Unload) {
+        warped = false
+        chested = false
+        reset()
+    }
 
+    @SubscribeEvent
+    fun onLoad(event: WorldEvent.Load) {
+        warped = false
+        chested = false
+        reset()
+    }
 
     fun reset() {
         LeverBlock.entries.forEach { it.i = 0 }
@@ -172,5 +224,24 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
         inline val leverPos: Vec3
             get() = DungeonUtils.currentRoom?.getRealCoords(relativePosition) ?: Vec3(0.0, 0.0, 0.0)
+    }
+
+
+    fun etherwarpToTopBlock(coords: BlockPos) {
+        KeyBinding.setKeyBindState(Core.mc.gameSettings.keyBindSneak.keyCode, true)
+        val rotateSpot = getYawAndPitch(coords.x + 0.5, coords.y.toDouble() + 1, coords.z + 0.5)
+        mc.thePlayer.rotationYaw = rotateSpot.first
+        mc.thePlayer.rotationPitch = rotateSpot.second
+        ClientUtils.clientScheduleTask(1) {
+            PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(Core.mc.thePlayer.heldItem))
+            KeyBinding.setKeyBindState(Core.mc.gameSettings.keyBindSneak.keyCode, false)
+        }
+        if (Core.mc.isSingleplayer)  {
+            ClientUtils.clientScheduleTask(5) {
+                Core.mc.thePlayer.setPosition(coords.x - 0.5, coords.y.toDouble() + 1, coords.z + 0.5)
+                Core.mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
+            }
+            ClientUtils.clientScheduleTask(7) {waitingForS08 = false}
+        }
     }
 }
