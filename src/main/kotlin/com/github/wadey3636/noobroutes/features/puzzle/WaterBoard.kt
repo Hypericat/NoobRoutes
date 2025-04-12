@@ -191,6 +191,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         reset()
     }
 
+    private fun reset() {
         LeverBlock.entries.forEach { it.i = 0 }
         patternIdentifier = -1
         solutions.clear()
