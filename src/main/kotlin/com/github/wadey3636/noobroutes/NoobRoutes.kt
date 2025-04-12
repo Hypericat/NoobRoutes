@@ -9,6 +9,7 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageDecoder
 import me.defnotstolen.Core
 import me.defnotstolen.Core.mc
+import me.defnotstolen.events.EventDispatcher
 import me.defnotstolen.features.ModuleManager
 import me.defnotstolen.font.OdinFont
 import me.defnotstolen.ui.clickgui.ClickGUI
@@ -74,7 +75,8 @@ class NoobRoutes {
             ScanUtils,
             AuraManager,
             Utils,
-            LocationUtils
+            LocationUtils,
+            EventDispatcher
 
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)

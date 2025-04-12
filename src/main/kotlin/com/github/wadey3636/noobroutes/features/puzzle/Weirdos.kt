@@ -46,23 +46,21 @@ init {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || currentRoomName != "Three Weirdos" || clickedChest) return
 
-        devMessage("Ticking")
 
 
         mc.theWorld.loadedEntityList
             .filter { it is EntityArmorStand && it.name.contains("CLICK") }
             .forEach { entity ->
-                devMessage("entity found")
                 if (clickedWeirdos.contains(entity.entityId) || entity.positionVector.distanceTo(mc.thePlayer.positionVector) > 5) return@forEach
-                devMessage("clicking")
                 AuraManager.auraEntity(entity, C02PacketUseEntity.Action.INTERACT_AT)
                 clickedWeirdos.add(entity.entityId)
                 return
             }
 
         correctPos?.let {
-            AuraManager.auraBlock(it)
-            clickedChest = true
+                AuraManager.auraBlock(it)
+                clickedChest = true
+
         }
 
 
