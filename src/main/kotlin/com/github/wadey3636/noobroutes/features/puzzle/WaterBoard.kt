@@ -152,10 +152,12 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
                 openedWaterTicks = tickCounter
             }
             lever.i++
+            return
         }
 
         if (solutions.all { (lever, times) -> lever.i >= times.size } && !warped) {
             etherwarpToTopBlock(DungeonUtils.currentRoom?.getRealCoords(15, 58, 22)!!)
+            waitingForS08 = true
             warped = true
         }
 
@@ -237,11 +239,11 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
             KeyBinding.setKeyBindState(Core.mc.gameSettings.keyBindSneak.keyCode, false)
         }
         if (Core.mc.isSingleplayer)  {
-            ClientUtils.clientScheduleTask(5) {
+            ClientUtils.clientScheduleTask(100) {
                 Core.mc.thePlayer.setPosition(coords.x - 0.5, coords.y.toDouble() + 1, coords.z + 0.5)
                 Core.mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
             }
-            ClientUtils.clientScheduleTask(7) {waitingForS08 = false}
+            ClientUtils.clientScheduleTask(107) {waitingForS08 = false}
         }
     }
 }
