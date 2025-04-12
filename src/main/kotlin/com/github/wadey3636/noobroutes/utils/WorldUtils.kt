@@ -30,6 +30,11 @@ fun getBlockIdAt(blockPos: BlockPos): Int? {
 fun isAir(blockPos: BlockPos): Boolean =
     getBlockAt(blockPos) == Blocks.air
 
+fun getLookingBlock(){
+
+}
+
+
 /**
  * Checks if the block at the specified `BlockPos` is a gold block in the Minecraft world.
  *

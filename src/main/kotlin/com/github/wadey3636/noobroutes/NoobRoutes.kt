@@ -1,5 +1,6 @@
 package com.github.wadey3636.noobroutes
 
+import com.github.wadey3636.noobroutes.commands.AuraTestCommand
 import com.github.wadey3636.noobroutes.commands.AutoP3Command
 import com.github.wadey3636.noobroutes.commands.NoobRoutesCommand
 import com.github.wadey3636.noobroutes.features.Blink
@@ -48,9 +49,16 @@ class NoobRoutes {
         } catch (e: java.io.IOException) {
             throw java.lang.RuntimeException(e)
         }
-        ClientCommandHandler.instance.registerCommand(NoobRoutesCommand())
-        ClientCommandHandler.instance.registerCommand(AutoP3Command())
-        val alwaysActiveObjects = listOf(
+
+        listOf(
+            NoobRoutesCommand(),
+            AutoP3Command(),
+            AuraTestCommand()
+        ).forEach {
+            ClientCommandHandler.instance.registerCommand(it)
+        }
+
+        listOf(
             Core,
             ModuleManager,
             Executor,
@@ -68,8 +76,7 @@ class NoobRoutes {
             Utils,
             LocationUtils
 
-        )
-        alwaysActiveObjects.forEach {
+        ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }
         OdinFont.init()

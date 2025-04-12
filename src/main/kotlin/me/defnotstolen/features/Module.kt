@@ -136,9 +136,10 @@ abstract class Module(
      *
      * @author Bonsai
      */
-    fun onMessage(filter: Regex, shouldRun: () -> Boolean = { alwaysActive || enabled }, func: (String) -> Unit) {
-        ModuleManager.messageFunctions.add(ModuleManager.MessageFunction(filter, shouldRun, func))
+    fun onMessage(filter: Regex, shouldRun: () -> Boolean = { alwaysActive || enabled }, func: (MatchResult) -> Unit) {
+        ModuleManager.messageFunctions.add(ModuleManager.MessageFunction(filter, shouldRun) { matchResult -> func(matchResult) })
     }
+
 
     fun onWorldLoad(func: () -> Unit) {
         ModuleManager.worldLoadFunctions.add(func)

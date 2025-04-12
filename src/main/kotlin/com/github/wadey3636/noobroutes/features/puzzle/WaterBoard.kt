@@ -4,37 +4,30 @@ package com.github.wadey3636.noobroutes.features.puzzle
 import com.github.wadey3636.noobroutes.utils.AuraManager
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
-import com.github.wadey3636.noobroutes.utils.Utils.getYawAndPitch
+import com.github.wadey3636.noobroutes.utils.RotationUtils
 import com.github.wadey3636.noobroutes.utils.Utils.isClose
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.sun.security.ntlm.Client
 import me.defnotstolen.Core
-import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.events.impl.S08Event
 import me.defnotstolen.events.impl.ServerTickEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
-import me.defnotstolen.utils.skyblock.devMessage
+import me.defnotstolen.utils.add
+import me.defnotstolen.utils.render.Color
+import me.defnotstolen.utils.render.Renderer
+import me.defnotstolen.utils.skyblock.*
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import me.defnotstolen.utils.skyblock.getBlockAt
-import me.defnotstolen.utils.skyblock.modMessage
 import me.defnotstolen.utils.toBlockPos
 import me.defnotstolen.utils.toVec3
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.init.Blocks
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
-import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
-import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraft.network.play.server.S08PacketPlayerPosLook
-import net.minecraft.network.play.server.S22PacketMultiBlockChange
-import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -229,21 +222,33 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
     }
 
 
-    fun etherwarpToTopBlock(coords: BlockPos) {
+    private fun etherwarpToTopBlock(coords: BlockPos) {
         KeyBinding.setKeyBindState(Core.mc.gameSettings.keyBindSneak.keyCode, true)
-        val rotateSpot = getYawAndPitch(coords.x + 0.5, coords.y.toDouble() + 1, coords.z + 0.5)
-        mc.thePlayer.rotationYaw = rotateSpot.first
-        mc.thePlayer.rotationPitch = rotateSpot.second
+        RotationUtils.setAngleToVec3(coords.toVec3().add(-0.5, 1.0, 0.5))
         ClientUtils.clientScheduleTask(1) {
             PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(Core.mc.thePlayer.heldItem))
             KeyBinding.setKeyBindState(Core.mc.gameSettings.keyBindSneak.keyCode, false)
         }
-        if (Core.mc.isSingleplayer)  {
-            ClientUtils.clientScheduleTask(100) {
+
+        //blockRays.add(Pair(coords.toVec3().add(-0.5, 1.0, 0.5), mc.thePlayer.positionVector.add(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0)))
+        if (LocationUtils.currentArea.isArea(Island.SinglePlayer))  {
+            devMessage("Single Player Gaming")
+            /*
+            ClientUtils.clientScheduleTask(5) {
                 Core.mc.thePlayer.setPosition(coords.x - 0.5, coords.y.toDouble() + 1, coords.z + 0.5)
                 Core.mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
             }
-            ClientUtils.clientScheduleTask(107) {waitingForS08 = false}
+            ClientUtils.clientScheduleTask(7) {waitingForS08 = false}
+
+             */
         }
     }
+    val blockRays = mutableListOf<Pair<Vec3, Vec3>>()
+
+    @SubscribeEvent
+    fun renderWorld(event: RenderWorldLastEvent){
+        blockRays.forEach { Renderer.draw3DLine(listOf(it.first, it.second), Color.GREEN) }
+    }
+
+
 }

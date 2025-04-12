@@ -2,17 +2,22 @@ package com.github.wadey3636.noobroutes.features.puzzle
 
 import com.github.wadey3636.noobroutes.utils.AuraManager
 import com.github.wadey3636.noobroutes.utils.BlockUtils
+import com.github.wadey3636.noobroutes.utils.getBlockAt
+import com.github.wadey3636.noobroutes.utils.isAir
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.events.impl.RoomEnterEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.impl.NumberSetting
 import me.defnotstolen.utils.clock.Executor
+import me.defnotstolen.utils.clock.Executor.Companion.register
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.RenderUtils
 import me.defnotstolen.utils.render.Renderer
 import me.defnotstolen.utils.skyblock.devMessage
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
+import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.currentRoom
+import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.currentRoomName
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import me.defnotstolen.utils.skyblock.dungeon.tiles.Room
@@ -42,25 +47,13 @@ object TicTacToe : Module(
     private var board: Board? = null
     private var mappedPositions = HashMap<Int, EntityItemFrame>()
 
-
-
     private var bestMove: BlockPos? = null
 
-    @SubscribeEvent
-    fun spawnItemFrame(event: PacketEvent.Receive){
-        val currentRoom = DungeonUtils.currentRoom
-        if (currentRoom == null) {
-            bestMove = null
-            return
-        }
-        if (event.packet !is S0EPacketSpawnObject || event.packet.type != 71 || currentRoom.data.name != "Tic Tac Toe") return
-        val entity = event.packet
-        val roomCoords = currentRoom.getRelativeCoords(entity.x / 32, entity.y / 32, entity.z / 32)
-        devMessage("Spawned ItemFrame RelativeCoords: $roomCoords")
-        solveBoard()
 
 
-    }
+
+
+
 
     @SubscribeEvent
     fun onRoomEnter(event: RoomEnterEvent) {
@@ -68,7 +61,12 @@ object TicTacToe : Module(
             bestMove = null
             return
         }
-        solveBoard()
+        execute(50) {
+            if (currentRoomName != "Tic Tac Toe") destroyExecutor()
+            devMessage("Attempting solve")
+            solveBoard()
+
+        }
     }
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
@@ -84,6 +82,7 @@ object TicTacToe : Module(
         val move = bestMove
         if (event.phase != TickEvent.Phase.START || move == null) return
         val eyePos = mc.thePlayer.getPositionEyes(0f)
+        if (isAir(move)) bestMove = null
 
 
         if (eyePos.distanceTo(move.toVec3()) > reach || System.currentTimeMillis() - lastClick < 500) return

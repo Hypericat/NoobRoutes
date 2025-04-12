@@ -4,6 +4,7 @@ import com.github.wadey3636.noobroutes.features.Blink
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
+import com.github.wadey3636.noobroutes.utils.RotationUtils.getYawAndPitch
 import com.github.wadey3636.noobroutes.utils.Utils
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
@@ -92,12 +93,12 @@ object Auto4: Module(
     fun getRotation(block: BlockPos): Pair<Float, Float> {
         if (mc.thePlayer.heldItem.displayName.contains("Terminator")) {
             return when (block.x) {
-                64 -> Utils.getYawAndPitch(65.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
-                68 -> Utils.getYawAndPitch(67.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
-                else -> if (shotBlocks.any { it.y == block.y && it.x == 64 }) Utils.getYawAndPitch(67.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5) else Utils.getYawAndPitch(65.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
+                64 -> getYawAndPitch(65.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
+                68 -> getYawAndPitch(67.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
+                else -> if (shotBlocks.any { it.y == block.y && it.x == 64 }) getYawAndPitch(67.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5) else getYawAndPitch(65.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
             }
         }
-        return Utils.getYawAndPitch(block.x.toDouble() + 0.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
+        return getYawAndPitch(block.x.toDouble() + 0.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
     }
 
     @SubscribeEvent

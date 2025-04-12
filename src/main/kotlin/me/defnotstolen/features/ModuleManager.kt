@@ -8,6 +8,7 @@ import com.github.wadey3636.noobroutes.features.misc.TimerHud
 import com.github.wadey3636.noobroutes.features.move.*
 import com.github.wadey3636.noobroutes.features.puzzle.TicTacToe
 import com.github.wadey3636.noobroutes.features.puzzle.WaterBoard
+import com.github.wadey3636.noobroutes.features.puzzle.Weirdos
 import com.github.wadey3636.noobroutes.features.render.Trail
 import me.defnotstolen.Core.mc
 import me.defnotstolen.events.impl.ChatPacketEvent
@@ -38,7 +39,7 @@ object ModuleManager {
         val shouldRun: () -> Boolean,
     )
 
-    data class MessageFunction(val filter: Regex, val shouldRun: () -> Boolean, val function: (String) -> Unit)
+    data class MessageFunction(val filter: Regex, val shouldRun: () -> Boolean, val function: (MatchResult) -> Unit)
 
     data class TickTask(var ticksLeft: Int, val server: Boolean, val function: () -> Unit)
 
@@ -69,7 +70,8 @@ object ModuleManager {
         LeverAura,
         WaterBoard,
         TicTacToe,
-        AuraTest
+        AuraTest,
+        Weirdos
     )
 
     init {
@@ -127,7 +129,7 @@ object ModuleManager {
     @SubscribeEvent(receiveCanceled = true)
     fun onChatPacket(event: ChatPacketEvent) {
         messageFunctions.forEach {
-            if (event.message matches it.filter && it.shouldRun()) it.function(event.message)
+            if (it.shouldRun()) it.function(it.filter.find(event.message) ?: return@forEach)
         }
     }
 
