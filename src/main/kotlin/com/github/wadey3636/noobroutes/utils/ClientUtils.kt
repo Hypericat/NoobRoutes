@@ -4,7 +4,6 @@ import me.defnotstolen.Core.mc
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import kotlin.jvm.Throws
 
 object ClientUtils {
     class ScheduledTask(var ticks: Int, val callback: () -> Unit)

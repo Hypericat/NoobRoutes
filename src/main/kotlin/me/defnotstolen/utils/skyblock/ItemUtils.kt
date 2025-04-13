@@ -3,15 +3,19 @@ package me.defnotstolen.utils.skyblock
 import me.defnotstolen.Core.mc
 import me.defnotstolen.utils.equalsOneOf
 import me.defnotstolen.utils.noControlCodes
-import me.defnotstolen.utils.render.*
+import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.RenderUtils.bind
+import me.defnotstolen.utils.render.scale
+import me.defnotstolen.utils.render.translate
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.*
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagList
+import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
 
 /**

@@ -4,13 +4,11 @@ import com.github.wadey3636.noobroutes.utils.AuraManager
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.impl.NumberSetting
-import me.defnotstolen.utils.skyblock.devMessage
 import me.defnotstolen.utils.toVec3
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
-
 
 
 object LeverAura: Module(

@@ -11,17 +11,13 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import me.defnotstolen.Core
 import me.defnotstolen.Core.logger
 import me.defnotstolen.Core.mc
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.utils.skyblock.modMessage
-import net.minecraft.util.Vec3
-import org.lwjgl.input.Keyboard
 import me.defnotstolen.config.DataManager
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.events.impl.TerminalOpenedEvent
+import me.defnotstolen.features.Category
+import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.Setting.Companion.withDependency
 import me.defnotstolen.features.settings.impl.*
 import me.defnotstolen.ui.hud.HudElement
@@ -30,12 +26,15 @@ import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.Renderer
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
+import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S18PacketEntityTeleport
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 
 enum class RingTypes {
     WALK,

@@ -22,7 +22,8 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.*
+import kotlin.math.floor
+import kotlin.math.roundToLong
 
 object DungeonUtils {
 

@@ -3,9 +3,11 @@ package me.defnotstolen.utils.skyblock
 import me.defnotstolen.Core.mc
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.impl.render.ClickGUIModule
-import me.defnotstolen.utils.*
+import me.defnotstolen.utils.cleanLine
+import me.defnotstolen.utils.cleanSB
 import me.defnotstolen.utils.clock.Executor
 import me.defnotstolen.utils.clock.Executor.Companion.register
+import me.defnotstolen.utils.sidebarLines
 import me.defnotstolen.utils.skyblock.dungeon.Dungeon
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
 import me.defnotstolen.utils.skyblock.dungeon.Floor

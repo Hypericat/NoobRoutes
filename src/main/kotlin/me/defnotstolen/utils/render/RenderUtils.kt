@@ -4,7 +4,6 @@ import gg.essential.universal.shader.BlendState
 import gg.essential.universal.shader.UShader
 import me.defnotstolen.Core
 import me.defnotstolen.Core.mc
-
 import me.defnotstolen.ui.clickgui.util.ColorUtil.withAlpha
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -25,7 +24,10 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13
 import org.lwjgl.util.glu.Cylinder
 import java.awt.image.BufferedImage
-import kotlin.math.*
+import kotlin.math.cos
+import kotlin.math.floor
+import kotlin.math.roundToInt
+import kotlin.math.sin
 
 object RenderUtils {
 

@@ -7,8 +7,6 @@ import com.github.wadey3636.noobroutes.features.floor7.AutoP3.waitingLeap
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.waitingTerm
 import com.github.wadey3636.noobroutes.features.floor7.Ring
 import com.github.wadey3636.noobroutes.features.floor7.RingTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import me.defnotstolen.Core.mc
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.utils.render.Color
@@ -21,7 +19,9 @@ import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.Vec3
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse

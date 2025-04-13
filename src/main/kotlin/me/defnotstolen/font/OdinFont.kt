@@ -2,7 +2,9 @@ package me.defnotstolen.font
 
 import me.defnotstolen.Core.mc
 import me.defnotstolen.utils.noControlCodes
-import me.defnotstolen.utils.render.*
+import me.defnotstolen.utils.render.Color
+import me.defnotstolen.utils.render.TextAlign
+import me.defnotstolen.utils.render.TextPos
 import net.minecraft.client.renderer.GlStateManager
 import kotlin.math.max
 

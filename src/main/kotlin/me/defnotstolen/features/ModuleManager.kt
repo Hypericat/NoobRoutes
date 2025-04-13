@@ -68,7 +68,7 @@ object ModuleManager {
         InstaMid,
         Auto4,
         LeverAura,
-        WaterBoard,
+        //WaterBoard,
         TicTacToe,
         AuraTest,
         Weirdos

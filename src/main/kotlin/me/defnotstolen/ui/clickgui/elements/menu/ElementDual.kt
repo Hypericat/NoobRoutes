@@ -3,7 +3,9 @@ package me.defnotstolen.ui.clickgui.elements.menu
 import me.defnotstolen.features.settings.impl.DualSetting
 import me.defnotstolen.font.OdinFont
 import me.defnotstolen.ui.clickgui.animations.impl.EaseInOut
-import me.defnotstolen.ui.clickgui.elements.*
+import me.defnotstolen.ui.clickgui.elements.Element
+import me.defnotstolen.ui.clickgui.elements.ElementType
+import me.defnotstolen.ui.clickgui.elements.ModuleButton
 import me.defnotstolen.ui.clickgui.util.ColorUtil.buttonColor
 import me.defnotstolen.ui.clickgui.util.ColorUtil.clickGUIColor
 import me.defnotstolen.ui.clickgui.util.ColorUtil.darker

@@ -4,11 +4,9 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.reflect.TypeToken
-
 import me.defnotstolen.utils.Vec2
 import net.minecraft.util.BlockPos
 import java.lang.reflect.Type
-import kotlin.collections.orEmpty
 
 data class Room(
     var rotation: Rotations = Rotations.NONE,

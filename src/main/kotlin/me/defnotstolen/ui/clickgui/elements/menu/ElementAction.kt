@@ -2,12 +2,17 @@ package me.defnotstolen.ui.clickgui.elements.menu
 
 import me.defnotstolen.features.settings.impl.ActionSetting
 import me.defnotstolen.font.OdinFont
-import me.defnotstolen.ui.clickgui.elements.*
+import me.defnotstolen.ui.clickgui.elements.Element
+import me.defnotstolen.ui.clickgui.elements.ElementType
+import me.defnotstolen.ui.clickgui.elements.ModuleButton
 import me.defnotstolen.ui.clickgui.util.ColorUtil.darker
 import me.defnotstolen.ui.clickgui.util.ColorUtil.elementBackground
 import me.defnotstolen.ui.clickgui.util.ColorUtil.textColor
 import me.defnotstolen.ui.util.MouseUtils
-import me.defnotstolen.utils.render.*
+import me.defnotstolen.utils.render.TextAlign
+import me.defnotstolen.utils.render.TextPos
+import me.defnotstolen.utils.render.roundedRectangle
+import me.defnotstolen.utils.render.text
 
 /**
  * Renders all the modules.

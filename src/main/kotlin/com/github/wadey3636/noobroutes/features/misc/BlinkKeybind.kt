@@ -7,23 +7,23 @@ import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.impl.BooleanSetting
 import me.defnotstolen.ui.clickgui.ClickGUI
-import me.defnotstolen.utils.skyblock.modMessage
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
-import net.minecraft.network.Packet
 import me.defnotstolen.utils.render.Color
 import me.defnotstolen.utils.render.TextAlign
 import me.defnotstolen.utils.render.roundedRectangle
 import me.defnotstolen.utils.render.text
+import me.defnotstolen.utils.skyblock.modMessage
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.entity.Entity
+import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket
+import org.lwjgl.input.Keyboard
 import kotlin.math.PI
 import kotlin.math.sin
 

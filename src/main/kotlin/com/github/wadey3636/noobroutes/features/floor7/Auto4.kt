@@ -5,13 +5,11 @@ import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import com.github.wadey3636.noobroutes.utils.RotationUtils.getYawAndPitch
-import com.github.wadey3636.noobroutes.utils.Utils
 import me.defnotstolen.events.impl.PacketEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.Setting.Companion.withDependency
 import me.defnotstolen.features.settings.impl.BooleanSetting
-import net.minecraft.client.settings.KeyBinding
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook

@@ -1,6 +1,7 @@
 package me.defnotstolen.ui.clickgui
 
 import me.defnotstolen.Core.display
+import me.defnotstolen.Core.logger
 import me.defnotstolen.config.Config
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.impl.render.ClickGUIModule
@@ -10,6 +11,7 @@ import me.defnotstolen.ui.clickgui.animations.impl.EaseInOut
 import me.defnotstolen.ui.clickgui.elements.menu.ElementColor
 import me.defnotstolen.ui.clickgui.util.ColorUtil
 import me.defnotstolen.ui.clickgui.util.ColorUtil.buttonColor
+import me.defnotstolen.ui.clickgui.util.ColorUtil.moduleButtonColorAlpha
 import me.defnotstolen.ui.clickgui.util.ColorUtil.textColor
 import me.defnotstolen.ui.clickgui.util.ColorUtil.withAlpha
 import me.defnotstolen.ui.clickgui.util.HoverHandler
@@ -21,8 +23,6 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.input.Mouse
 import kotlin.math.sign
-import me.defnotstolen.Core.logger
-import me.defnotstolen.ui.clickgui.util.ColorUtil.moduleButtonColorAlpha
 
 /**
  * Renders all the modules.

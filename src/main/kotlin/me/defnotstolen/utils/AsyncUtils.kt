@@ -1,6 +1,9 @@
 package me.defnotstolen.utils
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.inventory.ContainerChest
 
 

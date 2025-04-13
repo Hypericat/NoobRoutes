@@ -1,13 +1,11 @@
 package com.github.wadey3636.noobroutes.utils
 
-import com.github.wadey3636.noobroutes.utils.ClientUtils.ScheduledTask
 import me.defnotstolen.Core.mc
 import me.defnotstolen.events.impl.PacketEvent
 import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.jvm.Throws
 
 object PacketUtils {
     class ScheduledTaskC03(var ticks: Int, val callback: () -> Unit, val cancel: Boolean)

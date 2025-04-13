@@ -2,13 +2,14 @@ package com.github.wadey3636.noobroutes.features.puzzle
 
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.inBoss
 import com.github.wadey3636.noobroutes.utils.AuraManager
+import me.defnotstolen.events.impl.RoomEnterEvent
 import me.defnotstolen.features.Category
 import me.defnotstolen.features.Module
 import me.defnotstolen.features.settings.impl.ColorSetting
+import me.defnotstolen.features.settings.impl.NumberSetting
 import me.defnotstolen.utils.addRotationCoords
 import me.defnotstolen.utils.noControlCodes
 import me.defnotstolen.utils.render.Color
-import me.defnotstolen.utils.render.Renderer
 import me.defnotstolen.utils.skyblock.PlayerUtils
 import me.defnotstolen.utils.skyblock.devMessage
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
@@ -20,57 +21,92 @@ import net.minecraft.util.BlockPos
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.concurrent.CopyOnWriteArraySet
 
 /**
  * Based on odin
  */
 object Weirdos : Module("Weirdos", description = "Solves weirdos puzzle", category = Category.PUZZLE) {
     private var correctPos: BlockPos? = null
-    private var wrongPositions = CopyOnWriteArraySet<BlockPos>()
+    private var wrongPositions = mutableListOf<BlockPos>()
     private var clickedChest = false
-    private val clickedWeirdos = mutableListOf<Int>()
-    private val weirdoColor by ColorSetting("Color", Color.GREEN, description = "The color of a weirdo after clicked. (Completely cosmetic)")
+    private var clickedWeirdos = mutableListOf<Int>()
+    private val recievedTextWeirdos = mutableListOf<Int>()
+    private val tickDelay by NumberSetting(
+        "Tick Delay",
+        3,
+        0,
+        5,
+        increment = 1,
+        description = "Adds a delay before you can click a weirdo to prevent the puzzle from breaking sometimes"
+    )
+    private var currentDelay = 0
+    private val weirdoColor by ColorSetting(
+        "Color",
+        Color.GREEN,
+        description = "The color of a weirdo after clicked. (Completely cosmetic)"
+    )
 
-init {
-    onMessage(Regex("\\[NPC] (.+): (.+).?"), { enabled && inDungeons && !inBoss }) {
-        str ->
-        val (npc, message) = str.destructured
-        onNPCMessage(npc, message)
+    init {
+        onMessage(Regex("\\[NPC] (.+): (.+).?"), { enabled && inDungeons && !inBoss }) { str ->
+            val (npc, message) = str.destructured
+            onNPCMessage(npc, message)
+        }
+
+
     }
 
-
-}
+    @SubscribeEvent
+    fun onEnterRoom(event: RoomEnterEvent) {
+        correctPos = null
+        wrongPositions.clear()
+        clickedChest = false
+        clickedWeirdos.clear()
+        currentDelay = tickDelay
+        recievedTextWeirdos.clear()
+    }
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || currentRoomName != "Three Weirdos" || clickedChest) return
-
-
-
         mc.theWorld.loadedEntityList
             .filter { it is EntityArmorStand && it.name.contains("CLICK") }
             .forEach { entity ->
+                if (currentDelay > 1) {
+                    currentDelay--
+                    return
+                }
+
+
                 if (clickedWeirdos.contains(entity.entityId) || entity.positionVector.distanceTo(mc.thePlayer.positionVector) > 5) return@forEach
+                //mc.theWorld.loadedEntityList.filter { it.positionVector.distanceTo(entity.positionVector) < 1.5 }.size
+
+
                 AuraManager.auraEntity(entity, C02PacketUseEntity.Action.INTERACT_AT)
                 clickedWeirdos.add(entity.entityId)
+                devMessage("Attempting to send click")
                 return
             }
 
+        if (clickedWeirdos != recievedTextWeirdos) {
+            clickedWeirdos = recievedTextWeirdos
+        }
+
         correctPos?.let {
+            if (wrongPositions.size == 2) {
                 AuraManager.auraBlock(it)
                 clickedChest = true
 
+            }
         }
 
 
     }
 
 
-
     private fun onNPCMessage(npc: String, msg: String) {
         if (solutions.none { it.matches(msg) } && wrong.none { it.matches(msg) }) return
-        val correctNPC = mc.theWorld?.loadedEntityList?.find { it is EntityArmorStand && it.name.noControlCodes == npc } ?: return
+        val correctNPC =
+            mc.theWorld?.loadedEntityList?.find { it is EntityArmorStand && it.name.noControlCodes == npc } ?: return
         val room = DungeonUtils.currentRoom ?: return
         val pos = BlockPos(correctNPC.posX - 0.5, 69.0, correctNPC.posZ - 0.5).addRotationCoords(room.rotation, -1, 0)
 
@@ -78,23 +114,25 @@ init {
             correctPos = pos
             PlayerUtils.playLoudSound("note.pling", 2f, 1f)
         } else wrongPositions.add(pos)
+
+        val receivedTextWeirdo = mc.theWorld?.loadedEntityList?.find {
+            it is EntityArmorStand && it.name.contains("CLICK") && it.positionVector.distanceTo(correctNPC.positionVector) < 1
+        } ?: return
+        recievedTextWeirdos.add(receivedTextWeirdo.entityId)
+        devMessage(receivedTextWeirdo.entityId)
+
+
     }
 
-    fun onRenderWorld(weirdosColor: Color, weirdosWrongColor: Color, weirdosStyle: Int) {
-        if (DungeonUtils.currentRoomName != "Three Weirdos") return
-        correctPos?.let { Renderer.drawStyledBlock(it, weirdosColor, weirdosStyle) }
-        wrongPositions.forEach {
-            Renderer.drawStyledBlock(it, weirdosWrongColor, weirdosStyle)
-        }
-    }
 
     @SubscribeEvent
     fun reset(event: WorldEvent.Load) {
+        recievedTextWeirdos.clear()
         correctPos = null
         wrongPositions.clear()
         clickedChest = false
         clickedWeirdos.clear()
-
+        currentDelay = tickDelay
     }
 
     private val solutions = listOf(

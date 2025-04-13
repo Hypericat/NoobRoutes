@@ -2,11 +2,13 @@ package me.defnotstolen.utils.skyblock
 
 import me.defnotstolen.Core.mc
 import me.defnotstolen.features.impl.render.ClickGUIModule.devMode
-
 import me.defnotstolen.utils.noControlCodes
 import me.defnotstolen.utils.runOnMCThread
-import net.minecraft.event.*
-import net.minecraft.util.*
+import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.ChatStyle
+import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.client.ClientCommandHandler
 import kotlin.math.roundToInt
 

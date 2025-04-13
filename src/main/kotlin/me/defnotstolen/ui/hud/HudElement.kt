@@ -11,7 +11,10 @@ import me.defnotstolen.ui.clickgui.util.HoverHandler
 import me.defnotstolen.ui.hud.EditHUDGui.dragging
 import me.defnotstolen.ui.util.MouseUtils.isAreaHovered
 import me.defnotstolen.utils.endProfile
-import me.defnotstolen.utils.render.*
+import me.defnotstolen.utils.render.Color
+import me.defnotstolen.utils.render.rectangleOutline
+import me.defnotstolen.utils.render.scale
+import me.defnotstolen.utils.render.translate
 import me.defnotstolen.utils.startProfile
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager

@@ -4,7 +4,9 @@ import me.defnotstolen.features.settings.impl.KeybindSetting
 import me.defnotstolen.font.OdinFont
 import me.defnotstolen.ui.clickgui.ClickGUI.TEXTOFFSET
 import me.defnotstolen.ui.clickgui.animations.impl.ColorAnimation
-import me.defnotstolen.ui.clickgui.elements.*
+import me.defnotstolen.ui.clickgui.elements.Element
+import me.defnotstolen.ui.clickgui.elements.ElementType
+import me.defnotstolen.ui.clickgui.elements.ModuleButton
 import me.defnotstolen.ui.clickgui.util.ColorUtil
 import me.defnotstolen.ui.clickgui.util.ColorUtil.brighter
 import me.defnotstolen.ui.clickgui.util.ColorUtil.clickGUIColor

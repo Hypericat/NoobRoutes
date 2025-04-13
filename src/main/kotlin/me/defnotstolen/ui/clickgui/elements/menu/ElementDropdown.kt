@@ -4,11 +4,15 @@ import me.defnotstolen.features.settings.impl.DropdownSetting
 import me.defnotstolen.font.OdinFont
 import me.defnotstolen.ui.clickgui.ClickGUI.TEXTOFFSET
 import me.defnotstolen.ui.clickgui.animations.impl.LinearAnimation
-import me.defnotstolen.ui.clickgui.elements.*
+import me.defnotstolen.ui.clickgui.elements.Element
+import me.defnotstolen.ui.clickgui.elements.ElementType
+import me.defnotstolen.ui.clickgui.elements.ModuleButton
 import me.defnotstolen.ui.clickgui.util.ColorUtil.elementBackground
 import me.defnotstolen.ui.clickgui.util.ColorUtil.textColor
 import me.defnotstolen.ui.util.MouseUtils.isAreaHovered
-import me.defnotstolen.utils.render.*
+import me.defnotstolen.utils.render.drawArrow
+import me.defnotstolen.utils.render.roundedRectangle
+import me.defnotstolen.utils.render.text
 
 /**
  * Renders all the modules.
