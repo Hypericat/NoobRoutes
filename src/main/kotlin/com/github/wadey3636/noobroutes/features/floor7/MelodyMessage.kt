@@ -36,7 +36,7 @@ object MelodyMessage: Module(
 
     @SubscribeEvent
     fun onClick(event: PacketEvent.Send) {
-        if (event.packet !is C0EPacketClickWindow || event.packet.windowId != melodyWindowId) return
+        if (event.packet !is C0EPacketClickWindow || event.packet.windowId != melodyWindowId || event.packet.windowId == 0) return
         devMessage("melody click detected")
         melodyClicks++
         sendCommand("pc $message $melodyClicks/4")
