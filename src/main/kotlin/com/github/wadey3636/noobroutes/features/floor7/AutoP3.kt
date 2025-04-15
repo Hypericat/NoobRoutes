@@ -2,6 +2,7 @@ package com.github.wadey3636.noobroutes.features.floor7
 
 import com.github.wadey3636.noobroutes.features.Blink
 import com.github.wadey3636.noobroutes.features.misc.SexAura
+import com.github.wadey3636.noobroutes.features.move.LavaClip
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils.motionAfter
 import com.github.wadey3636.noobroutes.utils.SecretGuideIntegration
@@ -44,7 +45,8 @@ enum class RingTypes {
     BLINK,
     TERM,
     LEAP,
-    MOTION
+    MOTION,
+    LAVA
 }
 
 
@@ -182,6 +184,13 @@ object AutoP3: Module (
                 AutoP3Utils.direction = ring.direction.yaw
                 motionAfter = true
             }
+            RingTypes.LAVA -> {
+                modMessage("activating lava clip")
+                mc.thePlayer.motionX = 0.0
+                mc.thePlayer.motionZ = 0.0
+                LavaClip.ringClip = ring.endY
+                LavaClip.toggle()
+            }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
     }
@@ -231,7 +240,7 @@ object AutoP3: Module (
     }
 
     private fun testFunctions(args: Array<out String>) {
-        if (args == null || args.size < 2) {
+        if (args.size < 2) {
             modMessage("Test: sgToggle, roomName, relativePos")
             return
         }
@@ -271,6 +280,7 @@ object AutoP3: Module (
             return
         }
         val ringType: RingTypes
+        var endPos = 0.0
         when(args[1].lowercase()) {
             "walk" -> {
                 modMessage("added walk")
@@ -302,12 +312,25 @@ object AutoP3: Module (
                 modMessage("motion added")
                 ringType = RingTypes.MOTION
             }
+            "lava" -> {
+                if (args.size < 3) {
+                    modMessage("need a length arg (positive number)")
+                    return
+                }
+                ringType = RingTypes.LAVA
+                val endY = args[2].toDoubleOrNull()
+                if (endY == null) {
+                    modMessage("need a length arg (positive number)")
+                    return
+                }
+                endPos = endY
+            }
             else -> return modMessage("thats not a ring type stoopid")
         }
         val look = args.any { it == "look" }
         val center = args.any {it == "center"}
         val walk = args.any {it == "walk"} && ringType != RingTypes.WALK
-        actuallyAddRing(Ring(ringType, look = look, center = center, walk = walk))
+        actuallyAddRing(Ring(ringType, look = look, center = center, walk = walk, endY = endPos))
     }
 
     fun actuallyAddRing(ring: Ring) {

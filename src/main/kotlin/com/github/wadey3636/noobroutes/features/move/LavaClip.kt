@@ -26,6 +26,7 @@ object LavaClip: Module(
     private val lavaDistance by NumberSetting(name = "Lava Clip distance", description = "how far to clip u", min = 10f, max = 50f, default = 30f)
 
     private var cancelS12 = false
+    var ringClip: Double? = null
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
@@ -34,15 +35,19 @@ object LavaClip: Module(
 
         if (mc.thePlayer.isInLava) {
             cancelS12 = true
-            ClientUtils.clientScheduleTask {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - lavaDistance, mc.thePlayer.posZ)}
+            val clipDistance = if (ringClip != null) ringClip else lavaDistance.toDouble()
+            if (clipDistance == null) return
+            ClientUtils.clientScheduleTask {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - clipDistance, mc.thePlayer.posZ)}
         }
     }
 
     @SubscribeEvent
     fun onOverlay(event: RenderGameOverlayEvent.Post) {
+        val clipDistance = if (ringClip != null) ringClip else lavaDistance.toDouble()
+        if (clipDistance == null) return
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         val resolution = ScaledResolution(mc)
-        text("Lava CLipping $lavaDistance", resolution.scaledWidth / 2, resolution.scaledHeight / 2.5, Color.RED, 13, align = TextAlign.Middle)
+        text("Lava CLipping ${clipDistance.toInt()}", resolution.scaledWidth / 2, resolution.scaledHeight / 2.5, Color.RED, 13, align = TextAlign.Middle)
     }
 
     @SubscribeEvent
@@ -51,5 +56,10 @@ object LavaClip: Module(
         event.isCanceled = true
         cancelS12 = false
         toggle()
+    }
+
+    override fun onDisable() {
+        ringClip = null
+        super.onDisable()
     }
 }
