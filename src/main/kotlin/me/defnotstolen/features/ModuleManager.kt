@@ -71,7 +71,8 @@ object ModuleManager {
         //WaterBoard,
         TicTacToe,
         AuraTest,
-        Weirdos
+        Weirdos,
+        MelodyMessage
     )
 
     init {
