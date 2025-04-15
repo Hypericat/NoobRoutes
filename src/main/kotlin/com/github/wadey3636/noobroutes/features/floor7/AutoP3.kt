@@ -85,7 +85,7 @@ object AutoP3: Module (
     val showEnd by BooleanSetting("Render End", default = true, description = "renders waypoint where blink ends").withDependency { blinkShit }
     val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes").withDependency { blinkShit }
     val moveHud by HudSetting("Move Hud", HudElement(100f, 50f, false, settingName = "Move Hud")).withDependency { blinkShit }
-    val toggleSG by BooleanSetting("SG toggle", default = false, description = "Disable Secret guide in boss").withDependency { SexAura.noobAccounts.contains(mc.thePlayer?.name ?: "No") }
+    val toggleSG by BooleanSetting("SG toggle", default = false, description = "Disable Secret guide in boss")
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     var waitingTerm = false
