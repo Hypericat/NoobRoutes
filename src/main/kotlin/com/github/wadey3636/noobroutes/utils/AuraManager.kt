@@ -41,6 +41,16 @@ object AuraManager {
         clickBlock(pos)
     }
 
+    fun auraBlock(x: Int, y: Int, z: Int){
+        val pos = BlockPos(x, y, z)
+        if (clickBlockCooldown > 0) {
+            queuedBlocks.add(pos)
+            return
+        }
+        clickBlock(pos)
+    }
+
+
     /**
      * Sends C02PacketUseEntity
      *
