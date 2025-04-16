@@ -1,5 +1,11 @@
 package com.github.wadey3636.noobroutes.utils
 
+import me.defnotstolen.Core.mc
+import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.WorldClient
+import net.minecraft.entity.Entity
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
@@ -48,5 +54,14 @@ object Utils {
     fun isClose(number1: Double, number2: Double): Boolean {
         return abs(number1 - number2) < 0.0001F
     }
+
+    inline fun <reified T : Entity> WorldClient.getEntitiesOfType(): List<T> {
+        return this.loadedEntityList.filterIsInstance<T>()
+    }
+
+    fun ItemStack.getID(): Int {
+        return Item.getIdFromItem(this.item)
+    }
+
 
 }
