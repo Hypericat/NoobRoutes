@@ -44,7 +44,7 @@ object AutoSS : Module(
     category = Category.FLOOR7,
     description = "Does SS, (stolen from Kaze)"
 ){
-    val clickDelay by NumberSetting("Delay", 200.0, 50.0, 500.0, 10.0, unit = "ms", description = "The delay for next click")
+    private val clickDelay by NumberSetting("Delay", 200.0, 50.0, 500.0, 10.0, unit = "ms", description = "The delay for next click")
     private val forceDevice by BooleanSetting("Force Device", false, description = "").withDependency {devMode}
     private val resetSS by ActionSetting("Reset SS", description = "Resets SS. crazyyy") {reset(); doingSS = false; clicked = false}
     private val autoStart by NumberSetting("Autostart delay", 125.0, 50.0, 200.0, 1.0, unit = "ms", description = "")

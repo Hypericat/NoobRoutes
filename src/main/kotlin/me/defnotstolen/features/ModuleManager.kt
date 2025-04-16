@@ -72,7 +72,8 @@ object ModuleManager {
         TicTacToe,
         AuraTest,
         Weirdos,
-        MelodyMessage
+        MelodyMessage,
+        AutoSS
     )
 
     init {
