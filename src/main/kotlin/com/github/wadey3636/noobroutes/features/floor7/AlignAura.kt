@@ -16,6 +16,7 @@ import com.github.wadey3636.noobroutes.utils.Utils.getID
 import me.defnotstolen.events.impl.ChatPacketEvent
 import me.defnotstolen.features.Category
 import net.minecraft.network.play.client.C02PacketUseEntity
+import kotlin.math.pow
 
 /**
  * Translated from AlignAura
@@ -39,7 +40,7 @@ object AlignAura : Module("Align Aura", description = "Does Arrow Align Device",
     )
     private val deviceStandLocation = Vec3(0.0, 120.0, 77.0)
     private val deviceCorner = Vec3(-2.0, 120.0, 75.0)
-    private val recentClicks = mutableListOf<Int>()
+    private val recentClicks = mutableListOf<Long>()
     private var currentFrames: MutableList<Pair<EntityItemFrame, Int>>? = null;
 
     private fun getCurrentFrames(): MutableList<Pair<EntityItemFrame, Int>> {
@@ -87,26 +88,38 @@ object AlignAura : Module("Align Aura", description = "Does Arrow Align Device",
             return;
         }
         currentFrames = getCurrentFrames();
-        val rotations = currentFrames.map(it?.rotation ?? null);
-        val solution = solutions.find(solution => !solution.some((value, index) => value === null ^ rotations[index] === null));
-        if (!solution) return;
-        for (var z of Object.entries(currentFrames).sort((a, b) => a[1] && b[1] && ((Player.getX() - b[1].entity.getX()) ** 2 + (Player.getY() + Player.getPlayer().func_70047_e() - b[1].entity.getY()) ** 2 + (Player.getZ() - b[1].entity.getZ()) ** 2) - ((Player.getX() - a[1].entity.getX()) ** 2 + (Player.getY() + Player.getPlayer().func_70047_e() - a[1].entity.getY()) ** 2 + (Player.getZ() - a[1].entity.getZ()) ** 2))) {
-            var [index, frame] = z;
-            if (!frame) continue;
-            val entity = frame.entity;
-            if ((Player.getX() - entity.getX()) ** 2 + (Player.getY() + Player.getPlayer().func_70047_e() - entity.getY()) ** 2 + (Player.getZ() - entity.getZ()) ** 2 > 25) continue;
-            var clicksNeeded = (solution[index] - frame.rotation + 8) % 8;
-            if (clicksNeeded <= 0) continue;
-            val mcEntity = entity.getEntity();
-            if (!mcEntity) continue;
-            if (!inP3 && currentFrames.filter((frame, index) => frame && (solution[index] - frame.rotation + 8) % 8 > 0).length <= 1) --clicksNeeded;
-            if (clicksNeeded > 0) recentClicks[index] = Date.now();
-            for (var i = 0; i < clicksNeeded; ++i) {
-            frame.rotation = (frame.rotation + 1) % 8;
-            PacketUtils.sendPacket( C02PacketUseEntity(mcEntity,  Vec3(0.03125, 0, 0)));
-            PacketUtils.sendPacket(C02PacketUseEntity(mcEntity, C02PacketUseEntity.Action.INTERACT));
+        val rotations = currentFrames?.map { it.first.rotation }
+        //val solution = solutions.find(!solution.some((value, index) => value === null ^ rotations[index] === null));
+
+        val solution = solutions.find { solution ->
+            solution.indices.all { index ->
+                (solution[index] == null) xor (rotations?.get(index) == null)
+            }
+        } ?: return
+
+        val sortedFrames = currentFrames!!.withIndex().sortedByDescending { (_, frame) ->
+            frame.let {
+                mc.thePlayer.positionVector.add(Vec3(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0)).squareDistanceTo(it.first.positionVector)
+            }
         }
-            break;
+
+        for ((index, frame) in sortedFrames) {
+            val entity = frame
+            if (mc.thePlayer.getDistanceSqToEntity(entity.first) > 25) continue
+            if (solution[index] == null) continue
+            var clicksNeeded = (solution[index]!! - frame.first.rotation + 8) % 8
+            if (clicksNeeded <= 0) continue
+            if (!inP3 && currentFrames!!.count { frame ->
+                (solution[currentFrames!!.indexOf(frame)]!! - frame.first.rotation + 8) % 8 > 0
+            } <= 1) {
+                clicksNeeded--
+            }
+            if (clicksNeeded > 0) recentClicks[index] = System.currentTimeMillis() //Wadey pls check wtf im supposed to do here
+            for (i in 0 until clicksNeeded) {
+                frame.first.setItemRotation((frame.first.rotation + 1) % 8)
+                PacketUtils.sendPacket( C02PacketUseEntity(entity.first,  Vec3(0.03125, 0.0, 0.0)));
+                PacketUtils.sendPacket(C02PacketUseEntity(entity.first, C02PacketUseEntity.Action.INTERACT));
+            }
         }
     }
 
