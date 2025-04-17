@@ -205,7 +205,7 @@ object AutoP3: Module (
                     modMessage("how tf is this empty, send this in noobroutes dc")
                     return
                 }
-                ClientUtils.clientScheduleTask { AuraManager.auraBlock(ring.blinkPackets[0].positionX.toInt(), ring.blinkPackets[0].positionY.toInt(), ring.blinkPackets[0].positionZ.toInt(), force = true) }
+                ClientUtils.clientScheduleTask(1) { AuraManager.auraBlock(ring.blinkPackets[0].positionX.toInt(), ring.blinkPackets[0].positionY.toInt(), ring.blinkPackets[0].positionZ.toInt(), force = true) }
             }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
