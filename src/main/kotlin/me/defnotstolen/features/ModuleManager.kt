@@ -67,10 +67,10 @@ object ModuleManager {
         InstaAccel,
         InstaMid,
         Auto4,
-        LeverAura,
+         LeverAura,
         //WaterBoard,
         TicTacToe,
-        AuraTest,
+        //AuraTest,
         Weirdos,
         MelodyMessage,
         AutoSS

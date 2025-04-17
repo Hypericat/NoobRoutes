@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C02PacketUseEntity.Action
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
 import net.minecraft.util.Vec3
@@ -19,8 +20,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
 object AuraManager {
-    class EntityAura(val entity: Entity, val action: C02PacketUseEntity.Action)
-    private val queuedBlocks: MutableList<BlockPos> = mutableListOf()
+    class EntityAura(val entity: Entity, val action: Action)
+    class BlockAura(val pos: BlockPos, val force: Boolean, val callback: () -> Unit)
+
+
+    private val queuedBlocks: MutableList<BlockAura> = mutableListOf()
     private var clickBlockCooldown: Int = 0
 
 
@@ -28,36 +32,82 @@ object AuraManager {
     private var clickEntityCooldown = 0
 
     /**
-     * Sends C08PacketPlayerBlockPlacement packet to a specified block.
+     * Sends C08PacketPlayerBlockPlacement packet to a specified BlockPos.
      * Queues the packet if one has already been sent during the tick.
      *
      * @param pos the BlockPos of the block to be clicked.
+     * @param force if the block is unknown, default to a full block aabb.
      */
-    fun auraBlock(pos: BlockPos){
+    fun auraBlock(pos: BlockPos, force: Boolean = false) {
         if (clickBlockCooldown > 0) {
-            queuedBlocks.add(pos)
+            queuedBlocks.add(BlockAura(pos, force) {})
             return
         }
-        clickBlock(pos)
+        clickBlock(BlockAura(pos, force) {})
     }
 
-    fun auraBlock(x: Int, y: Int, z: Int){
+
+    /**
+     * Sends C08PacketPlayerBlockPlacement packet to a specified BlockPos.
+     * Queues the packet if one has already been sent during the tick.
+     *
+     * @param pos the BlockPos of the block to be clicked.
+     * @param force if the block is unknown, default to a full block aabb.
+     * @param callback code that runs if the block is undefined
+     */
+    fun auraBlock(pos: BlockPos, force: Boolean = false, callback: () -> Unit) {
+        if (clickBlockCooldown > 0) {
+            queuedBlocks.add(BlockAura(pos, force, callback))
+            return
+        }
+        clickBlock(BlockAura(pos, force) {})
+    }
+
+    /**
+     * Sends C08PacketPlayerBlockPlacement packet to a specified BlockPos.
+     * Queues the packet if one has already been sent during the tick.
+     *
+     * @param x the X position of the block to be clicked.
+     * @param y the Y position of the block to be clicked.
+     * @param z the Z position of the block to be clicked.
+     * @param force if the block is unknown, default to a full block aabb.
+     */
+    fun auraBlock(x: Int, y: Int, z: Int, force: Boolean = false) {
         val pos = BlockPos(x, y, z)
         if (clickBlockCooldown > 0) {
-            queuedBlocks.add(pos)
+            queuedBlocks.add(BlockAura(pos, force) {})
             return
         }
-        clickBlock(pos)
+        queuedBlocks.add(BlockAura(pos, force) {})
     }
 
+    /**
+     * Sends C08PacketPlayerBlockPlacement packet to a specified BlockPos.
+     * Queues the packet if one has already been sent during the tick.
+     *
+     * @param x the X position of the block to be clicked.
+     * @param y the Y position of the block to be clicked.
+     * @param z the Z position of the block to be clicked.
+     * @param force if the block is unknown, default to a full block aabb.
+     * @param callback code that runs if the block is undefined
+     */
+
+    fun auraBlock(x: Int, y: Int, z: Int, force: Boolean = false, callback: () -> Unit) {
+        val pos = BlockPos(x, y, z)
+        if (clickBlockCooldown > 0) {
+            queuedBlocks.add(BlockAura(pos, force, callback))
+            return
+        }
+        queuedBlocks.add(BlockAura(pos, force, callback))
+    }
 
     /**
      * Sends C02PacketUseEntity
      *
      * @param entity Entity
      * @param action C02PacketUseEntity Action Type
-      */
-    fun auraEntity(entity: Entity, action: Action){
+     */
+    fun auraEntity(entity: Entity, action: Action) {
         if (clickEntityCooldown > 0) {
             queuedEntityClicks.add(EntityAura(entity, action))
             return
@@ -66,10 +116,8 @@ object AuraManager {
     }
 
 
-
-
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load){
+    fun onWorldLoad(event: WorldEvent.Load) {
         queuedBlocks.clear()
         queuedEntityClicks.clear()
         clickBlockCooldown = 20
@@ -78,7 +126,7 @@ object AuraManager {
 
 
     @SubscribeEvent
-    fun auraQueue(event: ClientTickEvent){
+    fun auraQueue(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
 
         if (clickBlockCooldown > 0) clickBlockCooldown--
@@ -106,24 +154,27 @@ object AuraManager {
     }
 
 
-    private fun clickBlock(block: BlockPos, removeFirst: Boolean = false){
-        val aabb = BlockUtils.getAABB(block)
+    private fun clickBlock(aura: BlockAura, removeFirst: Boolean = false) {
+        var aabb = BlockUtils.getAABB(aura.pos)
+        if (aura.force && aabb == null) aabb = AxisAlignedBB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         if (aabb == null) {
+            aura.callback()
             devMessage("Invalid Aura Block")
             logger.info("Invalid Aura Block")
             if (removeFirst) queuedBlocks.removeFirst()
             return
 
         }
-        val centerPos = Vec3(block).addVector(
+        val centerPos = Vec3(aura.pos).addVector(
             (aabb.minX + aabb.maxX) / 2,
             (aabb.minY + aabb.maxY) / 2,
             (aabb.minZ + aabb.maxZ) / 2
         )
-        val movingObjectPosition: MovingObjectPosition = collisionRayTrace(block, aabb, mc.thePlayer.getPositionEyes(0f), centerPos) ?: return
+        val movingObjectPosition: MovingObjectPosition =
+            collisionRayTrace(aura.pos, aabb, mc.thePlayer.getPositionEyes(0f), centerPos) ?: return
         PacketUtils.sendPacket(
             C08PacketPlayerBlockPlacement(
-                block,
+                aura.pos,
                 movingObjectPosition.sideHit.index,
                 mc.thePlayer.heldItem,
                 movingObjectPosition.hitVec.xCoord.toFloat(),
@@ -133,24 +184,36 @@ object AuraManager {
         )
         devMessage("sent c08")
         if (removeFirst) queuedBlocks.removeFirst()
-        //devMessage(System.currentTimeMillis())
     }
 
     /**
      * Modified from CGA
      * https://github.com/WompWatr/CatgirlAddons
      */
-    private fun clickEntity(entityAura: EntityAura, removeFirst: Boolean = false){
+    private fun clickEntity(entityAura: EntityAura, removeFirst: Boolean = false) {
         if (removeFirst) queuedEntityClicks.removeFirst()
-        if (mc.thePlayer.getPositionEyes(0f).distanceTo(Vec3(entityAura.entity.posX, entityAura.entity.posY, entityAura.entity.posZ)) < 5) {
+        if (mc.thePlayer.getPositionEyes(0f)
+                .distanceTo(Vec3(entityAura.entity.posX, entityAura.entity.posY, entityAura.entity.posZ)) < 5
+        ) {
             if (entityAura.action == Action.INTERACT) {
                 devMessage("entity packet sent")
                 PacketUtils.sendPacket(C02PacketUseEntity(entityAura.entity, Action.INTERACT))
             } else if (entityAura.action == Action.INTERACT_AT) {
                 val expandValue: Double = entityAura.entity.collisionBorderSize.toDouble()
                 val eyePos = mc.thePlayer.getPositionEyes(0f)
-                val movingObjectPosition = entityAura.entity.entityBoundingBox.expand(expandValue, expandValue, expandValue).calculateIntercept(eyePos, getEntityCenter(entityAura.entity)) ?: return
-                PacketUtils.sendPacket(C02PacketUseEntity(entityAura.entity, Vec3(movingObjectPosition.hitVec.xCoord, movingObjectPosition.hitVec.yCoord, movingObjectPosition.hitVec.zCoord)))
+                val movingObjectPosition =
+                    entityAura.entity.entityBoundingBox.expand(expandValue, expandValue, expandValue)
+                        .calculateIntercept(eyePos, getEntityCenter(entityAura.entity)) ?: return
+                PacketUtils.sendPacket(
+                    C02PacketUseEntity(
+                        entityAura.entity,
+                        Vec3(
+                            movingObjectPosition.hitVec.xCoord,
+                            movingObjectPosition.hitVec.yCoord,
+                            movingObjectPosition.hitVec.zCoord
+                        )
+                    )
+                )
                 devMessage("entity packet sent")
             }
             return
@@ -169,8 +232,6 @@ object AuraManager {
         val centerZ = (boundingBox.minZ + boundingBox.maxZ) / 2
         return Vec3(centerX, centerY, centerZ)
     }
-
-
 
 
 }

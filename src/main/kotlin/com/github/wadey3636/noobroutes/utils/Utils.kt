@@ -59,9 +59,9 @@ object Utils {
         return this.loadedEntityList.filterIsInstance<T>()
     }
 
-    fun ItemStack.getID(): Int {
-        return Item.getIdFromItem(this.item)
-    }
+    val ItemStack?.ID: Int
+        get() = Item.getIdFromItem(this?.item)
+
 
 
 }
