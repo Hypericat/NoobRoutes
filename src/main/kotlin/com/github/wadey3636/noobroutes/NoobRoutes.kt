@@ -66,7 +66,8 @@ class NoobRoutes {
             AuraManager,
             Utils,
             LocationUtils,
-            EventDispatcher
+            EventDispatcher,
+            SwapManager
 
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)

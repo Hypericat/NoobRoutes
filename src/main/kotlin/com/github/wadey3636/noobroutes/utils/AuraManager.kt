@@ -156,7 +156,10 @@ object AuraManager {
 
     private fun clickBlock(aura: BlockAura, removeFirst: Boolean = false) {
         var aabb = BlockUtils.getAABB(aura.pos)
-        if (aura.force && aabb == null) aabb = AxisAlignedBB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        if (aura.force && aabb == null) {
+            aabb = AxisAlignedBB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+            if (isAir(aura.pos)) aabb = null
+        }
         if (aabb == null) {
             aura.callback()
             devMessage("Invalid Aura Block")

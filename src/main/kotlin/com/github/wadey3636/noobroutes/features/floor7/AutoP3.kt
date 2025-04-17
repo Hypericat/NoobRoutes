@@ -6,9 +6,12 @@ import com.github.wadey3636.noobroutes.features.move.LavaClip
 import com.github.wadey3636.noobroutes.utils.AuraManager
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils.motionAfter
+import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.SecretGuideIntegration
+import com.github.wadey3636.noobroutes.utils.SwapManager
 import com.github.wadey3636.noobroutes.utils.Utils
 import com.github.wadey3636.noobroutes.utils.adapters.RingsMapTypeAdapter
+import com.github.wadey3636.noobroutes.utils.isAir
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -29,6 +32,7 @@ import me.defnotstolen.utils.render.Renderer
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
 import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import me.defnotstolen.utils.skyblock.modMessage
+import net.minecraft.block.Block
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
@@ -196,12 +200,12 @@ object AutoP3: Module (
             }
             RingTypes.TNT -> {
                 modMessage("tnting")
-                //swap here
+                SwapManager.swapFromName("TNT")
                 if (ring.blinkPackets.isEmpty()) {
                     modMessage("how tf is this empty, send this in noobroutes dc")
                     return
                 }
-                AuraManager.auraBlock(ring.blinkPackets[0].positionX.toInt(), ring.blinkPackets[0].positionY.toInt(), ring.blinkPackets[0].positionZ.toInt())
+                ClientUtils.clientScheduleTask { AuraManager.auraBlock(ring.blinkPackets[0].positionX.toInt(), ring.blinkPackets[0].positionY.toInt(), ring.blinkPackets[0].positionZ.toInt(), force = true) }
             }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
@@ -242,10 +246,8 @@ object AutoP3: Module (
     fun handleNoobCommand(args: Array<out String>?) {
         if (route.isEmpty()) return modMessage("Put in a route dumbass")
         when(args?.get(0)) {
-            "add" -> addNormalRing(args)
-            "create" -> addNormalRing(args)
-            "delete" -> deleteNormalRing(args)
-            "remove" -> deleteNormalRing(args)
+            "add","create" -> addNormalRing(args)
+            "delete","remove" -> deleteNormalRing(args)
             "blink" -> Blink.blinkCommand(args)
             "start" -> inBoss = true
             "rat" -> Utils.rat.forEach{ modMessage(it) }
@@ -345,12 +347,12 @@ object AutoP3: Module (
             }
             "tnt", "boom" -> {
                 ringType = RingTypes.TNT
-                modMessage("added boom")
                 val block = mc.objectMouseOver.blockPos
-                if (block == null) {
+                if (isAir(block)) {
                     modMessage("must look at a block")
                     return
                 }
+                modMessage("added boom")
                 packets.add(C04PacketPlayerPosition(block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), false))
             }
             else -> return modMessage("thats not a ring type stoopid")
