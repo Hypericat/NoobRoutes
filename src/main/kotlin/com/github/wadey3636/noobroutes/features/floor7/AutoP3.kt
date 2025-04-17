@@ -3,6 +3,7 @@ package com.github.wadey3636.noobroutes.features.floor7
 import com.github.wadey3636.noobroutes.features.Blink
 import com.github.wadey3636.noobroutes.features.misc.SexAura
 import com.github.wadey3636.noobroutes.features.move.LavaClip
+import com.github.wadey3636.noobroutes.utils.AuraManager
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils.motionAfter
 import com.github.wadey3636.noobroutes.utils.SecretGuideIntegration
@@ -32,6 +33,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S18PacketEntityTeleport
+import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -46,7 +48,8 @@ enum class RingTypes {
     TERM,
     LEAP,
     MOTION,
-    LAVA
+    LAVA,
+    TNT
 }
 
 
@@ -135,7 +138,7 @@ object AutoP3: Module (
         }
         if (ring.center && mc.thePlayer.onGround) mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord)
         if (ring.walk) AutoP3Utils.walkAfter = true
-        AutoP3Utils.unPressKeys()
+        stopOrNot(ring.type)
         when(ring.type) {
             RingTypes.WALK -> {
                 AutoP3Utils.startWalk(ring.direction.yaw)
@@ -191,8 +194,22 @@ object AutoP3: Module (
                 LavaClip.ringClip = ring.endY
                 LavaClip.toggle()
             }
+            RingTypes.TNT -> {
+                modMessage("tnting")
+                //swap here
+                if (ring.blinkPackets.isEmpty()) {
+                    modMessage("how tf is this empty, send this in noobroutes dc")
+                    return
+                }
+                AuraManager.auraBlock(ring.blinkPackets[0].positionX.toInt(), ring.blinkPackets[0].positionY.toInt(), ring.blinkPackets[0].positionZ.toInt())
+            }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
+    }
+
+    fun stopOrNot(ring: RingTypes) {
+        if (ring == RingTypes.TNT) return
+        else AutoP3Utils.unPressKeys()
     }
 
     @SubscribeEvent
@@ -269,8 +286,8 @@ object AutoP3: Module (
             modMessage("no ring to restore")
             return
         }
-        actuallyAddRing(deletedRings.last()!!)
-        modMessage("${deletedRings.last()!!.type} added back")
+        actuallyAddRing(deletedRings.last())
+        modMessage("${deletedRings.last().type} added back")
         deletedRings.removeLast()
     }
 
@@ -281,6 +298,7 @@ object AutoP3: Module (
         }
         val ringType: RingTypes
         var endPos = 0.0
+        var packets = mutableListOf<C04PacketPlayerPosition>()
         when(args[1].lowercase()) {
             "walk" -> {
                 modMessage("added walk")
@@ -325,12 +343,22 @@ object AutoP3: Module (
                 }
                 endPos = endY
             }
+            "tnt", "boom" -> {
+                ringType = RingTypes.TNT
+                modMessage("added boom")
+                val block = mc.objectMouseOver.blockPos
+                if (block == null) {
+                    modMessage("must look at a block")
+                    return
+                }
+                packets.add(C04PacketPlayerPosition(block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), false))
+            }
             else -> return modMessage("thats not a ring type stoopid")
         }
         val look = args.any { it == "look" }
         val center = args.any {it == "center"}
         val walk = args.any {it == "walk"} && ringType != RingTypes.WALK
-        actuallyAddRing(Ring(ringType, look = look, center = center, walk = walk, endY = endPos))
+        actuallyAddRing(Ring(ringType, look = look, center = center, walk = walk, endY = endPos, blinkPackets = packets))
     }
 
     fun actuallyAddRing(ring: Ring) {
