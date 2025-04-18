@@ -50,7 +50,7 @@ object Auto4: Module(
     fun onPacket(event: PacketEvent.Receive) {
         if (mc.thePlayer == null) return
         if (mc.thePlayer.getDistance(63.5, 127.0, 35.5) > 1.5 || mc.thePlayer.heldItem?.item != Items.bow) {
-            shotBlocks = mutableListOf<BlockPos>()
+            shotBlocks = mutableListOf()
             return
         }
         if (event.packet is S23PacketBlockChange && devBlocks.contains(event.packet.blockPosition) && event.packet.blockState.block == Blocks.emerald_block) shoot(event.packet.blockPosition)
@@ -60,7 +60,7 @@ object Auto4: Module(
 
     }
 
-    fun shoot(block: BlockPos) {
+    private fun shoot(block: BlockPos) {
         val rotation = getRotation(block)
         if (!silent || Blink.cancelled < 1) {
             mc.thePlayer.rotationYaw = rotation.first

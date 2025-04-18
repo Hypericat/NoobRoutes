@@ -11,6 +11,10 @@ object RotationUtils {
 
     /**
      * Taken from cga
+     * @param x X position to aim at.
+     * @param y Y position to aim at.
+     * @param z Z position to aim at.
+     * @param sneaking determines whether the function accounts for sneak height.
      */
     fun getYawAndPitch(x: Double, y:Double, z:Double, sneaking: Boolean = false): Pair<Float, Float> { //stolen from CGA
         val dx = x - mc.thePlayer.posX
@@ -26,6 +30,17 @@ object RotationUtils {
 
         return Pair(normalizedYaw.toFloat(), pitch.toFloat())
     }
+
+    /**
+     * Gets the angle to aim at a Vec3.
+     *
+     * @param pos Vec3 to aim at.
+     * @param sneaking determines whether the function accounts for sneak height.
+     */
+    fun getYawAndPitch(pos: Vec3, sneaking: Boolean = false): Pair<Float, Float> {
+        return getYawAndPitch(pos.xCoord, pos.yCoord, pos.zCoord, sneaking)
+    }
+
     /**
      * sets angle from relative yaw/pitch
      * @param {number} yaw delta yaw

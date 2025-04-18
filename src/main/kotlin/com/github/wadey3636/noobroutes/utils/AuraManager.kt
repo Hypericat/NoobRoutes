@@ -127,10 +127,11 @@ object AuraManager {
 
     @SubscribeEvent
     fun auraQueue(event: ClientTickEvent) {
+        if (event.phase == TickEvent.Phase.END) {
+            if (clickBlockCooldown > 0) clickBlockCooldown--
+            if (clickEntityCooldown > 0) clickEntityCooldown--
+        }
         if (event.phase != TickEvent.Phase.START) return
-
-        if (clickBlockCooldown > 0) clickBlockCooldown--
-        if (clickEntityCooldown > 0) clickEntityCooldown--
 
         if (clickBlockCooldown == 0) {
             val block = queuedBlocks.firstOrNull() ?: return
