@@ -2,19 +2,18 @@ package com.github.wadey3636.noobroutes.features.puzzle
 
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.inBoss
 import com.github.wadey3636.noobroutes.utils.AuraManager
-import me.defnotstolen.events.impl.RoomEnterEvent
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.features.settings.impl.ColorSetting
-import me.defnotstolen.features.settings.impl.NumberSetting
-import me.defnotstolen.utils.addRotationCoords
-import me.defnotstolen.utils.noControlCodes
-import me.defnotstolen.utils.render.Color
-import me.defnotstolen.utils.skyblock.PlayerUtils
-import me.defnotstolen.utils.skyblock.devMessage
-import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
-import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.currentRoomName
-import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.inDungeons
+import me.modcore.events.impl.RoomEnterEvent
+import me.modcore.features.Category
+import me.modcore.features.Module
+import me.modcore.features.settings.impl.ColorSetting
+import me.modcore.utils.addRotationCoords
+import me.modcore.utils.noControlCodes
+import me.modcore.utils.render.Color
+import me.modcore.utils.skyblock.PlayerUtils
+import me.modcore.utils.skyblock.devMessage
+import me.modcore.utils.skyblock.dungeon.DungeonUtils
+import me.modcore.utils.skyblock.dungeon.DungeonUtils.currentRoomName
+import me.modcore.utils.skyblock.dungeon.DungeonUtils.inDungeons
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.util.BlockPos
@@ -31,15 +30,8 @@ object Weirdos : Module("Weirdos", description = "Solves weirdos puzzle", catego
     private var clickedChest = false
     private var clickedWeirdos = mutableListOf<Int>()
     private val recievedTextWeirdos = mutableListOf<Int>()
-    private val tickDelay by NumberSetting(
-        "Tick Delay",
-        3,
-        0,
-        5,
-        increment = 1,
-        description = "Adds a delay before you can click a weirdo to prevent the puzzle from breaking sometimes"
-    )
-    private var currentDelay = 0
+
+
     private val weirdoColor by ColorSetting(
         "Color",
         Color.GREEN,
@@ -61,7 +53,7 @@ object Weirdos : Module("Weirdos", description = "Solves weirdos puzzle", catego
         wrongPositions.clear()
         clickedChest = false
         clickedWeirdos.clear()
-        currentDelay = tickDelay
+
         recievedTextWeirdos.clear()
     }
 
@@ -71,14 +63,15 @@ object Weirdos : Module("Weirdos", description = "Solves weirdos puzzle", catego
         mc.theWorld.loadedEntityList
             .filter { it is EntityArmorStand && it.name.contains("CLICK") }
             .forEach { entity ->
-                if (currentDelay > 1) {
-                    currentDelay--
-                    return
-                }
 
 
-                if (clickedWeirdos.contains(entity.entityId) || entity.positionVector.distanceTo(mc.thePlayer.positionVector) > 5) return@forEach
-                //mc.theWorld.loadedEntityList.filter { it.positionVector.distanceTo(entity.positionVector) < 1.5 }.size
+
+                if (
+                    clickedWeirdos.contains(entity.entityId) ||
+                    entity.positionVector.distanceTo(mc.thePlayer.positionVector) > 5 ||
+                    mc.theWorld.loadedEntityList.filter { it.positionVector.distanceTo(entity.positionVector) < 1.5 }.size < 3
+                    ) return@forEach
+
 
 
                 AuraManager.auraEntity(entity, C02PacketUseEntity.Action.INTERACT_AT)
@@ -132,7 +125,7 @@ object Weirdos : Module("Weirdos", description = "Solves weirdos puzzle", catego
         wrongPositions.clear()
         clickedChest = false
         clickedWeirdos.clear()
-        currentDelay = tickDelay
+
     }
 
     private val solutions = listOf(

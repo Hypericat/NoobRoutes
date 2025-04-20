@@ -1,11 +1,11 @@
 package com.github.wadey3636.noobroutes.features.misc
 
-import me.defnotstolen.Core
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.utils.render.Color
-import me.defnotstolen.utils.render.text
-import me.defnotstolen.utils.skyblock.modMessage
+import me.modcore.Core
+import me.modcore.features.Category
+import me.modcore.features.Module
+import me.modcore.utils.render.Color
+import me.modcore.utils.render.text
+import me.modcore.utils.skyblock.modMessage
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.world.WorldEvent

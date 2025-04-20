@@ -2,13 +2,15 @@ package com.github.wadey3636.noobroutes.features.move
 
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
-import me.defnotstolen.events.impl.PacketEvent
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.features.settings.impl.NumberSetting
-import me.defnotstolen.utils.render.Color
-import me.defnotstolen.utils.render.TextAlign
-import me.defnotstolen.utils.render.text
+import me.modcore.events.impl.PacketEvent
+import me.modcore.features.Category
+import me.modcore.features.Module
+import me.modcore.features.settings.impl.NumberSetting
+import me.modcore.utils.render.Color
+import me.modcore.utils.render.TextAlign
+import me.modcore.utils.render.text
+import me.modcore.utils.skyblock.Island
+import me.modcore.utils.skyblock.LocationUtils
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraftforge.client.event.RenderGameOverlayEvent

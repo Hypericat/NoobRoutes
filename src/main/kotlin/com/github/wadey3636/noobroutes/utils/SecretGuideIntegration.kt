@@ -1,6 +1,6 @@
 package com.github.wadey3636.noobroutes.utils
 
-import me.defnotstolen.Core.logger
+import me.modcore.Core.logger
 import java.lang.reflect.Field
 
 object SecretGuideIntegration {

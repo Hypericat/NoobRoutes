@@ -1,7 +1,5 @@
 package com.github.wadey3636.noobroutes.utils
 
-import me.defnotstolen.Core.mc
-import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.item.Item

@@ -1,14 +1,16 @@
 package com.github.wadey3636.noobroutes.mixin;
 
+import com.github.wadey3636.noobroutes.features.misc.NoDebuff;
 import com.mojang.authlib.GameProfile;
-import me.defnotstolen.events.impl.MotionUpdateEvent;
-import me.defnotstolen.utils.Utils;
+import me.modcore.events.impl.MotionUpdateEvent;
+import me.modcore.utils.Utils;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
@@ -92,5 +94,10 @@ public abstract class MixinEntityPlayerSP extends EntityPlayer {
         this.rotationPitch = motionUpdateEvent.pitch;
 
         this.onGround = motionUpdateEvent.onGround;
+    }
+
+    @Redirect(method = {"pushOutOfBlocks"}, at = @At(value = "FIELD", target = "Lnet/minecraft/client/entity/EntityPlayerSP;noClip:Z"))
+    public boolean shouldPrevent(EntityPlayerSP instance) {
+        return NoDebuff.INSTANCE.getNoPush();
     }
 }

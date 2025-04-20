@@ -1,22 +1,22 @@
 package com.github.wadey3636.noobroutes.features.floor7
 
+
 import com.github.wadey3636.noobroutes.utils.RotationUtils.getYawAndPitch
-import me.defnotstolen.Core.logger
-import me.defnotstolen.events.impl.BlockChangeEvent
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.features.impl.render.ClickGUIModule.devMode
-import me.defnotstolen.features.settings.Setting.Companion.withDependency
-import me.defnotstolen.features.settings.impl.ActionSetting
-import me.defnotstolen.features.settings.impl.BooleanSetting
-import me.defnotstolen.features.settings.impl.NumberSetting
-import me.defnotstolen.utils.clock.Executor
-import me.defnotstolen.utils.clock.Executor.Companion.register
-import me.defnotstolen.utils.render.Color
-import me.defnotstolen.utils.render.RenderUtils.drawStringInWorld
-import me.defnotstolen.utils.render.Renderer
-import me.defnotstolen.utils.skyblock.LocationUtils
-import me.defnotstolen.utils.skyblock.devMessage
+import me.modcore.Core.logger
+import me.modcore.events.impl.BlockChangeEvent
+import me.modcore.features.Category
+import me.modcore.features.Module
+import me.modcore.features.impl.render.ClickGUIModule.devMode
+import me.modcore.features.settings.Setting.Companion.withDependency
+import me.modcore.features.settings.impl.*
+import me.modcore.utils.clock.Executor
+import me.modcore.utils.clock.Executor.Companion.register
+import me.modcore.utils.render.Color
+import me.modcore.utils.render.RenderUtils.drawStringInWorld
+import me.modcore.utils.render.Renderer
+import me.modcore.utils.skyblock.LocationUtils
+import me.modcore.utils.skyblock.devMessage
+import me.modcore.utils.skyblock.sendCommand
 import net.minecraft.block.Block
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
@@ -29,6 +29,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 import kotlin.random.Random
 
 /**
@@ -46,9 +47,15 @@ object AutoSS : Module(
 ){
     private val clickDelay by NumberSetting("Delay", 200.0, 50.0, 500.0, 10.0, unit = "ms", description = "The delay for next click")
     private val forceDevice by BooleanSetting("Force Device", false, description = "").withDependency {devMode}
-    private val resetSS by ActionSetting("Reset SS", description = "Resets SS. crazyyy") {reset(); doingSS = false; clicked = false}
+    private val resetSSKeybind by KeybindSetting("Reset SS", Keyboard.KEY_NONE, "Resets AutoSS on press").onPress { resetKey() }
+
+
     private val autoStart by NumberSetting("Autostart delay", 125.0, 50.0, 200.0, 1.0, unit = "ms", description = "")
     private val dontCheck by BooleanSetting("Faster SS?", false, description = "idk what this means")
+    private val sendSSBroke by BooleanSetting("Send SS Broke", description = "If The player hits the restart SS Keybind")
+
+
+
 
     init {
         ssLoop()
@@ -77,11 +84,11 @@ object AutoSS : Module(
     }
 
 
-
-
-    override fun onKeybind() {
+    private fun resetKey(){
+        sendCommand("pc SS Broke")
         start()
     }
+
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {

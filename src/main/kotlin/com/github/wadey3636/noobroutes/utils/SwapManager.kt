@@ -1,14 +1,13 @@
 package com.github.wadey3636.noobroutes.utils
 
 import com.github.wadey3636.noobroutes.utils.Utils.ID
-import me.defnotstolen.Core.mc
-import me.defnotstolen.events.impl.PacketEvent
-import me.defnotstolen.utils.skyblock.modMessage
-import me.defnotstolen.utils.skyblock.skyblockID
-import me.defnotstolen.utils.skyblock.unformattedName
+import me.modcore.Core.mc
+import me.modcore.events.impl.PacketEvent
+import me.modcore.utils.skyblock.modMessage
+import me.modcore.utils.skyblock.skyblockID
+import me.modcore.utils.skyblock.unformattedName
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -64,12 +63,12 @@ object SwapManager {
         return SwapState.UNKNOWN
     }
 
-    fun swapFromSBId(skyblockID: String): SwapState {
+    fun swapFromSBId(vararg skyblockID: String): SwapState {
         for (i in 0..8) {
             val stack: ItemStack? = mc.thePlayer.inventory.getStackInSlot(i)
             val itemName = stack?.skyblockID
             if (itemName != null) {
-                if (itemName.contains(skyblockID, ignoreCase = true)) {
+                if (skyblockID.any { it == itemName }) {
                     if (mc.thePlayer.inventory.currentItem != i) {
                         if (recentlySwapped) {
                             modMessage("yo somethings wrong $itemName")

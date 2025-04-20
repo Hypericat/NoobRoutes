@@ -1,10 +1,10 @@
 package com.github.wadey3636.noobroutes.utils
 
 import com.github.wadey3636.noobroutes.utils.BlockUtils.collisionRayTrace
-import me.defnotstolen.Core.logger
-import me.defnotstolen.Core.mc
-import me.defnotstolen.events.impl.PacketEvent
-import me.defnotstolen.utils.skyblock.devMessage
+import me.modcore.Core.logger
+import me.modcore.Core.mc
+import me.modcore.events.impl.PacketEvent
+import me.modcore.utils.skyblock.devMessage
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C02PacketUseEntity.Action

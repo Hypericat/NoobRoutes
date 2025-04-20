@@ -5,11 +5,11 @@ import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import com.github.wadey3636.noobroutes.utils.RotationUtils.getYawAndPitch
-import me.defnotstolen.events.impl.PacketEvent
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.features.settings.Setting.Companion.withDependency
-import me.defnotstolen.features.settings.impl.BooleanSetting
+import me.modcore.events.impl.PacketEvent
+import me.modcore.features.Category
+import me.modcore.features.Module
+import me.modcore.features.settings.Setting.Companion.withDependency
+import me.modcore.features.settings.impl.BooleanSetting
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
@@ -99,7 +99,10 @@ object Auto4: Module(
         return getYawAndPitch(block.x.toDouble() + 0.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
     }
 
-    @SubscribeEvent
+
+
+    //Why tf is this a thing, it is so ass, kys
+    //@SubscribeEvent
     fun onKey(event: InputEvent) {
         if (shotBlocks.size in 1..8) AutoP3Utils.unPressKeys()
     }

@@ -1,6 +1,6 @@
 package com.github.wadey3636.noobroutes.utils
 
-import me.defnotstolen.Core.mc
+import me.modcore.Core.mc
 import net.minecraft.block.Block
 import net.minecraft.block.BlockButton
 import net.minecraft.block.BlockLever
