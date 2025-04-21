@@ -136,10 +136,11 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun movement(event: ClientTickEvent) {
-        if (!walking || event.phase != TickEvent.Phase.START) return
-
+        if (mc.thePlayer == null) return
         if (mc.thePlayer.onGround) air = 0
         else air++
+
+        if (!walking || event.phase != TickEvent.Phase.START) return
 
         if (air <= 1)  {
             val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
