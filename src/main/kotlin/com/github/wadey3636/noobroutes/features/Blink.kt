@@ -209,11 +209,11 @@ object Blink{
         if (event.isCanceled) return
         modMessage("recording ${recordedPackets.size}")
         if (event.packet is C04PacketPlayerPosition) {
-            if (recordedPackets.last() == C04PacketPlayerPosition(event.packet.positionX, event.packet.positionX, event.packet.positionX, event.packet.isOnGround)) return
+            if (recordedPackets.last() == C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)) return
             recordedPackets.add(event.packet)
         }
         else if (event.packet is C06PacketPlayerPosLook) {
-            if (recordedPackets.last() == C04PacketPlayerPosition(event.packet.positionX, event.packet.positionX, event.packet.positionX, event.packet.isOnGround)) return
+            if (recordedPackets.last() == C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)) return
             recordedPackets.add(C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround))
         }
         if (recordedPackets.size == recordingLength) {
