@@ -5,7 +5,7 @@ import io.netty.channel.ChannelHandlerContext
 import me.modcore.events.impl.MelodyOpenEvent
 import me.modcore.events.impl.S08Event
 import me.modcore.events.impl.S2FPacketSetSlotEvent
-import me.modcore.events.impl.TerminalOpenedEvent
+import me.modcore.events.impl.S2DEvent
 import me.modcore.utils.postAndCatch
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S2DPacketOpenWindow
@@ -23,7 +23,7 @@ object NettyS2DPacketInterceptor {
             override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
                 when (msg) {
                     is S2DPacketOpenWindow -> {
-                        TerminalOpenedEvent().postAndCatch()
+                        S2DEvent(msg).postAndCatch()
                         if (msg.windowTitle.unformattedText == "Click the button on time!") MelodyOpenEvent(msg).postAndCatch()
                     }
                     is S08PacketPlayerPosLook -> S08Event().postAndCatch()

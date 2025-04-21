@@ -1,5 +1,6 @@
 package me.modcore.events
 
+import com.github.wadey3636.noobroutes.utils.ClientUtils
 import kotlinx.coroutines.launch
 import me.modcore.Core.mc
 import me.modcore.Core.scope
@@ -69,4 +70,14 @@ object EventDispatcher {
 
         GuiEvent.Loaded(container, container.name).postAndCatch()
     }
+
+    private var termTitle = "I Love U Wadey"
+    @SubscribeEvent
+    fun onS2D(event: S2DEvent) {
+        if (termTitle != event.packet.windowTitle.unformattedText) TermOpenEvent().postAndCatch()
+        termTitle = event.packet.windowTitle.unformattedText
+        ClientUtils.clientScheduleTask(1) { termTitle = "I Love U Wadey" }
+    }
+
+
 }

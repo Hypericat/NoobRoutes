@@ -5,7 +5,6 @@ import com.github.wadey3636.noobroutes.features.misc.SexAura
 import com.github.wadey3636.noobroutes.features.move.LavaClip
 import com.github.wadey3636.noobroutes.utils.AuraManager
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
-import com.github.wadey3636.noobroutes.utils.AutoP3Utils.motionAfter
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.SecretGuideIntegration
 import com.github.wadey3636.noobroutes.utils.SwapManager
@@ -20,7 +19,8 @@ import me.modcore.Core.logger
 import me.modcore.Core.mc
 import me.modcore.config.DataManager
 import me.modcore.events.impl.PacketEvent
-import me.modcore.events.impl.TerminalOpenedEvent
+import me.modcore.events.impl.S2DEvent
+import me.modcore.events.impl.TermOpenEvent
 import me.modcore.features.Category
 import me.modcore.features.Module
 import me.modcore.features.settings.Setting.Companion.withDependency
@@ -187,7 +187,6 @@ object AutoP3: Module (
                 if(mc.thePlayer.onGround) mc.thePlayer.jump()
                 AutoP3Utils.awaitingTick = true
                 AutoP3Utils.direction = ring.direction.yaw
-                motionAfter = true
             }
             RingTypes.LAVA -> {
                 modMessage("activating lava clip")
@@ -215,7 +214,7 @@ object AutoP3: Module (
     }
 
     @SubscribeEvent
-    fun awaitingOpen(event: TerminalOpenedEvent) {
+    fun awaitingOpen(event: TermOpenEvent) {
         if (!waitingTerm) return
         AutoP3Utils.walking = true
     }

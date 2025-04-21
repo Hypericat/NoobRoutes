@@ -43,8 +43,6 @@ object AutoP3Utils {
 
     var walkAfter = false
     var awaitingTick = false
-    var motionAfter = false
-    private var motioning = false
 
     fun unPressKeys(stop: Boolean = true) {
         Keyboard.enableRepeatEvents(false)
@@ -52,7 +50,6 @@ object AutoP3Utils {
         if (!stop) return
         walking = false
         yeeting = false
-        motioning = false
     }
 
     fun rePressKeys() {
@@ -81,13 +78,8 @@ object AutoP3Utils {
         xSpeed = speed * Utils.xPart(direction)
         zSpeed = speed * Utils.zPart(direction)
         if (walkAfter) {
-            walking = true
             walkAfter = false
-        }
-        else if (motionAfter)  {
-            modMessage("starting motion")
-            motioning = true
-            motionAfter = false
+            ClientUtils.clientScheduleTask(1) { walking = true }
         }
     }
 
@@ -96,7 +88,6 @@ object AutoP3Utils {
         if (event.packet !is S08PacketPlayerPosLook) return
         walking = false
         yeeting = false
-        motioning = false
     }
 
     @SubscribeEvent
@@ -126,8 +117,8 @@ object AutoP3Utils {
                 mc.thePlayer.motionZ = Utils.zPart(direction) * speed
             }
             else {
-                mc.thePlayer.motionX += mc.thePlayer.capabilities.walkSpeed * 0.0509 * Utils.xPart(direction)
-                mc.thePlayer.motionZ += mc.thePlayer.capabilities.walkSpeed * 0.0509 * Utils.zPart(direction)
+                mc.thePlayer.motionX += mc.thePlayer.capabilities.walkSpeed * motionValue/10000 * Utils.xPart(direction)
+                mc.thePlayer.motionZ += mc.thePlayer.capabilities.walkSpeed * motionValue/10000 * Utils.zPart(direction)
             }
         }
         yeetTicks++
@@ -136,11 +127,11 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun movement(event: ClientTickEvent) {
-        if (mc.thePlayer == null) return
+        if (mc.thePlayer == null || event.phase != TickEvent.Phase.START) return
         if (mc.thePlayer.onGround) air = 0
         else air++
 
-        if (!walking || event.phase != TickEvent.Phase.START) return
+        if (!walking) return
 
         if (air <= 1)  {
             val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
@@ -157,31 +148,6 @@ object AutoP3Utils {
         }
     }
 
-    @SubscribeEvent
-    fun motion(event: ClientTickEvent) {
-        if (!motioning || event.phase != TickEvent.Phase.END) return
-        if (mc.thePlayer.onGround) {
-            walking = true
-            motioning = false
-            val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
-            xSpeed = speed * Utils.xPart(direction)
-            zSpeed = speed * Utils.zPart(direction)
-            mc.thePlayer.motionX = speed * Utils.xPart(direction)
-            mc.thePlayer.motionZ = speed * Utils.zPart(direction)
-        }
-        else {
-            modMessage("motioning")
-            mc.thePlayer.motionX *= 0.925
-            mc.thePlayer.motionZ *= 0.925
-            mc.thePlayer.motionX *= 1.1
-            mc.thePlayer.motionZ *= 1.1
-        }
-    }
-
-
-
-
-
     fun distanceToRing(coords: Vec3): Double {
         if(AutoP3.frame) return (coords.xCoord-mc.thePlayer.renderX).pow(2)+(coords.zCoord-mc.thePlayer.renderZ).pow(2).pow(0.5)
         return (coords.xCoord-mc.thePlayer.posX).pow(2)+(coords.zCoord-mc.thePlayer.posZ).pow(2).pow(0.5)
@@ -194,13 +160,12 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun onKeyInput(event: InputEvent.KeyInputEvent) {
-        if (!walking && !yeeting && !motioning) return
+        if (!walking && !yeeting) return
         val keyCode = Keyboard.getEventKey()
         if (keyCode != Keyboard.KEY_W && keyCode != Keyboard.KEY_A && keyCode != Keyboard.KEY_S && keyCode != Keyboard.KEY_D ) return
         if (!Keyboard.getEventKeyState()) return
         walking = false
         yeeting = false
-        motioning = false
     }
 
     @SubscribeEvent
