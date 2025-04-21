@@ -1,7 +1,7 @@
 package com.github.wadey3636.noobroutes.mixin;
 
 import com.github.wadey3636.noobroutes.features.misc.NoDebuff;
-import me.modcore.events.impl.RenderOverlayNoCaching;
+import me.noobmodcore.events.impl.RenderOverlayNoCaching;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import org.spongepowered.asm.mixin.Mixin;
@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static me.modcore.utils.Utils.postAndCatch;
+import static me.noobmodcore.utils.Utils.postAndCatch;
 
 @Mixin(value = EntityRenderer.class)
 abstract public class MixinEntityRenderer implements IResourceManagerReloadListener {

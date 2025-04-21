@@ -2,21 +2,22 @@ package com.github.wadey3636.noobroutes.features.floor7
 
 
 import com.github.wadey3636.noobroutes.utils.RotationUtils.getYawAndPitch
-import me.modcore.Core.logger
-import me.modcore.events.impl.BlockChangeEvent
-import me.modcore.features.Category
-import me.modcore.features.Module
-import me.modcore.features.impl.render.ClickGUIModule.devMode
-import me.modcore.features.settings.Setting.Companion.withDependency
-import me.modcore.features.settings.impl.*
-import me.modcore.utils.clock.Executor
-import me.modcore.utils.clock.Executor.Companion.register
-import me.modcore.utils.render.Color
-import me.modcore.utils.render.RenderUtils.drawStringInWorld
-import me.modcore.utils.render.Renderer
-import me.modcore.utils.skyblock.LocationUtils
-import me.modcore.utils.skyblock.devMessage
-import me.modcore.utils.skyblock.sendCommand
+import me.noobmodcore.Core.logger
+import me.noobmodcore.events.impl.BlockChangeEvent
+import me.noobmodcore.events.impl.ChatPacketEvent
+import me.noobmodcore.features.Category
+import me.noobmodcore.features.Module
+import me.noobmodcore.features.impl.render.ClickGUIModule.devMode
+import me.noobmodcore.features.settings.Setting.Companion.withDependency
+import me.noobmodcore.features.settings.impl.*
+import me.noobmodcore.utils.clock.Executor
+import me.noobmodcore.utils.clock.Executor.Companion.register
+import me.noobmodcore.utils.render.Color
+import me.noobmodcore.utils.render.RenderUtils.drawStringInWorld
+import me.noobmodcore.utils.render.Renderer
+import me.noobmodcore.utils.skyblock.LocationUtils
+import me.noobmodcore.utils.skyblock.devMessage
+import me.noobmodcore.utils.skyblock.sendCommand
 import net.minecraft.block.Block
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
@@ -49,8 +50,8 @@ object AutoSS : Module(
     private val forceDevice by BooleanSetting("Force Device", false, description = "").withDependency {devMode}
     private val resetSSKeybind by KeybindSetting("Reset SS", Keyboard.KEY_NONE, "Resets AutoSS on press").onPress { resetKey() }
 
-
-    private val autoStart by NumberSetting("Autostart delay", 125.0, 50.0, 200.0, 1.0, unit = "ms", description = "")
+    private val autoStart by BooleanSetting("Autostart", true, description = "Automatically starts autoSS")
+    private val autoStartDelay by NumberSetting("Autostart delay", 125.0, 50.0, 200.0, 1.0, unit = "ms", description = "The delay used for starting autoSS")
     private val dontCheck by BooleanSetting("Faster SS?", false, description = "idk what this means")
     private val sendSSBroke by BooleanSetting("Send SS Broke", description = "If The player hits the restart SS Keybind")
 
@@ -111,7 +112,7 @@ object AutoSS : Module(
                     for (i in 0 until 2) {
                         reset()
                         clickButton(startButton.x, startButton.y, startButton.z)
-                        Thread.sleep(Random.nextInt(autoStart.toInt(), autoStart.toInt() * 1136 / 1000).toLong())
+                        Thread.sleep(Random.nextInt(autoStartDelay.toInt(), autoStartDelay.toInt() * 1136 / 1000).toLong())
                     }
                     doingSS = true
                     clickButton(startButton.x, startButton.y, startButton.z)
@@ -179,6 +180,13 @@ object AutoSS : Module(
             }
         }.register()
     }
+
+    @SubscribeEvent
+    fun onChat(event: ChatPacketEvent){
+        if (event.message == "[BOSS] Goldor: Who dares trespass into my domain?" && autoStart) start()
+    }
+
+
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {

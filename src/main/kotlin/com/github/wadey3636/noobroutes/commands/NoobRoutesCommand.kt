@@ -1,7 +1,7 @@
 package com.github.wadey3636.noobroutes.commands
 
-import me.modcore.Core.display
-import me.modcore.ui.clickgui.ClickGUI
+import me.noobmodcore.Core.display
+import me.noobmodcore.ui.clickgui.ClickGUI
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import org.apache.logging.log4j.LogManager

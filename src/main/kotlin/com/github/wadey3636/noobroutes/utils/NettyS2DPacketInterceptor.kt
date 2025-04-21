@@ -2,11 +2,11 @@ package com.github.wadey3636.noobroutes.utils
 
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
-import me.modcore.events.impl.MelodyOpenEvent
-import me.modcore.events.impl.S08Event
-import me.modcore.events.impl.S2FPacketSetSlotEvent
-import me.modcore.events.impl.S2DEvent
-import me.modcore.utils.postAndCatch
+import me.noobmodcore.events.impl.MelodyOpenEvent
+import me.noobmodcore.events.impl.S08Event
+import me.noobmodcore.events.impl.S2FPacketSetSlotEvent
+import me.noobmodcore.events.impl.S2DEvent
+import me.noobmodcore.utils.postAndCatch
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot

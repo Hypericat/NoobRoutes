@@ -2,16 +2,16 @@ package com.github.wadey3636.noobroutes.features.misc
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
-import me.modcore.events.impl.PacketEvent
-import me.modcore.features.Category
-import me.modcore.features.Module
-import me.modcore.features.settings.impl.BooleanSetting
-import me.modcore.ui.clickgui.ClickGUI
-import me.modcore.utils.render.Color
-import me.modcore.utils.render.TextAlign
-import me.modcore.utils.render.roundedRectangle
-import me.modcore.utils.render.text
-import me.modcore.utils.skyblock.modMessage
+import me.noobmodcore.events.impl.PacketEvent
+import me.noobmodcore.features.Category
+import me.noobmodcore.features.Module
+import me.noobmodcore.features.settings.impl.BooleanSetting
+import me.noobmodcore.ui.clickgui.ClickGUI
+import me.noobmodcore.utils.render.Color
+import me.noobmodcore.utils.render.TextAlign
+import me.noobmodcore.utils.render.roundedRectangle
+import me.noobmodcore.utils.render.text
+import me.noobmodcore.utils.skyblock.modMessage
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.entity.Entity

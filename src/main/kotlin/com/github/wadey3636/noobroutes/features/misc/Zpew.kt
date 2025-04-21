@@ -2,17 +2,17 @@ package com.github.wadey3636.noobroutes.features.misc
 
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
-import me.modcore.events.impl.PacketEvent
-import me.modcore.features.Category
-import me.modcore.features.Module
-import me.modcore.features.impl.render.ClickGUIModule
-import me.modcore.features.settings.Setting.Companion.withDependency
-import me.modcore.features.settings.impl.BooleanSetting
-import me.modcore.features.settings.impl.NumberSetting
-import me.modcore.features.settings.impl.SelectorSetting
-import me.modcore.features.settings.impl.StringSetting
-import me.modcore.utils.skyblock.*
-import me.modcore.utils.skyblock.dungeon.DungeonUtils
+import me.noobmodcore.events.impl.PacketEvent
+import me.noobmodcore.features.Category
+import me.noobmodcore.features.Module
+import me.noobmodcore.features.impl.render.ClickGUIModule
+import me.noobmodcore.features.settings.Setting.Companion.withDependency
+import me.noobmodcore.features.settings.impl.BooleanSetting
+import me.noobmodcore.features.settings.impl.NumberSetting
+import me.noobmodcore.features.settings.impl.SelectorSetting
+import me.noobmodcore.features.settings.impl.StringSetting
+import me.noobmodcore.utils.skyblock.*
+import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils
 import net.minecraft.block.Block
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C03PacketPlayer
@@ -69,7 +69,7 @@ object Zpew : Module(
 
         if (recentlySentC06s.size >= MAXQUEUEDPACKETS) return false
 
-        while (recentFails.size != 0 && System.currentTimeMillis() - recentFails[0] > FAILWATCHPERIOD * 1000) recentFails.removeFirst()
+        while (recentFails.isNotEmpty() && System.currentTimeMillis() - recentFails[0] > FAILWATCHPERIOD * 1000) recentFails.removeFirst()
 
         return recentFails.size < MAXFAILSPERFAILPERIOD
     }
@@ -211,7 +211,7 @@ object Zpew : Module(
         devMessage("Failed")
 
         recentFails.add(System.currentTimeMillis())
-        while (recentlySentC06s.size > 0) recentlySentC06s.removeFirst()
+        while (recentlySentC06s.isNotEmpty()) recentlySentC06s.removeFirst()
     }
 
     @SubscribeEvent

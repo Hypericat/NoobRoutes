@@ -1,9 +1,6 @@
 package com.github.wadey3636.noobroutes.utils
 
-import me.modcore.Core.mc
-import me.modcore.utils.render.Color
-import me.modcore.utils.render.Renderer
-import me.modcore.utils.skyblock.devMessage
+import me.noobmodcore.Core.mc
 import net.minecraft.util.Vec3
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
@@ -19,7 +16,17 @@ object BowUtils {
 
     private val linesList = mutableListOf<ArrayList<Vec3>>()
     /**
-     * Adapted from odin
+     * Adapted from odin.
+     *
+     *
+     * Calculates and identifies entities hit in the path of a projectile based on the given origin,
+     * yaw, and pitch. Determines the trajectory starting from the specified origin point with
+     * an angle defined by yaw and pitch, and simulates the motion of the projectile to detect collisions.
+     *
+     * @param origin The starting position of the projectile, represented as a vector.
+     * @param yaw The horizontal angle (in degrees) defining the direction of the projectile.
+     * @param pitch The vertical angle (in degrees) defining the trajectory elevation of the projectile.
+     * @return A list of entities hit by the simulated projectile trajectory, or null if no entities are hit.
      */
     fun findHitEntity(origin: Vec3, yaw: Double, pitch:Double): List<Entity>? {
         val charge = 2f

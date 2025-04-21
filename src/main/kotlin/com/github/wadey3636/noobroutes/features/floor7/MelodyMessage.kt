@@ -1,15 +1,15 @@
 package com.github.wadey3636.noobroutes.features.floor7
 
-import me.modcore.events.impl.MelodyOpenEvent
-import me.modcore.events.impl.PacketEvent
-import me.modcore.events.impl.S2FPacketSetSlotEvent
-import me.modcore.features.Category
-import me.modcore.features.Module
-import me.modcore.features.settings.impl.StringSetting
-import me.modcore.utils.skyblock.devMessage
-import me.modcore.utils.skyblock.modMessage
-import me.modcore.utils.skyblock.sendCommand
-import me.modcore.utils.skyblock.unformattedName
+import me.noobmodcore.events.impl.MelodyOpenEvent
+import me.noobmodcore.events.impl.PacketEvent
+import me.noobmodcore.events.impl.S2FPacketSetSlotEvent
+import me.noobmodcore.features.Category
+import me.noobmodcore.features.Module
+import me.noobmodcore.features.settings.impl.StringSetting
+import me.noobmodcore.utils.skyblock.devMessage
+import me.noobmodcore.utils.skyblock.modMessage
+import me.noobmodcore.utils.skyblock.sendCommand
+import me.noobmodcore.utils.skyblock.unformattedName
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot

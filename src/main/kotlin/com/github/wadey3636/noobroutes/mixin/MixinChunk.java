@@ -1,7 +1,7 @@
 package com.github.wadey3636.noobroutes.mixin;
 
 
-import me.modcore.events.impl.BlockChangeEvent;
+import me.noobmodcore.events.impl.BlockChangeEvent;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static me.modcore.utils.Utils.postAndCatch;
+import static me.noobmodcore.utils.Utils.postAndCatch;
 
 @Mixin(Chunk.class)
 public abstract class MixinChunk {

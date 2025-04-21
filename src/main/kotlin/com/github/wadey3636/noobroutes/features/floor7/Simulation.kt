@@ -1,9 +1,9 @@
 package com.github.wadey3636.noobroutes.features.floor7
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
-import me.modcore.features.Category
-import me.modcore.features.Module
-import me.modcore.features.settings.impl.BooleanSetting
+import me.noobmodcore.features.Category
+import me.noobmodcore.features.Module
+import me.noobmodcore.features.settings.impl.BooleanSetting
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraftforge.event.world.WorldEvent

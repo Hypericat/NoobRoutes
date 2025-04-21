@@ -1,12 +1,10 @@
 package com.github.wadey3636.noobroutes.features.floor7
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
-import me.modcore.events.impl.PacketEvent
-import me.modcore.features.Category
-import me.modcore.features.Module
-import me.modcore.features.settings.impl.NumberSetting
-import me.modcore.utils.skyblock.Island
-import me.modcore.utils.skyblock.LocationUtils
+import me.noobmodcore.events.impl.PacketEvent
+import me.noobmodcore.features.Category
+import me.noobmodcore.features.Module
+import me.noobmodcore.features.settings.impl.NumberSetting
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

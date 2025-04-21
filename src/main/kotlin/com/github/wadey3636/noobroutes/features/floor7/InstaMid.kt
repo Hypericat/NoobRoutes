@@ -2,11 +2,11 @@ package com.github.wadey3636.noobroutes.features.floor7
 
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.inBoss
 import com.github.wadey3636.noobroutes.utils.PacketUtils
-import me.modcore.events.impl.PacketEvent
-import me.modcore.features.Category
-import me.modcore.features.Module
-import me.modcore.utils.noControlCodes
-import me.modcore.utils.skyblock.modMessage
+import me.noobmodcore.events.impl.PacketEvent
+import me.noobmodcore.features.Category
+import me.noobmodcore.features.Module
+import me.noobmodcore.utils.noControlCodes
+import me.noobmodcore.utils.skyblock.modMessage
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook

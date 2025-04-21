@@ -5,11 +5,11 @@ import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import com.github.wadey3636.noobroutes.utils.RotationUtils.getYawAndPitch
-import me.modcore.events.impl.PacketEvent
-import me.modcore.features.Category
-import me.modcore.features.Module
-import me.modcore.features.settings.Setting.Companion.withDependency
-import me.modcore.features.settings.impl.BooleanSetting
+import me.noobmodcore.events.impl.PacketEvent
+import me.noobmodcore.features.Category
+import me.noobmodcore.features.Module
+import me.noobmodcore.features.settings.Setting.Companion.withDependency
+import me.noobmodcore.features.settings.impl.BooleanSetting
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook

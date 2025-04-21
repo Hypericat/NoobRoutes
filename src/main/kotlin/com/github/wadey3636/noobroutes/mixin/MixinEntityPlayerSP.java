@@ -2,8 +2,8 @@ package com.github.wadey3636.noobroutes.mixin;
 
 import com.github.wadey3636.noobroutes.features.misc.NoDebuff;
 import com.mojang.authlib.GameProfile;
-import me.modcore.events.impl.MotionUpdateEvent;
-import me.modcore.utils.Utils;
+import me.noobmodcore.events.impl.MotionUpdateEvent;
+import me.noobmodcore.utils.Utils;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;

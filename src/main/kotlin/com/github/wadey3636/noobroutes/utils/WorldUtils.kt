@@ -1,6 +1,6 @@
 package com.github.wadey3636.noobroutes.utils
 
-import me.modcore.Core.mc
+import me.noobmodcore.Core.mc
 import net.minecraft.block.Block
 import net.minecraft.block.BlockButton
 import net.minecraft.block.BlockLever
@@ -120,6 +120,12 @@ object BlockUtils {
         return point == null || !(point.xCoord >= minX) || !(point.xCoord <= maxX) || !(point.yCoord >= minY) || !(point.yCoord <= maxY)
     }
 
+    /**
+     * Retrieves the Axis-Aligned Bounding Box (AABB) for a specific block, based on its position and state.
+     *
+     * @param block The position of the block in the world, represented as a [BlockPos].
+     * @return The corresponding [AxisAlignedBB] for the block if defined, or null if no bounding box is applicable.
+     */
     fun getAABB(block: BlockPos): AxisAlignedBB? {
         val blockState = mc.theWorld.getBlockState(block)
         return when (blockState.block) {

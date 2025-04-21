@@ -1,9 +1,9 @@
 package com.github.wadey3636.noobroutes.features
 
-import me.modcore.features.Category
-import me.modcore.features.Module
-import me.modcore.features.settings.impl.*
-import me.modcore.utils.render.Color
+import me.noobmodcore.features.Category
+import me.noobmodcore.features.Module
+import me.noobmodcore.features.settings.impl.*
+import me.noobmodcore.utils.render.Color
 
 object ElementTester : Module(
     name = "Element Tester",

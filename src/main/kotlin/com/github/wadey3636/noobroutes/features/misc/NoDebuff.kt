@@ -1,9 +1,9 @@
 package com.github.wadey3636.noobroutes.features.misc
 
-import me.modcore.events.impl.PacketEvent
-import me.modcore.features.Module
-import me.modcore.features.settings.impl.BooleanSetting
-import me.modcore.utils.equalsOneOf
+import me.noobmodcore.events.impl.PacketEvent
+import me.noobmodcore.features.Module
+import me.noobmodcore.features.settings.impl.BooleanSetting
+import me.noobmodcore.utils.equalsOneOf
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.network.play.server.S2APacketParticles

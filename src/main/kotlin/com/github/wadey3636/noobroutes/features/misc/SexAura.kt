@@ -2,12 +2,12 @@ package com.github.wadey3636.noobroutes.features.misc
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
-import me.modcore.features.Category
-import me.modcore.features.Module
-import me.modcore.features.settings.impl.BooleanSetting
-import me.modcore.features.settings.impl.NumberSetting
-import me.modcore.utils.skyblock.modMessage
-import me.modcore.utils.skyblock.sendCommand
+import me.noobmodcore.features.Category
+import me.noobmodcore.features.Module
+import me.noobmodcore.features.settings.impl.BooleanSetting
+import me.noobmodcore.features.settings.impl.NumberSetting
+import me.noobmodcore.utils.skyblock.modMessage
+import me.noobmodcore.utils.skyblock.sendCommand
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C01PacketChatMessage

@@ -2,15 +2,13 @@ package com.github.wadey3636.noobroutes.features.move
 
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
-import me.modcore.events.impl.PacketEvent
-import me.modcore.features.Category
-import me.modcore.features.Module
-import me.modcore.features.settings.impl.NumberSetting
-import me.modcore.utils.render.Color
-import me.modcore.utils.render.TextAlign
-import me.modcore.utils.render.text
-import me.modcore.utils.skyblock.Island
-import me.modcore.utils.skyblock.LocationUtils
+import me.noobmodcore.events.impl.PacketEvent
+import me.noobmodcore.features.Category
+import me.noobmodcore.features.Module
+import me.noobmodcore.features.settings.impl.NumberSetting
+import me.noobmodcore.utils.render.Color
+import me.noobmodcore.utils.render.TextAlign
+import me.noobmodcore.utils.render.text
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraftforge.client.event.RenderGameOverlayEvent

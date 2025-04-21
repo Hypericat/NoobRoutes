@@ -2,8 +2,8 @@ package com.github.wadey3636.noobroutes.utils
 
 
 
-import me.modcore.Core.mc
-import me.modcore.events.impl.PacketEvent
+import me.noobmodcore.Core.mc
+import me.noobmodcore.events.impl.PacketEvent
 import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraftforge.fml.common.eventhandler.EventPriority
