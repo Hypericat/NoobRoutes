@@ -1,9 +1,9 @@
 package com.github.wadey3636.noobroutes.features.move
 
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3
-import me.defnotstolen.events.impl.PacketEvent
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
+import me.modcore.events.impl.PacketEvent
+import me.modcore.features.Category
+import me.modcore.features.Module
 import net.minecraft.network.play.server.S27PacketExplosion
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard

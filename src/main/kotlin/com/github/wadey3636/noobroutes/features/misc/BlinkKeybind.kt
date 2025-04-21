@@ -2,16 +2,16 @@ package com.github.wadey3636.noobroutes.features.misc
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
-import me.defnotstolen.events.impl.PacketEvent
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.features.settings.impl.BooleanSetting
-import me.defnotstolen.ui.clickgui.ClickGUI
-import me.defnotstolen.utils.render.Color
-import me.defnotstolen.utils.render.TextAlign
-import me.defnotstolen.utils.render.roundedRectangle
-import me.defnotstolen.utils.render.text
-import me.defnotstolen.utils.skyblock.modMessage
+import me.modcore.events.impl.PacketEvent
+import me.modcore.features.Category
+import me.modcore.features.Module
+import me.modcore.features.settings.impl.BooleanSetting
+import me.modcore.ui.clickgui.ClickGUI
+import me.modcore.utils.render.Color
+import me.modcore.utils.render.TextAlign
+import me.modcore.utils.render.roundedRectangle
+import me.modcore.utils.render.text
+import me.modcore.utils.skyblock.modMessage
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.entity.Entity

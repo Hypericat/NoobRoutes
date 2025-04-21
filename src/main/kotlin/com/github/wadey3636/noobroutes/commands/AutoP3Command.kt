@@ -1,7 +1,7 @@
 package com.github.wadey3636.noobroutes.commands
 
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3
-import me.defnotstolen.utils.skyblock.modMessage
+import me.modcore.utils.skyblock.modMessage
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 
@@ -15,7 +15,7 @@ class AutoP3Command: CommandBase() {
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Blink, Start")
+        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Blink, Start, Restore, Load")
         AutoP3.handleNoobCommand(args)
     }
 

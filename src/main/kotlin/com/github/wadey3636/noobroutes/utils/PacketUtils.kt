@@ -1,7 +1,9 @@
 package com.github.wadey3636.noobroutes.utils
 
-import me.defnotstolen.Core.mc
-import me.defnotstolen.events.impl.PacketEvent
+
+
+import me.modcore.Core.mc
+import me.modcore.events.impl.PacketEvent
 import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -13,7 +15,6 @@ object PacketUtils {
     fun sendPacket(packet: Packet<*>?) {
         mc.netHandler.networkManager.sendPacket(packet)
     }
-
 
     @Throws(IndexOutOfBoundsException::class)
     fun c03ScheduleTask(ticks: Int, cancel: Boolean = false, callback: () -> Unit) {
@@ -29,18 +30,24 @@ object PacketUtils {
 
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onTick(event: PacketEvent.Send) {
+    fun onPacket(event: PacketEvent.Send) {
         if (event.packet !is C03PacketPlayer) return
+        val toRun = mutableListOf<() -> Unit>()
         scheduledTasks.removeAll {
             if (it.ticks <= 0) {
                 if (it.cancel) event.isCanceled = true
-                mc.addScheduledTask { it.callback() }
+                toRun.add(it.callback)
                 true
             } else {
                 it.ticks--
                 false
             }
         }
+        toRun.forEach {
+            mc.addScheduledTask { it() }
+        }
+
+
     }
 
 

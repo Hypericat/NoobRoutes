@@ -8,23 +8,22 @@ import com.github.wadey3636.noobroutes.utils.RotationUtils
 import com.github.wadey3636.noobroutes.utils.Utils.isClose
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import me.defnotstolen.events.impl.S08Event
-import me.defnotstolen.events.impl.ServerTickEvent
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.features.impl.render.ClickGUIModule.devMode
-import me.defnotstolen.features.impl.render.ClickGUIModule.forceHypixel
-import me.defnotstolen.utils.add
-import me.defnotstolen.utils.render.Color
-import me.defnotstolen.utils.render.Renderer
-import me.defnotstolen.utils.skyblock.*
-import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
-import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.currentRoom
-import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import me.defnotstolen.utils.toBlockPos
-import me.defnotstolen.utils.toVec3
-import net.minecraft.client.settings.KeyBinding
+import me.modcore.events.impl.S08Event
+import me.modcore.events.impl.ServerTickEvent
+import me.modcore.features.Category
+import me.modcore.features.Module
+import me.modcore.features.impl.render.ClickGUIModule.devMode
+import me.modcore.features.impl.render.ClickGUIModule.forceHypixel
+import me.modcore.utils.add
+import me.modcore.utils.render.Color
+import me.modcore.utils.render.Renderer
+import me.modcore.utils.skyblock.*
+import me.modcore.utils.skyblock.dungeon.DungeonUtils
+import me.modcore.utils.skyblock.dungeon.DungeonUtils.currentRoom
+import me.modcore.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import me.modcore.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
+import me.modcore.utils.toBlockPos
+import me.modcore.utils.toVec3
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.BlockPos
@@ -234,11 +233,11 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         }
 
 
-        KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, true)
+        PlayerUtils.sneak()
         RotationUtils.setAngleToVec3(target, true)
         ClientUtils.clientScheduleTask(1) {
             PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.keyCode))
+            PlayerUtils.unSneak()
             if (LocationUtils.currentArea.isArea(Island.SinglePlayer) && forceHypixel) {
                 mc.thePlayer.setPosition(target.xCoord, target.yCoord, target.zCoord)
                 mc.thePlayer.setVelocity(0.0, 0.0, 0.0)

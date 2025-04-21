@@ -1,9 +1,9 @@
 package com.github.wadey3636.noobroutes.commands
 
 import com.github.wadey3636.noobroutes.features.misc.AuraTest.blockAuraList
-import me.defnotstolen.Core.mc
-import me.defnotstolen.features.impl.render.ClickGUIModule.devMode
-import me.defnotstolen.utils.skyblock.modMessage
+import me.modcore.Core.mc
+import me.modcore.features.impl.render.ClickGUIModule.devMode
+import me.modcore.utils.skyblock.modMessage
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 

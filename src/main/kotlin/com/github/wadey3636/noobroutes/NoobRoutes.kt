@@ -5,18 +5,18 @@ import com.github.wadey3636.noobroutes.commands.AutoP3Command
 import com.github.wadey3636.noobroutes.commands.NoobRoutesCommand
 import com.github.wadey3636.noobroutes.features.Blink
 import com.github.wadey3636.noobroutes.utils.*
-import me.defnotstolen.Core
-import me.defnotstolen.Core.mc
-import me.defnotstolen.events.EventDispatcher
-import me.defnotstolen.features.ModuleManager
-import me.defnotstolen.font.OdinFont
-import me.defnotstolen.ui.clickgui.ClickGUI
-import me.defnotstolen.utils.clock.Executor
-import me.defnotstolen.utils.render.RenderUtils
-import me.defnotstolen.utils.render.RenderUtils2D
-import me.defnotstolen.utils.render.Renderer
-import me.defnotstolen.utils.skyblock.LocationUtils
-import me.defnotstolen.utils.skyblock.dungeon.ScanUtils
+import me.modcore.Core
+import me.modcore.Core.mc
+import me.modcore.events.EventDispatcher
+import me.modcore.features.ModuleManager
+import me.modcore.font.OdinFont
+import me.modcore.ui.clickgui.ClickGUI
+import me.modcore.utils.clock.Executor
+import me.modcore.utils.render.RenderUtils
+import me.modcore.utils.render.RenderUtils2D
+import me.modcore.utils.render.Renderer
+import me.modcore.utils.skyblock.LocationUtils
+import me.modcore.utils.skyblock.dungeon.ScanUtils
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
@@ -67,7 +67,8 @@ class NoobRoutes {
             Utils,
             LocationUtils,
             EventDispatcher,
-            SwapManager
+            SwapManager,
+            BowUtils
 
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)

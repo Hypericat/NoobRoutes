@@ -2,12 +2,12 @@ package com.github.wadey3636.noobroutes.features.misc
 
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.features.settings.impl.BooleanSetting
-import me.defnotstolen.features.settings.impl.NumberSetting
-import me.defnotstolen.utils.skyblock.modMessage
-import me.defnotstolen.utils.skyblock.sendCommand
+import me.modcore.features.Category
+import me.modcore.features.Module
+import me.modcore.features.settings.impl.BooleanSetting
+import me.modcore.features.settings.impl.NumberSetting
+import me.modcore.utils.skyblock.modMessage
+import me.modcore.utils.skyblock.sendCommand
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C01PacketChatMessage

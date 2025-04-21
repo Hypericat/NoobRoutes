@@ -2,15 +2,15 @@ package com.github.wadey3636.noobroutes.features.puzzle
 
 import com.github.wadey3636.noobroutes.utils.AuraManager
 import com.github.wadey3636.noobroutes.utils.isAir
-import me.defnotstolen.events.impl.RoomEnterEvent
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.features.settings.impl.NumberSetting
-import me.defnotstolen.utils.render.Color
-import me.defnotstolen.utils.render.Renderer
-import me.defnotstolen.utils.skyblock.devMessage
-import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.currentRoomName
-import me.defnotstolen.utils.toVec3
+import me.modcore.events.impl.RoomEnterEvent
+import me.modcore.features.Category
+import me.modcore.features.Module
+import me.modcore.features.settings.impl.NumberSetting
+import me.modcore.utils.render.Color
+import me.modcore.utils.render.Renderer
+import me.modcore.utils.skyblock.devMessage
+import me.modcore.utils.skyblock.dungeon.DungeonUtils.currentRoomName
+import me.modcore.utils.toVec3
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items

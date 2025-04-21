@@ -5,11 +5,11 @@ import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import com.github.wadey3636.noobroutes.utils.RotationUtils.getYawAndPitch
-import me.defnotstolen.events.impl.PacketEvent
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.features.settings.Setting.Companion.withDependency
-import me.defnotstolen.features.settings.impl.BooleanSetting
+import me.modcore.events.impl.PacketEvent
+import me.modcore.features.Category
+import me.modcore.features.Module
+import me.modcore.features.settings.Setting.Companion.withDependency
+import me.modcore.features.settings.impl.BooleanSetting
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
@@ -50,7 +50,7 @@ object Auto4: Module(
     fun onPacket(event: PacketEvent.Receive) {
         if (mc.thePlayer == null) return
         if (mc.thePlayer.getDistance(63.5, 127.0, 35.5) > 1.5 || mc.thePlayer.heldItem?.item != Items.bow) {
-            shotBlocks = mutableListOf<BlockPos>()
+            shotBlocks = mutableListOf()
             return
         }
         if (event.packet is S23PacketBlockChange && devBlocks.contains(event.packet.blockPosition) && event.packet.blockState.block == Blocks.emerald_block) shoot(event.packet.blockPosition)
@@ -60,7 +60,7 @@ object Auto4: Module(
 
     }
 
-    fun shoot(block: BlockPos) {
+    private fun shoot(block: BlockPos) {
         val rotation = getRotation(block)
         if (!silent || Blink.cancelled < 1) {
             mc.thePlayer.rotationYaw = rotation.first
@@ -99,7 +99,10 @@ object Auto4: Module(
         return getYawAndPitch(block.x.toDouble() + 0.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
     }
 
-    @SubscribeEvent
+
+
+    //Why tf is this a thing, it is so ass, kys
+    //@SubscribeEvent
     fun onKey(event: InputEvent) {
         if (shotBlocks.size in 1..8) AutoP3Utils.unPressKeys()
     }

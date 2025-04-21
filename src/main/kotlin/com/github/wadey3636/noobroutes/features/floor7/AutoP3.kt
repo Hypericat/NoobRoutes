@@ -16,28 +16,26 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import me.defnotstolen.Core.logger
-import me.defnotstolen.Core.mc
-import me.defnotstolen.config.DataManager
-import me.defnotstolen.events.impl.PacketEvent
-import me.defnotstolen.events.impl.TerminalOpenedEvent
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.features.settings.Setting.Companion.withDependency
-import me.defnotstolen.features.settings.impl.*
-import me.defnotstolen.ui.hud.HudElement
-import me.defnotstolen.utils.LookVec
-import me.defnotstolen.utils.render.Color
-import me.defnotstolen.utils.render.Renderer
-import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils
-import me.defnotstolen.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import me.defnotstolen.utils.skyblock.modMessage
-import net.minecraft.block.Block
+import me.modcore.Core.logger
+import me.modcore.Core.mc
+import me.modcore.config.DataManager
+import me.modcore.events.impl.PacketEvent
+import me.modcore.events.impl.TerminalOpenedEvent
+import me.modcore.features.Category
+import me.modcore.features.Module
+import me.modcore.features.settings.Setting.Companion.withDependency
+import me.modcore.features.settings.impl.*
+import me.modcore.ui.hud.HudElement
+import me.modcore.utils.LookVec
+import me.modcore.utils.render.Color
+import me.modcore.utils.render.Renderer
+import me.modcore.utils.skyblock.dungeon.DungeonUtils
+import me.modcore.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
+import me.modcore.utils.skyblock.modMessage
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S18PacketEntityTeleport
-import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -254,6 +252,7 @@ object AutoP3: Module (
             "pickup" -> SexAura.pickupLineByName(args)
             "restore" -> restoreRing()
             "test" -> testFunctions(args)
+            "load" -> loadRings()
             else -> modMessage("not an option")
         }
     }

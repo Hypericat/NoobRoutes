@@ -3,8 +3,8 @@ package com.github.wadey3636.noobroutes.features.move
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.ClientUtils
 import com.github.wadey3636.noobroutes.utils.Utils
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
+import me.modcore.features.Category
+import me.modcore.features.Module
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import org.lwjgl.input.Keyboard

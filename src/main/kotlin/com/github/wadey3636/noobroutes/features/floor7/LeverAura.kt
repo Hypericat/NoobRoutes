@@ -1,10 +1,10 @@
 package com.github.wadey3636.noobroutes.features.floor7
 
 import com.github.wadey3636.noobroutes.utils.AuraManager
-import me.defnotstolen.features.Category
-import me.defnotstolen.features.Module
-import me.defnotstolen.features.settings.impl.NumberSetting
-import me.defnotstolen.utils.toVec3
+import me.modcore.features.Category
+import me.modcore.features.Module
+import me.modcore.features.settings.impl.NumberSetting
+import me.modcore.utils.toVec3
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent

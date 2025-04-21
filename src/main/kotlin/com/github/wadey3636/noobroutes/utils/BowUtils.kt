@@ -1,0 +1,107 @@
+package com.github.wadey3636.noobroutes.utils
+
+import me.modcore.Core.mc
+import me.modcore.utils.render.Color
+import me.modcore.utils.render.Renderer
+import me.modcore.utils.skyblock.devMessage
+import net.minecraft.util.Vec3
+import net.minecraft.entity.Entity
+import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.projectile.EntityArrow
+import net.minecraft.util.AxisAlignedBB
+import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.*
+
+object BowUtils {
+
+    private const val RANGE = 40
+
+    private val linesList = mutableListOf<ArrayList<Vec3>>()
+    /**
+     * Adapted from odin
+     */
+    fun findHitEntity(origin: Vec3, yaw: Double, pitch:Double): List<Entity>? {
+        val charge = 2f
+
+        val yawRadians = Math.toRadians(yaw)
+        val pitchRadians = Math.toRadians(pitch)
+
+        val posX = origin.xCoord - cos(Math.toRadians(yaw)) * 0.16
+        val posY = origin.yCoord
+        val posZ = origin.zCoord - sin(Math.toRadians(pitch)) * 0.16
+
+        var motionX = -sin(yawRadians) * cos(pitchRadians)
+        var motionY = -sin(pitchRadians)
+        var motionZ = cos(yawRadians) * cos(pitchRadians)
+
+        val lengthOffset = sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ)
+        motionX = (motionX / lengthOffset) * charge * 1.5
+        motionY = (motionY / lengthOffset) * charge * 1.5
+        motionZ = (motionZ / lengthOffset) * charge * 1.5
+
+        return calculateBowTrajectory(Vec3(motionX, motionY, motionZ), Vec3(posX, posY, posZ))
+    }
+
+    /**
+     * Adapted from odin
+     */
+    private fun calculateBowTrajectory(mV: Vec3,pV: Vec3): List<Entity>? {
+        var motionVec = mV
+        var posVec = pV
+        //val lines = arrayListOf<Vec3>()
+        repeat(RANGE + 1) {
+            //lines.add(posVec)
+            val aabb = AxisAlignedBB(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+                .offset(posVec.xCoord, posVec.yCoord, posVec.zCoord)
+                .addCoord(motionVec.xCoord, motionVec.yCoord, motionVec.zCoord)
+                .expand(0.01, 0.01, 0.01)
+            val entityHit = mc.theWorld?.getEntitiesWithinAABBExcludingEntity(mc.thePlayer, aabb)?.filter { it !is EntityArrow && it !is EntityArmorStand }.orEmpty()
+            if (entityHit.isNotEmpty()) {
+                //if (!linesList.contains(lines)) linesList.add(lines)
+                return entityHit
+            } else {
+                mc.theWorld?.rayTraceBlocks(posVec, motionVec.add(posVec), false, true, false)?.let {
+                    //if (!linesList.contains(lines)) linesList.add(lines)
+                    return null
+                }
+            }
+            posVec = posVec.add(motionVec)
+            motionVec = Vec3(motionVec.xCoord * 0.99, motionVec.yCoord * 0.99 - 0.05, motionVec.zCoord * 0.99)
+        }
+        //if (!linesList.contains(lines)) linesList.add(lines)
+        return null
+
+    }
+
+    @SubscribeEvent
+    fun debug(event: RenderWorldLastEvent){
+        //linesList.forEach {
+        //    Renderer.draw3DLine(it, Color.GREEN)
+        //}
+    }
+
+
+
+    /**
+     * Adapted from cga
+     * @param x X position to aim at.
+     * @param y Y position to aim at.
+     * @param z Z position to aim at.
+     * @
+     */
+    fun getYawAndPitchOrigin(origin: Vec3, pos: Vec3): Pair<Float, Float> {
+        val dx = pos.xCoord - origin.xCoord
+        val dy = pos.yCoord - origin.yCoord
+        val dz = pos.zCoord - origin.zCoord
+
+        val horizontalDistance = sqrt(dx * dx + dz * dz )
+
+        val yaw = Math.toDegrees(atan2(-dx, dz))
+        val pitch = -Math.toDegrees(atan2(dy, horizontalDistance))
+
+        val normalizedYaw = if (yaw < -180) yaw + 360 else yaw
+        return Pair(normalizedYaw.toFloat(), pitch.toFloat())
+    }
+
+}
