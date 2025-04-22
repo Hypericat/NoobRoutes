@@ -96,7 +96,7 @@ object AutoP3: Module (
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     var waitingTerm = false
     var waitingLeap = false
-    private var leaped = 0
+    private var leapedIDs = mutableSetOf<Int>()
     var inBoss = false
     private val deletedRings  = mutableListOf<Ring>()
 
@@ -120,7 +120,7 @@ object AutoP3: Module (
         }
         waitingTerm = rings[route]?.any { it.type == RingTypes.TERM && !it.should } == true
         waitingLeap = rings[route]?.any { it.type == RingTypes.LEAP && !it.should } == true
-        if (!waitingLeap) leaped = 0
+        if (!waitingLeap) leapedIDs = mutableSetOf<Int>()
     }
 
     @SubscribeEvent
@@ -226,8 +226,8 @@ object AutoP3: Module (
         val x = event.packet.x/32.0 //don't fucking ask why its like this
         val y = event.packet.y/32.0
         val z = event.packet.z/32.0
-        if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistance(x,y,z) < 2) leaped++
-        if (leaped == leapPlayers()) {
+        if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistance(x,y,z) < 2) leapedIDs.add(event.packet.entityId)
+        if (leapedIDs.size == leapPlayers()) {
             modMessage("everyone leaped")
             AutoP3Utils.walking = true
         }
