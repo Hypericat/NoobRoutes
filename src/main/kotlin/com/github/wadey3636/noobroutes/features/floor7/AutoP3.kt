@@ -34,6 +34,7 @@ import me.noobmodcore.utils.skyblock.modMessage
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
+import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -92,6 +93,7 @@ object AutoP3: Module (
     val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes").withDependency { blinkShit }
     val moveHud by HudSetting("Move Hud", HudElement(100f, 50f, false, settingName = "Move Hud")).withDependency { blinkShit }
     val toggleSG by BooleanSetting("SG toggle", default = false, description = "Disable Secret guide in boss")
+    private val fixBounce by BooleanSetting("fix lava bounce", default = false, description = "tries to fix inconsistent lava bounce for wadey")
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     var waitingTerm = false
@@ -210,6 +212,14 @@ object AutoP3: Module (
     fun stopOrNot(ring: RingTypes) {
         if (ring == RingTypes.TNT) return
         else AutoP3Utils.unPressKeys()
+    }
+
+    @SubscribeEvent
+    fun onS12(event: PacketEvent.Receive) {
+        if (event.packet !is S12PacketEntityVelocity || event.packet.entityID != mc.thePlayer.entityId || event.packet.motionY != 26000 || !fixBounce) return
+        modMessage("fixing the bounce")
+        event.isCanceled = true
+        mc.thePlayer.motionY = 3.5
     }
 
     @SubscribeEvent
