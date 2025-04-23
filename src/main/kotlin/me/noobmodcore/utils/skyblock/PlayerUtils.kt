@@ -35,6 +35,7 @@ object PlayerUtils {
     }
 
     fun airClick(){
+        devMessage("Clicked")
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
     }
 

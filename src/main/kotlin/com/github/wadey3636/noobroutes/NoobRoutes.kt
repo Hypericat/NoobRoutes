@@ -68,7 +68,8 @@ class NoobRoutes {
             LocationUtils,
             EventDispatcher,
             SwapManager,
-            BowUtils
+            BowUtils,
+            RotationUtils
 
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)

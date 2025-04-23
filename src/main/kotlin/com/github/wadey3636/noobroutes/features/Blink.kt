@@ -24,6 +24,7 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.sin
 
@@ -229,10 +230,17 @@ object Blink{
         if (event.packet is S08PacketPlayerPosLook) c03AfterS08 = 2
     }
 
-    @SubscribeEvent
+    var rotSkip = false
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun canceller(event: PacketEvent.Send) {
         if(!inBoss) return
         if (event.packet !is C03PacketPlayer) return
+        if (rotSkip) {
+            rotSkip = false
+            return
+        }
+
         if (skip) return
         if (awaitingRotation) {
             awaitingRotation = false

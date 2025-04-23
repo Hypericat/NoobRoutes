@@ -107,11 +107,13 @@ object Zpew : Module(
         if (dingdingding) PlayerUtils.playLoudSound(getSound(), 100f, Zpew.pitch.toFloat())
 
         ClientUtils.clientScheduleTask(0) {
-            mc.netHandler.addToSendQueue(C06PacketPlayerPosLook(x, y, z, yaw, pitch, mc.thePlayer.onGround))
-            if (zpewOffset) y -= 0.05
-            mc.thePlayer.setPosition(x, y, z)
-            mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
+            sendChatMessage("/tp $x $y $z")
             updatePosition = true
+            //mc.netHandler.addToSendQueue(C06PacketPlayerPosLook(x, y, z, yaw, pitch, mc.thePlayer.onGround))
+            //if (zpewOffset) y -= 0.05
+            //mc.thePlayer.setPosition(x, y, z)
+            //mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
+            //updatePosition = true
         }
     }
 
@@ -156,6 +158,7 @@ object Zpew : Module(
         val z = event.packet.positionZ
         val yaw = event.packet.yaw
         val pitch = event.packet.pitch
+
 
         if (event.packet.isMoving) {
             lastX = x

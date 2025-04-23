@@ -87,7 +87,7 @@ dependencies {
     shadowImpl(kotlin("stdlib-jdk8"))
 
     //compileOnly("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all")
-    shadowImpl("gg.essential:loader-launchwrapper:1.1.3")
+    //shadowImpl("gg.essential:loader-launchwrapper:1.1.3")
     implementation("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5") {
         exclude(module = "asm")
         exclude(module = "asm-commons")

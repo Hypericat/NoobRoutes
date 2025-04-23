@@ -1,10 +1,11 @@
 package com.github.wadey3636.noobroutes.features.move
 
+import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-object InstantSlow : Module("Instant Slow", description = "Instantly stops momentum when you are not pressing wasd while in creative fly.") {
+object InstantSlow : Module("Instant Slow", description = "Instantly stops momentum when you are not pressing wasd while in creative fly.", category = Category.MOVE) {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {

@@ -23,6 +23,8 @@ object LocationUtils {
         private set
     var isInSkyblock: Boolean = false
 
+    inline val isSinglePlayer get() = currentArea.isArea(Island.SinglePlayer)
+
     var currentDungeon: Dungeon? = null
         private set
     var currentArea: Island = Island.Unknown

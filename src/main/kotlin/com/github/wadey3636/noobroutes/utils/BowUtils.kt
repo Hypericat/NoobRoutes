@@ -1,12 +1,15 @@
 package com.github.wadey3636.noobroutes.utils
 
 import me.noobmodcore.Core.mc
+import me.noobmodcore.utils.render.Color
+import me.noobmodcore.utils.render.Renderer
 import net.minecraft.util.Vec3
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityArrow
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.*
 
@@ -53,39 +56,39 @@ object BowUtils {
     /**
      * Adapted from odin
      */
-    private fun calculateBowTrajectory(mV: Vec3,pV: Vec3): List<Entity>? {
+    private fun calculateBowTrajectory(mV: Vec3, pV: Vec3): List<Entity>? {
         var motionVec = mV
         var posVec = pV
-        //val lines = arrayListOf<Vec3>()
+        val lines = arrayListOf<Vec3>()
         repeat(RANGE + 1) {
-            //lines.add(posVec)
+            lines.add(posVec)
             val aabb = AxisAlignedBB(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
                 .offset(posVec.xCoord, posVec.yCoord, posVec.zCoord)
                 .addCoord(motionVec.xCoord, motionVec.yCoord, motionVec.zCoord)
                 .expand(0.01, 0.01, 0.01)
-            val entityHit = mc.theWorld?.getEntitiesWithinAABBExcludingEntity(mc.thePlayer, aabb)?.filter { it !is EntityArrow && it !is EntityArmorStand }.orEmpty()
+            val entityHit = mc.theWorld?.getEntitiesWithinAABBExcludingEntity(mc.thePlayer, aabb)
+                ?.filter { it !is EntityArrow && it !is EntityArmorStand }.orEmpty()
             if (entityHit.isNotEmpty()) {
-                //if (!linesList.contains(lines)) linesList.add(lines)
+                if (!linesList.any { it.containsAll(lines) && it.size == lines.size }) linesList.add(lines)
                 return entityHit
             } else {
                 mc.theWorld?.rayTraceBlocks(posVec, motionVec.add(posVec), false, true, false)?.let {
-                    //if (!linesList.contains(lines)) linesList.add(lines)
+                    //if (!linesList.any { it.containsAll(lines) && it.size == lines.size }) linesList.add(lines)  
                     return null
                 }
             }
             posVec = posVec.add(motionVec)
             motionVec = Vec3(motionVec.xCoord * 0.99, motionVec.yCoord * 0.99 - 0.05, motionVec.zCoord * 0.99)
         }
-        //if (!linesList.contains(lines)) linesList.add(lines)
+        if (!linesList.any { it.containsAll(lines) && it.size == lines.size }) linesList.add(lines)
         return null
-
     }
 
     @SubscribeEvent
     fun debug(event: RenderWorldLastEvent){
-        //linesList.forEach {
-        //    Renderer.draw3DLine(it, Color.GREEN)
-        //}
+        linesList.forEach {
+            Renderer.draw3DLine(it, Color.GREEN)
+        }
     }
 
 
@@ -109,6 +112,10 @@ object BowUtils {
 
         val normalizedYaw = if (yaw < -180) yaw + 360 else yaw
         return Pair(normalizedYaw.toFloat(), pitch.toFloat())
+    }
+    @SubscribeEvent
+    fun onWorld(event: WorldEvent.Unload){
+        linesList.clear()
     }
 
 }

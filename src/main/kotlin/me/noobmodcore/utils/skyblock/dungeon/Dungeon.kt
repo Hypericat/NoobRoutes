@@ -43,12 +43,6 @@ class Dungeon(val floor: Floor) {
         }
     }
 
-    init {
-        scope.launch(Dispatchers.IO) {
-            paul = hasBonusPaulScore()
-        }
-    }
-
     fun enterDungeonRoom(event: RoomEnterEvent) {
         val room = event.room?.takeUnless { room -> passedRooms.any { it.data.name == room.data.name } } ?: return
         val roomSecrets = room.data.secrets
