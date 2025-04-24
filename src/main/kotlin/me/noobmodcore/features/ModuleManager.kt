@@ -24,6 +24,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import me.noobmodcore.ui.hud.EditHUDGui
+import me.odinmain.features.impl.dungeon.puzzlesolvers.WaterBoard
 
 /**
  * Class that contains all Modules and huds
@@ -67,7 +68,7 @@ object ModuleManager {
         InstaMid,
         Auto4,
         LeverAura,
-        //WaterBoard,
+        WaterBoard,
         TicTacToe,
         //AuraTest,
         Weirdos,
