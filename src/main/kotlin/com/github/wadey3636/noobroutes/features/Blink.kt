@@ -1,6 +1,8 @@
 package com.github.wadey3636.noobroutes.features
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.blink
+import com.github.wadey3636.noobroutes.features.floor7.AutoP3.customBlinkLength
+import com.github.wadey3636.noobroutes.features.floor7.AutoP3.customBlinkLengthToggle
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.inBoss
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.maxBlinks
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.mode
@@ -47,9 +49,9 @@ object Blink{
     var movementPackets = mutableListOf<C04PacketPlayerPosition>()
     private var endY = 0.0
     var skip = false
+    private lateinit var lastWaypoint: BlinkWaypoints
 
     private var recording = false
-    private var recordingLength = 0
     private var recordedPackets = mutableListOf<C04PacketPlayerPosition>()
     private lateinit var lastSentC03: C04PacketPlayerPosition
 
@@ -93,6 +95,7 @@ object Blink{
         cancelled = 0
         SecretGuideIntegration.setSecretGuideAura(true)
         inBoss = false
+        customBlinkLengthToggle = false
     }
 
     @SubscribeEvent
@@ -101,6 +104,7 @@ object Blink{
         cancelled = 0
         SecretGuideIntegration.setSecretGuideAura(true)
         inBoss = false
+        customBlinkLengthToggle = false
     }
 
     @SubscribeEvent
@@ -145,7 +149,7 @@ object Blink{
         modMessage("started recording")
         recordedPackets = mutableListOf<C04PacketPlayerPosition>()
         recordedPackets.add(lastSentC03)
-        recordingLength = waypoint.length
+        lastWaypoint = waypoint
         recording = true
 
     }
@@ -217,11 +221,15 @@ object Blink{
             if (recordedPackets.last() == C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)) return
             recordedPackets.add(C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround))
         }
-        if (recordedPackets.size == recordingLength) {
+        if (recordedPackets.size == getRecordingGoalLength(lastWaypoint)) {
             modMessage("finished recording")
             recording = false
-            AutoP3.actuallyAddRing(Ring(RingTypes.BLINK, coords = Vec3(recordedPackets[0].positionX, recordedPackets[0].positionY, recordedPackets[0].positionZ),  blinkPackets = recordedPackets, endY = mc.thePlayer.motionY))
+            AutoP3.actuallyAddRing(Ring(RingTypes.BLINK, coords = lastWaypoint.coords,  blinkPackets = recordedPackets, endY = mc.thePlayer.motionY))
         }
+    }
+
+    fun getRecordingGoalLength(waypoint: BlinkWaypoints): Int {
+        return if (customBlinkLengthToggle) customBlinkLength else waypoint.length
     }
 
     @SubscribeEvent

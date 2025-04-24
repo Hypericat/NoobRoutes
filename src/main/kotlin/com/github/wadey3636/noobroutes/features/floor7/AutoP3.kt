@@ -92,8 +92,9 @@ object AutoP3: Module (
     val showEnd by BooleanSetting("Render End", default = true, description = "renders waypoint where blink ends").withDependency { blinkShit }
     val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes").withDependency { blinkShit }
     val moveHud by HudSetting("Move Hud", HudElement(100f, 50f, false, settingName = "Move Hud")).withDependency { blinkShit }
+    var customBlinkLengthToggle by BooleanSetting("blink length", default = true, description = "allows for changing the blink length of waypoints").withDependency { blinkShit }
+    val customBlinkLength by NumberSetting(name = "length", description = "well how long for the blink to be", min = 1, max = 40, default = 24).withDependency { blinkShit && customBlinkLengthToggle }
     val toggleSG by BooleanSetting("SG toggle", default = false, description = "Disable Secret guide in boss")
-    private val fixBounce by BooleanSetting("fix lava bounce", default = false, description = "tries to fix inconsistent lava bounce for wadey")
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     var waitingTerm = false
@@ -212,14 +213,6 @@ object AutoP3: Module (
     fun stopOrNot(ring: RingTypes) {
         if (ring == RingTypes.TNT) return
         else AutoP3Utils.unPressKeys()
-    }
-
-    @SubscribeEvent
-    fun onS12(event: PacketEvent.Receive) {
-        if (event.packet !is S12PacketEntityVelocity || event.packet.entityID != mc.thePlayer.entityId || event.packet.motionY != 26000 || !fixBounce) return
-        modMessage("fixing the bounce")
-        event.isCanceled = true
-        mc.thePlayer.motionY = 3.5
     }
 
     @SubscribeEvent
