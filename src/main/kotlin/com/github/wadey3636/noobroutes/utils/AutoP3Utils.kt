@@ -78,7 +78,7 @@ object AutoP3Utils {
         zSpeed = speed * Utils.zPart(direction)
         if (walkAfter) {
             walkAfter = false
-            ClientUtils.clientScheduleTask { walking = true }
+            Scheduler.schedulePreTickTask { walking = true }
         }
     }
 

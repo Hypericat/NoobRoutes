@@ -2,7 +2,7 @@ package com.github.wadey3636.noobroutes.features.floor7
 
 import com.github.wadey3636.noobroutes.features.Blink
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import com.github.wadey3636.noobroutes.utils.RotationUtils.getYawAndPitch
 import me.noobmodcore.events.impl.PacketEvent
@@ -12,6 +12,7 @@ import me.noobmodcore.features.settings.Setting.Companion.withDependency
 import me.noobmodcore.features.settings.impl.BooleanSetting
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
+import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S22PacketMultiBlockChange
@@ -65,7 +66,7 @@ object Auto4: Module(
         if (!silent || Blink.cancelled < 1) {
             mc.thePlayer.rotationYaw = rotation.first
             mc.thePlayer.rotationPitch = rotation.second
-            ClientUtils.clientScheduleTask(1) { PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem)) }
+            Scheduler.schedulePreTickTask(1) { PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem)) }
         }
         else if (speedyBoi) {
             PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
@@ -73,14 +74,14 @@ object Auto4: Module(
             PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
         }
         else if (!shit){
-            ClientUtils.clientScheduleTask {
+            Scheduler.schedulePreTickTask {
                 PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
                 Blink.cancelled--
                 PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
             }
         }
         else {
-            PacketUtils.c03ScheduleTask(true) {
+            Scheduler.scheduleC03Task(cancel = true) {
                 PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
                 PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
             }

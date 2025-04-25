@@ -1,12 +1,10 @@
 package me.odinmain.features.impl.dungeon.puzzlesolvers
 
-import codes.som.anthony.koffee.modifiers.open
 import com.github.wadey3636.noobroutes.utils.AuraManager
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import com.github.wadey3636.noobroutes.utils.RotationUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import jdk.nashorn.internal.ir.Block
 import me.noobmodcore.events.impl.PacketEvent
 import me.noobmodcore.events.impl.RoomEnterEvent
 import me.noobmodcore.events.impl.ServerTickEvent
@@ -14,18 +12,14 @@ import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
 import me.noobmodcore.features.settings.impl.NumberSetting
 import me.noobmodcore.utils.skyblock.PlayerUtils
-import me.noobmodcore.utils.skyblock.devMessage
 import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils
 import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import me.noobmodcore.utils.skyblock.getBlockAt
 import me.noobmodcore.utils.skyblock.isAir
 import me.noobmodcore.utils.skyblock.modMessage
 import me.noobmodcore.utils.toBlockPos
-import me.noobmodcore.utils.toVec3
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.init.Blocks
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
@@ -116,12 +110,12 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
             val rot = RotationUtils.getYawAndPitch(realSpot, sneaking = true)
             etherwarp(rot.first, rot.second)
             if (mc.isSingleplayer) {
-                ClientUtils.clientScheduleTask(4) {
+                Scheduler.schedulePreTickTask(4) {
                     mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
                     mc.thePlayer.setPosition(realSpot.xCoord, realSpot.yCoord, realSpot.zCoord)
                     PlayerUtils.unSneak()
                 }
-                ClientUtils.clientScheduleTask(6) {
+                Scheduler.schedulePreTickTask(6) {
                     awaitingS08 = false
                 }
             }
@@ -158,12 +152,12 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
             val rot = RotationUtils.getYawAndPitch(realSpot, sneaking = true)
             etherwarp(rot.first, rot.second)
             if (mc.isSingleplayer) {
-                ClientUtils.clientScheduleTask(4) {
+                Scheduler.schedulePreTickTask(4) {
                     mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
                     mc.thePlayer.setPosition(realSpot.xCoord, realSpot.yCoord, realSpot.zCoord)
                     PlayerUtils.unSneak()
                 }
-                ClientUtils.clientScheduleTask(6) {
+                Scheduler.schedulePreTickTask(6) {
                     awaitingS08 = false
                 }
             }
@@ -181,7 +175,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, true)
         PlayerUtils.sneak()
         awaitingS08 = true
-        ClientUtils.clientScheduleTask(c08delay) {
+        Scheduler.schedulePreTickTask(c08delay) {
             PlayerUtils.airClick()
         }
     }
@@ -189,7 +183,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
     @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook || !awaitingS08) return
-        ClientUtils.clientScheduleTask(s08falseDelay) { awaitingS08 = false }
+        Scheduler.schedulePreTickTask(s08falseDelay) { awaitingS08 = false }
     }
 
     @SubscribeEvent

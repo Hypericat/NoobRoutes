@@ -1,6 +1,6 @@
 package com.github.wadey3636.noobroutes.features.misc
 
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.noobmodcore.events.impl.PacketEvent
 import me.noobmodcore.features.Category
@@ -80,7 +80,7 @@ object BlinkKeybind: Module(
             val entity = event.packet.getEntityFromWorld(mc.theWorld)
             if (hit.any { it.entity == entity && System.currentTimeMillis() - it.lastHit < 500 }) return
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.keyCode, false)
-            ClientUtils.clientScheduleTask { KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.keyCode, Keyboard.isKeyDown(mc.gameSettings.keyBindForward.keyCode)) }
+            Scheduler.schedulePreTickTask { KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.keyCode, Keyboard.isKeyDown(mc.gameSettings.keyBindForward.keyCode)) }
             skip = cancelledPackets.size
             cancelledPackets.forEach { PacketUtils.sendPacket(it) }
             if (hit.any { it.entity == entity }) hit.find { it.entity == entity }?.lastHit = System.currentTimeMillis()

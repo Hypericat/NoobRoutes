@@ -4,6 +4,7 @@ import com.github.wadey3636.noobroutes.features.Blink.skip
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils.walking
 import com.github.wadey3636.noobroutes.utils.PacketUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import com.github.wadey3636.noobroutes.utils.Utils.isClose
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
@@ -44,8 +45,8 @@ object CoreClip: Module(
         cd = 3
         mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, coord1)
         skip = true
-        PacketUtils.c03ScheduleTask {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, coord2)}
-        PacketUtils.c03ScheduleTask(1) {
+        Scheduler.scheduleC03Task {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, coord2)}
+        Scheduler.scheduleC03Task(1) {
             walking = doWalk
             AutoP3Utils.rePressKeys()
             skip = false

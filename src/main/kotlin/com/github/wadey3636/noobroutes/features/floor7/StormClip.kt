@@ -1,6 +1,6 @@
 package com.github.wadey3636.noobroutes.features.floor7
 
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import me.noobmodcore.events.impl.PacketEvent
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
@@ -24,7 +24,7 @@ object StormClip: Module(
     @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook || has ) return
-        if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) ClientUtils.clientScheduleTask(
+        if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) Scheduler.schedulePreTickTask(
             delayTicks
         ) {
             mc.thePlayer.setPosition(73.5, 221.5 - clipDistance, 14.5)

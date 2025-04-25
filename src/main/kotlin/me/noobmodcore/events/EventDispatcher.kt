@@ -1,6 +1,6 @@
 package me.noobmodcore.events
 
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import kotlinx.coroutines.launch
 import me.noobmodcore.Core.mc
 import me.noobmodcore.Core.scope
@@ -76,7 +76,7 @@ object EventDispatcher {
     fun onS2D(event: S2DEvent) {
         if (termTitle != event.packet.windowTitle.unformattedText) TermOpenEvent().postAndCatch()
         termTitle = event.packet.windowTitle.unformattedText
-        ClientUtils.clientScheduleTask(1) { termTitle = "I Love U Wadey" }
+        Scheduler.schedulePreTickTask(1) { termTitle = "I Love U Wadey" }
     }
 
 

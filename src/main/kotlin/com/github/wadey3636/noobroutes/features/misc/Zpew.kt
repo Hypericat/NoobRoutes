@@ -1,7 +1,7 @@
 package com.github.wadey3636.noobroutes.features.misc
 
 
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import me.noobmodcore.events.impl.PacketEvent
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
@@ -16,7 +16,6 @@ import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils
 import net.minecraft.block.Block
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C0BPacketEntityAction
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
@@ -106,7 +105,7 @@ object Zpew : Module(
 
         if (dingdingding) PlayerUtils.playLoudSound(getSound(), 100f, Zpew.pitch.toFloat())
 
-        ClientUtils.clientScheduleTask(0) {
+        Scheduler.schedulePreTickTask(0) {
             sendChatMessage("/tp $x $y $z")
             updatePosition = true
             //mc.netHandler.addToSendQueue(C06PacketPlayerPosLook(x, y, z, yaw, pitch, mc.thePlayer.onGround))

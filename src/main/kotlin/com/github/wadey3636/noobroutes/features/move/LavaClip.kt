@@ -1,7 +1,7 @@
 package com.github.wadey3636.noobroutes.features.move
 
 
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import me.noobmodcore.events.impl.PacketEvent
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
@@ -37,7 +37,7 @@ object LavaClip: Module(
             cancelS12 = true
             val clipDistance = if (ringClip != null) ringClip else lavaDistance.toDouble()
             if (clipDistance == null) return
-            ClientUtils.clientScheduleTask {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - clipDistance, mc.thePlayer.posZ)}
+            Scheduler.schedulePreTickTask {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - clipDistance, mc.thePlayer.posZ)}
         }
     }
 
