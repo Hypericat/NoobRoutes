@@ -1,6 +1,6 @@
 package com.github.wadey3636.noobroutes.features.misc
 
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
@@ -79,10 +79,10 @@ object SexAura: Module(
     private fun sendPickupLine(player: EntityPlayer) {
         if (noobAccounts.contains(player.name) && !wadeyAccounts.contains(mc.thePlayer.name)) {
             modMessage("im not a fucking hoe how dare u (ban in 3)")
-            ClientUtils.clientScheduleTask(20) { modMessage("2...") }
-            ClientUtils.clientScheduleTask(40) { modMessage("1...") }
-            ClientUtils.clientScheduleTask(60) { modMessage("now") }
-            ClientUtils.clientScheduleTask(69) { modMessage("lucky piece of shit i hope u die") }
+            Scheduler.schedulePreTickTask(20) { modMessage("2...") }
+            Scheduler.schedulePreTickTask(40) { modMessage("1...") }
+            Scheduler.schedulePreTickTask(60) { modMessage("now") }
+            Scheduler.schedulePreTickTask(69) { modMessage("lucky piece of shit i hope u die") }
         }
         else if (wadeyAccounts.contains(player.name) && !noobAccounts.contains(mc.thePlayer.name)) {
             modMessage("trying to pickup my pookie bear wadey are we?")
@@ -92,7 +92,7 @@ object SexAura: Module(
         else if (actuallySend) sendCommand("msg ${player.name} ${pickupLines.random()}")
         else modMessage("/msg ${player.name} ${pickupLines.random()}")
         sentList.add(player.name)
-        ClientUtils.clientScheduleTask(200) { sentList.remove(player.name) }
+        Scheduler.schedulePreTickTask(200) { sentList.remove(player.name) }
         lastMessage = System.currentTimeMillis()
     }
 

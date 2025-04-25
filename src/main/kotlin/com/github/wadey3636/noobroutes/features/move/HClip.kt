@@ -2,6 +2,7 @@ package com.github.wadey3636.noobroutes.features.move
 
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import com.github.wadey3636.noobroutes.utils.Utils
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
@@ -62,7 +63,7 @@ object HClip: Module(
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
         AutoP3Utils.unPressKeys()
-        PacketUtils.c03ScheduleTask {
+        Scheduler.scheduleC03Task {
             val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
             mc.thePlayer.motionX = speed * Utils.xPart(mc.thePlayer.rotationYaw + yawChange())
             mc.thePlayer.motionZ = speed * Utils.zPart(mc.thePlayer.rotationYaw + yawChange())

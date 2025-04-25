@@ -1,6 +1,6 @@
 package com.github.wadey3636.noobroutes.features.floor7
 
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
 import me.noobmodcore.features.settings.impl.BooleanSetting
@@ -44,11 +44,11 @@ object Simulation : Module(
             && mc.thePlayer.posY - floor(mc.thePlayer.posY) < 0.1) {
 
             inLava = true
-            ClientUtils.clientScheduleTask(2) {
+            Scheduler.schedulePreTickTask(2) {
                 mc.thePlayer.setVelocity(mc.thePlayer.motionX, 3.5, mc.thePlayer.motionZ)
 
             }
-            ClientUtils.clientScheduleTask(3) { inLava = false }
+            Scheduler.schedulePreTickTask(3) { inLava = false }
         }
     }
 

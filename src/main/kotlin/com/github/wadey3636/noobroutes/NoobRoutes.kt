@@ -59,7 +59,7 @@ class NoobRoutes {
             ClickGUI,
             AutoP3Utils,
             Blink,
-            ClientUtils,
+            Scheduler,
             PacketUtils,
             NettyS2DPacketInterceptor,
             ScanUtils,
@@ -69,7 +69,8 @@ class NoobRoutes {
             EventDispatcher,
             SwapManager,
             BowUtils,
-            RotationUtils
+            RotationUtils,
+            SilentRotator
 
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)

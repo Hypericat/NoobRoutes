@@ -1,7 +1,7 @@
 package com.github.wadey3636.noobroutes.features.move
 
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import com.github.wadey3636.noobroutes.utils.Utils
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
@@ -25,6 +25,6 @@ object InstantAcceleration: Module(
         AutoP3Utils.unPressKeys()
         mc.thePlayer.motionX = speed* Utils.xPart(mc.thePlayer.rotationYaw + differenceL + differenceR)
         mc.thePlayer.motionZ = speed* Utils.zPart(mc.thePlayer.rotationYaw + differenceL + differenceR)
-        ClientUtils.clientScheduleTask { AutoP3Utils.rePressKeys() }
+        Scheduler.schedulePreTickTask { AutoP3Utils.rePressKeys() }
     }
 }

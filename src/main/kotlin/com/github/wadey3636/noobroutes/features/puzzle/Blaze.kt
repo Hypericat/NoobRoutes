@@ -3,8 +3,7 @@ package com.github.wadey3636.noobroutes.features.puzzle
 
 import com.github.wadey3636.noobroutes.utils.AuraManager
 import com.github.wadey3636.noobroutes.utils.BowUtils
-import com.github.wadey3636.noobroutes.utils.ClientUtils
-import com.github.wadey3636.noobroutes.utils.ClientUtils.clientScheduleTask
+import com.github.wadey3636.noobroutes.utils.Scheduler.schedulePreTickTask
 import com.github.wadey3636.noobroutes.utils.RotationUtils
 import com.github.wadey3636.noobroutes.utils.SecretGuideIntegration
 import com.github.wadey3636.noobroutes.utils.SwapManager
@@ -24,7 +23,6 @@ import me.noobmodcore.utils.render.RenderUtils.renderVec
 import me.noobmodcore.utils.render.Renderer
 import me.noobmodcore.utils.skyblock.LocationUtils
 import me.noobmodcore.utils.skyblock.PlayerUtils
-import me.noobmodcore.utils.skyblock.devMessage
 import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils
 import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import me.noobmodcore.utils.skyblock.dungeon.tiles.Room
@@ -57,6 +55,7 @@ object Blaze : Module(
     private val silent by BooleanSetting("Silent", description = "Server Side Rotations. Only works with zpew")
     private var awaitingRoomChange = false
     private var warping = false
+    private var warped = false
     private var hasAuraedBlock = false
 
     private val shotCooldown by NumberSetting(
@@ -147,11 +146,12 @@ object Blaze : Module(
         PlayerUtils.unPressKeys()
         PlayerUtils.sneak()
         warping = true
+        warped = true
         mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
         val state = SwapManager.swapFromSBId("ASPECT_OF_THE_END", "ASPECT_OF_THE_VOID")
         val rot = RotationUtils.getYawAndPitch(vec3, true)
         rotateAndClick(state, rot)
-        if (LocationUtils.isSinglePlayer) clientScheduleTask(3) { warping = false }
+        if (LocationUtils.isSinglePlayer) schedulePreTickTask(3) { warping = false }
     }
 
 
@@ -174,7 +174,7 @@ object Blaze : Module(
         if (mc.thePlayer.posY > 60) return
         var ewPoints: List<Vec3>
         if (room.data.name == "Lower Blaze") {
-            devMessage("${mc.thePlayer.positionVector}, ${room.getRealCoords(12, 70, 24).toVec3().add(0.5, 1.0, 0.5)}, ${ room.getRealCoords(12, 70, 24).toVec3().add(0.5, 1.0, 0.5).distanceTo(mc.thePlayer.positionVector) < 0.1}")
+            //devMessage("${mc.thePlayer.positionVector}, ${room.getRealCoords(12, 70, 24).toVec3().add(0.5, 1.0, 0.5)}, ${ room.getRealCoords(12, 70, 24).toVec3().add(0.5, 1.0, 0.5).distanceTo(mc.thePlayer.positionVector) < 0.1}")
 
             ewPoints = lowerBlazeEWLocations.map { room.getRealCoords(it) }
         } else {
@@ -283,7 +283,7 @@ object Blaze : Module(
             }
 
             SwapManager.SwapState.SWAPPED -> {
-                clientScheduleTask(1) {
+                schedulePreTickTask(1) {
                     RotationUtils.clickAt(rot.first, rot.second, silent)
                 }
             }
@@ -316,6 +316,6 @@ object Blaze : Module(
 
     @SubscribeEvent
     fun onS08(event: S08Event) {
-        clientScheduleTask(3) { warping = false }
+        schedulePreTickTask(2) { warping = false }
     }
 }

@@ -1,6 +1,6 @@
 package me.noobmodcore.events
 
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import kotlinx.coroutines.launch
 import me.noobmodcore.Core.mc
 import me.noobmodcore.Core.scope
@@ -76,6 +76,7 @@ object EventDispatcher {
 
     private var lastEntityClick = System.currentTimeMillis()
     @SubscribeEvent
+
     fun onPacketSent(event: PacketEvent.Send) {
         if (event.packet !is C02PacketUseEntity) return
         val entity = event.packet.getEntityFromWorld(mc.theWorld)

@@ -2,7 +2,7 @@ package com.github.wadey3636.noobroutes.features.render
 
 import com.github.wadey3636.noobroutes.features.Blink.movementPackets
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3
-import com.github.wadey3636.noobroutes.utils.ClientUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import me.noobmodcore.events.impl.PacketEvent
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
@@ -56,7 +56,7 @@ object Trail: Module(
         val posVec = getVec3(event.packet)
         if (event.packet !is C04PacketPlayerPosition && event.packet !is C06PacketPlayerPosLook) return
         if (positions.isEmpty() || !positions[positions.size-1].equal(posVec)) {
-            if (tickDelay) ClientUtils.clientScheduleTask { positions.add(0, posVec) } else positions.add(0, posVec)
+            if (tickDelay) Scheduler.schedulePreTickTask { positions.add(0, posVec) } else positions.add(0, posVec)
         }
         positions.coerceMax(trailDistance)
     }

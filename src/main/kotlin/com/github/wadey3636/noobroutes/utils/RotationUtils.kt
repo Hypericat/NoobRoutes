@@ -11,6 +11,7 @@ import net.minecraft.network.play.client.C03PacketPlayer.*
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
@@ -83,66 +84,31 @@ object RotationUtils {
         queuedRots.add(Rotation(yaw, pitch, true, silent))
     }
 
+    private val offset get() = ((Scheduler.runTime % 2 * 2 - 1) * 1e-6).toFloat()
+
 
     private var packetSent = false
 
 
     @SubscribeEvent
-    fun onPacketSent(event: PacketEvent.Send) {
-        if (event.packet !is C03PacketPlayer) return
-        if (packetSent) {
-            packetSent = false
-            return
-        }
-        if (queuedRots.isEmpty()) {
-            return
-        }
+    fun onPlayerTick(event: TickEvent.PlayerTickEvent) {
+        if (event.phase != TickEvent.Phase.END || event.player != mc.thePlayer || mc.thePlayer == null || event.isCanceled || queuedRots.isEmpty()) return
         val rot = queuedRots.removeFirst()
-        if (rot.yaw == lastSentRot.first && rot.pitch == lastSentRot.second) {
-            if (rot.click) PlayerUtils.airClick()
-            return
-        }
-        event.isCanceled = true
-        packetSent = true
         Blink.rotSkip = true
-        val packet = event.packet
-        if (packet is C04PacketPlayerPosition || packet is C06PacketPlayerPosLook) {
-            PacketUtils.sendPacket(
-                C06PacketPlayerPosLook(
-                    packet.positionX,
-                    packet.positionY,
-                    packet.positionZ,
-                    rot.yaw,
-                    rot.pitch,
-                    packet.isOnGround
-                )
-            )
-            devMessage("Sent C06PacketPlayerPosLook, ${rot.yaw}, ${rot.pitch}, ${packet.isOnGround}")
-            if (!rot.silent) {
-               ClientUtils.clientScheduleTask { setAngles(rot.yaw, rot.pitch) }
-            }
-            if (rot.click) PlayerUtils.airClick()
-        } else {
-            PacketUtils.sendPacket(
-                C05PacketPlayerLook(
-                    rot.yaw,
-                    rot.pitch,
-                    packet.isOnGround
-                )
-            )
-            devMessage("Sent C06PacketPlayerPosLook, ${rot.yaw}, ${rot.pitch}, ${packet.isOnGround}")
-            if (!rot.silent) {
-                ClientUtils.clientScheduleTask { setAngles(rot.yaw, rot.pitch) }
-            }
-            if (rot.click) PlayerUtils.airClick()
+        if (rot.silent) {
+            SilentRotator.doSilentRotation()
         }
+        setAngles(rot.yaw + offset, rot.pitch)
+        if (rot.click) {
+            Scheduler.schedulePostTickTask {
+                PlayerUtils.airClick()
+            }
+        }
+
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = false)
-    fun onLastPacketSent(event: PacketEvent.Send){
-        if (event.packet is C05PacketPlayerLook || event.packet is C06PacketPlayerPosLook) {
-            lastSentRot = Pair(event.packet.yaw, event.packet.pitch)
-        }
-    }
+
+
+
 
 }

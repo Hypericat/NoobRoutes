@@ -3,10 +3,12 @@ package com.github.wadey3636.noobroutes.utils
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import me.noobmodcore.events.impl.MelodyOpenEvent
+import me.noobmodcore.events.impl.NettyPacketEvent
 import me.noobmodcore.events.impl.S08Event
 import me.noobmodcore.events.impl.S2FPacketSetSlotEvent
 import me.noobmodcore.events.impl.S2DEvent
 import me.noobmodcore.utils.postAndCatch
+import net.minecraft.network.Packet
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot
@@ -21,6 +23,7 @@ object NettyS2DPacketInterceptor {
         val pipeline = channel.pipeline()
         pipeline.addAfter("fml:packet_handler", "Fuck_U_ChatTriggers", object : ChannelDuplexHandler() {
             override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
+                if (msg is Packet<*>) NettyPacketEvent(msg).postAndCatch()
                 when (msg) {
                     is S2DPacketOpenWindow -> {
                         S2DEvent(msg).postAndCatch()
