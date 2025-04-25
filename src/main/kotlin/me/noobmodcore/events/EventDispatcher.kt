@@ -12,8 +12,10 @@ import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils.inDungeons
 import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils.isSecret
 import me.noobmodcore.utils.skyblock.unformattedName
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S29PacketSoundEffect
@@ -71,13 +73,12 @@ object EventDispatcher {
         GuiEvent.Loaded(container, container.name).postAndCatch()
     }
 
-    private var termTitle = "I Love U Wadey"
     @SubscribeEvent
-    fun onS2D(event: S2DEvent) {
-        if (termTitle != event.packet.windowTitle.unformattedText) TermOpenEvent().postAndCatch()
-        termTitle = event.packet.windowTitle.unformattedText
-        ClientUtils.clientScheduleTask(1) { termTitle = "I Love U Wadey" }
+    fun onPacketSent(event: PacketEvent.Send) {
+        if (event.packet !is C02PacketUseEntity) return
+        val entity = event.packet.getEntityFromWorld(mc.theWorld)
+        if (entity !is EntityArmorStand) return
+        val armorStand: EntityArmorStand = entity
+        if (armorStand.name.noControlCodes.contains("Inactive Terminal", true)) TermOpenEvent().postAndCatch()
     }
-
-
 }
