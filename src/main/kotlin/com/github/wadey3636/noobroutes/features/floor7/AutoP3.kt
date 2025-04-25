@@ -423,6 +423,4 @@ object AutoP3: Module (
             rings[routeName] = ringList
         }
     }
-
-
 }
