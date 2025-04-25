@@ -1,26 +1,22 @@
-package me.odinmain.features.impl.dungeon.puzzlesolvers
+package com.github.wadey3636.noobroutes.features.puzzle
+
 
 import com.github.wadey3636.noobroutes.utils.AuraManager
-import com.github.wadey3636.noobroutes.utils.Scheduler
-import com.github.wadey3636.noobroutes.utils.RotationUtils
+import com.github.wadey3636.noobroutes.utils.Etherwarper
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import me.noobmodcore.events.impl.PacketEvent
 import me.noobmodcore.events.impl.RoomEnterEvent
 import me.noobmodcore.events.impl.ServerTickEvent
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
-import me.noobmodcore.features.settings.impl.NumberSetting
-import me.noobmodcore.utils.skyblock.PlayerUtils
+import me.noobmodcore.features.settings.impl.BooleanSetting
 import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils
 import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import me.noobmodcore.utils.skyblock.getBlockAt
 import me.noobmodcore.utils.skyblock.isAir
 import me.noobmodcore.utils.skyblock.modMessage
 import me.noobmodcore.utils.toBlockPos
-import net.minecraft.client.settings.KeyBinding
 import net.minecraft.init.Blocks
-import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.event.world.WorldEvent
@@ -29,13 +25,9 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 
 object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, description = "Automatic Waterboard Solver") {
-    val c08delay by NumberSetting(name = "c08 delay", description = "how many ticks to wait after rotating before right clicking", min = 0, max = 5, default = 2)
-    val s08falseDelay by NumberSetting(name = "delay after s08", description = "how many ticks to wait before resetting awaiting s08 flag after receiving s08", min = 0, max = 5, default = 2)
+    val silent by BooleanSetting("Silent", false, description = "Serverside Rotations")
     private var waterSolutions: JsonObject
 
     init {
@@ -82,11 +74,10 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         }
     }
 
-    private var awaitingS08 = false
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || awaitingS08 || doChest || didChest) return
+        if (event.phase != TickEvent.Phase.START || doChest || didChest || Etherwarper.warping) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board" || mc.thePlayer.posY != 59.0) return
         val room = DungeonUtils.currentRoom ?: return
         val solutionList = solutions
@@ -107,18 +98,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         val etherwarpBlock = room.getRealCoords(15, 58, expectedZRelative)
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != etherwarpBlock) {
             val realSpot = Vec3(etherwarpBlock.x + 0.5, etherwarpBlock.y + 1.0, etherwarpBlock.z + 0.5)
-            val rot = RotationUtils.getYawAndPitch(realSpot, sneaking = true)
-            etherwarp(rot.first, rot.second)
-            if (mc.isSingleplayer) {
-                Scheduler.schedulePreTickTask(4) {
-                    mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
-                    mc.thePlayer.setPosition(realSpot.xCoord, realSpot.yCoord, realSpot.zCoord)
-                    PlayerUtils.unSneak()
-                }
-                Scheduler.schedulePreTickTask(6) {
-                    awaitingS08 = false
-                }
-            }
+            Etherwarper.etherwarpToVec3(realSpot, silent)
             return
         }
 
@@ -142,25 +122,14 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
     @SubscribeEvent
     fun doChest(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || awaitingS08 || !doChest || didChest) return
+        if (event.phase != TickEvent.Phase.START || Etherwarper.warping || !doChest || didChest) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board" || mc.thePlayer.posY != 59.0) return
         val room = DungeonUtils.currentRoom ?: return
 
         val aboveChest = room.getRealCoords(15, 58, 22)
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != aboveChest) {
             val realSpot = Vec3(aboveChest.x + 0.5, aboveChest.y + 1.0, aboveChest.z + 0.5)
-            val rot = RotationUtils.getYawAndPitch(realSpot, sneaking = true)
-            etherwarp(rot.first, rot.second)
-            if (mc.isSingleplayer) {
-                Scheduler.schedulePreTickTask(4) {
-                    mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
-                    mc.thePlayer.setPosition(realSpot.xCoord, realSpot.yCoord, realSpot.zCoord)
-                    PlayerUtils.unSneak()
-                }
-                Scheduler.schedulePreTickTask(6) {
-                    awaitingS08 = false
-                }
-            }
+            Etherwarper.etherwarpToVec3(realSpot, silent)
             return
         }
         val chest = room.getRealCoords(BlockPos(15 ,56, 22))
@@ -169,22 +138,8 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         didChest = true
     }
 
-    fun etherwarp(yaw: Float, pitch: Float) {
-        mc.thePlayer.rotationYaw = yaw
-        mc.thePlayer.rotationPitch = pitch
-        KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, true)
-        PlayerUtils.sneak()
-        awaitingS08 = true
-        Scheduler.schedulePreTickTask(c08delay) {
-            PlayerUtils.airClick()
-        }
-    }
 
-    @SubscribeEvent
-    fun onS08(event: PacketEvent.Receive) {
-        if (event.packet !is S08PacketPlayerPosLook || !awaitingS08) return
-        Scheduler.schedulePreTickTask(s08falseDelay) { awaitingS08 = false }
-    }
+
 
     @SubscribeEvent
     fun onServerTick(event: ServerTickEvent) {

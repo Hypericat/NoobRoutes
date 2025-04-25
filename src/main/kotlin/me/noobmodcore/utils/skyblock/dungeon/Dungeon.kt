@@ -1,9 +1,6 @@
 package me.noobmodcore.utils.skyblock.dungeon
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import me.noobmodcore.Core.mc
-import me.noobmodcore.Core.scope
 import me.noobmodcore.events.impl.PacketEvent
 import me.noobmodcore.events.impl.RoomEnterEvent
 import me.noobmodcore.utils.*

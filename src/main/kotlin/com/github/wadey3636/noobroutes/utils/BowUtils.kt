@@ -1,17 +1,21 @@
 package com.github.wadey3636.noobroutes.utils
 
 import me.noobmodcore.Core.mc
+import me.noobmodcore.features.impl.render.ClickGUIModule.devMode
 import me.noobmodcore.utils.render.Color
 import me.noobmodcore.utils.render.Renderer
-import net.minecraft.util.Vec3
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityArrow
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.*
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 object BowUtils {
 
@@ -72,8 +76,8 @@ object BowUtils {
                 if (!linesList.any { it.containsAll(lines) && it.size == lines.size }) linesList.add(lines)
                 return entityHit
             } else {
-                mc.theWorld?.rayTraceBlocks(posVec, motionVec.add(posVec), false, true, false)?.let {
-                    //if (!linesList.any { it.containsAll(lines) && it.size == lines.size }) linesList.add(lines)  
+                mc.theWorld?.rayTraceBlocks(posVec, motionVec.add(posVec), true, false, false)?.let {
+                    if (!linesList.any { it.containsAll(lines) && it.size == lines.size }) linesList.add(lines)
                     return null
                 }
             }
@@ -86,6 +90,7 @@ object BowUtils {
 
     @SubscribeEvent
     fun debug(event: RenderWorldLastEvent){
+        if (!devMode) return
         linesList.forEach {
             Renderer.draw3DLine(it, Color.GREEN)
         }

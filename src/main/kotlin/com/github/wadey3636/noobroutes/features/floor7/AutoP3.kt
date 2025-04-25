@@ -3,14 +3,8 @@ package com.github.wadey3636.noobroutes.features.floor7
 import com.github.wadey3636.noobroutes.features.Blink
 import com.github.wadey3636.noobroutes.features.misc.SexAura
 import com.github.wadey3636.noobroutes.features.move.LavaClip
-import com.github.wadey3636.noobroutes.utils.AuraManager
-import com.github.wadey3636.noobroutes.utils.AutoP3Utils
-import com.github.wadey3636.noobroutes.utils.Scheduler
-import com.github.wadey3636.noobroutes.utils.SecretGuideIntegration
-import com.github.wadey3636.noobroutes.utils.SwapManager
-import com.github.wadey3636.noobroutes.utils.Utils
+import com.github.wadey3636.noobroutes.utils.*
 import com.github.wadey3636.noobroutes.utils.adapters.RingsMapTypeAdapter
-import com.github.wadey3636.noobroutes.utils.isAir
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject

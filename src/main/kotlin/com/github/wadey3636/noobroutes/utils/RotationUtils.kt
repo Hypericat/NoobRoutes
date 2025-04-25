@@ -3,13 +3,8 @@ package com.github.wadey3636.noobroutes.utils
 
 import com.github.wadey3636.noobroutes.features.Blink
 import me.noobmodcore.Core.mc
-import me.noobmodcore.events.impl.PacketEvent
 import me.noobmodcore.utils.skyblock.PlayerUtils
-import me.noobmodcore.utils.skyblock.devMessage
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C03PacketPlayer.*
 import net.minecraft.util.Vec3
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.atan2
@@ -80,6 +75,13 @@ object RotationUtils {
         queuedRots.add(Rotation(yaw, pitch, false, silent))
     }
 
+    /**
+     * Queues a rotation with specified yaw, pitch, and clicks.
+     *
+     * @param yaw The horizontal rotation angle.
+     * @param pitch The vertical rotation angle.
+     * @param silent Indicates whether the rotation should be silent. Defaults to false.
+     */
     fun clickAt(yaw: Float, pitch: Float, silent: Boolean = false) {
         queuedRots.add(Rotation(yaw, pitch, true, silent))
     }

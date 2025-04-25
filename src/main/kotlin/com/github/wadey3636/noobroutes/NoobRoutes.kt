@@ -70,7 +70,8 @@ class NoobRoutes {
             SwapManager,
             BowUtils,
             RotationUtils,
-            SilentRotator
+            SilentRotator,
+            Etherwarper
 
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)

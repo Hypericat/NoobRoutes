@@ -5,6 +5,7 @@ import com.github.wadey3636.noobroutes.features.misc.*
 import com.github.wadey3636.noobroutes.features.move.*
 import com.github.wadey3636.noobroutes.features.puzzle.Blaze
 import com.github.wadey3636.noobroutes.features.puzzle.TicTacToe
+import com.github.wadey3636.noobroutes.features.puzzle.WaterBoard
 import com.github.wadey3636.noobroutes.features.puzzle.Weirdos
 import com.github.wadey3636.noobroutes.features.render.Trail
 import me.noobmodcore.Core.mc
@@ -14,6 +15,7 @@ import me.noobmodcore.events.impl.PacketEvent
 import me.noobmodcore.events.impl.ServerTickEvent
 import me.noobmodcore.features.impl.render.ClickGUIModule
 import me.noobmodcore.features.settings.impl.KeybindSetting
+import me.noobmodcore.ui.hud.EditHUDGui
 import me.noobmodcore.ui.hud.HudElement
 import me.noobmodcore.utils.capitalizeFirst
 import me.noobmodcore.utils.profile
@@ -23,8 +25,6 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import me.noobmodcore.ui.hud.EditHUDGui
-import me.odinmain.features.impl.dungeon.puzzlesolvers.WaterBoard
 
 /**
  * Class that contains all Modules and huds

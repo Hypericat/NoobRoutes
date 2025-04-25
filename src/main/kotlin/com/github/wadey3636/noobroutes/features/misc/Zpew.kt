@@ -203,7 +203,6 @@ object Zpew : Module(
 
         if (isCorrect) {
             devMessage("Correct")
-            event.isCanceled = true
             return
         }
 

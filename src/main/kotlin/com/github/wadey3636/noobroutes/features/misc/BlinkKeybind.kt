@@ -1,7 +1,7 @@
 package com.github.wadey3636.noobroutes.features.misc
 
-import com.github.wadey3636.noobroutes.utils.Scheduler
 import com.github.wadey3636.noobroutes.utils.PacketUtils
+import com.github.wadey3636.noobroutes.utils.Scheduler
 import me.noobmodcore.events.impl.PacketEvent
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module

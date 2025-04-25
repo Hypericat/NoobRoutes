@@ -9,7 +9,9 @@ import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
 import me.noobmodcore.features.impl.render.ClickGUIModule.devMode
 import me.noobmodcore.features.settings.Setting.Companion.withDependency
-import me.noobmodcore.features.settings.impl.*
+import me.noobmodcore.features.settings.impl.BooleanSetting
+import me.noobmodcore.features.settings.impl.KeybindSetting
+import me.noobmodcore.features.settings.impl.NumberSetting
 import me.noobmodcore.utils.clock.Executor
 import me.noobmodcore.utils.clock.Executor.Companion.register
 import me.noobmodcore.utils.render.Color

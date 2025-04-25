@@ -7,6 +7,7 @@ import me.noobmodcore.features.Category
 import me.noobmodcore.features.impl.render.ClickGUIModule
 import me.noobmodcore.font.OdinFont
 import me.noobmodcore.ui.Screen
+import me.noobmodcore.ui.clickgui.ClickGUI.draw
 import me.noobmodcore.ui.clickgui.animations.impl.EaseInOut
 import me.noobmodcore.ui.clickgui.elements.menu.ElementColor
 import me.noobmodcore.ui.clickgui.util.ColorUtil

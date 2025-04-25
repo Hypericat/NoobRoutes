@@ -1,34 +1,23 @@
 package com.github.wadey3636.noobroutes.features.puzzle
 
 
-import com.github.wadey3636.noobroutes.utils.AuraManager
-import com.github.wadey3636.noobroutes.utils.BowUtils
+import com.github.wadey3636.noobroutes.utils.*
 import com.github.wadey3636.noobroutes.utils.Scheduler.schedulePreTickTask
-import com.github.wadey3636.noobroutes.utils.RotationUtils
-import com.github.wadey3636.noobroutes.utils.SecretGuideIntegration
-import com.github.wadey3636.noobroutes.utils.SwapManager
 import me.noobmodcore.events.impl.RoomEnterEvent
-import me.noobmodcore.events.impl.S08Event
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
 import me.noobmodcore.features.settings.Setting.Companion.withDependency
 import me.noobmodcore.features.settings.impl.BooleanSetting
 import me.noobmodcore.features.settings.impl.ColorSetting
 import me.noobmodcore.features.settings.impl.NumberSetting
-import me.noobmodcore.utils.add
-import me.noobmodcore.utils.equalsOneOf
-import me.noobmodcore.utils.noControlCodes
+import me.noobmodcore.utils.*
 import me.noobmodcore.utils.render.Color
 import me.noobmodcore.utils.render.RenderUtils.renderVec
 import me.noobmodcore.utils.render.Renderer
-import me.noobmodcore.utils.skyblock.LocationUtils
-import me.noobmodcore.utils.skyblock.PlayerUtils
 import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils
 import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import me.noobmodcore.utils.skyblock.dungeon.tiles.Room
 import me.noobmodcore.utils.skyblock.skyblockID
-import me.noobmodcore.utils.toBlockPos
-import me.noobmodcore.utils.toVec3
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -54,8 +43,7 @@ object Blaze : Module(
     private var currentBlazeTarget: EntityArmorStand? = null
     private val silent by BooleanSetting("Silent", description = "Server Side Rotations. Only works with zpew")
     private var awaitingRoomChange = false
-    private var warping = false
-    private var warped = false
+
     private var hasAuraedBlock = false
 
     private val shotCooldown by NumberSetting(
@@ -122,7 +110,7 @@ object Blaze : Module(
         getBlaze()
         when (event.room.data.name) {
             "Lower Blaze" -> {
-                etherwarpToVec3(event.room.getRealCoords(12, 70, 24).toVec3().add(0.5, 0.5, 0.5))
+                Etherwarper.etherwarpToVec3(event.room.getRealCoords(12, 70, 24).toVec3().add(0.5, 0.5, 0.5), silent)
             }
         }
 
@@ -142,24 +130,13 @@ object Blaze : Module(
         return isOnBlock(pos.toVec3())
     }
 
-    private fun etherwarpToVec3(vec3: Vec3){
-        PlayerUtils.unPressKeys()
-        PlayerUtils.sneak()
-        warping = true
-        warped = true
-        mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
-        val state = SwapManager.swapFromSBId("ASPECT_OF_THE_END", "ASPECT_OF_THE_VOID")
-        val rot = RotationUtils.getYawAndPitch(vec3, true)
-        rotateAndClick(state, rot)
-        if (LocationUtils.isSinglePlayer) schedulePreTickTask(3) { warping = false }
-    }
 
 
 
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || warping) return
+        if (event.phase != TickEvent.Phase.START || Etherwarper.warping) return
         val room = DungeonUtils.currentRoom ?: return
         if (!room.data.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
 
@@ -172,20 +149,17 @@ object Blaze : Module(
         if (blazes.isEmpty()) return
         currentBlazeTarget = blazes[0]
         if (mc.thePlayer.posY > 60) return
-        var ewPoints: List<Vec3>
-        if (room.data.name == "Lower Blaze") {
-            //devMessage("${mc.thePlayer.positionVector}, ${room.getRealCoords(12, 70, 24).toVec3().add(0.5, 1.0, 0.5)}, ${ room.getRealCoords(12, 70, 24).toVec3().add(0.5, 1.0, 0.5).distanceTo(mc.thePlayer.positionVector) < 0.1}")
-
-            ewPoints = lowerBlazeEWLocations.map { room.getRealCoords(it) }
+        val ewPoints: List<Vec3> = if (room.data.name == "Lower Blaze") {
+            lowerBlazeEWLocations.map { room.getRealCoords(it) }
         } else {
-            ewPoints = higherBlazeEWLocations.map { room.getRealCoords(it) }
+            higherBlazeEWLocations.map { room.getRealCoords(it) }
         }
 
         val closestBlock = findClosestEwBlock(ewPoints, currentBlazeTarget!!, room) ?: return
         currentEtherwarpTarget = closestBlock.toBlockPos()
 
         if (!isOnBlock(currentEtherwarpTarget!!)) {
-            etherwarpToVec3(closestBlock.add(0.5, 1.1, 0.5))
+            Etherwarper.etherwarpToVec3(closestBlock.add(0.5, 1.1, 0.5), silent)
             return
         }
 
@@ -196,10 +170,10 @@ object Blaze : Module(
 
     private fun handleConnectPoints(room: Room): Boolean {
         if (room.data.name == "Lower Blaze" && isOnBlock(room.getRealCoords(BlockPos(12, 70, 24)))) {
-            etherwarpToVec3(room.getRealCoords(22, 56, 16).toVec3().add(0.5, 1.0, 0.5))
+            Etherwarper.etherwarpToVec3(room.getRealCoords(22, 56, 16).toVec3().add(0.5, 1.0, 0.5), silent)
             return true
         } else if (room.data.name == "Higher Blaze" && isOnBlock(room.getRealCoords(BlockPos(11, 51, 23)))) {
-            //etherwarpToVec3(room.getRealCoords(11, 31, 10).toVec3().add(0.5, 1.0, 0.5))
+            //Etherwarper.etherwarpToVec3(room.getRealCoords(11, 31, 10).toVec3().add(0.5, 1.0, 0.5), silent)
             return true
         }
         return false
@@ -314,8 +288,5 @@ object Blaze : Module(
 
     }
 
-    @SubscribeEvent
-    fun onS08(event: S08Event) {
-        schedulePreTickTask(2) { warping = false }
-    }
+
 }
