@@ -27,10 +27,7 @@ object Auto4: Module(
     category = Category.FLOOR7,
     description = "does 4th device"
 ) {
-    private val silent by BooleanSetting("silent", true, description = "snaps only serverside")
-    private val shit by BooleanSetting("code stuff", false, description = "off is wadey, on is noob").withDependency { silent && !speedyBoi }
-    private val speedyBoi by BooleanSetting("speedyBoi", false, description = "does shit faster").withDependency { silent }
-
+    private val silent by BooleanSetting("silent", true, description = "visual only")
 
     private val devBlocks = listOf(
         BlockPos(64, 126, 50),
@@ -62,29 +59,16 @@ object Auto4: Module(
 
     private fun shoot(block: BlockPos) {
         val rotation = getRotation(block)
-        if (!silent || Blink.cancelled < 1) {
+        if (!silent || Blink.cancelled == 0) {
             mc.thePlayer.rotationYaw = rotation.first
             mc.thePlayer.rotationPitch = rotation.second
-            Scheduler.schedulePreTickTask(1) { PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem)) }
         }
-        else if (speedyBoi) {
+        if (Blink.cancelled >= 1) {
             PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
             Blink.cancelled--
             PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
         }
-        else if (!shit){
-            Scheduler.schedulePreTickTask {
-                PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
-                Blink.cancelled--
-                PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
-            }
-        }
-        else {
-            Scheduler.scheduleC03Task(cancel = true) {
-                PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
-                PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
-            }
-        }
+        else Scheduler.scheduleLowestPreTickTask(1) { PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem)) }
         shotBlocks.add(block)
     }
 

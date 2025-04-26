@@ -50,7 +50,7 @@ object Utils {
 
 
     fun isClose(number1: Double, number2: Double): Boolean {
-        return abs(number1 - number2) < 0.0001F
+        return abs(number1 - number2) < 0.0005F
     }
 
     inline fun <reified T : Entity> WorldClient.getEntitiesOfType(): List<T> {

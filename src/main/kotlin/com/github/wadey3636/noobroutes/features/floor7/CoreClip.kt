@@ -5,6 +5,7 @@ import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils.walking
 import com.github.wadey3636.noobroutes.utils.Scheduler
 import com.github.wadey3636.noobroutes.utils.Utils.isClose
+import me.noobmodcore.events.impl.MotionUpdateEvent
 import me.noobmodcore.features.Category
 import me.noobmodcore.features.Module
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -23,28 +24,33 @@ object CoreClip: Module(
     private var doWalk = false
 
     @SubscribeEvent
-    fun atCore(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onMotionPre(event: MotionUpdateEvent.Pre) {
         if (mc.thePlayer == null) return
         if (cd > 0) {
             cd--
             return
         }
-        if (mc.thePlayer.posY != 115.0) return
-        if (mc.thePlayer.posX !in 52.0..57.0) return
+        if (event.y != 115.0) return
+        if (event.x !in 52.0..57.0) return
 
-        if (isClose(mc.thePlayer.posZ, 53.7)) doClip(53.7624, 55.301)
-        else if (isClose(mc.thePlayer.posZ, 55.3)) doClip(55.2376, 53.699)
+        if (isClose(event.z, 53.7)) {
+            event.motionZ = 0.0
+            event.z = 53.7624
+            doClip(55.301)
+        }
+        else if (isClose(event.z, 55.3)){
+            event.motionZ = 0.0
+            event.z = 55.2376
+            doClip(53.699)
+        }
     }
 
-    private fun doClip(coord1: Double, coord2: Double) {
+    private fun doClip(coord: Double) {
         doWalk = walking
         AutoP3Utils.unPressKeys()
-        mc.thePlayer.motionZ = 0.0
         cd = 3
-        mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, coord1)
         skip = true
-        Scheduler.scheduleC03Task {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, coord2)}
+        Scheduler.scheduleC03Task {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, coord)}
         Scheduler.scheduleC03Task(1) {
             walking = doWalk
             AutoP3Utils.rePressKeys()

@@ -202,7 +202,7 @@ object AutoSS : Module(
 
         if (mc.thePlayer.getDistanceSqToCenter(startButton) < 1600) {
             if (clickedButton != null) {
-               Renderer.drawBlock(BlockPos(clickedButton!!.xCoord, clickedButton!!.yCoord, clickedButton!!.zCoord), Color.PINK)
+               Renderer.drawBlock(BlockPos(clickedButton!!.xCoord, clickedButton!!.yCoord, clickedButton!!.zCoord), Color.GREEN)
             }
             allButtons.forEachIndexed{index, location ->
                 drawStringInWorld((index + 1).toString(), Vec3(location.xCoord - 0.0625, location.yCoord + 0.5625, location.zCoord + 0.5), scale = 0.02f, shadow = true, depthTest = false)
