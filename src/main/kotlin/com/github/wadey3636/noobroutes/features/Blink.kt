@@ -1,4 +1,5 @@
 package com.github.wadey3636.noobroutes.features
+import com.github.wadey3636.noobroutes.Core.mc
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.blink
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.customBlinkLength
@@ -11,13 +12,12 @@ import com.github.wadey3636.noobroutes.features.floor7.RingTypes
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import com.github.wadey3636.noobroutes.utils.SecretGuideIntegration
-import me.noobmodcore.Core.mc
-import me.noobmodcore.events.impl.PacketEvent
-import me.noobmodcore.utils.render.Color
-import me.noobmodcore.utils.render.Renderer
-import me.noobmodcore.utils.render.TextAlign
-import me.noobmodcore.utils.render.text
-import me.noobmodcore.utils.skyblock.modMessage
+import com.github.wadey3636.noobroutes.events.impl.PacketEvent
+import com.github.wadey3636.noobroutes.utils.render.Color
+import com.github.wadey3636.noobroutes.utils.render.Renderer
+import com.github.wadey3636.noobroutes.utils.render.TextAlign
+import com.github.wadey3636.noobroutes.utils.render.text
+import com.github.wadey3636.noobroutes.utils.skyblock.modMessage
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.*
 import net.minecraft.network.play.server.S08PacketPlayerPosLook

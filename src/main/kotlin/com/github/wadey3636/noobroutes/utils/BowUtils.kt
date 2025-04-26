@@ -1,9 +1,9 @@
 package com.github.wadey3636.noobroutes.utils
 
-import me.noobmodcore.Core.mc
-import me.noobmodcore.features.impl.render.ClickGUIModule.devMode
-import me.noobmodcore.utils.render.Color
-import me.noobmodcore.utils.render.Renderer
+import com.github.wadey3636.noobroutes.Core.mc
+import com.github.wadey3636.noobroutes.features.render.ClickGUIModule.devMode
+import com.github.wadey3636.noobroutes.utils.render.Color
+import com.github.wadey3636.noobroutes.utils.render.Renderer
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityArrow
@@ -91,7 +91,7 @@ object BowUtils {
     @SubscribeEvent
     fun debug(event: RenderWorldLastEvent){
         if (!devMode) return
-        linesList.forEach {
+        linesList.toList().forEach {
             Renderer.draw3DLine(it, Color.GREEN)
         }
     }
@@ -118,6 +118,7 @@ object BowUtils {
         val normalizedYaw = if (yaw < -180) yaw + 360 else yaw
         return Pair(normalizedYaw.toFloat(), pitch.toFloat())
     }
+
     @SubscribeEvent
     fun onWorld(event: WorldEvent.Unload){
         linesList.clear()

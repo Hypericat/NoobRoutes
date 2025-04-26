@@ -2,12 +2,12 @@ package com.github.wadey3636.noobroutes.features.misc
 
 import com.github.wadey3636.noobroutes.utils.PacketUtils
 import com.github.wadey3636.noobroutes.utils.Scheduler
-import me.noobmodcore.features.Category
-import me.noobmodcore.features.Module
-import me.noobmodcore.features.settings.impl.BooleanSetting
-import me.noobmodcore.features.settings.impl.NumberSetting
-import me.noobmodcore.utils.skyblock.modMessage
-import me.noobmodcore.utils.skyblock.sendCommand
+import com.github.wadey3636.noobroutes.features.Category
+import com.github.wadey3636.noobroutes.features.Module
+import com.github.wadey3636.noobroutes.features.settings.impl.BooleanSetting
+import com.github.wadey3636.noobroutes.features.settings.impl.NumberSetting
+import com.github.wadey3636.noobroutes.utils.skyblock.modMessage
+import com.github.wadey3636.noobroutes.utils.skyblock.sendCommand
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C01PacketChatMessage
@@ -61,7 +61,8 @@ object SexAura: Module(
         "You could hand me a restraining order, and I'd frame it like a love letter.",
         "Are you my Uber Eats driver? Because I watch your every move, wai4ting for you to arrive, and I cry when you’re gone.",
         "Are you a mirage? Because every time I think I have a chance with you, I realize it was just my thirst hallucinating.",
-        "Heet je noor? want je ogen zijn net zo mooi als het noor-derlicht"
+        "Heet je noor? want je ogen zijn net zo mooi als het noor-derlicht",
+        "Do you like pokemon? Because I wanna shove you in my balls."
     )
 
     @SubscribeEvent

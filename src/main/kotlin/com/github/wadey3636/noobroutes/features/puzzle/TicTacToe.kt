@@ -2,15 +2,15 @@ package com.github.wadey3636.noobroutes.features.puzzle
 
 import com.github.wadey3636.noobroutes.utils.AuraManager
 import com.github.wadey3636.noobroutes.utils.isAir
-import me.noobmodcore.events.impl.RoomEnterEvent
-import me.noobmodcore.features.Category
-import me.noobmodcore.features.Module
-import me.noobmodcore.features.settings.impl.NumberSetting
-import me.noobmodcore.utils.render.Color
-import me.noobmodcore.utils.render.Renderer
-import me.noobmodcore.utils.skyblock.devMessage
-import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils.currentRoomName
-import me.noobmodcore.utils.toVec3
+import com.github.wadey3636.noobroutes.events.impl.RoomEnterEvent
+import com.github.wadey3636.noobroutes.features.Category
+import com.github.wadey3636.noobroutes.features.Module
+import com.github.wadey3636.noobroutes.features.settings.impl.NumberSetting
+import com.github.wadey3636.noobroutes.utils.render.Color
+import com.github.wadey3636.noobroutes.utils.render.Renderer
+import com.github.wadey3636.noobroutes.utils.skyblock.devMessage
+import com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils.currentRoomName
+import com.github.wadey3636.noobroutes.utils.toVec3
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items

@@ -1,5 +1,6 @@
 package com.github.wadey3636.noobroutes.utils
 
+import com.github.wadey3636.noobroutes.Core.mc
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.depth
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.motionValue
@@ -7,13 +8,12 @@ import com.github.wadey3636.noobroutes.features.floor7.AutoP3.waitingLeap
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3.waitingTerm
 import com.github.wadey3636.noobroutes.features.floor7.Ring
 import com.github.wadey3636.noobroutes.features.floor7.RingTypes
-import me.noobmodcore.Core.mc
-import me.noobmodcore.events.impl.PacketEvent
-import me.noobmodcore.utils.render.Color
-import me.noobmodcore.utils.render.RenderUtils.renderX
-import me.noobmodcore.utils.render.RenderUtils.renderY
-import me.noobmodcore.utils.render.RenderUtils.renderZ
-import me.noobmodcore.utils.render.Renderer
+import com.github.wadey3636.noobroutes.events.impl.PacketEvent
+import com.github.wadey3636.noobroutes.utils.render.Color
+import com.github.wadey3636.noobroutes.utils.render.RenderUtils.renderX
+import com.github.wadey3636.noobroutes.utils.render.RenderUtils.renderY
+import com.github.wadey3636.noobroutes.utils.render.RenderUtils.renderZ
+import com.github.wadey3636.noobroutes.utils.render.Renderer
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook

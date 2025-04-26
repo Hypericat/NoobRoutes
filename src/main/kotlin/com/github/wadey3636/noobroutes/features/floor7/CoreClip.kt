@@ -5,12 +5,10 @@ import com.github.wadey3636.noobroutes.utils.AutoP3Utils
 import com.github.wadey3636.noobroutes.utils.AutoP3Utils.walking
 import com.github.wadey3636.noobroutes.utils.Scheduler
 import com.github.wadey3636.noobroutes.utils.Utils.isClose
-import me.noobmodcore.events.impl.MotionUpdateEvent
-import me.noobmodcore.features.Category
-import me.noobmodcore.features.Module
+import com.github.wadey3636.noobroutes.events.impl.MotionUpdateEvent
+import com.github.wadey3636.noobroutes.features.Category
+import com.github.wadey3636.noobroutes.features.Module
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 
 object CoreClip: Module(

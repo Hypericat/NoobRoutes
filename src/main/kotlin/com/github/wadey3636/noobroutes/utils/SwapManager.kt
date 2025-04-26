@@ -1,16 +1,15 @@
 package com.github.wadey3636.noobroutes.utils
 
+import com.github.wadey3636.noobroutes.Core.mc
 import com.github.wadey3636.noobroutes.utils.Utils.ID
-import me.noobmodcore.Core.mc
-import me.noobmodcore.events.impl.PacketEvent
-import me.noobmodcore.utils.skyblock.modMessage
-import me.noobmodcore.utils.skyblock.skyblockID
-import me.noobmodcore.utils.skyblock.unformattedName
+import com.github.wadey3636.noobroutes.events.impl.PacketEvent
+import com.github.wadey3636.noobroutes.utils.skyblock.modMessage
+import com.github.wadey3636.noobroutes.utils.skyblock.skyblockID
+import com.github.wadey3636.noobroutes.utils.skyblock.unformattedName
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-
 
 
 /**

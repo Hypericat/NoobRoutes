@@ -1,0 +1,113 @@
+package com.github.wadey3636.noobroutes.utils.skyblock
+
+import com.github.wadey3636.noobroutes.Core.mc
+import com.github.wadey3636.noobroutes.features.render.ClickGUIModule
+import com.github.wadey3636.noobroutes.utils.cleanLine
+import com.github.wadey3636.noobroutes.utils.cleanSB
+import com.github.wadey3636.noobroutes.utils.clock.Executor.Companion.register
+import com.github.wadey3636.noobroutes.utils.sidebarLines
+import net.minecraft.client.network.NetHandlerPlayClient
+import net.minecraft.network.play.server.S3FPacketCustomPayload
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.network.FMLNetworkEvent
+
+object LocationUtils {
+
+    var isOnHypixel: Boolean = false
+        private set
+    var isInSkyblock: Boolean = false
+
+    inline val isSinglePlayer get() = currentArea.isArea(Island.SinglePlayer)
+
+    var currentDungeon: com.github.wadey3636.noobroutes.utils.skyblock.dungeon.Dungeon? = null
+        private set
+    var currentArea: Island = Island.Unknown
+    var kuudraTier: Int = 0
+
+    init {
+        _root_ide_package_.com.github.wadey3636.noobroutes.utils.clock.Executor(500, "LocationUtils") {
+            if (!isInSkyblock)
+                isInSkyblock = isOnHypixel && mc.theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)
+                    ?.let { cleanSB(it.displayName).contains("SKYBLOCK") } == true
+
+            if (currentArea.isArea(Island.Kuudra) && kuudraTier == 0)
+                sidebarLines.find { cleanLine(it).contains("Kuudra's Hollow (") }?.let {
+                    kuudraTier = it.substringBefore(")").lastOrNull()?.digitToIntOrNull() ?: 0
+                }
+
+            if (currentArea.isArea(Island.Unknown)) currentArea = getArea()
+
+            if ((_root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons || currentArea.isArea(
+                    Island.SinglePlayer
+                )) && currentDungeon == null
+            ) currentDungeon = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.Dungeon(
+                getFloor() ?: return@Executor
+            )
+
+        }.register()
+    }
+
+    @SubscribeEvent
+    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+        isOnHypixel = false
+        isInSkyblock = false
+        currentArea = Island.Unknown
+        kuudraTier = 0
+        currentDungeon = null
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Unload) {
+        currentDungeon = null
+        isInSkyblock = false
+        kuudraTier = 0
+        currentArea = Island.Unknown
+    }
+
+    /**
+     * Taken from [SBC](https://github.com/Harry282/Skyblock-Client/blob/main/src/main/kotlin/skyblockclient/utils/LocationUtils.kt)
+     *
+     * @author Harry282
+     */
+    @SubscribeEvent
+    fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
+        isOnHypixel = if (ClickGUIModule.forceHypixel) true else mc.runCatching {
+            !event.isLocal && ((thePlayer?.clientBrand?.contains("hypixel", true) ?: currentServerData?.serverIP?.contains("hypixel", true)) == true)
+        }.getOrDefault(false)
+    }
+
+    @SubscribeEvent
+    fun onPacket(event: com.github.wadey3636.noobroutes.events.impl.PacketEvent.Receive) {
+        if (isOnHypixel || event.packet !is S3FPacketCustomPayload || event.packet.channelName != "MC|Brand") return
+        if (event.packet.bufferData?.readStringFromBuffer(Short.MAX_VALUE.toInt())?.contains("hypixel", true) == true) isOnHypixel = true
+    }
+
+    /**
+     * Returns the current area from the tab list info.
+     * If no info can be found, return Island.Unknown.
+     *
+     * @author Aton
+     */
+    private fun getArea(): Island {
+        if (mc.isSingleplayer) return Island.SinglePlayer
+        if (!isInSkyblock) return Island.Unknown
+        val netHandlerPlayClient: NetHandlerPlayClient = mc.thePlayer?.sendQueue ?: return Island.Unknown
+        val list = netHandlerPlayClient.playerInfoMap ?: return Island.Unknown
+
+        val area = list.find {
+            it?.displayName?.unformattedText?.startsWith("Area: ") == true ||
+                    it?.displayName?.unformattedText?.startsWith("Dungeon: ") == true
+        }?.displayName?.formattedText
+
+        return Island.entries.firstOrNull { area?.contains(it.displayName, true) == true } ?: Island.Unknown
+    }
+
+    fun getFloor(): com.github.wadey3636.noobroutes.utils.skyblock.dungeon.Floor? {
+        if (currentArea.isArea(Island.SinglePlayer)) return _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.Floor.E
+        for (i in sidebarLines) {
+            return _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.Floor.valueOf(Regex("The Catacombs \\((\\w+)\\)\$").find(cleanSB(i))?.groupValues?.get(1) ?: continue)
+        }
+        return null
+    }
+}

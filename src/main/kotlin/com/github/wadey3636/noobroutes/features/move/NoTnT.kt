@@ -1,9 +1,9 @@
 package com.github.wadey3636.noobroutes.features.move
 
 import com.github.wadey3636.noobroutes.features.floor7.AutoP3
-import me.noobmodcore.events.impl.PacketEvent
-import me.noobmodcore.features.Category
-import me.noobmodcore.features.Module
+import com.github.wadey3636.noobroutes.events.impl.PacketEvent
+import com.github.wadey3636.noobroutes.features.Category
+import com.github.wadey3636.noobroutes.features.Module
 import net.minecraft.network.play.server.S27PacketExplosion
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard

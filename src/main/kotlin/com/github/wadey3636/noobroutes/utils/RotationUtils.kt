@@ -1,9 +1,9 @@
 package com.github.wadey3636.noobroutes.utils
 
 
+import com.github.wadey3636.noobroutes.Core.mc
 import com.github.wadey3636.noobroutes.features.Blink
-import me.noobmodcore.Core.mc
-import me.noobmodcore.utils.skyblock.PlayerUtils
+import com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -72,31 +72,60 @@ object RotationUtils {
     private var lastSentRot: Pair<Float, Float> = Pair(0f, 0f)
 
     fun rotateTo(yaw: Float, pitch: Float, silent: Boolean = false) {
-        queuedRots.add(Rotation(yaw, pitch, false, silent))
+        if (rotated) {
+            queuedRots.add(Rotation(yaw, pitch, false, silent))
+            return
+        }
+        if (silent) {
+            SilentRotator.doSilentRotation()
+        }
+        setAngles(yaw + offset, pitch)
     }
 
     /**
-     * Queues a rotation with specified yaw, pitch, and clicks.
+     * Simulates a click action by adjusting rotation angles to specified yaw and pitch.
+     * The method allows for additional control over whether the action is silent and whether to check
+     * for sneaking before executing the click.
      *
-     * @param yaw The horizontal rotation angle.
-     * @param pitch The vertical rotation angle.
-     * @param silent Indicates whether the rotation should be silent. Defaults to false.
+     * @param yaw The yaw angle to rotate to before performing the action.
+     * @param pitch The pitch angle to rotate to before performing the action.
+     * @param silent Whether the rotation should be performed silently without visually updating the player's angles. Defaults to false.
+     * @param sneakCheck Whether to check if the player is sneaking before executing the click action. Defaults to false.
      */
-    fun clickAt(yaw: Float, pitch: Float, silent: Boolean = false) {
-        queuedRots.add(Rotation(yaw, pitch, true, silent))
+    fun clickAt(yaw: Float, pitch: Float, silent: Boolean = false, sneakCheck: Boolean = false) {
+        if (rotated) {
+            queuedRots.add(Rotation(yaw, pitch, true, silent))
+            return
+        }
+        Blink.rotSkip = true
+        rotated = true
+        if (silent) {
+            SilentRotator.doSilentRotation()
+        }
+        setAngles(yaw + offset, pitch)
+        Scheduler.schedulePostTickTask {
+            if (!sneakCheck || mc.thePlayer.isSneaking) PlayerUtils.airClick()
+        }
     }
 
-    private val offset get() = ((Scheduler.runTime % 2 * 2 - 1) * 1e-6).toFloat()
+    val offset get() = ((Scheduler.runTime % 2 * 2 - 1) * 1e-6).toFloat()
 
 
     private var packetSent = false
 
 
+    private var rotated = false
+
+
     @SubscribeEvent
     fun onPlayerTick(event: TickEvent.PlayerTickEvent) {
+        if (event.phase == TickEvent.Phase.START) {
+            rotated = false
+        }
         if (event.phase != TickEvent.Phase.END || event.player != mc.thePlayer || mc.thePlayer == null || event.isCanceled || queuedRots.isEmpty()) return
         val rot = queuedRots.removeFirst()
         Blink.rotSkip = true
+        rotated = true
         if (rot.silent) {
             SilentRotator.doSilentRotation()
         }

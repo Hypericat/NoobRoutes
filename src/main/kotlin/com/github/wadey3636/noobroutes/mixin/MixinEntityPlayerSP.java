@@ -2,8 +2,7 @@ package com.github.wadey3636.noobroutes.mixin;
 
 import com.github.wadey3636.noobroutes.features.misc.NoDebuff;
 import com.mojang.authlib.GameProfile;
-import me.noobmodcore.events.impl.MotionUpdateEvent;
-import me.noobmodcore.utils.Utils;
+import com.github.wadey3636.noobroutes.events.impl.MotionUpdateEvent;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
@@ -13,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static com.github.wadey3636.noobroutes.utils.UtilsKt.postAndCatch;
 
 
 @Mixin(value = {EntityPlayerSP.class})
@@ -51,7 +51,7 @@ public abstract class MixinEntityPlayerSP extends EntityPlayer {
 
         MotionUpdateEvent.Pre motionUpdateEvent = new MotionUpdateEvent.Pre(this.posX, this.posY, this.posZ, this.motionX, this.motionY, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround);
 
-        if (Utils.postAndCatch(motionUpdateEvent)) ci.cancel();
+        if (postAndCatch(motionUpdateEvent)) ci.cancel();
 
         this.posX = motionUpdateEvent.x;
         this.posY = motionUpdateEvent.y;
@@ -84,7 +84,7 @@ public abstract class MixinEntityPlayerSP extends EntityPlayer {
 
         MotionUpdateEvent.Post motionUpdateEvent = new MotionUpdateEvent.Post(posX, posY, posZ, motionX, motionY, motionZ, rotationYaw, rotationPitch, onGround);
 
-        if (Utils.postAndCatch(motionUpdateEvent)) ci.cancel();
+        if (postAndCatch(motionUpdateEvent)) ci.cancel();
 
         this.posX = motionUpdateEvent.x;
         this.posY = motionUpdateEvent.y;

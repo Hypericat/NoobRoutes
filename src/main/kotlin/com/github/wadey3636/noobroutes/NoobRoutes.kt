@@ -1,22 +1,22 @@
 package com.github.wadey3636.noobroutes
 
+import com.github.wadey3636.noobroutes.Core.mc
 import com.github.wadey3636.noobroutes.commands.AuraTestCommand
 import com.github.wadey3636.noobroutes.commands.AutoP3Command
+import com.github.wadey3636.noobroutes.commands.EtherwarpTestCommand
 import com.github.wadey3636.noobroutes.commands.NoobRoutesCommand
+import com.github.wadey3636.noobroutes.events.EventDispatcher
 import com.github.wadey3636.noobroutes.features.Blink
+import com.github.wadey3636.noobroutes.features.ModuleManager
+import com.github.wadey3636.noobroutes.font.OdinFont
+import com.github.wadey3636.noobroutes.ui.clickgui.ClickGUI
 import com.github.wadey3636.noobroutes.utils.*
-import me.noobmodcore.Core
-import me.noobmodcore.Core.mc
-import me.noobmodcore.events.EventDispatcher
-import me.noobmodcore.features.ModuleManager
-import me.noobmodcore.font.OdinFont
-import me.noobmodcore.ui.clickgui.ClickGUI
-import me.noobmodcore.utils.clock.Executor
-import me.noobmodcore.utils.render.RenderUtils
-import me.noobmodcore.utils.render.RenderUtils2D
-import me.noobmodcore.utils.render.Renderer
-import me.noobmodcore.utils.skyblock.LocationUtils
-import me.noobmodcore.utils.skyblock.dungeon.ScanUtils
+import com.github.wadey3636.noobroutes.utils.clock.Executor
+import com.github.wadey3636.noobroutes.utils.render.RenderUtils
+import com.github.wadey3636.noobroutes.utils.render.RenderUtils2D
+import com.github.wadey3636.noobroutes.utils.render.Renderer
+import com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils
+import com.github.wadey3636.noobroutes.utils.skyblock.dungeon.ScanUtils
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
@@ -44,7 +44,8 @@ class NoobRoutes {
         listOf(
             NoobRoutesCommand(),
             AutoP3Command(),
-            AuraTestCommand()
+            AuraTestCommand(),
+            EtherwarpTestCommand()
         ).forEach {
             ClientCommandHandler.instance.registerCommand(it)
         }

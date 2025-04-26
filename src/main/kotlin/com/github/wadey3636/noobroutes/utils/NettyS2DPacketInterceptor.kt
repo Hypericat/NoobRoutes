@@ -2,8 +2,7 @@ package com.github.wadey3636.noobroutes.utils
 
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
-import me.noobmodcore.events.impl.*
-import me.noobmodcore.utils.postAndCatch
+import com.github.wadey3636.noobroutes.events.impl.*
 import net.minecraft.network.Packet
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S2DPacketOpenWindow

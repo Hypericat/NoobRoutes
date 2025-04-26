@@ -1,7 +1,7 @@
 package com.github.wadey3636.noobroutes.mixin;
 
-import me.noobmodcore.events.impl.ClickEvent;
-import me.noobmodcore.events.impl.InputEvent;
+import com.github.wadey3636.noobroutes.events.impl.ClickEvent;
+import com.github.wadey3636.noobroutes.events.impl.InputEvent;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static me.noobmodcore.utils.Utils.postAndCatch;
+import static com.github.wadey3636.noobroutes.utils.UtilsKt.postAndCatch;
 
 @Mixin(value = {Minecraft.class}, priority = 800)
 public class MixinMinecraft {

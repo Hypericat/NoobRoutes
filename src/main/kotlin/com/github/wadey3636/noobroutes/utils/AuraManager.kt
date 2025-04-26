@@ -1,10 +1,10 @@
 package com.github.wadey3636.noobroutes.utils
 
+import com.github.wadey3636.noobroutes.Core.logger
+import com.github.wadey3636.noobroutes.Core.mc
 import com.github.wadey3636.noobroutes.utils.BlockUtils.collisionRayTrace
-import me.noobmodcore.Core.logger
-import me.noobmodcore.Core.mc
-import me.noobmodcore.events.impl.PacketEvent
-import me.noobmodcore.utils.skyblock.devMessage
+import com.github.wadey3636.noobroutes.events.impl.PacketEvent
+import com.github.wadey3636.noobroutes.utils.skyblock.devMessage
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C02PacketUseEntity.Action
@@ -16,7 +16,6 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
 object AuraManager {

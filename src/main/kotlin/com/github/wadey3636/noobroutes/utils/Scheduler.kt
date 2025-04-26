@@ -1,7 +1,7 @@
 package com.github.wadey3636.noobroutes.utils
 
-import me.noobmodcore.Core.mc
-import me.noobmodcore.events.impl.PacketEvent
+import com.github.wadey3636.noobroutes.Core.mc
+import com.github.wadey3636.noobroutes.events.impl.PacketEvent
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraftforge.event.entity.living.LivingEvent

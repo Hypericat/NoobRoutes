@@ -5,7 +5,7 @@ import com.github.wadey3636.noobroutes.features.floor7.RingTypes
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import me.noobmodcore.utils.LookVec
+import com.github.wadey3636.noobroutes.utils.LookVec
 import net.minecraft.util.Vec3
 
 

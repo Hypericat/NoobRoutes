@@ -1,11 +1,10 @@
 package com.github.wadey3636.noobroutes.utils
 
 
-import com.github.wadey3636.noobroutes.utils.Scheduler.schedulePreTickTask
-import me.noobmodcore.Core.mc
-import me.noobmodcore.events.impl.S08Event
-import me.noobmodcore.utils.skyblock.PlayerUtils
-import me.noobmodcore.utils.skyblock.devMessage
+import com.github.wadey3636.noobroutes.Core.mc
+import com.github.wadey3636.noobroutes.events.impl.S08Event
+import com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils
+import com.github.wadey3636.noobroutes.utils.skyblock.devMessage
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -24,11 +23,16 @@ object Etherwarper {
         warping = true
         mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
         val rot = RotationUtils.getYawAndPitch(vec3, true)
-        if (state == SwapManager.SwapState.SWAPPED) {
-            schedulePreTickTask(2) { RotationUtils.clickAt(rot.first, rot.second, silent) }
-        } else {
-            Scheduler.schedulePostTickTask() { RotationUtils.clickAt(rot.first, rot.second, silent)}
+        RotationUtils.clickAt(rot.first, rot.second, silent, true)
+
+        /*
+        if (silent) SilentRotator.doSilentRotation()
+        RotationUtils.setAngles(rot.first + RotationUtils.offset, rot.second)
+        Scheduler.schedulePostTickTask {
+            if (mc.thePlayer.isSneaking) PlayerUtils.airClick()
         }
+
+         */
 
     }
 

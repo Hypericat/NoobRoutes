@@ -1,23 +1,23 @@
 package com.github.wadey3636.noobroutes.features.puzzle
 
 
+import com.github.wadey3636.noobroutes.features.puzzle.Blaze.isOnBlock
 import com.github.wadey3636.noobroutes.utils.*
-import com.github.wadey3636.noobroutes.utils.Scheduler.schedulePreTickTask
-import me.noobmodcore.events.impl.RoomEnterEvent
-import me.noobmodcore.features.Category
-import me.noobmodcore.features.Module
-import me.noobmodcore.features.settings.Setting.Companion.withDependency
-import me.noobmodcore.features.settings.impl.BooleanSetting
-import me.noobmodcore.features.settings.impl.ColorSetting
-import me.noobmodcore.features.settings.impl.NumberSetting
-import me.noobmodcore.utils.*
-import me.noobmodcore.utils.render.Color
-import me.noobmodcore.utils.render.RenderUtils.renderVec
-import me.noobmodcore.utils.render.Renderer
-import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils
-import me.noobmodcore.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import me.noobmodcore.utils.skyblock.dungeon.tiles.Room
-import me.noobmodcore.utils.skyblock.skyblockID
+import com.github.wadey3636.noobroutes.events.impl.RoomEnterEvent
+import com.github.wadey3636.noobroutes.features.Category
+import com.github.wadey3636.noobroutes.features.Module
+import com.github.wadey3636.noobroutes.features.settings.Setting.Companion.withDependency
+import com.github.wadey3636.noobroutes.features.settings.impl.BooleanSetting
+import com.github.wadey3636.noobroutes.features.settings.impl.ColorSetting
+import com.github.wadey3636.noobroutes.features.settings.impl.NumberSetting
+import com.github.wadey3636.noobroutes.utils.*
+import com.github.wadey3636.noobroutes.utils.render.Color
+import com.github.wadey3636.noobroutes.utils.render.RenderUtils.renderVec
+import com.github.wadey3636.noobroutes.utils.render.Renderer
+import com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils
+import com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Room
+import com.github.wadey3636.noobroutes.utils.skyblock.skyblockID
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -25,7 +25,6 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
 
 object Blaze : Module(
@@ -78,7 +77,12 @@ object Blaze : Module(
         Vec3(11.0, 51.0, 23.0),
         Vec3(8.0, 37.0, 11.0)
     )
-    private val higherBlazeEWLocations = listOf<Vec3>()
+    private val higherBlazeEWLocations = listOf<Vec3>(
+        Vec3(19.0, 90.0, 20.0),
+        Vec3(20.0, 85.0, 11.0),
+        Vec3(9.0, 113.0, 18.0),
+        Vec3(8.0, 107.0, 9.0)
+    )
 
 
     /**
@@ -112,6 +116,9 @@ object Blaze : Module(
             "Lower Blaze" -> {
                 Etherwarper.etherwarpToVec3(event.room.getRealCoords(12, 70, 24).toVec3().add(0.5, 0.5, 0.5), silent)
             }
+            "Higher Blaze" -> {
+                Etherwarper.etherwarpToVec3(event.room.getRealCoords(15, 69, 14).toVec3().add(0.5, 0.5, 0.5), silent)
+            }
         }
 
         if (toggleSG) {
@@ -135,7 +142,7 @@ object Blaze : Module(
 
 
     @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
+    fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || Etherwarper.warping) return
         val room = DungeonUtils.currentRoom ?: return
         if (!room.data.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
@@ -148,7 +155,8 @@ object Blaze : Module(
         if (handleConnectPoints(room)) return
         if (blazes.isEmpty()) return
         currentBlazeTarget = blazes[0]
-        if (mc.thePlayer.posY > 60) return
+        if (mc.thePlayer.posY > 60 && room.data.name == "Lower Blaze") return
+        if (mc.thePlayer.posY < 78 && room.data.name == "Higher Blaze") return
         val ewPoints: List<Vec3> = if (room.data.name == "Lower Blaze") {
             lowerBlazeEWLocations.map { room.getRealCoords(it) }
         } else {
@@ -172,8 +180,8 @@ object Blaze : Module(
         if (room.data.name == "Lower Blaze" && isOnBlock(room.getRealCoords(BlockPos(12, 70, 24)))) {
             Etherwarper.etherwarpToVec3(room.getRealCoords(22, 56, 16).toVec3().add(0.5, 1.0, 0.5), silent)
             return true
-        } else if (room.data.name == "Higher Blaze" && isOnBlock(room.getRealCoords(BlockPos(11, 51, 23)))) {
-            //Etherwarper.etherwarpToVec3(room.getRealCoords(11, 31, 10).toVec3().add(0.5, 1.0, 0.5), silent)
+        } else if (room.data.name == "Higher Blaze" && isOnBlock(room.getRealCoords(BlockPos(15, 69, 14)))) {
+            Etherwarper.etherwarpToVec3(room.getRealCoords(20, 85, 11).toVec3().add(0.5, 1.0, 0.5), silent)
             return true
         }
         return false
@@ -210,19 +218,37 @@ object Blaze : Module(
             if (blazeHighlight) Renderer.drawBlock(it, blazeHighlightColor)
         }
 
-        val pos = room.getRealCoords(12, 70, 24).toVec3().add(0.5, 0.5, 0.5)
-        Renderer.drawBox(
-            AxisAlignedBB(
-                pos.xCoord - 0.03,
-                pos.yCoord,
-                pos.zCoord - 0.03,
-                pos.xCoord + 0.03,
-                pos.yCoord + 0.06,
-                pos.zCoord + 0.03
-            ), Color.GREEN, fillAlpha = 0, outlineWidth = 1.5F
-        )
+        if (room.data.name == "Higher Blaze") {
 
-        lowerBlazeEWLocations.forEach {
+
+        }
+            higherBlazeEWLocations.forEach {
+                val pos1 = room.getRealCoords(it).add(0.5, 1.0, 0.5)
+                Renderer.drawBox(
+                    AxisAlignedBB(
+                        pos1.xCoord - 0.03,
+                        pos1.yCoord,
+                        pos1.zCoord - 0.03,
+                        pos1.xCoord + 0.03,
+                        pos1.yCoord + 0.06,
+                        pos1.zCoord + 0.03
+                    ), Color.GREEN, fillAlpha = 0, outlineWidth = 1.5F
+                )
+        }
+
+        if (room.data.name == "Lower Blaze") {
+            val pos = room.getRealCoords(12, 70, 24).toVec3().add(0.5, 0.5, 0.5)
+            Renderer.drawBox(
+                AxisAlignedBB(
+                    pos.xCoord - 0.03,
+                    pos.yCoord,
+                    pos.zCoord - 0.03,
+                    pos.xCoord + 0.03,
+                    pos.yCoord + 0.06,
+                    pos.zCoord + 0.03
+                ), Color.GREEN, fillAlpha = 0, outlineWidth = 1.5F
+            )
+            lowerBlazeEWLocations.forEach {
             val pos1 = room.getRealCoords(it).add(0.5, 1.0, 0.5)
             Renderer.drawBox(
                 AxisAlignedBB(
@@ -234,6 +260,7 @@ object Blaze : Module(
                     pos1.zCoord + 0.03
                 ), Color.GREEN, fillAlpha = 0, outlineWidth = 1.5F
             )
+        }
         }
 
         currentBlazeTarget?.let {
@@ -257,7 +284,7 @@ object Blaze : Module(
             }
 
             SwapManager.SwapState.SWAPPED -> {
-                schedulePreTickTask(1) {
+                Scheduler.schedulePostPlayerTickTask(1) {
                     RotationUtils.clickAt(rot.first, rot.second, silent)
                 }
             }

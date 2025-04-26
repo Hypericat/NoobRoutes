@@ -1,11 +1,11 @@
 package com.github.wadey3636.noobroutes.features.misc
 
-import me.noobmodcore.Core
-import me.noobmodcore.features.Category
-import me.noobmodcore.features.Module
-import me.noobmodcore.utils.render.Color
-import me.noobmodcore.utils.render.text
-import me.noobmodcore.utils.skyblock.modMessage
+import com.github.wadey3636.noobroutes.Core
+import com.github.wadey3636.noobroutes.features.Category
+import com.github.wadey3636.noobroutes.features.Module
+import com.github.wadey3636.noobroutes.utils.render.Color
+import com.github.wadey3636.noobroutes.utils.render.text
+import com.github.wadey3636.noobroutes.utils.skyblock.modMessage
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.world.WorldEvent

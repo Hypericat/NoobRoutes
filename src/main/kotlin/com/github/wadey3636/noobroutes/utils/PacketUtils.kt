@@ -2,7 +2,7 @@ package com.github.wadey3636.noobroutes.utils
 
 
 
-import me.noobmodcore.Core.mc
+import com.github.wadey3636.noobroutes.Core.mc
 import net.minecraft.network.Packet
 
 object PacketUtils {
