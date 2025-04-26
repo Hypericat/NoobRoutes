@@ -1,10 +1,10 @@
-package com.github.wadey3636.noobroutes.font
+package noobroutes.font
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.utils.noControlCodes
-import com.github.wadey3636.noobroutes.utils.render.Color
-import com.github.wadey3636.noobroutes.utils.render.TextAlign
-import com.github.wadey3636.noobroutes.utils.render.TextPos
+import noobroutes.Core.mc
+import noobroutes.utils.noControlCodes
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.TextAlign
+import noobroutes.utils.render.TextPos
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.GlStateManager
 import kotlin.math.max

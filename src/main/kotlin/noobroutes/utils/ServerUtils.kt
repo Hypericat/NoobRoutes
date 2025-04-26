@@ -1,7 +1,7 @@
-package com.github.wadey3636.noobroutes.utils
+package noobroutes.utils
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.utils.clock.Executor.Companion.register
+import noobroutes.Core.mc
+import noobroutes.utils.clock.Executor.Companion.register
 import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C16PacketClientStatus
 import net.minecraft.network.play.server.S01PacketJoinGame
@@ -36,13 +36,13 @@ object ServerUtils {
     }
 
     init {
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.clock.Executor(2000, "ClientUtils") {
+        _root_ide_package_.noobroutes.utils.clock.Executor(2000, "ClientUtils") {
             sendPing()
         }.register()
     }
 
     @SubscribeEvent
-    fun onPacket(event: com.github.wadey3636.noobroutes.events.impl.PacketEvent.Receive) {
+    fun onPacket(event: noobroutes.events.impl.PacketEvent.Receive) {
         when (event.packet) {
             is S37PacketStatistics -> averagePing = (System.nanoTime() - pingStartTime) / 1e6
 

@@ -1,6 +1,6 @@
-package com.github.wadey3636.noobroutes.ui.clickgui.animations.impl
+package noobroutes.ui.clickgui.animations.impl
 
-import com.github.wadey3636.noobroutes.ui.clickgui.animations.Animation
+import noobroutes.ui.clickgui.animations.Animation
 
 class LinearAnimation<E>(duration: Long): Animation<E>(duration) where E : Number, E: Comparable<E> {
 

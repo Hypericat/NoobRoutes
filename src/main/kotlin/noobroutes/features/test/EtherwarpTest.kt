@@ -1,13 +1,13 @@
-package com.github.wadey3636.noobroutes.features.test
+package noobroutes.features.test
 
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.features.Module
-import com.github.wadey3636.noobroutes.features.floor7.AutoP3
-import com.github.wadey3636.noobroutes.features.settings.impl.BooleanSetting
-import com.github.wadey3636.noobroutes.utils.Etherwarper
-import com.github.wadey3636.noobroutes.utils.add
-import com.github.wadey3636.noobroutes.utils.render.Color
-import com.github.wadey3636.noobroutes.utils.render.Renderer
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.floor7.AutoP3
+import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.utils.Etherwarper
+import noobroutes.utils.add
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.Renderer
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

@@ -1,6 +1,6 @@
-package com.github.wadey3636.noobroutes.utils
+package noobroutes.utils
 
-import com.github.wadey3636.noobroutes.Core.logger
+import noobroutes.Core.logger
 import java.lang.reflect.Field
 
 object SecretGuideIntegration {

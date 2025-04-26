@@ -1,12 +1,8 @@
-package com.github.wadey3636.noobroutes.utils.skyblock
+package noobroutes.utils.skyblock
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.utils.get
-import com.github.wadey3636.noobroutes.utils.multiply
-import com.github.wadey3636.noobroutes.utils.render.RenderUtils.renderVec
-import com.github.wadey3636.noobroutes.utils.round
-import com.github.wadey3636.noobroutes.utils.toBlockPos
-import com.github.wadey3636.noobroutes.utils.*
+import noobroutes.Core.mc
+import noobroutes.utils.*
+import noobroutes.utils.render.RenderUtils.renderVec
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import kotlin.math.*
@@ -31,13 +27,13 @@ object EtherWarpHelper {
     fun getEtherPos(pos: Vec3, yaw: Float, pitch: Float, distance: Double = 60.0, returnEnd: Boolean = false): EtherPos {
         mc.thePlayer ?: return EtherPos.NONE
 
-        val startPos: Vec3 = _root_ide_package_.com.github.wadey3636.noobroutes.utils.getPositionEyes(pos)
-        val endPos = _root_ide_package_.com.github.wadey3636.noobroutes.utils.getLook(yaw = yaw, pitch = pitch).normalize().multiply(factor = distance).add(startPos)
+        val startPos: Vec3 = _root_ide_package_.noobroutes.utils.getPositionEyes(pos)
+        val endPos = _root_ide_package_.noobroutes.utils.getLook(yaw = yaw, pitch = pitch).normalize().multiply(factor = distance).add(startPos)
 
         return traverseVoxels(startPos, endPos).takeUnless { it == EtherPos.NONE && returnEnd } ?: EtherPos(true, endPos.toBlockPos())
     }
 
-    fun getEtherPos(positionLook: com.github.wadey3636.noobroutes.utils.PositionLook = _root_ide_package_.com.github.wadey3636.noobroutes.utils.PositionLook(
+    fun getEtherPos(positionLook: noobroutes.utils.PositionLook = _root_ide_package_.noobroutes.utils.PositionLook(
         mc.thePlayer.renderVec,
         mc.thePlayer.rotationYaw,
         mc.thePlayer.rotationPitch

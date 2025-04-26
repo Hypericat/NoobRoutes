@@ -1,8 +1,8 @@
-package com.github.wadey3636.noobroutes.ui.clickgui.util
+package noobroutes.ui.clickgui.util
 
 
-import com.github.wadey3636.noobroutes.ui.clickgui.animations.impl.LinearAnimation
-import com.github.wadey3636.noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.ui.clickgui.animations.impl.LinearAnimation
+import noobroutes.ui.util.MouseUtils.isAreaHovered
 
 class HoverHandler(private val startDelay: Long, delay: Long) {
 

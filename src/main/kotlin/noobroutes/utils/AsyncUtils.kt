@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.utils
+package noobroutes.utils
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope

@@ -1,21 +1,21 @@
-package com.github.wadey3636.noobroutes.ui.hud
+package noobroutes.ui.hud
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.features.ModuleManager.huds
-import com.github.wadey3636.noobroutes.features.Module
-import com.github.wadey3636.noobroutes.features.settings.impl.BooleanSetting
-import com.github.wadey3636.noobroutes.features.settings.impl.NumberSetting
-import com.github.wadey3636.noobroutes.ui.clickgui.animations.impl.EaseInOut
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.withAlpha
-import com.github.wadey3636.noobroutes.ui.clickgui.util.HoverHandler
-import com.github.wadey3636.noobroutes.ui.hud.EditHUDGui.dragging
-import com.github.wadey3636.noobroutes.ui.util.MouseUtils.isAreaHovered
-import com.github.wadey3636.noobroutes.utils.endProfile
-import com.github.wadey3636.noobroutes.utils.render.Color
-import com.github.wadey3636.noobroutes.utils.render.rectangleOutline
-import com.github.wadey3636.noobroutes.utils.render.scale
-import com.github.wadey3636.noobroutes.utils.render.translate
-import com.github.wadey3636.noobroutes.utils.startProfile
+import noobroutes.Core.mc
+import noobroutes.features.Module
+import noobroutes.features.ModuleManager.huds
+import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.ui.clickgui.animations.impl.EaseInOut
+import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.ui.clickgui.util.HoverHandler
+import noobroutes.ui.hud.EditHUDGui.dragging
+import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.utils.endProfile
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.rectangleOutline
+import noobroutes.utils.render.scale
+import noobroutes.utils.render.translate
+import noobroutes.utils.startProfile
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.Display
@@ -167,11 +167,14 @@ open class HudElement(
     /** Used for smooth resetting animations */
     internal var resetScale: Float = 0f
 
-    private val xHud = NumberSetting("$settingName x", default = x, hidden = true, min = 0f, max = Float.MAX_VALUE, description = "")
-    private val yHud = NumberSetting("$settingName y", default = y, hidden = true, min = 0f, max = Float.MAX_VALUE, description = "")
+    private val xHud =
+        NumberSetting("$settingName x", default = x, hidden = true, min = 0f, max = Float.MAX_VALUE, description = "")
+    private val yHud =
+        NumberSetting("$settingName y", default = y, hidden = true, min = 0f, max = Float.MAX_VALUE, description = "")
 
     init {
-        val scaleHud = NumberSetting("$settingName scale", defaultScale, 1f, 8.0f, 0.01f, hidden = true, description = "")
+        val scaleHud =
+            NumberSetting("$settingName scale", defaultScale, 1f, 8.0f, 0.01f, hidden = true, description = "")
 
         this.xSetting = xHud
         this.ySetting = yHud

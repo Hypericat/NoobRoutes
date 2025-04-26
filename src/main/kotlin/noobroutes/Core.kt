@@ -1,10 +1,10 @@
-package com.github.wadey3636.noobroutes
+package noobroutes
 
-import com.github.wadey3636.noobroutes.config.Config
-import com.github.wadey3636.noobroutes.features.floor7.AutoP3
-import com.github.wadey3636.noobroutes.font.OdinFont
-import com.github.wadey3636.noobroutes.ui.clickgui.ClickGUI
-import com.github.wadey3636.noobroutes.ui.util.shader.RoundedRect
+import noobroutes.config.Config
+import noobroutes.features.floor7.AutoP3
+import noobroutes.font.OdinFont
+import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.ui.util.shader.RoundedRect
 import kotlinx.coroutines.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen

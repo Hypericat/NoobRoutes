@@ -1,9 +1,9 @@
-package com.github.wadey3636.noobroutes.utils.skyblock
+package noobroutes.utils.skyblock
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.utils.equalsOneOf
-import com.github.wadey3636.noobroutes.utils.noControlCodes
-import com.github.wadey3636.noobroutes.utils.render.RenderUtils.bind
+import noobroutes.Core.mc
+import noobroutes.utils.equalsOneOf
+import noobroutes.utils.noControlCodes
+import noobroutes.utils.render.RenderUtils.bind
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
@@ -132,17 +132,17 @@ fun getItemIndexInContainerChestByLore(container: ContainerChest, lore: String, 
 enum class ItemRarity(
     val loreName: String,
     val colorCode: String,
-    val color: com.github.wadey3636.noobroutes.utils.render.Color
+    val color: noobroutes.utils.render.Color
 ) {
-    COMMON("COMMON", "§f", _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.WHITE),
-    UNCOMMON("UNCOMMON", "§2", _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.GREEN),
-    RARE("RARE", "§9", _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.BLUE),
-    EPIC("EPIC", "§5", _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.PURPLE),
-    LEGENDARY("LEGENDARY", "§6", _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.ORANGE),
-    MYTHIC("MYTHIC", "§d", _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.MAGENTA),
-    DIVINE("DIVINE", "§b", _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.CYAN),
-    SPECIAL("SPECIAL", "§c", _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.RED),
-    VERY_SPECIAL("VERY SPECIAL", "§c", _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.RED);
+    COMMON("COMMON", "§f", _root_ide_package_.noobroutes.utils.render.Color.Companion.WHITE),
+    UNCOMMON("UNCOMMON", "§2", _root_ide_package_.noobroutes.utils.render.Color.Companion.GREEN),
+    RARE("RARE", "§9", _root_ide_package_.noobroutes.utils.render.Color.Companion.BLUE),
+    EPIC("EPIC", "§5", _root_ide_package_.noobroutes.utils.render.Color.Companion.PURPLE),
+    LEGENDARY("LEGENDARY", "§6", _root_ide_package_.noobroutes.utils.render.Color.Companion.ORANGE),
+    MYTHIC("MYTHIC", "§d", _root_ide_package_.noobroutes.utils.render.Color.Companion.MAGENTA),
+    DIVINE("DIVINE", "§b", _root_ide_package_.noobroutes.utils.render.Color.Companion.CYAN),
+    SPECIAL("SPECIAL", "§c", _root_ide_package_.noobroutes.utils.render.Color.Companion.RED),
+    VERY_SPECIAL("VERY SPECIAL", "§c", _root_ide_package_.noobroutes.utils.render.Color.Companion.RED);
 }
 
 private val rarityRegex = Regex("§l(?<rarity>${ItemRarity.entries.joinToString("|") { it.loreName }}) ?(?<type>[A-Z ]+)?(?:§[0-9a-f]§l§ka)?$")
@@ -208,9 +208,9 @@ fun ItemStack.setLoreWidth(lines: List<String>, width: Int): ItemStack {
 
 fun ItemStack.drawItem(x: Float = 0f, y: Float = 0f, scale: Float = 1f, z: Float = 200f) {
     GlStateManager.pushMatrix()
-    _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.scale(scale, scale, 1f)
-    _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.translate(x / scale, y / scale, 0f)
-    _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.WHITE.bind()
+    _root_ide_package_.noobroutes.utils.render.scale(scale, scale, 1f)
+    _root_ide_package_.noobroutes.utils.render.translate(x / scale, y / scale, 0f)
+    _root_ide_package_.noobroutes.utils.render.Color.Companion.WHITE.bind()
 
     RenderHelper.enableStandardItemLighting()
     RenderHelper.enableGUIStandardItemLighting()

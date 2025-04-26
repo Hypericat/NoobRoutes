@@ -1,7 +1,7 @@
-package com.github.wadey3636.noobroutes.features.move
+package noobroutes.features.move
 
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.features.Module
+import noobroutes.features.Category
+import noobroutes.features.Module
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 

@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.utils.skyblock.dungeon
+package noobroutes.utils.skyblock.dungeon
 
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ResourceLocation
@@ -65,17 +65,17 @@ sealed class PuzzleStatus {
  *
  */
 enum class DungeonClass(
-    val color: com.github.wadey3636.noobroutes.utils.render.Color,
+    val color: noobroutes.utils.render.Color,
     val colorCode: Char,
     val defaultQuadrant: Int,
     var priority: Int,
 ) {
-    Archer(_root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.ORANGE, '6', 0, 2),
-    Berserk(_root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.DARK_RED, '4', 1, 0),
-    Healer(_root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.PINK, 'd', 2, 2),
-    Mage(_root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.BLUE, 'b', 3, 2),
-    Tank(_root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.DARK_GREEN, '2', 3, 1),
-    Unknown(_root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.WHITE, 'f', 0, 0)
+    Archer(_root_ide_package_.noobroutes.utils.render.Color.Companion.ORANGE, '6', 0, 2),
+    Berserk(_root_ide_package_.noobroutes.utils.render.Color.Companion.DARK_RED, '4', 1, 0),
+    Healer(_root_ide_package_.noobroutes.utils.render.Color.Companion.PINK, 'd', 2, 2),
+    Mage(_root_ide_package_.noobroutes.utils.render.Color.Companion.BLUE, 'b', 3, 2),
+    Tank(_root_ide_package_.noobroutes.utils.render.Color.Companion.DARK_GREEN, '2', 3, 1),
+    Unknown(_root_ide_package_.noobroutes.utils.render.Color.Companion.WHITE, 'f', 0, 0)
 }
 
 enum class Blessing(

@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.features.settings.impl
+package noobroutes.features.settings.impl
 
 import com.google.gson.JsonElement
 
@@ -11,8 +11,8 @@ class ListSetting<E, T : MutableCollection<E>>(
     name: String,
     override val default: T,
     description: String = "",
-) : com.github.wadey3636.noobroutes.features.settings.Setting<T>(name, true, description),
-    com.github.wadey3636.noobroutes.features.settings.Saving {
+) : noobroutes.features.settings.Setting<T>(name, true, description),
+    noobroutes.features.settings.Saving {
 
     override var value: T = default
 

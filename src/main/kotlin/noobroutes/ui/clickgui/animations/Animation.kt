@@ -1,6 +1,6 @@
-package com.github.wadey3636.noobroutes.ui.clickgui.animations
+package noobroutes.ui.clickgui.animations
 
-import com.github.wadey3636.noobroutes.utils.clock.Clock
+import noobroutes.utils.clock.Clock
 
 /**
  * Simple class that calculates a "point" between two values and a percentage.

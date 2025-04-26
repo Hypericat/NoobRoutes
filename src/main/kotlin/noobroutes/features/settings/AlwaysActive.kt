@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.features.settings
+package noobroutes.features.settings
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)

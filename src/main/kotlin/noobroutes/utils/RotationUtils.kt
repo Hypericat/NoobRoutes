@@ -1,9 +1,9 @@
-package com.github.wadey3636.noobroutes.utils
+package noobroutes.utils
 
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.features.Blink
-import com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.Core.mc
+import noobroutes.features.Blink
+import noobroutes.utils.skyblock.PlayerUtils
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent

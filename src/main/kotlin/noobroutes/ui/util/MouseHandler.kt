@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.ui.util
+package noobroutes.ui.util
 
 /**
  * Edited verison of OneConfig InputHandler to have a translation option cuz why not
@@ -21,11 +21,13 @@ class MouseHandler {
         tY = y
     }
 
-    val mouseX get() =
-        (MouseUtils.mouseX - tX) / scaleX
+    val mouseX
+        get() =
+            (MouseUtils.mouseX - tX) / scaleX
 
-    val mouseY get() =
-        (MouseUtils.mouseY - tY) / scaleY
+    val mouseY
+        get() =
+            (MouseUtils.mouseY - tY) / scaleY
 
     fun isAreaHovered(x: Float, y: Float, width: Float, height: Float): Boolean =
         mouseX > x && mouseY > y && mouseX < x + width && mouseY < y + height

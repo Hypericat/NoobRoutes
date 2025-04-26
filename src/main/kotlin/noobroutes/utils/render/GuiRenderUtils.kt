@@ -1,12 +1,11 @@
-package com.github.wadey3636.noobroutes.utils.render
+package noobroutes.utils.render
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.font.OdinFont
-import com.github.wadey3636.noobroutes.utils.*
+import noobroutes.Core.mc
+import noobroutes.font.OdinFont
+import noobroutes.ui.clickgui.util.ColorUtil
+import noobroutes.ui.util.shader.RoundedRect
+import noobroutes.utils.*
 import gg.essential.universal.UMatrixStack
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil
-import com.github.wadey3636.noobroutes.ui.util.shader.RoundedRect
-import com.github.wadey3636.noobroutes.utils.*
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
@@ -16,7 +15,7 @@ import org.lwjgl.opengl.GL11
 val matrix = UMatrixStack.Compat
 val scaleFactor get() = ScaledResolution(mc).scaleFactor.toFloat()
 private val arrowIcon = DynamicTexture(
-    _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.loadBufferedImage(
+    _root_ide_package_.noobroutes.utils.render.RenderUtils.loadBufferedImage(
         "/assets/defnotstolen/clickgui/arrow.png"
     )
 )
@@ -110,7 +109,7 @@ fun circle(x: Number, y: Number, radius: Number, color: Color, borderColor: Colo
     }
 }
 
-fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = OdinFont.REGULAR, align: TextAlign = _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false) {
+fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = OdinFont.REGULAR, align: TextAlign = _root_ide_package_.noobroutes.utils.render.TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false) {
     OdinFont.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
 }
 
@@ -118,7 +117,7 @@ fun mcText(text: String, x: Number, y: Number, scale: Number, color: Color, shad
     RenderUtils.drawText("$text§r", x.toFloat(), y.toFloat(), scale.toDouble(), color, shadow, center)
 }
 
-fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = OdinFont.REGULAR, align: TextAlign = _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false): Float {
+fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = OdinFont.REGULAR, align: TextAlign = _root_ide_package_.noobroutes.utils.render.TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false): Float {
     text(text, x, y, color, size, type, align, verticalAlign, shadow)
     return getTextWidth(text, size).toFloat()
 }
@@ -216,7 +215,7 @@ fun drawDynamicTexture(dynamicTexture: DynamicTexture, x: Number, y: Number, w: 
 
     dynamicTexture.updateDynamicTexture()
     GlStateManager.bindTexture(dynamicTexture.glTextureId)
-    _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.drawTexturedModalRect(
+    _root_ide_package_.noobroutes.utils.render.RenderUtils.drawTexturedModalRect(
         x.toInt(),
         y.toInt(),
         w.toInt(),

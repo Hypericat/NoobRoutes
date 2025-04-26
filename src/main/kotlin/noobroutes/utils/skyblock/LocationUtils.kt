@@ -1,11 +1,11 @@
-package com.github.wadey3636.noobroutes.utils.skyblock
+package noobroutes.utils.skyblock
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.features.render.ClickGUIModule
-import com.github.wadey3636.noobroutes.utils.cleanLine
-import com.github.wadey3636.noobroutes.utils.cleanSB
-import com.github.wadey3636.noobroutes.utils.clock.Executor.Companion.register
-import com.github.wadey3636.noobroutes.utils.sidebarLines
+import noobroutes.Core.mc
+import noobroutes.features.render.ClickGUIModule
+import noobroutes.utils.cleanLine
+import noobroutes.utils.cleanSB
+import noobroutes.utils.clock.Executor.Companion.register
+import noobroutes.utils.sidebarLines
 import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.network.play.server.S3FPacketCustomPayload
 import net.minecraftforge.event.world.WorldEvent
@@ -20,13 +20,13 @@ object LocationUtils {
 
     inline val isSinglePlayer get() = currentArea.isArea(Island.SinglePlayer)
 
-    var currentDungeon: com.github.wadey3636.noobroutes.utils.skyblock.dungeon.Dungeon? = null
+    var currentDungeon: noobroutes.utils.skyblock.dungeon.Dungeon? = null
         private set
     var currentArea: Island = Island.Unknown
     var kuudraTier: Int = 0
 
     init {
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.clock.Executor(500, "LocationUtils") {
+        _root_ide_package_.noobroutes.utils.clock.Executor(500, "LocationUtils") {
             if (!isInSkyblock)
                 isInSkyblock = isOnHypixel && mc.theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)
                     ?.let { cleanSB(it.displayName).contains("SKYBLOCK") } == true
@@ -38,10 +38,10 @@ object LocationUtils {
 
             if (currentArea.isArea(Island.Unknown)) currentArea = getArea()
 
-            if ((_root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons || currentArea.isArea(
+            if ((_root_ide_package_.noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons || currentArea.isArea(
                     Island.SinglePlayer
                 )) && currentDungeon == null
-            ) currentDungeon = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.Dungeon(
+            ) currentDungeon = _root_ide_package_.noobroutes.utils.skyblock.dungeon.Dungeon(
                 getFloor() ?: return@Executor
             )
 
@@ -78,7 +78,7 @@ object LocationUtils {
     }
 
     @SubscribeEvent
-    fun onPacket(event: com.github.wadey3636.noobroutes.events.impl.PacketEvent.Receive) {
+    fun onPacket(event: noobroutes.events.impl.PacketEvent.Receive) {
         if (isOnHypixel || event.packet !is S3FPacketCustomPayload || event.packet.channelName != "MC|Brand") return
         if (event.packet.bufferData?.readStringFromBuffer(Short.MAX_VALUE.toInt())?.contains("hypixel", true) == true) isOnHypixel = true
     }
@@ -103,10 +103,10 @@ object LocationUtils {
         return Island.entries.firstOrNull { area?.contains(it.displayName, true) == true } ?: Island.Unknown
     }
 
-    fun getFloor(): com.github.wadey3636.noobroutes.utils.skyblock.dungeon.Floor? {
-        if (currentArea.isArea(Island.SinglePlayer)) return _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.Floor.E
+    fun getFloor(): noobroutes.utils.skyblock.dungeon.Floor? {
+        if (currentArea.isArea(Island.SinglePlayer)) return _root_ide_package_.noobroutes.utils.skyblock.dungeon.Floor.E
         for (i in sidebarLines) {
-            return _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.Floor.valueOf(Regex("The Catacombs \\((\\w+)\\)\$").find(cleanSB(i))?.groupValues?.get(1) ?: continue)
+            return _root_ide_package_.noobroutes.utils.skyblock.dungeon.Floor.valueOf(Regex("The Catacombs \\((\\w+)\\)\$").find(cleanSB(i))?.groupValues?.get(1) ?: continue)
         }
         return null
     }

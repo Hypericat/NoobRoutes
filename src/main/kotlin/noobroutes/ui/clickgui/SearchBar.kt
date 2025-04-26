@@ -1,14 +1,14 @@
-package com.github.wadey3636.noobroutes.ui.clickgui
+package noobroutes.ui.clickgui
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.font.OdinFont
-import com.github.wadey3636.noobroutes.ui.clickgui.animations.impl.ColorAnimation
-import com.github.wadey3636.noobroutes.ui.clickgui.elements.menu.ElementTextField
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.buttonColor
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.withAlpha
-import com.github.wadey3636.noobroutes.ui.util.MouseUtils
-import com.github.wadey3636.noobroutes.utils.render.*
+import noobroutes.Core.mc
+import noobroutes.font.OdinFont
+import noobroutes.ui.clickgui.animations.impl.ColorAnimation
+import noobroutes.ui.clickgui.elements.menu.ElementTextField
+import noobroutes.ui.clickgui.util.ColorUtil
+import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
+import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.ui.util.MouseUtils
+import noobroutes.utils.render.*
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
 

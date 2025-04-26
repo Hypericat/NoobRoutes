@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.features.settings.impl
+package noobroutes.features.settings.impl
 
 
 import com.google.gson.JsonElement
@@ -19,8 +19,8 @@ class NumberSetting<E>(
         hidden: Boolean = false,
         description: String,
         val unit: String = "",
-) : com.github.wadey3636.noobroutes.features.settings.Setting<E>(name, hidden, description),
-    com.github.wadey3636.noobroutes.features.settings.Saving where E : Number, E : Comparable<E> {
+) : noobroutes.features.settings.Setting<E>(name, hidden, description),
+    noobroutes.features.settings.Saving where E : Number, E : Comparable<E> {
 
     override var value: E = default
         set(value) {

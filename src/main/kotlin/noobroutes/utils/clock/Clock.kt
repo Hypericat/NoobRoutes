@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.utils.clock
+package noobroutes.utils.clock
 
 @Suppress("NOTHING_TO_INLINE")
 /**

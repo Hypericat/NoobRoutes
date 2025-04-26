@@ -1,11 +1,11 @@
-package com.github.wadey3636.noobroutes.features.settings
+package noobroutes.features.settings
 
 import com.google.gson.JsonElement
 
 /**
  * Used for settings that you want to save/load.
  *
- * @see com.github.wadey3636.noobroutes.features.settings.impl.BooleanSetting
+ * @see noobroutes.features.settings.impl.BooleanSetting
  */
 internal interface Saving {
     /**

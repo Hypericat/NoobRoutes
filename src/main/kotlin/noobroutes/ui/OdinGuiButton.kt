@@ -1,9 +1,9 @@
-package com.github.wadey3636.noobroutes.ui
+package noobroutes.ui
 
-import com.github.wadey3636.noobroutes.features.render.ClickGUIModule
-import com.github.wadey3636.noobroutes.font.OdinFont
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.darker
-import com.github.wadey3636.noobroutes.utils.render.*
+import noobroutes.features.render.ClickGUIModule
+import noobroutes.font.OdinFont
+import noobroutes.ui.clickgui.util.ColorUtil.darker
+import noobroutes.utils.render.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.renderer.GlStateManager

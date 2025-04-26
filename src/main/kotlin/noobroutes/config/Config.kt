@@ -1,10 +1,10 @@
-package com.github.wadey3636.noobroutes.config
+package noobroutes.config
 
-import com.github.wadey3636.noobroutes.Core.logger
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.features.ModuleManager
+import noobroutes.Core.logger
+import noobroutes.Core.mc
+import noobroutes.features.ModuleManager
+import noobroutes.features.settings.Saving
 import com.google.gson.*
-import com.github.wadey3636.noobroutes.features.settings.Saving
 import java.io.File
 
 /**

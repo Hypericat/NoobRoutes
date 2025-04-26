@@ -1,9 +1,9 @@
-package com.github.wadey3636.noobroutes.utils
+package noobroutes.utils
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.features.render.ClickGUIModule.devMode
-import com.github.wadey3636.noobroutes.utils.render.Color
-import com.github.wadey3636.noobroutes.utils.render.Renderer
+import noobroutes.Core.mc
+import noobroutes.features.render.ClickGUIModule.devMode
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.Renderer
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityArrow

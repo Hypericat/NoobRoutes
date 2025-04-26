@@ -1,13 +1,13 @@
-package com.github.wadey3636.noobroutes.features.floor7
+package noobroutes.features.floor7
 
-import com.github.wadey3636.noobroutes.features.Blink.skip
-import com.github.wadey3636.noobroutes.utils.AutoP3Utils
-import com.github.wadey3636.noobroutes.utils.AutoP3Utils.walking
-import com.github.wadey3636.noobroutes.utils.Scheduler
-import com.github.wadey3636.noobroutes.utils.Utils.isClose
-import com.github.wadey3636.noobroutes.events.impl.MotionUpdateEvent
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.features.Module
+import noobroutes.events.impl.MotionUpdateEvent
+import noobroutes.features.Blink.skip
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.AutoP3Utils.walking
+import noobroutes.utils.Scheduler
+import noobroutes.utils.Utils.isClose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 

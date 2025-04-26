@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.features.settings.impl
+package noobroutes.features.settings.impl
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
@@ -10,8 +10,8 @@ class KeybindSetting(
     override val default: Keybinding,
     description: String,
     hidden: Boolean = false
-) : com.github.wadey3636.noobroutes.features.settings.Setting<Keybinding>(name, hidden, description),
-    com.github.wadey3636.noobroutes.features.settings.Saving {
+) : noobroutes.features.settings.Setting<Keybinding>(name, hidden, description),
+    noobroutes.features.settings.Saving {
 
     constructor(name: String, key: Int, description: String, hidden: Boolean = false) : this(name, Keybinding(key), description, hidden)
 

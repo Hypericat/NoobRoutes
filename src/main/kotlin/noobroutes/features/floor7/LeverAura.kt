@@ -1,10 +1,10 @@
-package com.github.wadey3636.noobroutes.features.floor7
+package noobroutes.features.floor7
 
-import com.github.wadey3636.noobroutes.utils.AuraManager
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.features.Module
-import com.github.wadey3636.noobroutes.features.settings.impl.NumberSetting
-import com.github.wadey3636.noobroutes.utils.toVec3
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.utils.AuraManager
+import noobroutes.utils.toVec3
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent

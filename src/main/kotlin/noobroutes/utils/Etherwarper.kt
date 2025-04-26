@@ -1,10 +1,10 @@
-package com.github.wadey3636.noobroutes.utils
+package noobroutes.utils
 
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.events.impl.S08Event
-import com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils
-import com.github.wadey3636.noobroutes.utils.skyblock.devMessage
+import noobroutes.Core.mc
+import noobroutes.events.impl.S08Event
+import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -25,14 +25,7 @@ object Etherwarper {
         val rot = RotationUtils.getYawAndPitch(vec3, true)
         RotationUtils.clickAt(rot.first, rot.second, silent, true)
 
-        /*
-        if (silent) SilentRotator.doSilentRotation()
-        RotationUtils.setAngles(rot.first + RotationUtils.offset, rot.second)
-        Scheduler.schedulePostTickTask {
-            if (mc.thePlayer.isSneaking) PlayerUtils.airClick()
-        }
 
-         */
 
     }
 

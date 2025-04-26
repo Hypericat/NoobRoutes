@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.mixin;
+package noobroutes.mixin;
 
 
 import net.minecraft.client.Minecraft;

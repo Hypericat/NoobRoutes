@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.features.settings.impl
+package noobroutes.features.settings.impl
 
 import com.google.gson.JsonElement
 
@@ -12,8 +12,8 @@ class MapSetting<K, V, T : MutableMap<K, V>>(
     override val default: T,
     description: String,
     hidden: Boolean = false
-) : com.github.wadey3636.noobroutes.features.settings.Setting<T>(name, hidden, description),
-    com.github.wadey3636.noobroutes.features.settings.Saving {
+) : noobroutes.features.settings.Setting<T>(name, hidden, description),
+    noobroutes.features.settings.Saving {
 
     override var value: T = default
 

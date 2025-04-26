@@ -1,9 +1,9 @@
-package com.github.wadey3636.noobroutes.commands
+package noobroutes.commands
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.features.test.AuraTest.blockAuraList
-import com.github.wadey3636.noobroutes.features.render.ClickGUIModule.devMode
-import com.github.wadey3636.noobroutes.utils.skyblock.modMessage
+import noobroutes.Core.mc
+import noobroutes.features.render.ClickGUIModule.devMode
+import noobroutes.features.test.AuraTest.blockAuraList
+import noobroutes.utils.skyblock.modMessage
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 

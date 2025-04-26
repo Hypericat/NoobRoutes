@@ -1,10 +1,10 @@
-package com.github.wadey3636.noobroutes.utils
+package noobroutes.utils
 
-import com.github.wadey3636.noobroutes.Core.logger
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.utils.BlockUtils.collisionRayTrace
-import com.github.wadey3636.noobroutes.events.impl.PacketEvent
-import com.github.wadey3636.noobroutes.utils.skyblock.devMessage
+import noobroutes.Core.logger
+import noobroutes.Core.mc
+import noobroutes.events.impl.PacketEvent
+import noobroutes.utils.BlockUtils.collisionRayTrace
+import noobroutes.utils.skyblock.devMessage
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C02PacketUseEntity.Action

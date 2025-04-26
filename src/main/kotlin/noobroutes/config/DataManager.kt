@@ -1,6 +1,6 @@
-package com.github.wadey3636.noobroutes.config
+package noobroutes.config
 
-import com.github.wadey3636.noobroutes.Core.mc
+import noobroutes.Core.mc
 import com.google.gson.*
 import java.io.File
 import java.io.IOException

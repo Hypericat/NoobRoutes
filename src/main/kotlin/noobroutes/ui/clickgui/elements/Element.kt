@@ -1,10 +1,10 @@
-package com.github.wadey3636.noobroutes.ui.clickgui.elements
+package noobroutes.ui.clickgui.elements
 
 
-import com.github.wadey3636.noobroutes.features.settings.Setting
-import com.github.wadey3636.noobroutes.ui.clickgui.ClickGUI
-import com.github.wadey3636.noobroutes.ui.clickgui.util.HoverHandler
-import com.github.wadey3636.noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.features.settings.Setting
+import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.ui.clickgui.util.HoverHandler
+import noobroutes.ui.util.MouseUtils.isAreaHovered
 
 /**
  * Renders all the modules.

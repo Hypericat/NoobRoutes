@@ -1,22 +1,22 @@
-package com.github.wadey3636.noobroutes.ui.clickgui.elements.menu
+package noobroutes.ui.clickgui.elements.menu
 
-import com.github.wadey3636.noobroutes.font.OdinFont
-import com.github.wadey3636.noobroutes.features.settings.impl.SelectorSetting
-import com.github.wadey3636.noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import com.github.wadey3636.noobroutes.ui.clickgui.animations.impl.EaseInOut
-import com.github.wadey3636.noobroutes.ui.clickgui.elements.Element
-import com.github.wadey3636.noobroutes.ui.clickgui.elements.ElementType
-import com.github.wadey3636.noobroutes.ui.clickgui.elements.ModuleButton
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.brighter
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.buttonColor
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.darker
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.elementBackground
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.textColor
-import com.github.wadey3636.noobroutes.ui.clickgui.util.HoverHandler
-import com.github.wadey3636.noobroutes.ui.util.MouseUtils.isAreaHovered
-import com.github.wadey3636.noobroutes.utils.capitalizeFirst
-import com.github.wadey3636.noobroutes.utils.render.*
+import noobroutes.features.settings.impl.SelectorSetting
+import noobroutes.font.OdinFont
+import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
+import noobroutes.ui.clickgui.animations.impl.EaseInOut
+import noobroutes.ui.clickgui.elements.Element
+import noobroutes.ui.clickgui.elements.ElementType
+import noobroutes.ui.clickgui.elements.ModuleButton
+import noobroutes.ui.clickgui.util.ColorUtil.brighter
+import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
+import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
+import noobroutes.ui.clickgui.util.ColorUtil.darker
+import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
+import noobroutes.ui.clickgui.util.ColorUtil.textColor
+import noobroutes.ui.clickgui.util.HoverHandler
+import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.utils.capitalizeFirst
+import noobroutes.utils.render.*
 
 /**
  * Renders all the modules.

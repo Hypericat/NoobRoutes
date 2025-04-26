@@ -1,11 +1,11 @@
-package com.github.wadey3636.noobroutes.utils.adapters
+package noobroutes.utils.adapters
 
-import com.github.wadey3636.noobroutes.features.floor7.Ring
-import com.github.wadey3636.noobroutes.features.floor7.RingTypes
+import noobroutes.features.floor7.Ring
+import noobroutes.features.floor7.RingTypes
+import noobroutes.utils.LookVec
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import com.github.wadey3636.noobroutes.utils.LookVec
 import net.minecraft.util.Vec3
 
 

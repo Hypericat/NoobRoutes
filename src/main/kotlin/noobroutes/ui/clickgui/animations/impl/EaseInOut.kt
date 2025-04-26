@@ -1,6 +1,6 @@
-package com.github.wadey3636.noobroutes.ui.clickgui.animations.impl
+package noobroutes.ui.clickgui.animations.impl
 
-import com.github.wadey3636.noobroutes.ui.clickgui.animations.Animation
+import noobroutes.ui.clickgui.animations.Animation
 import kotlin.math.pow
 
 class EaseInOut(duration: Long): Animation<Float>(duration) {

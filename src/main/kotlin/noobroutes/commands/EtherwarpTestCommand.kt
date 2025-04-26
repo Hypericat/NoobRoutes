@@ -1,10 +1,10 @@
-package com.github.wadey3636.noobroutes.commands
+package noobroutes.commands
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.features.test.EtherwarpTest
-import com.github.wadey3636.noobroutes.utils.render.RenderUtils.renderVec
-import com.github.wadey3636.noobroutes.utils.skyblock.EtherWarpHelper
-import com.github.wadey3636.noobroutes.utils.skyblock.devMessage
+import noobroutes.Core.mc
+import noobroutes.features.test.EtherwarpTest
+import noobroutes.utils.render.RenderUtils.renderVec
+import noobroutes.utils.skyblock.EtherWarpHelper
+import noobroutes.utils.skyblock.devMessage
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 

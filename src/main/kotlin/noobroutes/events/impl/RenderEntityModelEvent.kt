@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.events.impl
+package noobroutes.events.impl
 
 import net.minecraft.client.model.ModelBase
 import net.minecraft.entity.EntityLivingBase

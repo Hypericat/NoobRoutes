@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.init;
+package noobroutes.init;
 
 import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;

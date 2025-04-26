@@ -1,13 +1,13 @@
-package com.github.wadey3636.noobroutes.features.misc
+package noobroutes.features.misc
 
-import com.github.wadey3636.noobroutes.utils.PacketUtils
-import com.github.wadey3636.noobroutes.utils.Scheduler
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.features.Module
-import com.github.wadey3636.noobroutes.features.settings.impl.BooleanSetting
-import com.github.wadey3636.noobroutes.features.settings.impl.NumberSetting
-import com.github.wadey3636.noobroutes.utils.skyblock.modMessage
-import com.github.wadey3636.noobroutes.utils.skyblock.sendCommand
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.utils.PacketUtils
+import noobroutes.utils.Scheduler
+import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.skyblock.sendCommand
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C01PacketChatMessage
@@ -17,18 +17,25 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 
-object SexAura: Module(
+object SexAura : Module(
     name = "Sex Aura",
     Keyboard.KEY_NONE,
     category = Category.MISC,
     description = "picks up them hoes"
 ) {
-    private val pickupRange by NumberSetting(name = "range", description = "how far the bitches can be away", min = 0, max = 15, default = 5)
+    private val pickupRange by NumberSetting(
+        name = "range",
+        description = "how far the bitches can be away",
+        min = 0,
+        max = 15,
+        default = 5
+    )
     private val actuallySend by BooleanSetting("Im ready", false, description = "wether to actually start the rizz")
     private val sentList = mutableListOf<String>()
     private var lastMessage = System.currentTimeMillis()
-    val noobAccounts = listOf("Noob0105", "ILickToes69420", "ISniffToes69420", "ISuckToes69420", "The69ToHis420", "ryealuwu")
-    private val wadeyAccounts = listOf("Wadey36","Tahudidu")
+    val noobAccounts =
+        listOf("Noob0105", "ILickToes69420", "ISniffToes69420", "ISuckToes69420", "The69ToHis420", "ryealuwu")
+    private val wadeyAccounts = listOf("Wadey36", "Tahudidu")
 
     private val pickupLines = listOf(
         "Are you WiFi? Because I’m feeling a strong connection… even though you’re clearly out of my league.",
@@ -70,7 +77,7 @@ object SexAura: Module(
         if (event.phase != TickEvent.Phase.START) return
         if (mc.theWorld == null || mc.thePlayer == null) return
         if (System.currentTimeMillis() - lastMessage < 1000) return
-        getPlayersInRenderDistance().sortedBy {mc.thePlayer.getDistanceToEntity(it)}.forEach { player ->
+        getPlayersInRenderDistance().sortedBy { mc.thePlayer.getDistanceToEntity(it) }.forEach { player ->
             if (System.currentTimeMillis() - lastMessage < 1000) return
             sendPickupLine(player)
         }
@@ -84,13 +91,11 @@ object SexAura: Module(
             Scheduler.schedulePreTickTask(40) { modMessage("1...") }
             Scheduler.schedulePreTickTask(60) { modMessage("now") }
             Scheduler.schedulePreTickTask(69) { modMessage("lucky piece of shit i hope u die") }
-        }
-        else if (wadeyAccounts.contains(player.name) && !noobAccounts.contains(mc.thePlayer.name)) {
+        } else if (wadeyAccounts.contains(player.name) && !noobAccounts.contains(mc.thePlayer.name)) {
             modMessage("trying to pickup my pookie bear wadey are we?")
             modMessage("i hope u fucking die a slow and painful death")
             modMessage("keep ur hands off Wadey from now on")
-        }
-        else if (actuallySend) sendCommand("msg ${player.name} ${pickupLines.random()}")
+        } else if (actuallySend) sendCommand("msg ${player.name} ${pickupLines.random()}")
         else modMessage("/msg ${player.name} ${pickupLines.random()}")
         sentList.add(player.name)
         Scheduler.schedulePreTickTask(200) { sentList.remove(player.name) }
@@ -107,13 +112,13 @@ object SexAura: Module(
     }
 
     private fun getPlayersInRenderDistance(): List<EntityPlayer> {
-        return mc.theWorld?.loadedEntityList?.filterIsInstance<EntityPlayer>()?.filter {player ->
-                player != mc.thePlayer &&
-                !player.isInvisible &&
-                mc.thePlayer.getDistanceToEntity(player) < pickupRange &&
-                !sentList.contains(player.name) &&
-                        mc.theWorld?.loadedEntityList?.any { it is EntityArmorStand && it.posX == player.posX && it.posZ == player.posZ } == false //idk why its indented
-                }.orEmpty()
+        return mc.theWorld?.loadedEntityList?.filterIsInstance<EntityPlayer>()?.filter { player ->
+            player != mc.thePlayer &&
+                    !player.isInvisible &&
+                    mc.thePlayer.getDistanceToEntity(player) < pickupRange &&
+                    !sentList.contains(player.name) &&
+                    mc.theWorld?.loadedEntityList?.any { it is EntityArmorStand && it.posX == player.posX && it.posZ == player.posZ } == false //idk why its indented
+        }.orEmpty()
     }
 
     @SubscribeEvent

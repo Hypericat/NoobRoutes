@@ -1,8 +1,8 @@
-package com.github.wadey3636.noobroutes.utils
+package noobroutes.utils
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.Core.scope
-import com.github.wadey3636.noobroutes.utils.render.RenderUtils.outlineBounds
+import noobroutes.Core.mc
+import noobroutes.Core.scope
+import noobroutes.utils.render.RenderUtils.outlineBounds
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
@@ -143,12 +143,12 @@ operator fun Vec3.get(index: Int): Double =
  * @param rotation The rotation to rotate around
  * @return The rotated Vec3
  */
-fun Vec3.rotateAroundNorth(rotation: com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations): Vec3 =
+fun Vec3.rotateAroundNorth(rotation: noobroutes.utils.skyblock.dungeon.tiles.Rotations): Vec3 =
     when (rotation) {
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations.NORTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations.WEST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations.SOUTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations.EAST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
+        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.NORTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
+        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.WEST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
+        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.SOUTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
+        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.EAST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
         else -> this
     }
 
@@ -157,12 +157,12 @@ fun Vec3.rotateAroundNorth(rotation: com.github.wadey3636.noobroutes.utils.skybl
  * @param rotation The rotation to rotate to
  * @return The rotated Vec3
  */
-fun Vec3.rotateToNorth(rotation: com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations): Vec3 =
+fun Vec3.rotateToNorth(rotation: noobroutes.utils.skyblock.dungeon.tiles.Rotations): Vec3 =
     when (rotation) {
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations.NORTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations.WEST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations.SOUTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations.EAST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
+        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.NORTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
+        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.WEST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
+        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.SOUTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
+        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.EAST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
         else -> this
     }
 
@@ -339,7 +339,7 @@ fun DoubleArray.toVec3(): Vec3 =
 
 /**
  * Solves the equation for diana burrow estimate.
- * @see com.github.wadey3636.noobroutes.utils.skyblock.DianaBurrowEstimate.guessPosition
+ * @see noobroutes.utils.skyblock.DianaBurrowEstimate.guessPosition
  * @author Soopy
  */
 fun calculateCoefficientsFromVectors(x: Vec3, y: Vec3): Triple<Double, Double, Double> {
@@ -382,7 +382,7 @@ val AxisAlignedBB.middle: Vec3 get() =
 
 /**
  * Finds the nearest grass block to the given position.
- * @see com.github.wadey3636.noobroutes.utils.skyblock.DianaBurrowEstimate.guessPosition
+ * @see noobroutes.utils.skyblock.DianaBurrowEstimate.guessPosition
  * @param pos The position to search around.
  * @author Bonsai
  */
@@ -524,11 +524,11 @@ fun wrapAngle(angle: Float): Float {
 fun bezier(t: Float, initial: Float, p1: Float, p2: Float, final: Float): Float =
     (1 - t).pow(3) * initial + 3 * (1 - t).pow(2) * t * p1 + 3 * (1 - t) * t.pow(2) * p2 + t.pow(3) * final
 
-fun BlockPos.addRotationCoords(rotation: com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations, x: Int, z: Int): BlockPos =
+fun BlockPos.addRotationCoords(rotation: noobroutes.utils.skyblock.dungeon.tiles.Rotations, x: Int, z: Int): BlockPos =
     when (rotation) {
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations.NORTH -> BlockPos(this.x + x, this.y, this.z + z)
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations.SOUTH -> BlockPos(this.x - x, this.y, this.z - z)
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations.WEST ->  BlockPos(this.x + z, this.y, this.z - x)
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Rotations.EAST ->  BlockPos(this.x - z, this.y, this.z + x)
+        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.NORTH -> BlockPos(this.x + x, this.y, this.z + z)
+        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.SOUTH -> BlockPos(this.x - x, this.y, this.z - z)
+        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.WEST ->  BlockPos(this.x + z, this.y, this.z - x)
+        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.EAST ->  BlockPos(this.x - z, this.y, this.z + x)
         else -> this
     }

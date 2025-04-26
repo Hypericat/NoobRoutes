@@ -1,8 +1,8 @@
-package com.github.wadey3636.noobroutes.utils
+package noobroutes.utils
 
+import noobroutes.events.impl.*
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
-import com.github.wadey3636.noobroutes.events.impl.*
 import net.minecraft.network.Packet
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S2DPacketOpenWindow

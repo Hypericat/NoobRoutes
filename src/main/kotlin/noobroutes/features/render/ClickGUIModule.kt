@@ -1,19 +1,15 @@
-package com.github.wadey3636.noobroutes.features.render
+package noobroutes.features.render
 
-import com.github.wadey3636.noobroutes.Core
-import com.github.wadey3636.noobroutes.config.Config
-import com.github.wadey3636.noobroutes.features.settings.AlwaysActive
-import com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.features.Module
-import com.github.wadey3636.noobroutes.features.settings.impl.ActionSetting
-import com.github.wadey3636.noobroutes.features.settings.impl.BooleanSetting
-import com.github.wadey3636.noobroutes.features.settings.impl.ColorSetting
-import com.github.wadey3636.noobroutes.features.settings.impl.NumberSetting
-import com.github.wadey3636.noobroutes.features.settings.impl.StringSetting
-import com.github.wadey3636.noobroutes.ui.clickgui.ClickGUI
-import com.github.wadey3636.noobroutes.ui.hud.EditHUDGui
-import com.github.wadey3636.noobroutes.utils.render.Color
+import noobroutes.Core
+import noobroutes.config.Config
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.settings.AlwaysActive
+import noobroutes.features.settings.impl.*
+import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.ui.hud.EditHUDGui
+import noobroutes.utils.render.Color
+import noobroutes.utils.skyblock.LocationUtils
 import org.lwjgl.input.Keyboard
 
 @AlwaysActive

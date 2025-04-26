@@ -1,7 +1,7 @@
-package com.github.wadey3636.noobroutes.ui.clickgui.util
+package noobroutes.ui.clickgui.util
 
-import com.github.wadey3636.noobroutes.features.render.ClickGUIModule
-import com.github.wadey3636.noobroutes.utils.render.Color
+import noobroutes.features.render.ClickGUIModule
+import noobroutes.utils.render.Color
 
 object ColorUtil {
 

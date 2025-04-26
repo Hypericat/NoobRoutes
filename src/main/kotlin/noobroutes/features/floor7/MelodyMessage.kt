@@ -1,15 +1,15 @@
-package com.github.wadey3636.noobroutes.features.floor7
+package noobroutes.features.floor7
 
-import com.github.wadey3636.noobroutes.events.impl.MelodyOpenEvent
-import com.github.wadey3636.noobroutes.events.impl.PacketEvent
-import com.github.wadey3636.noobroutes.events.impl.S2FPacketSetSlotEvent
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.features.Module
-import com.github.wadey3636.noobroutes.features.settings.impl.StringSetting
-import com.github.wadey3636.noobroutes.utils.skyblock.devMessage
-import com.github.wadey3636.noobroutes.utils.skyblock.modMessage
-import com.github.wadey3636.noobroutes.utils.skyblock.sendCommand
-import com.github.wadey3636.noobroutes.utils.skyblock.unformattedName
+import noobroutes.events.impl.MelodyOpenEvent
+import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.S2FPacketSetSlotEvent
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.settings.impl.StringSetting
+import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.skyblock.sendCommand
+import noobroutes.utils.skyblock.unformattedName
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot

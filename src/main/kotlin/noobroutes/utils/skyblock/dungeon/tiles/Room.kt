@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles
+package noobroutes.utils.skyblock.dungeon.tiles
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -14,7 +14,7 @@ data class Room(
 )
 
 data class RoomComponent(val x: Int, val z: Int, val core: Int = 0) {
-    val vec2 = _root_ide_package_.com.github.wadey3636.noobroutes.utils.Vec2(x, z)
+    val vec2 = _root_ide_package_.noobroutes.utils.Vec2(x, z)
     val blockPos = BlockPos(x, 70, z)
 }
 

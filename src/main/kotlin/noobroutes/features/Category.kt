@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.features
+package noobroutes.features
 
 enum class Category {
     RENDER,

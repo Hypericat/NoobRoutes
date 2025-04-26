@@ -1,7 +1,7 @@
-package com.github.wadey3636.noobroutes.ui.util.shader
+package noobroutes.ui.util.shader
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.utils.render.Color
+import noobroutes.Core.mc
+import noobroutes.utils.render.Color
 import org.lwjgl.opengl.GL20
 
 object GlowShader : FramebufferShader("source/entity/glow.fsh") {

@@ -1,14 +1,14 @@
-package com.github.wadey3636.noobroutes.features.move
+package noobroutes.features.move
 
 
-import com.github.wadey3636.noobroutes.utils.Scheduler
-import com.github.wadey3636.noobroutes.events.impl.PacketEvent
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.features.Module
-import com.github.wadey3636.noobroutes.features.settings.impl.NumberSetting
-import com.github.wadey3636.noobroutes.utils.render.Color
-import com.github.wadey3636.noobroutes.utils.render.TextAlign
-import com.github.wadey3636.noobroutes.utils.render.text
+import noobroutes.events.impl.PacketEvent
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.utils.Scheduler
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.TextAlign
+import noobroutes.utils.render.text
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraftforge.client.event.RenderGameOverlayEvent

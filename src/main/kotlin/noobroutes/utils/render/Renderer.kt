@@ -1,13 +1,13 @@
-package com.github.wadey3636.noobroutes.utils.render
+package noobroutes.utils.render
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.utils.addVec
-import com.github.wadey3636.noobroutes.utils.render.RenderUtils.outlineBounds
-import com.github.wadey3636.noobroutes.utils.render.RenderUtils.renderVec
-import com.github.wadey3636.noobroutes.utils.toAABB
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.multiplyAlpha
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.withAlpha
-import com.github.wadey3636.noobroutes.utils.getBlockAt
+import noobroutes.Core.mc
+import noobroutes.ui.clickgui.util.ColorUtil.multiplyAlpha
+import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.utils.addVec
+import noobroutes.utils.getBlockAt
+import noobroutes.utils.render.RenderUtils.outlineBounds
+import noobroutes.utils.render.RenderUtils.renderVec
+import noobroutes.utils.toAABB
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
@@ -127,7 +127,7 @@ object Renderer {
      * @param depth     Indicates whether to draw with depth (default is false).
      */
     fun drawTracer(goal: Vec3, color: Color, lineWidth: Float = 3f, depth: Boolean = false) {
-        RenderUtils.drawLines(listOf(mc.thePlayer.renderVec.addVec(y = _root_ide_package_.com.github.wadey3636.noobroutes.utils.fastEyeHeight()), goal), color, lineWidth, depth)
+        RenderUtils.drawLines(listOf(mc.thePlayer.renderVec.addVec(y = _root_ide_package_.noobroutes.utils.fastEyeHeight()), goal), color, lineWidth, depth)
     }
 
     /**
@@ -154,7 +154,7 @@ object Renderer {
         )
 
         val alpha = if (noFade) 1f else min(1f, max(0f, dist.toFloat()) / 60f)
-        if (beacon) _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.drawBeaconBeam(
+        if (beacon) _root_ide_package_.noobroutes.utils.render.RenderUtils.drawBeaconBeam(
             vec3,
             color.withAlpha(alpha),
             depth = true

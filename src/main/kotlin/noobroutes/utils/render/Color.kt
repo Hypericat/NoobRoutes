@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.utils.render
+package noobroutes.utils.render
 
 import com.google.gson.*
 import java.awt.Color.HSBtoRGB

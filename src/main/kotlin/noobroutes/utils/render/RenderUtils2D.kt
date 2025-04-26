@@ -1,11 +1,11 @@
-package com.github.wadey3636.noobroutes.utils.render
+package noobroutes.utils.render
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.utils.addVec
-import com.github.wadey3636.noobroutes.utils.corners
-import com.github.wadey3636.noobroutes.utils.render.RenderUtils.bind
-import com.github.wadey3636.noobroutes.utils.render.RenderUtils.renderVec
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.Core.mc
+import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.utils.addVec
+import noobroutes.utils.corners
+import noobroutes.utils.render.RenderUtils.bind
+import noobroutes.utils.render.RenderUtils.renderVec
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -123,22 +123,22 @@ object RenderUtils2D {
         GL11.glLineWidth(lineWidth)
         color.bind()
 
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION)
+        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION)
 
         // Draw the four lines of the box
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.x, box.y, 0.0).endVertex()  // Top-left to top-right
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.w, box.y, 0.0).endVertex()
+        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.x, box.y, 0.0).endVertex()  // Top-left to top-right
+        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.w, box.y, 0.0).endVertex()
 
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.w, box.y, 0.0).endVertex()  // Top-right to bottom-right
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.w, box.h, 0.0).endVertex()
+        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.w, box.y, 0.0).endVertex()  // Top-right to bottom-right
+        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.w, box.h, 0.0).endVertex()
 
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.w, box.h, 0.0).endVertex()  // Bottom-right to bottom-left
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.x, box.h, 0.0).endVertex()
+        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.w, box.h, 0.0).endVertex()  // Bottom-right to bottom-left
+        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.x, box.h, 0.0).endVertex()
 
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.x, box.h, 0.0).endVertex()  // Bottom-left to top-left
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.x, box.y, 0.0).endVertex()
+        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.x, box.h, 0.0).endVertex()  // Bottom-left to top-left
+        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.x, box.y, 0.0).endVertex()
 
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.RenderUtils.tessellator.draw()
+        _root_ide_package_.noobroutes.utils.render.RenderUtils.tessellator.draw()
 
         Color.WHITE.bind()
         GL11.glLineWidth(1f)

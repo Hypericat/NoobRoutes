@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.utils.clock
+package noobroutes.utils.clock
 
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -17,7 +17,7 @@ open class Executor(val delay: () -> Long, private val profileName: String = "Un
     open fun run(): Boolean {
         if (shouldFinish) return true
             if (clock.hasTimePassed(delay(), true)) {
-                _root_ide_package_.com.github.wadey3636.noobroutes.utils.profile(profileName) {
+                _root_ide_package_.noobroutes.utils.profile(profileName) {
                     runCatching {
                         func()
                     }
@@ -66,7 +66,7 @@ open class Executor(val delay: () -> Long, private val profileName: String = "Un
 
         @SubscribeEvent
         fun onRender(event: RenderWorldLastEvent) {
-            _root_ide_package_.com.github.wadey3636.noobroutes.utils.profile("Executors") {
+            _root_ide_package_.noobroutes.utils.profile("Executors") {
                 executors.removeAll {
                     if (!it.shouldRun()) return@removeAll false
                     else it.run()

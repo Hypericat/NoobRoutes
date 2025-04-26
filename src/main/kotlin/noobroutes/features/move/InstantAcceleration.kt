@@ -1,10 +1,10 @@
-package com.github.wadey3636.noobroutes.features.move
+package noobroutes.features.move
 
-import com.github.wadey3636.noobroutes.utils.AutoP3Utils
-import com.github.wadey3636.noobroutes.utils.Scheduler
-import com.github.wadey3636.noobroutes.utils.Utils
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.features.Module
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.Scheduler
+import noobroutes.utils.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import org.lwjgl.input.Keyboard

@@ -1,7 +1,7 @@
-package com.github.wadey3636.noobroutes.ui.util.shader
+package noobroutes.ui.util.shader
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.utils.render.Color
+import noobroutes.Core.mc
+import noobroutes.utils.render.Color
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.shader.Framebuffer
@@ -36,10 +36,10 @@ abstract class FramebufferShader(fragmentShader: String) : Shader(fragmentShader
 
         startShader()
         mc.entityRenderer.setupOverlayRendering()
-        GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 0, 1);
+        GlStateManager.enableBlend()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 0, 1)
         framebuffer?.let { drawFramebuffer(it) }
-        GlStateManager.disableBlend();
+        GlStateManager.disableBlend()
 
         stopShader()
 
@@ -53,7 +53,7 @@ abstract class FramebufferShader(fragmentShader: String) : Shader(fragmentShader
      * @author TheSlowly
      */
     private fun setupFrameBuffer(frameBuffer: Framebuffer?): Framebuffer {
-        return if (frameBuffer == null || frameBuffer.framebufferWidth != mc.displayWidth || frameBuffer.framebufferHeight  != mc.displayHeight) {
+        return if (frameBuffer == null || frameBuffer.framebufferWidth != mc.displayWidth || frameBuffer.framebufferHeight != mc.displayHeight) {
             Framebuffer(mc.displayWidth, mc.displayHeight, true)
         } else {
             frameBuffer.framebufferClear()

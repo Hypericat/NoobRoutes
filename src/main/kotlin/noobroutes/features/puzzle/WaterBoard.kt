@@ -1,21 +1,17 @@
-package com.github.wadey3636.noobroutes.features.puzzle
+package noobroutes.features.puzzle
 
 
-import com.github.wadey3636.noobroutes.utils.AuraManager
-import com.github.wadey3636.noobroutes.utils.Etherwarper
+import noobroutes.events.impl.RoomEnterEvent
+import noobroutes.events.impl.ServerTickEvent
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.utils.*
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.modMessage
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.github.wadey3636.noobroutes.events.impl.RoomEnterEvent
-import com.github.wadey3636.noobroutes.events.impl.ServerTickEvent
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.features.Module
-import com.github.wadey3636.noobroutes.features.settings.impl.BooleanSetting
-import com.github.wadey3636.noobroutes.utils.getBlockAt
-import com.github.wadey3636.noobroutes.utils.isAir
-import com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils
-import com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import com.github.wadey3636.noobroutes.utils.skyblock.modMessage
-import com.github.wadey3636.noobroutes.utils.toBlockPos
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3

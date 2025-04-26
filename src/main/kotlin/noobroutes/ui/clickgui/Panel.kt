@@ -1,24 +1,24 @@
-package com.github.wadey3636.noobroutes.ui.clickgui
+package noobroutes.ui.clickgui
 
 
-import com.github.wadey3636.noobroutes.features.ModuleManager.modules
-import com.github.wadey3636.noobroutes.features.render.ClickGUIModule
-import com.github.wadey3636.noobroutes.font.OdinFont
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.ui.clickgui.SearchBar.currentSearch
-import com.github.wadey3636.noobroutes.ui.clickgui.animations.impl.LinearAnimation
-import com.github.wadey3636.noobroutes.ui.clickgui.elements.ModuleButton
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.brighter
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.darkerIf
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.titlePanelColor
-import com.github.wadey3636.noobroutes.ui.util.MouseUtils.isAreaHovered
-import com.github.wadey3636.noobroutes.ui.util.MouseUtils.mouseX
-import com.github.wadey3636.noobroutes.ui.util.MouseUtils.mouseY
-import com.github.wadey3636.noobroutes.utils.capitalizeFirst
-import com.github.wadey3636.noobroutes.utils.render.*
-import com.github.wadey3636.noobroutes.utils.render.RenderUtils.loadBufferedImage
-import com.github.wadey3636.noobroutes.utils.round
+import noobroutes.features.Category
+import noobroutes.features.ModuleManager.modules
+import noobroutes.features.render.ClickGUIModule
+import noobroutes.font.OdinFont
+import noobroutes.ui.clickgui.SearchBar.currentSearch
+import noobroutes.ui.clickgui.animations.impl.LinearAnimation
+import noobroutes.ui.clickgui.elements.ModuleButton
+import noobroutes.ui.clickgui.util.ColorUtil
+import noobroutes.ui.clickgui.util.ColorUtil.brighter
+import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
+import noobroutes.ui.clickgui.util.ColorUtil.titlePanelColor
+import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.ui.util.MouseUtils.mouseX
+import noobroutes.ui.util.MouseUtils.mouseY
+import noobroutes.utils.capitalizeFirst
+import noobroutes.utils.render.*
+import noobroutes.utils.render.RenderUtils.loadBufferedImage
+import noobroutes.utils.round
 import net.minecraft.client.renderer.texture.DynamicTexture
 import kotlin.math.floor
 

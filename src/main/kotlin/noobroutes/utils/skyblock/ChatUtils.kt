@@ -1,8 +1,8 @@
-package com.github.wadey3636.noobroutes.utils.skyblock
+package noobroutes.utils.skyblock
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.features.render.ClickGUIModule.devMode
-import com.github.wadey3636.noobroutes.utils.noControlCodes
+import noobroutes.Core.mc
+import noobroutes.features.render.ClickGUIModule.devMode
+import noobroutes.utils.noControlCodes
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
@@ -29,7 +29,7 @@ fun sendCommand(text: Any, clientSide: Boolean = false) {
  * @param message Message to be sent.
  */
 fun sendChatMessage(message: Any) {
-    _root_ide_package_.com.github.wadey3636.noobroutes.utils.runOnMCThread { mc.thePlayer?.sendChatMessage(message.toString()) }
+    _root_ide_package_.noobroutes.utils.runOnMCThread { mc.thePlayer?.sendChatMessage(message.toString()) }
 }
 
 /**
@@ -42,7 +42,7 @@ fun sendChatMessage(message: Any) {
 fun modMessage(message: Any?, prefix: String = "§8§l-<§r§aNoob Routes§r§8§l>-§r ", chatStyle: ChatStyle? = null) {
     val chatComponent = ChatComponentText("$prefix$message")
     chatStyle?.let { chatComponent.setChatStyle(it) } // Set chat style using setChatStyle method
-    _root_ide_package_.com.github.wadey3636.noobroutes.utils.runOnMCThread { mc.thePlayer?.addChatMessage(chatComponent) }
+    _root_ide_package_.noobroutes.utils.runOnMCThread { mc.thePlayer?.addChatMessage(chatComponent) }
 }
 
 /**

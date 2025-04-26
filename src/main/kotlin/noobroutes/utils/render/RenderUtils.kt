@@ -1,10 +1,10 @@
-package com.github.wadey3636.noobroutes.utils.render
+package noobroutes.utils.render
 
-import com.github.wadey3636.noobroutes.Core
-import com.github.wadey3636.noobroutes.Core.mc
+import noobroutes.Core
+import noobroutes.Core.mc
+import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import gg.essential.universal.shader.BlendState
 import gg.essential.universal.shader.UShader
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.WorldRenderer

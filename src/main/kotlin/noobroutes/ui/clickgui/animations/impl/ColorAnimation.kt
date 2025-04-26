@@ -1,6 +1,6 @@
-package com.github.wadey3636.noobroutes.ui.clickgui.animations.impl
+package noobroutes.ui.clickgui.animations.impl
 
-import com.github.wadey3636.noobroutes.utils.render.Color
+import noobroutes.utils.render.Color
 
 // TODO: fix it
 class ColorAnimation(duration: Long) {

@@ -1,22 +1,22 @@
-package com.github.wadey3636.noobroutes.ui.clickgui.elements
+package noobroutes.ui.clickgui.elements
 
-import com.github.wadey3636.noobroutes.features.render.ClickGUIModule
-import com.github.wadey3636.noobroutes.font.OdinFont
-import com.github.wadey3636.noobroutes.features.Module
-import com.github.wadey3636.noobroutes.features.settings.impl.*
-import com.github.wadey3636.noobroutes.ui.clickgui.ClickGUI
-import com.github.wadey3636.noobroutes.ui.clickgui.Panel
-import com.github.wadey3636.noobroutes.ui.clickgui.animations.impl.ColorAnimation
-import com.github.wadey3636.noobroutes.ui.clickgui.animations.impl.EaseInOut
-import com.github.wadey3636.noobroutes.ui.clickgui.elements.menu.*
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.brighter
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.darkerIf
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.moduleButtonColor
-import com.github.wadey3636.noobroutes.ui.clickgui.util.HoverHandler
-import com.github.wadey3636.noobroutes.ui.util.MouseUtils.isAreaHovered
-import com.github.wadey3636.noobroutes.utils.render.*
-import com.github.wadey3636.noobroutes.utils.render.RenderUtils.loadBufferedImage
+import noobroutes.features.Module
+import noobroutes.features.render.ClickGUIModule
+import noobroutes.features.settings.impl.*
+import noobroutes.font.OdinFont
+import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.ui.clickgui.Panel
+import noobroutes.ui.clickgui.animations.impl.ColorAnimation
+import noobroutes.ui.clickgui.animations.impl.EaseInOut
+import noobroutes.ui.clickgui.elements.menu.*
+import noobroutes.ui.clickgui.util.ColorUtil.brighter
+import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
+import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
+import noobroutes.ui.clickgui.util.ColorUtil.moduleButtonColor
+import noobroutes.ui.clickgui.util.HoverHandler
+import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.utils.render.*
+import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import net.minecraft.client.renderer.texture.DynamicTexture
 import kotlin.math.floor
 
@@ -76,7 +76,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
                     is ActionSetting -> ElementAction(this, setting)
                     is DualSetting -> ElementDual(this, setting)
                     is HudSetting -> ElementHud(this, setting)
-                    is com.github.wadey3636.noobroutes.features.settings.impl.KeybindSetting -> ElementKeyBind(this, setting)
+                    is noobroutes.features.settings.impl.KeybindSetting -> ElementKeyBind(this, setting)
                     is DropdownSetting -> ElementDropdown(this, setting)
                     else -> {
                         position--

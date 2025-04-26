@@ -1,7 +1,7 @@
-package com.github.wadey3636.noobroutes.commands
+package noobroutes.commands
 
-import com.github.wadey3636.noobroutes.features.floor7.AutoP3
-import com.github.wadey3636.noobroutes.utils.skyblock.modMessage
+import noobroutes.features.floor7.AutoP3
+import noobroutes.utils.skyblock.modMessage
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 

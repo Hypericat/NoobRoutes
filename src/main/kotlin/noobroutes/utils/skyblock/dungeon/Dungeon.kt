@@ -1,10 +1,7 @@
-package com.github.wadey3636.noobroutes.utils.skyblock.dungeon
+package noobroutes.utils.skyblock.dungeon
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.utils.equalsOneOf
-import com.github.wadey3636.noobroutes.utils.name
-import com.github.wadey3636.noobroutes.utils.noControlCodes
-import com.github.wadey3636.noobroutes.utils.*
+import noobroutes.Core.mc
+import noobroutes.utils.*
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3EPacketTeams
@@ -22,27 +19,27 @@ class Dungeon(val floor: Floor) {
     var dungeonTeammatesNoSelf: ArrayList<DungeonPlayer> = ArrayList(4)
     var leapTeammates: ArrayList<DungeonPlayer> = ArrayList(4)
     var dungeonStats = DungeonStats()
-    val currentRoom: com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Room? get() = ScanUtils.currentRoom
-    val passedRooms: MutableSet<com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Room> get() = ScanUtils.passedRooms
+    val currentRoom: noobroutes.utils.skyblock.dungeon.tiles.Room? get() = ScanUtils.currentRoom
+    val passedRooms: MutableSet<noobroutes.utils.skyblock.dungeon.tiles.Room> get() = ScanUtils.passedRooms
     var puzzles = listOf<Puzzle>()
 
     private fun getBoss(): Boolean {
         return when (floor.floorNumber) {
-            1 -> _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils.posX > -71 && _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils.posZ > -39
-            in 2..4 -> _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils.posX > -39 && _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils.posZ > -39
-            in 5..6 -> _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils.posX > -39 && _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils.posZ > -7
-            7 -> _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils.posX > -7 && _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils.posZ > -7
+            1 -> _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posX > -71 && _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posZ > -39
+            in 2..4 -> _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posX > -39 && _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posZ > -39
+            in 5..6 -> _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posX > -39 && _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posZ > -7
+            7 -> _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posX > -7 && _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posZ > -7
             else -> false
         }
     }
 
-    fun enterDungeonRoom(event: com.github.wadey3636.noobroutes.events.impl.RoomEnterEvent) {
+    fun enterDungeonRoom(event: noobroutes.events.impl.RoomEnterEvent) {
         val room = event.room?.takeUnless { room -> passedRooms.any { it.data.name == room.data.name } } ?: return
         val roomSecrets = room.data.secrets
         dungeonStats.knownSecrets = dungeonStats.knownSecrets?.plus(roomSecrets) ?: roomSecrets
     }
 
-    fun onPacket(event: com.github.wadey3636.noobroutes.events.impl.PacketEvent.Receive) {
+    fun onPacket(event: noobroutes.events.impl.PacketEvent.Receive) {
         when (event.packet) {
             is S38PacketPlayerListItem -> handleTabListPacket(event.packet)
             is S3EPacketTeams -> handleScoreboardPacket(event.packet)
@@ -68,7 +65,7 @@ class Dungeon(val floor: Floor) {
     private fun handleHeaderFooterPacket(packet: S47PacketPlayerListHeaderFooter) {
         Blessing.entries.forEach { blessing ->
             blessing.regex.find(packet.footer.unformattedText.noControlCodes)?.let { match -> blessing.current =
-                _root_ide_package_.com.github.wadey3636.noobroutes.utils.romanToInt(match.groupValues[1])
+                _root_ide_package_.noobroutes.utils.romanToInt(match.groupValues[1])
             }
         }
     }
@@ -89,10 +86,10 @@ class Dungeon(val floor: Floor) {
         }
 
         updateDungeonTeammates(packet.entries)
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.runOnMCThread {
+        _root_ide_package_.noobroutes.utils.runOnMCThread {
             puzzles =
-                _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils.getDungeonPuzzles(
-                    _root_ide_package_.com.github.wadey3636.noobroutes.utils.getTabList
+                _root_ide_package_.noobroutes.utils.skyblock.dungeon.DungeonUtils.getDungeonPuzzles(
+                    _root_ide_package_.noobroutes.utils.getTabList
                 ) // transfer to packet based
         }
     }
@@ -147,7 +144,7 @@ class Dungeon(val floor: Floor) {
 
     private fun updateDungeonTeammates(tabList: List<S38PacketPlayerListItem.AddPlayerData>) {
         dungeonTeammates =
-            _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils.getDungeonTeammates(
+            _root_ide_package_.noobroutes.utils.skyblock.dungeon.DungeonUtils.getDungeonTeammates(
                 dungeonTeammates,
                 tabList
             )

@@ -1,18 +1,18 @@
-package com.github.wadey3636.noobroutes.ui.clickgui.elements.menu
+package noobroutes.ui.clickgui.elements.menu
 
-import com.github.wadey3636.noobroutes.font.OdinFont
-import com.github.wadey3636.noobroutes.features.settings.impl.DropdownSetting
-import com.github.wadey3636.noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import com.github.wadey3636.noobroutes.ui.clickgui.animations.impl.LinearAnimation
-import com.github.wadey3636.noobroutes.ui.clickgui.elements.Element
-import com.github.wadey3636.noobroutes.ui.clickgui.elements.ElementType
-import com.github.wadey3636.noobroutes.ui.clickgui.elements.ModuleButton
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.elementBackground
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.textColor
-import com.github.wadey3636.noobroutes.ui.util.MouseUtils.isAreaHovered
-import com.github.wadey3636.noobroutes.utils.render.drawArrow
-import com.github.wadey3636.noobroutes.utils.render.roundedRectangle
-import com.github.wadey3636.noobroutes.utils.render.text
+import noobroutes.features.settings.impl.DropdownSetting
+import noobroutes.font.OdinFont
+import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
+import noobroutes.ui.clickgui.animations.impl.LinearAnimation
+import noobroutes.ui.clickgui.elements.Element
+import noobroutes.ui.clickgui.elements.ElementType
+import noobroutes.ui.clickgui.elements.ModuleButton
+import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
+import noobroutes.ui.clickgui.util.ColorUtil.textColor
+import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.utils.render.drawArrow
+import noobroutes.utils.render.roundedRectangle
+import noobroutes.utils.render.text
 
 /**
  * Renders all the modules.

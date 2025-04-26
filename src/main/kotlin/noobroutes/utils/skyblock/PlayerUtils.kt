@@ -1,8 +1,8 @@
-package com.github.wadey3636.noobroutes.utils.skyblock
+package noobroutes.utils.skyblock
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.utils.AutoP3Utils
-import com.github.wadey3636.noobroutes.utils.PacketUtils
+import noobroutes.Core.mc
+import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.PacketUtils
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
@@ -47,9 +47,9 @@ object PlayerUtils {
      *
      * @author Odtheking, Bonsai
      */
-    fun alert(title: String, time: Int = 20, color: com.github.wadey3636.noobroutes.utils.render.Color = _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Color.Companion.WHITE, playSound: Boolean = true, displayText: Boolean = true) {
+    fun alert(title: String, time: Int = 20, color: noobroutes.utils.render.Color = _root_ide_package_.noobroutes.utils.render.Color.Companion.WHITE, playSound: Boolean = true, displayText: Boolean = true) {
         if (playSound) playLoudSound("note.pling", 100f, 1f)
-        if (displayText) _root_ide_package_.com.github.wadey3636.noobroutes.utils.render.Renderer.displayTitle(title , time, color = color)
+        if (displayText) _root_ide_package_.noobroutes.utils.render.Renderer.displayTitle(title , time, color = color)
     }
 
     inline val posX get() = mc.thePlayer?.posX ?: 0.0
@@ -61,7 +61,7 @@ object PlayerUtils {
     private var lastClickSent = 0L
 
     @SubscribeEvent
-    fun onPacketSend(event: com.github.wadey3636.noobroutes.events.impl.PacketEvent.Send) {
+    fun onPacketSend(event: noobroutes.events.impl.PacketEvent.Send) {
         if (event.packet !is C0EPacketClickWindow) return
         lastClickSent = System.currentTimeMillis()
     }

@@ -1,15 +1,15 @@
-package com.github.wadey3636.noobroutes.events
+package noobroutes.events
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.Core.scope
+import noobroutes.Core.mc
+import noobroutes.Core.scope
+import noobroutes.events.impl.*
+import noobroutes.utils.*
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.dungeonItemDrops
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.inBoss
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.isSecret
+import noobroutes.utils.skyblock.unformattedName
 import kotlinx.coroutines.launch
-import com.github.wadey3636.noobroutes.events.impl.*
-import com.github.wadey3636.noobroutes.utils.*
-import com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils.dungeonItemDrops
-import com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils.inBoss
-import com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons
-import com.github.wadey3636.noobroutes.utils.skyblock.dungeon.DungeonUtils.isSecret
-import com.github.wadey3636.noobroutes.utils.skyblock.unformattedName
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem

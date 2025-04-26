@@ -1,11 +1,11 @@
-package com.github.wadey3636.noobroutes.ui.util.shader
+package noobroutes.ui.util.shader
 
-import com.github.wadey3636.noobroutes.Core.logger
+import noobroutes.Core.logger
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.RenderUtils.createLegacyShader
 import gg.essential.elementa.components.UIBlock
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.shader.*
-import com.github.wadey3636.noobroutes.utils.render.Color
-import com.github.wadey3636.noobroutes.utils.render.RenderUtils.createLegacyShader
 
 object RoundedRect {
 
@@ -34,11 +34,28 @@ object RoundedRect {
         RoundedRectangle.shaderColor2Uniform.setValue(color2.r / 255f, color2.g / 255f, color2.b / 255f, color2.alpha)
         val direction = RoundedRectangle.directionVecs[gradientDir]
         RoundedRectangle.shaderGradientDir.setValue(direction.first, direction.second)
-        RoundedRectangle.shaderBorderColorUniform.setValue(borderColor.r / 255f, borderColor.g / 255f, borderColor.b / 255f, borderColor.alpha)
-        RoundedRectangle.shaderShadowColorUniform.setValue(shadowColor.r / 255f, shadowColor.g / 255f, shadowColor.b / 255f, shadowColor.alpha)
+        RoundedRectangle.shaderBorderColorUniform.setValue(
+            borderColor.r / 255f,
+            borderColor.g / 255f,
+            borderColor.b / 255f,
+            borderColor.alpha
+        )
+        RoundedRectangle.shaderShadowColorUniform.setValue(
+            shadowColor.r / 255f,
+            shadowColor.g / 255f,
+            shadowColor.b / 255f,
+            shadowColor.alpha
+        )
         RoundedRectangle.shaderShadowSoftness.setValue(shadowSoftness)
 
-        UIBlock.drawBlockWithActiveShader(matrixStack, color.javaColor, x.toDouble(), y.toDouble(), x.toDouble() + width.toDouble(), y.toDouble() + height.toDouble())
+        UIBlock.drawBlockWithActiveShader(
+            matrixStack,
+            color.javaColor,
+            x.toDouble(),
+            y.toDouble(),
+            x.toDouble() + width.toDouble(),
+            y.toDouble() + height.toDouble()
+        )
 
         RoundedRectangle.shader.unbind()
     }
@@ -51,28 +68,65 @@ object RoundedRect {
         HSBBox.shaderSizeUniform.setValue(width, height)
         HSBBox.shaderColorUniform.setValue(color.r / 255f, color.g / 255f, color.b / 255f, color.alpha)
 
-        UIBlock.drawBlockWithActiveShader(matrixStack, color.javaColor, x.toDouble(), y.toDouble(), x.toDouble() + width.toDouble(), y.toDouble() + height.toDouble())
+        UIBlock.drawBlockWithActiveShader(
+            matrixStack,
+            color.javaColor,
+            x.toDouble(),
+            y.toDouble(),
+            x.toDouble() + width.toDouble(),
+            y.toDouble() + height.toDouble()
+        )
 
         HSBBox.shader.unbind()
     }
 
-    fun drawCircle(matrixStack: UMatrixStack, x: Float, y: Float, radius: Float, color: Color, borderColor: Color, borderThickness: Float) {
+    fun drawCircle(
+        matrixStack: UMatrixStack,
+        x: Float,
+        y: Float,
+        radius: Float,
+        color: Color,
+        borderColor: Color,
+        borderThickness: Float
+    ) {
         if (!Circle.isInitialized() || !Circle.shader.usable) return
 
         Circle.shader.bind()
         Circle.shaderCenterUniform.setValue(x, y)
         Circle.shaderRadiusUniform.setValue(radius)
         Circle.shaderColorUniform.setValue(color.r / 255f, color.g / 255f, color.b / 255f, color.alpha)
-        Circle.shaderBorderColorUniform.setValue(borderColor.r / 255f, borderColor.g / 255f, borderColor.b / 255f, borderColor.alpha)
+        Circle.shaderBorderColorUniform.setValue(
+            borderColor.r / 255f,
+            borderColor.g / 255f,
+            borderColor.b / 255f,
+            borderColor.alpha
+        )
         Circle.shaderBorderThicknessUniform.setValue(borderThickness)
 
-        UIBlock.drawBlockWithActiveShader(matrixStack, color.javaColor, x.toDouble() - radius, y.toDouble() - radius, x.toDouble() + radius, y.toDouble() + radius)
+        UIBlock.drawBlockWithActiveShader(
+            matrixStack,
+            color.javaColor,
+            x.toDouble() - radius,
+            y.toDouble() - radius,
+            x.toDouble() + radius,
+            y.toDouble() + radius
+        )
 
         Circle.shader.unbind()
     }
 
     fun drawDropShadow(
-        matrixStack: UMatrixStack, x: Float, y: Float, width: Float, height: Float, shadowColor: Color, topL: Float, topR: Float, botL: Float, botR: Float, shadowSoftness: Float
+        matrixStack: UMatrixStack,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        shadowColor: Color,
+        topL: Float,
+        topR: Float,
+        botL: Float,
+        botR: Float,
+        shadowSoftness: Float
     ) {
         if (!DropShadow.isInitialized() || !DropShadow.shader.usable) return
 
@@ -80,10 +134,22 @@ object RoundedRect {
         DropShadow.shaderCenterUniform.setValue(x + (width / 2), y + (height / 2))
         DropShadow.shaderSizeUniform.setValue(width, height)
         DropShadow.shaderRadiusUniform.setValue(botR, topR, botL, topL)
-        DropShadow.shaderShadowColorUniform.setValue(shadowColor.r / 255f, shadowColor.g / 255f, shadowColor.b / 255f, shadowColor.alpha)
+        DropShadow.shaderShadowColorUniform.setValue(
+            shadowColor.r / 255f,
+            shadowColor.g / 255f,
+            shadowColor.b / 255f,
+            shadowColor.alpha
+        )
         DropShadow.shaderShadowSoftness.setValue(shadowSoftness)
 
-        UIBlock.drawBlockWithActiveShader(matrixStack, Color.WHITE.javaColor, x.toDouble() - shadowSoftness, y.toDouble() - shadowSoftness, x.toDouble() + width.toDouble() + shadowSoftness * 2, y.toDouble() + height.toDouble() + shadowSoftness * 2)
+        UIBlock.drawBlockWithActiveShader(
+            matrixStack,
+            Color.WHITE.javaColor,
+            x.toDouble() - shadowSoftness,
+            y.toDouble() - shadowSoftness,
+            x.toDouble() + width.toDouble() + shadowSoftness * 2,
+            y.toDouble() + height.toDouble() + shadowSoftness * 2
+        )
 
         DropShadow.shader.unbind()
     }

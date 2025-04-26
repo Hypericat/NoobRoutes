@@ -1,6 +1,6 @@
-package com.github.wadey3636.noobroutes.ui.util
+package noobroutes.ui.util
 
-import com.github.wadey3636.noobroutes.Core.mc
+import noobroutes.Core.mc
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
 

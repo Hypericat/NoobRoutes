@@ -1,14 +1,14 @@
-package com.github.wadey3636.noobroutes.features.move
+package noobroutes.features.move
 
-import com.github.wadey3636.noobroutes.utils.AutoP3Utils
-import com.github.wadey3636.noobroutes.utils.Scheduler
-import com.github.wadey3636.noobroutes.utils.Utils
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.features.Module
-import com.github.wadey3636.noobroutes.features.settings.Setting.Companion.withDependency
-import com.github.wadey3636.noobroutes.features.settings.impl.BooleanSetting
-import com.github.wadey3636.noobroutes.features.settings.impl.NumberSetting
-import com.github.wadey3636.noobroutes.utils.skyblock.modMessage
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.settings.Setting.Companion.withDependency
+import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.Scheduler
+import noobroutes.utils.Utils
+import noobroutes.utils.skyblock.modMessage
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent

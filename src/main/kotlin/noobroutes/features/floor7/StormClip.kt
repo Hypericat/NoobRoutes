@@ -1,10 +1,10 @@
-package com.github.wadey3636.noobroutes.features.floor7
+package noobroutes.features.floor7
 
-import com.github.wadey3636.noobroutes.utils.Scheduler
-import com.github.wadey3636.noobroutes.events.impl.PacketEvent
-import com.github.wadey3636.noobroutes.features.Category
-import com.github.wadey3636.noobroutes.features.Module
-import com.github.wadey3636.noobroutes.features.settings.impl.NumberSetting
+import noobroutes.events.impl.PacketEvent
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.utils.Scheduler
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

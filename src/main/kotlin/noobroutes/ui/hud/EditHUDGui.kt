@@ -1,17 +1,17 @@
-package com.github.wadey3636.noobroutes.ui.hud
+package noobroutes.ui.hud
 
-import com.github.wadey3636.noobroutes.features.ModuleManager.huds
-import com.github.wadey3636.noobroutes.font.OdinFont
-import com.github.wadey3636.noobroutes.config.Config
-import com.github.wadey3636.noobroutes.ui.Screen
-import com.github.wadey3636.noobroutes.ui.clickgui.animations.impl.EaseInOut
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.textColor
-import com.github.wadey3636.noobroutes.ui.clickgui.util.HoverHandler
-import com.github.wadey3636.noobroutes.ui.util.MouseUtils
-import com.github.wadey3636.noobroutes.ui.util.MouseUtils.isAreaHovered
-import com.github.wadey3636.noobroutes.utils.clock.Executor
-import com.github.wadey3636.noobroutes.utils.clock.Executor.Companion.register
-import com.github.wadey3636.noobroutes.utils.render.*
+import noobroutes.config.Config
+import noobroutes.features.ModuleManager.huds
+import noobroutes.font.OdinFont
+import noobroutes.ui.Screen
+import noobroutes.ui.clickgui.animations.impl.EaseInOut
+import noobroutes.ui.clickgui.util.ColorUtil.textColor
+import noobroutes.ui.clickgui.util.HoverHandler
+import noobroutes.ui.util.MouseUtils
+import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.utils.clock.Executor
+import noobroutes.utils.clock.Executor.Companion.register
+import noobroutes.utils.render.*
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.Display
 import kotlin.math.sign
@@ -55,7 +55,16 @@ object EditHUDGui : Screen() {
         //dropShadow(-100f, -25f, 200f, 50f, 10f, 1f)
         roundedRectangle(Display.getWidth() / 2 - 75, Display.getHeight() * .86f - 30, 150f, 40f, color, 9f)
 
-        text("Reset", Display.getWidth() / 2f, Display.getHeight() * .86f, textColor, 18f, OdinFont.REGULAR, TextAlign.Middle, TextPos.Bottom)
+        text(
+            "Reset",
+            Display.getWidth() / 2f,
+            Display.getHeight() * .86f,
+            textColor,
+            18f,
+            OdinFont.REGULAR,
+            TextAlign.Middle,
+            TextPos.Bottom
+        )
 
         if (openAnim.isAnimating()) {
             val animVal = openAnim.get(0f, 1f, !open)
@@ -73,7 +82,7 @@ object EditHUDGui : Screen() {
         mc.mcProfiler.endSection()
     }
 
-    private val color = Color(0f, 0.75f, 0.75f,0.75f)
+    private val color = Color(0f, 0.75f, 0.75f, 0.75f)
         get() {
             field.brightness = (0.75f + hoverHandler.percent() / 500f).coerceAtMost(1f)
             return field

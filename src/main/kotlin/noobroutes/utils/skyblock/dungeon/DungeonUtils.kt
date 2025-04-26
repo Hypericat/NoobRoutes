@@ -1,8 +1,7 @@
-package com.github.wadey3636.noobroutes.utils.skyblock.dungeon
+package noobroutes.utils.skyblock.dungeon
 
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.utils.*
-import com.github.wadey3636.noobroutes.utils.*
+import noobroutes.Core.mc
+import noobroutes.utils.*
 import net.minecraft.block.BlockSkull
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
@@ -20,94 +19,94 @@ import kotlin.math.roundToLong
 object DungeonUtils {
 
     inline val inDungeons: Boolean
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentArea.isArea(
-            _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.Island.Dungeon)
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentArea.isArea(
+            _root_ide_package_.noobroutes.utils.skyblock.Island.Dungeon)
 
     inline val floorNumber: Int
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.floor?.floorNumber ?: 0
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.floor?.floorNumber ?: 0
 
     inline val floor: Floor
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.floor ?: Floor.E
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.floor ?: Floor.E
 
     inline val inBoss: Boolean
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.inBoss == true
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.inBoss == true
 
     inline val secretCount: Int
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.secretsFound ?: 0
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.secretsFound ?: 0
 
     inline val knownSecrets: Int
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.knownSecrets ?: 0
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.knownSecrets ?: 0
 
     inline val secretPercentage: Float
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.secretsPercent ?: 0f
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.secretsPercent ?: 0f
 
     inline val totalSecrets: Int
         get() = if (secretCount == 0 || secretPercentage == 0f) 0 else floor(100 / secretPercentage * secretCount + 0.5).toInt()
 
     inline val deathCount: Int
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.deaths ?: 0
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.deaths ?: 0
 
     inline val cryptCount: Int
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.crypts ?: 0
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.crypts ?: 0
 
     inline val openRoomCount: Int
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.openedRooms ?: 0
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.openedRooms ?: 0
 
     inline val completedRoomCount: Int
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.completedRooms ?: 0
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.completedRooms ?: 0
 
     inline val percentCleared: Int
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.percentCleared ?: 0
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.percentCleared ?: 0
 
     inline val totalRooms: Int
         get() = if (completedRoomCount == 0 || percentCleared == 0) 0 else floor((completedRoomCount / (percentCleared * 0.01).toFloat()) + 0.4).toInt()
 
     inline val puzzles: List<Puzzle>
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.puzzles.orEmpty()
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.puzzles.orEmpty()
 
     inline val puzzleCount: Int
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.puzzles?.size ?: 0
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.puzzles?.size ?: 0
 
     inline val dungeonTime: String
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.elapsedTime ?: "00m 00s"
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.elapsedTime ?: "00m 00s"
 
     inline val isGhost: Boolean
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.getItemSlot("Haunt", true) != null
+        get() = _root_ide_package_.noobroutes.utils.skyblock.getItemSlot("Haunt", true) != null
 
     inline val currentRoomName: String
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.currentRoom?.data?.name ?: "Unknown"
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.currentRoom?.data?.name ?: "Unknown"
 
     inline val dungeonTeammates: ArrayList<DungeonPlayer>
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonTeammates ?: ArrayList()
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonTeammates ?: ArrayList()
 
     inline val dungeonTeammatesNoSelf: ArrayList<DungeonPlayer>
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonTeammatesNoSelf ?: ArrayList()
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonTeammatesNoSelf ?: ArrayList()
 
     inline val leapTeammates: ArrayList<DungeonPlayer>
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.leapTeammates ?: ArrayList()
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.leapTeammates ?: ArrayList()
 
     inline val currentDungeonPlayer: DungeonPlayer
         get() = dungeonTeammates.find { it.name == mc.thePlayer?.name } ?: DungeonPlayer(mc.thePlayer?.name ?: "Unknown", DungeonClass.Unknown, 0, entity = mc.thePlayer)
 
     inline val doorOpener: String
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.doorOpener ?: "Unknown"
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.doorOpener ?: "Unknown"
 
     inline val mimicKilled: Boolean
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.mimicKilled == true
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.mimicKilled == true
 
-    inline val currentRoom: com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Room?
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.currentRoom
+    inline val currentRoom: noobroutes.utils.skyblock.dungeon.tiles.Room?
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.currentRoom
 
-    inline val passedRooms: Set<com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Room>
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.passedRooms.orEmpty()
+    inline val passedRooms: Set<noobroutes.utils.skyblock.dungeon.tiles.Room>
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.passedRooms.orEmpty()
 
     inline val isPaul: Boolean
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.paul == true
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.paul == true
 
 
 
     inline val bloodDone: Boolean
-        get() = _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.bloodDone == true
+        get() = _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.dungeonStats?.bloodDone == true
 
 
     /**
@@ -126,13 +125,13 @@ object DungeonUtils {
      * @return The current phase of floor 7 boss, or `null` if the player is not in the boss room.
      */
     fun getF7Phase(): M7Phases {
-        if ((!isFloor(7) || !inBoss) && _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.isOnHypixel) return M7Phases.Unknown
+        if ((!isFloor(7) || !inBoss) && _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.isOnHypixel) return M7Phases.Unknown
 
         return when {
-            _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils.posY > 210 -> M7Phases.P1
-            _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils.posY > 155 -> M7Phases.P2
-            _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils.posY > 100 -> M7Phases.P3
-            _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.PlayerUtils.posY > 45 -> M7Phases.P4
+            _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posY > 210 -> M7Phases.P1
+            _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posY > 155 -> M7Phases.P2
+            _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posY > 100 -> M7Phases.P3
+            _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posY > 45 -> M7Phases.P4
             else -> M7Phases.P5
         }
     }
@@ -152,23 +151,23 @@ object DungeonUtils {
     }
 
     @SubscribeEvent
-    fun onPacket(event: com.github.wadey3636.noobroutes.events.impl.PacketEvent.Receive) {
-        if (inDungeons) _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.onPacket(event)
+    fun onPacket(event: noobroutes.events.impl.PacketEvent.Receive) {
+        if (inDungeons) _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.onPacket(event)
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onRoomEnter(event: com.github.wadey3636.noobroutes.events.impl.RoomEnterEvent) {
-        if (inDungeons) _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.enterDungeonRoom(event)
+    fun onRoomEnter(event: noobroutes.events.impl.RoomEnterEvent) {
+        if (inDungeons) _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.enterDungeonRoom(event)
     }
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.onWorldLoad()
+        _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.onWorldLoad()
     }
 
     @SubscribeEvent
     fun onEntityJoin(event: EntityJoinWorldEvent) {
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.onEntityJoin(event)
+        _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentDungeon?.onEntityJoin(event)
     }
 
     private val puzzleRegex = Regex("^§r (\\w+(?: \\w+)*|\\?\\?\\?): §r§7\\[(§r§c§l✖|§r§a§l✔|§r§6§l✦)§r§7] ?(?:§r§f\\(§r§[a-z](\\w+)§r§f\\))?§r$")
@@ -184,7 +183,7 @@ object DungeonUtils {
                 status == "§r§a§l✔" -> PuzzleStatus.Completed
                 status == "§r§6§l✦" -> PuzzleStatus.Incomplete
                 else -> {
-                    _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.modMessage(text.replace("§", "&"))
+                    _root_ide_package_.noobroutes.utils.skyblock.modMessage(text.replace("§", "&"))
                     return@mapNotNull null
                 }
             }
@@ -201,7 +200,7 @@ object DungeonUtils {
             val (_, name, clazz, clazzLevel) = tablistRegex.find(displayName)?.destructured ?: continue
 
             previousTeammates.find { it.name == name }?.let { player -> player.isDead = clazz == "DEAD" } ?:
-            previousTeammates.add(DungeonPlayer(name, DungeonClass.entries.find { it.name == clazz } ?: continue, clazzLvl = _root_ide_package_.com.github.wadey3636.noobroutes.utils.romanToInt(
+            previousTeammates.add(DungeonPlayer(name, DungeonClass.entries.find { it.name == clazz } ?: continue, clazzLvl = _root_ide_package_.noobroutes.utils.romanToInt(
                 clazzLevel
             ), mc.netHandler?.getPlayerInfo(name)?.locationSkin ?: continue, mc.theWorld?.getPlayerEntityByName(name), false))
         }
@@ -229,7 +228,7 @@ object DungeonUtils {
         }
     }
 
-    fun com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Room.getRelativeCoords(pos: Vec3) = pos.subtractVec(x = clayPos.x, z = clayPos.z).rotateToNorth(rotation)
+    fun noobroutes.utils.skyblock.dungeon.tiles.Room.getRelativeCoords(pos: Vec3) = pos.subtractVec(x = clayPos.x, z = clayPos.z).rotateToNorth(rotation)
     /*
     (15, 58, 9)    (-138, 99, -136)
 fun Vec3.rotateAroundNorth(rotation: Rotations): Vec3 =
@@ -243,11 +242,11 @@ fun Vec3.rotateAroundNorth(rotation: Rotations): Vec3 =
      */
 
 
-    fun com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Room.getRealCoords(pos: Vec3) = pos.rotateAroundNorth(rotation).addVec(x = clayPos.x, z = clayPos.z)
-    fun com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Room.getRelativeCoords(pos: BlockPos) = getRelativeCoords(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
-    fun com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Room.getRealCoords(pos: BlockPos) = getRealCoords(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
-    fun com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Room.getRelativeCoords(x: Int, y: Int, z: Int) = getRelativeCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
-    fun com.github.wadey3636.noobroutes.utils.skyblock.dungeon.tiles.Room.getRealCoords(x: Int, y: Int, z: Int) = getRealCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
+    fun noobroutes.utils.skyblock.dungeon.tiles.Room.getRealCoords(pos: Vec3) = pos.rotateAroundNorth(rotation).addVec(x = clayPos.x, z = clayPos.z)
+    fun noobroutes.utils.skyblock.dungeon.tiles.Room.getRelativeCoords(pos: BlockPos) = getRelativeCoords(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
+    fun noobroutes.utils.skyblock.dungeon.tiles.Room.getRealCoords(pos: BlockPos) = getRealCoords(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
+    fun noobroutes.utils.skyblock.dungeon.tiles.Room.getRelativeCoords(x: Int, y: Int, z: Int) = getRelativeCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
+    fun noobroutes.utils.skyblock.dungeon.tiles.Room.getRealCoords(x: Int, y: Int, z: Int) = getRealCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
 
     val dungeonItemDrops = listOf(
         "Health Potion VIII Splash Potion", "Healing Potion 8 Splash Potion", "Healing Potion VIII Splash Potion", "Healing VIII Splash Potion", "Healing 8 Splash Potion",

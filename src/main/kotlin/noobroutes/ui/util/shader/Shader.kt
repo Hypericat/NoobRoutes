@@ -1,6 +1,6 @@
-package com.github.wadey3636.noobroutes.ui.util.shader
+package noobroutes.ui.util.shader
 
-import com.github.wadey3636.noobroutes.Core.logger
+import noobroutes.Core.logger
 import org.apache.commons.io.IOUtils
 import org.lwjgl.opengl.*
 
@@ -15,12 +15,20 @@ abstract class Shader(fragmentShader: String) {
 
         try {
             val vertexStream = javaClass.getResourceAsStream("/shaders/source/entity/vertex.vsh")
-            vertexShaderID = createShader(IOUtils.toString(vertexStream), ARBVertexShader.GL_VERTEX_SHADER_ARB, "/shaders/source/entity/vertex.vsh")
+            vertexShaderID = createShader(
+                IOUtils.toString(vertexStream),
+                ARBVertexShader.GL_VERTEX_SHADER_ARB,
+                "/shaders/source/entity/vertex.vsh"
+            )
             IOUtils.closeQuietly(vertexStream)
 
             val fragmentStream =
                 javaClass.getResourceAsStream("/shaders/$fragmentShader")
-            fragmentShaderID = createShader(IOUtils.toString(fragmentStream), ARBFragmentShader.GL_FRAGMENT_SHADER_ARB, "/shaders/$fragmentShader")
+            fragmentShaderID = createShader(
+                IOUtils.toString(fragmentStream),
+                ARBFragmentShader.GL_FRAGMENT_SHADER_ARB,
+                "/shaders/$fragmentShader"
+            )
             IOUtils.closeQuietly(fragmentStream)
         } catch (e: Exception) {
             logger.error("Error creating shader", e)
@@ -70,7 +78,11 @@ abstract class Shader(fragmentShader: String) {
             ARBShaderObjects.glShaderSourceARB(shader, shaderSource)
             ARBShaderObjects.glCompileShaderARB(shader)
 
-            if (ARBShaderObjects.glGetObjectParameteriARB(shader, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB) == GL11.GL_FALSE)
+            if (ARBShaderObjects.glGetObjectParameteriARB(
+                    shader,
+                    ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB
+                ) == GL11.GL_FALSE
+            )
                 throw RuntimeException("Error creating shader: " + getLogInfo(shader))
             else println("Successfully created shader $shaderName")
 

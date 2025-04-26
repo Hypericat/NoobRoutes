@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.features.settings
+package noobroutes.features.settings
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -14,7 +14,7 @@ abstract class Setting<T> (
     val name: String,
     var hidden: Boolean = false,
     var description: String = "",
-) : ReadWriteProperty<com.github.wadey3636.noobroutes.features.Module, T>, PropertyDelegateProvider<com.github.wadey3636.noobroutes.features.Module, ReadWriteProperty<com.github.wadey3636.noobroutes.features.Module, T>> {
+) : ReadWriteProperty<noobroutes.features.Module, T>, PropertyDelegateProvider<noobroutes.features.Module, ReadWriteProperty<noobroutes.features.Module, T>> {
 
     /**
      * Default value of the setting
@@ -27,7 +27,7 @@ abstract class Setting<T> (
     abstract var value: T
 
     /**
-     * Dependency for if it should be shown in the [click gui][com.github.wadey3636.noobroutes.ui.clickgui.elements.ModuleButton].
+     * Dependency for if it should be shown in the [click gui][noobroutes.ui.clickgui.elements.ModuleButton].
      */
     protected var visibilityDependency: (() -> Boolean)? = null
 
@@ -43,15 +43,15 @@ abstract class Setting<T> (
             return (visibilityDependency?.invoke() ?: true) && !hidden
         }
 
-    override operator fun provideDelegate(thisRef: com.github.wadey3636.noobroutes.features.Module, property: KProperty<*>): ReadWriteProperty<com.github.wadey3636.noobroutes.features.Module, T> {
+    override operator fun provideDelegate(thisRef: noobroutes.features.Module, property: KProperty<*>): ReadWriteProperty<noobroutes.features.Module, T> {
         return thisRef.register(this)
     }
 
-    override operator fun getValue(thisRef: com.github.wadey3636.noobroutes.features.Module, property: KProperty<*>): T {
+    override operator fun getValue(thisRef: noobroutes.features.Module, property: KProperty<*>): T {
         return value
     }
 
-    override operator fun setValue(thisRef: com.github.wadey3636.noobroutes.features.Module, property: KProperty<*>, value: T) {
+    override operator fun setValue(thisRef: noobroutes.features.Module, property: KProperty<*>, value: T) {
         this.value = value
     }
 

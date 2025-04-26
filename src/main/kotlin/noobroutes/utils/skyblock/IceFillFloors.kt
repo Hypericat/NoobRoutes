@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.utils.skyblock
+package noobroutes.utils.skyblock
 
 import net.minecraft.util.Vec3i
 

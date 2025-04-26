@@ -1,11 +1,11 @@
-package com.github.wadey3636.noobroutes.utils
+package noobroutes.utils
 
-import com.github.wadey3636.noobroutes.Core
-import com.github.wadey3636.noobroutes.Core.logger
-import com.github.wadey3636.noobroutes.Core.mc
-import com.github.wadey3636.noobroutes.features.ModuleManager
-import com.github.wadey3636.noobroutes.ui.clickgui.util.ColorUtil.withAlpha
-import com.github.wadey3636.noobroutes.utils.skyblock.skyblockID
+import noobroutes.Core
+import noobroutes.Core.logger
+import noobroutes.Core.mc
+import noobroutes.features.ModuleManager
+import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.utils.skyblock.skyblockID
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
@@ -218,7 +218,7 @@ fun Event.postAndCatch(): Boolean {
         val style = ChatStyle()
         style.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/od copy ```${it.stackTraceToString().lineSequence().take(10).joinToString("\n")}```")
         style.chatHoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§6Click to copy the error to your clipboard."))
-        _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.modMessage(
+        _root_ide_package_.noobroutes.utils.skyblock.modMessage(
             "${Core.VERSION} Caught an ${it::class.simpleName ?: "error"} at ${this::class.simpleName}. §cPlease click this message to copy and send it in the Odin discord!",
             chatStyle = style
         )
@@ -272,7 +272,7 @@ fun endProfile() {
  */
 fun String.capitalizeFirst(): String = replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 
-fun com.github.wadey3636.noobroutes.utils.render.Color.coerceAlpha(min: Float, max: Float): com.github.wadey3636.noobroutes.utils.render.Color {
+fun noobroutes.utils.render.Color.coerceAlpha(min: Float, max: Float): noobroutes.utils.render.Color {
     return if (this.alpha < min) this.withAlpha(min)
     else if (this.alpha > max) this.withAlpha(max)
     else this
@@ -330,7 +330,7 @@ fun checkGLError(message: String) {
  */
 fun writeToClipboard(text: String, successMessage: String = "§aCopied to clipboard.") {
     GuiScreen.setClipboardString(text)
-    if (successMessage.isNotEmpty()) _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.modMessage(
+    if (successMessage.isNotEmpty()) _root_ide_package_.noobroutes.utils.skyblock.modMessage(
         successMessage
     )
 }
@@ -352,7 +352,7 @@ fun romanToInt(s: String): Int {
 
 fun fillItemFromSack(amount: Int, itemId: String, sackName: String, sendMessage: Boolean) {
     val needed = mc.thePlayer?.inventory?.mainInventory?.find { it?.skyblockID == itemId }?.stackSize ?: 0
-    if (needed != amount) _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.sendCommand("gfs $sackName ${amount - needed}") else if (sendMessage) _root_ide_package_.com.github.wadey3636.noobroutes.utils.skyblock.modMessage(
+    if (needed != amount) _root_ide_package_.noobroutes.utils.skyblock.sendCommand("gfs $sackName ${amount - needed}") else if (sendMessage) _root_ide_package_.noobroutes.utils.skyblock.modMessage(
         "§cAlready at max stack size."
     )
 }

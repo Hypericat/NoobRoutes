@@ -1,6 +1,6 @@
-package com.github.wadey3636.noobroutes.utils.render
+package noobroutes.utils.render
 
-import com.github.wadey3636.noobroutes.Core.mc
+import noobroutes.Core.mc
 import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.client.shader.Framebuffer
 import org.lwjgl.opengl.EXTFramebufferObject
@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11.*
  */
 object OutlineUtils {
     fun outlineEntity(
-        event: com.github.wadey3636.noobroutes.events.impl.RenderEntityModelEvent,
+        event: noobroutes.events.impl.RenderEntityModelEvent,
         color: Color = Color.WHITE,
         lineWidth: Float = 2f,
         shouldCancelHurt: Boolean = true
@@ -42,7 +42,7 @@ object OutlineUtils {
         mc.gameSettings.gammaSetting = gamma
     }
 
-    private fun render(event: com.github.wadey3636.noobroutes.events.impl.RenderEntityModelEvent) {
+    private fun render(event: noobroutes.events.impl.RenderEntityModelEvent) {
         event.model.render(
             event.entity,
             event.limbSwing,

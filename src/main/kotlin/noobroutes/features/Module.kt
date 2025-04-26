@@ -1,15 +1,15 @@
-package com.github.wadey3636.noobroutes.features
+package noobroutes.features
 
-import com.github.wadey3636.noobroutes.Core
-import com.github.wadey3636.noobroutes.features.render.ClickGUIModule
-import com.github.wadey3636.noobroutes.features.settings.AlwaysActive
-import com.github.wadey3636.noobroutes.features.settings.Setting
-import com.github.wadey3636.noobroutes.features.settings.impl.HudSetting
-import com.github.wadey3636.noobroutes.features.settings.impl.Keybinding
-import com.github.wadey3636.noobroutes.utils.clock.Executable
-import com.github.wadey3636.noobroutes.utils.clock.Executor
-import com.github.wadey3636.noobroutes.utils.clock.Executor.Companion.register
-import com.github.wadey3636.noobroutes.utils.skyblock.modMessage
+import noobroutes.Core
+import noobroutes.features.render.ClickGUIModule
+import noobroutes.features.settings.AlwaysActive
+import noobroutes.features.settings.Setting
+import noobroutes.features.settings.impl.HudSetting
+import noobroutes.features.settings.impl.Keybinding
+import noobroutes.utils.clock.Executable
+import noobroutes.utils.clock.Executor
+import noobroutes.utils.clock.Executor.Companion.register
+import noobroutes.utils.skyblock.modMessage
 import net.minecraft.network.Packet
 import net.minecraftforge.common.MinecraftForge
 import org.lwjgl.input.Keyboard
@@ -44,7 +44,7 @@ abstract class Module(
     protected inline val mc get() = Core.mc
 
     /**
-     * Indicates if the module has the annotation [com.github.wadey3636.noobroutes.features.settings.AlwaysActive],
+     * Indicates if the module has the annotation [noobroutes.features.settings.AlwaysActive],
      * which keeps the module registered to the eventbus, even if disabled
      */
     @Transient

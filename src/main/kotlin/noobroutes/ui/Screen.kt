@@ -1,4 +1,4 @@
-package com.github.wadey3636.noobroutes.ui
+package noobroutes.ui
 
 
 import net.minecraft.client.gui.GuiScreen
