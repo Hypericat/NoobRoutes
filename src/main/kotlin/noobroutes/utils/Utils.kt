@@ -18,8 +18,10 @@ import net.minecraft.inventory.Container
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
+import net.minecraft.util.Vec3
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 import org.lwjgl.opengl.GL11
@@ -85,7 +87,12 @@ object Utils {
 
 
 
-
+fun isOnBlock(vec3: Vec3): Boolean {
+    return vec3.add(0.5, 1.0, 0.5).distanceTo(mc.thePlayer.positionVector) < 0.1
+}
+fun isOnBlock(pos: BlockPos): Boolean {
+    return isOnBlock(pos.toVec3())
+}
 
 val FORMATTING_CODE_PATTERN = Regex("§[0-9a-fk-or]", RegexOption.IGNORE_CASE)
 

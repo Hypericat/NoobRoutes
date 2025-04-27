@@ -7,11 +7,15 @@ import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.utils.render.RenderUtils.renderVec
+import noobroutes.utils.skyblock.EtherWarpHelper
 
 object Etherwarper {
     var warping = false
 
     private var sendCoords = Vec3(0.0, 0.0, 0.0)
+    private var targetBlock: EtherWarpHelper.EtherPos = EtherWarpHelper.EtherPos(false, null)
     fun etherwarpToVec3(vec3: Vec3, silent: Boolean = false){
         if (sendCoords.distanceTo(mc.thePlayer.positionVector) < 0.2) return
         devMessage("sendcoords: $sendCoords, positionVec: ${mc.thePlayer.positionVector}, vec3: $vec3")
@@ -23,10 +27,19 @@ object Etherwarper {
         warping = true
         mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
         val rot = RotationUtils.getYawAndPitch(vec3, true)
+        targetBlock = EtherWarpHelper.getEtherPos(mc.thePlayer.renderVec, rot.first, rot.second)
         RotationUtils.clickAt(rot.first, rot.second, silent, true)
 
 
 
+    }
+
+    @SubscribeEvent
+    fun onTickEvent(event: TickEvent.ClientTickEvent){
+        val target = targetBlock.pos ?: return
+        if (targetBlock.succeeded && !isOnBlock(target)) return
+        warping = false
+        targetBlock = EtherWarpHelper.EtherPos(false, null)
     }
 
 

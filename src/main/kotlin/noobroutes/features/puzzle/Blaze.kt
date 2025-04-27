@@ -128,12 +128,7 @@ object Blaze : Module(
         }
     }
 
-    private fun isOnBlock(vec3: Vec3): Boolean {
-        return vec3.add(0.5, 1.0, 0.5).distanceTo(mc.thePlayer.positionVector) < 0.1
-    }
-    private fun isOnBlock(pos: BlockPos): Boolean {
-        return isOnBlock(pos.toVec3())
-    }
+
 
 
 
