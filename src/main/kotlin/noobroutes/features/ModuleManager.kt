@@ -83,7 +83,8 @@ object ModuleManager {
         AutoSS,
         Blaze,
         InstantSlow,
-        EtherwarpTest
+        EtherwarpTest,
+        Doorless
     )
 
     init {
