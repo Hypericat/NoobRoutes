@@ -44,7 +44,8 @@ object Blink{
 
     private var c03AfterS08 = 0
 
-    private var lastBlink = System.currentTimeMillis()
+    var lastBlink = System.currentTimeMillis()
+    var lastBlinkRing: Ring? = null
 
     var movementPackets = mutableListOf<C04PacketPlayerPosition>()
     private var endY = 0.0
@@ -182,6 +183,8 @@ object Blink{
     fun doBlink(ring: Ring) {
         if (movementPackets.isNotEmpty()) return
 
+
+
         if (System.currentTimeMillis() - lastBlink >= 500 && (blinksInstance + ring.blinkPackets.size > maxBlinks || !blink)) {
             modMessage("movementing")
             movementPackets = ring.blinkPackets.toMutableList()
@@ -200,6 +203,7 @@ object Blink{
         //modMessage("blinking with ${ring.blinkPackets.size} of those suckers")
         blinksInstance += ring.blinkPackets.size
         lastBlink = System.currentTimeMillis()
+        lastBlinkRing = ring
         ring.blinkPackets.forEach { PacketUtils.sendPacket(it) }
         val lastPacket = ring.blinkPackets.size - 1
         mc.thePlayer.setPosition(ring.blinkPackets[lastPacket].positionX, ring.blinkPackets[lastPacket].positionY, ring.blinkPackets[lastPacket].positionZ)

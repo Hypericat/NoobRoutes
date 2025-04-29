@@ -31,6 +31,8 @@ import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.features.Blink.lastBlink
+import noobroutes.features.Blink.lastBlinkRing
 import org.lwjgl.input.Keyboard
 
 enum class RingTypes {
@@ -134,7 +136,7 @@ object AutoP3: Module (
         }
         if (ring.center && mc.thePlayer.onGround) mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord)
         if (ring.walk) AutoP3Utils.walkAfter = true
-        stopOrNot(ring.type)
+        stopOrNot(ring)
         when(ring.type) {
             RingTypes.WALK -> {
                 AutoP3Utils.startWalk(ring.direction.yaw)
@@ -154,6 +156,7 @@ object AutoP3: Module (
                 AutoP3Utils.direction = ring.direction.yaw
             }
             RingTypes.BLINK -> {
+                if (lastBlinkRing == ring && System.currentTimeMillis() - lastBlink < 5000) return
                 Blink.doBlink(ring)
             }
             RingTypes.TERM -> {
@@ -202,8 +205,8 @@ object AutoP3: Module (
         }
     }
 
-    fun stopOrNot(ring: RingTypes) {
-        if (ring == RingTypes.TNT) return
+    fun stopOrNot(ring: Ring) {
+        if (ring.type == RingTypes.TNT || (ring.type == RingTypes.BLINK && lastBlinkRing == ring && System.currentTimeMillis() - lastBlink < 5000)) return
         else AutoP3Utils.unPressKeys()
     }
 
