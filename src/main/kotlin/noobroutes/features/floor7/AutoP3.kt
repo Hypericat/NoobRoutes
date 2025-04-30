@@ -109,11 +109,11 @@ object AutoP3: Module (
                 if (showLine) Renderer.draw3DLine(vec3List, Color.GREEN, lineWidth = 1F, depth = true)
             }
             if (editMode) return@forEachIndexed
-            if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.7071 && AutoP3Utils.ringCheckY(ring) && ring.should) {
+            if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring) && ring.should) {
                 executeRing(ring)
                 if (ring.type != RingTypes.BLINK) ring.should = false
             }
-            else if(AutoP3Utils.distanceToRingSq(ring.coords) > 0.7071 || !AutoP3Utils.ringCheckY(ring)) ring.should = true
+            else if(AutoP3Utils.distanceToRingSq(ring.coords) > 0.25 || !AutoP3Utils.ringCheckY(ring)) ring.should = true
         }
         waitingTerm = rings[route]?.any { it.type == RingTypes.TERM && !it.should } == true
         waitingLeap = rings[route]?.any { it.type == RingTypes.LEAP && !it.should } == true
@@ -224,7 +224,7 @@ object AutoP3: Module (
         val x = event.packet.x/32.0 //don't fucking ask why its like this
         val y = event.packet.y/32.0
         val z = event.packet.z/32.0
-        if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistanceSq(x,y,z) < 2) leapedIDs.add(event.packet.entityId)
+        if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistanceSq(x,y,z) < 1.25) leapedIDs.add(event.packet.entityId)
         if (leapedIDs.size == leapPlayers()) {
             modMessage("everyone leaped")
             AutoP3Utils.walking = true
@@ -385,7 +385,7 @@ object AutoP3: Module (
 
         val playerEyeVec = mc.thePlayer.positionVector.add(Vec3(0.0, mc.thePlayer.eyeHeight.toDouble(),0.0))
         val deleteList = rings[route]?.sortedBy{it.coords.squareDistanceTo(playerEyeVec)}
-        if (deleteList?.get(0)?.coords?.squareDistanceTo(playerEyeVec)!! > 1.7) return
+        if (deleteList?.get(0)?.coords?.squareDistanceTo(playerEyeVec)!! > 9) return
         deletedRings.add(deleteList[0])
         rings[route]?.remove(deleteList[0])
         modMessage("deleted a ring")

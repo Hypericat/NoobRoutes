@@ -137,12 +137,12 @@ object Blink{
         blinkStarts.forEach {
             Renderer.drawCylinder(it.coords.add(Vec3(0.0, 0.5 * sin(System.currentTimeMillis().toDouble()/300) + 0.5 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.WHITE, depth = true)
             if (AutoP3.editMode) return
-            if (AutoP3Utils.distanceToRingSq(it.coords) < 0.7071 && mc.thePlayer.posY == it.coords.yCoord && it.active) {
+            if (AutoP3Utils.distanceToRingSq(it.coords) < 0.25 && mc.thePlayer.posY == it.coords.yCoord && it.active) {
                 recordedPackets = mutableListOf<C04PacketPlayerPosition>()
                 startRecording(it)
                 it.active = false
             }
-            else if(AutoP3Utils.distanceToRingSq(it.coords) > 0.7071 || mc.thePlayer.posY != it.coords.yCoord) it.active = true
+            else if(AutoP3Utils.distanceToRingSq(it.coords) > 0.25 || mc.thePlayer.posY != it.coords.yCoord) it.active = true
         }
     }
 
@@ -285,7 +285,7 @@ object Blink{
             !mc.thePlayer.onGround || mc.thePlayer.motionX != 0.0 ||
             mc.thePlayer.motionZ != 0.0 ||
             movementPackets.isNotEmpty() ||
-            (mc.thePlayer.getDistanceSq(63.5, 127.0, 35.5) < 2 && event.packet is C05PacketPlayerLook) ||
+            (mc.thePlayer.getDistanceSq(63.5, 127.0, 35.5) < 1.25 && event.packet is C05PacketPlayerLook) ||
             System.currentTimeMillis() - lastBlink < 1 //listen if it works it works
         ) {
             if (cancelled > 0) cancelled--
