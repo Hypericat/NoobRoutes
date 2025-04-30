@@ -147,9 +147,9 @@ object AutoP3Utils {
         }
     }
 
-    fun distanceToRing(coords: Vec3): Double {
-        if(AutoP3.frame) return (coords.xCoord-mc.thePlayer.renderX).pow(2)+(coords.zCoord-mc.thePlayer.renderZ).pow(2).pow(0.5)
-        return (coords.xCoord-mc.thePlayer.posX).pow(2)+(coords.zCoord-mc.thePlayer.posZ).pow(2).pow(0.5)
+    fun distanceToRingSq(coords: Vec3): Double {
+        if(AutoP3.frame) return (coords.xCoord-mc.thePlayer.renderX).pow(2)+(coords.zCoord-mc.thePlayer.renderZ).pow(2)
+        return (coords.xCoord-mc.thePlayer.posX).pow(2)+(coords.zCoord-mc.thePlayer.posZ).pow(2)
     }
 
     fun ringCheckY(ring: Ring): Boolean {
