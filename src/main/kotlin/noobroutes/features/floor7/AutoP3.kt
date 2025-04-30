@@ -33,6 +33,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.features.Blink.lastBlink
 import noobroutes.features.Blink.lastBlinkRing
+import noobroutes.utils.render.RenderUtils
 import org.lwjgl.input.Keyboard
 
 enum class RingTypes {
@@ -106,7 +107,7 @@ object AutoP3: Module (
             if (ring.type == RingTypes.BLINK) {
                 val vec3List: List<Vec3> = ring.blinkPackets.map { packet -> Vec3(packet.positionX, packet.positionY + 0.01, packet.positionZ) }
                 if (showEnd && ring.blinkPackets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
-                if (showLine) Renderer.draw3DLine(vec3List, Color.GREEN, lineWidth = 1F, depth = true)
+                if (showLine) RenderUtils.drawGradient3DLine(vec3List, Color.GREEN, Color.RED, 1F, true)
             }
             if (editMode) return@forEachIndexed
             if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring) && ring.should) {

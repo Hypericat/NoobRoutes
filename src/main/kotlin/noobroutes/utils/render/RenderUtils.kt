@@ -209,6 +209,57 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
+    fun drawGradient3DLine(
+        points: List<Vec3>,
+        startColor: Color,
+        endColor: Color,
+        lineWidth: Float = 3f,
+        depth: Boolean = false
+    ) {
+        if (points.size < 2) return
+
+        GlStateManager.pushMatrix()
+        preDraw()
+        depth(depth)
+        GL11.glEnable(GL11.GL_LINE_SMOOTH)
+        GL11.glLineWidth(lineWidth)
+
+        worldRenderer {
+            begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR)
+            for (i in 1 until points.size) {
+                val t = i.toFloat() / (points.size - 1)
+
+                val r = lerp(startColor.redFloat, endColor.redFloat, t)
+                val g = lerp(startColor.greenFloat, endColor.greenFloat, t)
+                val b = lerp(startColor.blueFloat, endColor.blueFloat, t)
+                val a = lerp(startColor.alphaFloat, endColor.alphaFloat, t)
+
+                val start = points[i - 1]
+                val end = points[i]
+
+                pos(start.xCoord, start.yCoord, start.zCoord)
+                color(r, g, b, a)
+                endVertex()
+
+                pos(end.xCoord, end.yCoord, end.zCoord)
+                color(r, g, b, a)
+                endVertex()
+            }
+        }
+
+        tessellator.draw()
+
+        if (!depth) resetDepth()
+        GL11.glDisable(GL11.GL_LINE_SMOOTH)
+        GL11.glLineWidth(1f)
+        postDraw()
+        GlStateManager.popMatrix()
+    }
+
+    private fun lerp(start: Float, end: Float, t: Float): Float {
+        return start * (1 - t) + end * t
+    }
+
     /**
      * Draws text in the world at the specified position with the specified color and optional parameters.
      *
