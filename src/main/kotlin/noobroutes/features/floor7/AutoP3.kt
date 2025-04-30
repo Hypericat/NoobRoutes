@@ -134,7 +134,10 @@ object AutoP3: Module (
             mc.thePlayer.rotationYaw = ring.direction.yaw
             Blink.rotate = ring.direction.yaw
         }
-        if (ring.center && mc.thePlayer.onGround) mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord)
+        if (ring.center && mc.thePlayer.onGround) {
+            mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord)
+            Blink.rotSkip = true
+        }
         if (ring.walk) AutoP3Utils.walkAfter = true
         stopOrNot(ring)
         when(ring.type) {

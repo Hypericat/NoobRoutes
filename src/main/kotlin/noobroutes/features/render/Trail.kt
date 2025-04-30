@@ -22,6 +22,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
@@ -48,7 +49,7 @@ object Trail: Module(
         positions.clear()
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: PacketEvent.Send) {
         if (mc.thePlayer == null) return
         if (event.packet !is C03PacketPlayer) return
