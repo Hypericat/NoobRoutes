@@ -16,11 +16,18 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import noobroutes.events.impl.MotionUpdateEvent
+import noobroutes.utils.Scheduler
+import noobroutes.utils.Utils.isClose
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import kotlin.experimental.and
 
 object TicTacToe : Module(
@@ -77,6 +84,31 @@ object TicTacToe : Module(
 
         lastClick = System.currentTimeMillis()
 
+    }
+
+    @SubscribeEvent
+    fun onMotion(event: MotionUpdateEvent.Pre) {
+        val room = DungeonUtils.currentRoom
+        if (room == null || event.y != 69.0) return
+        val relativePlayerVec: Vec3 = room.getRelativeCoords(Vec3(event.x, event.y, event.z))
+        if (relativePlayerVec.zCoord !in 15.29 .. 17.71) return
+
+        if (isClose(relativePlayerVec.xCoord, 7.3)) {
+            event.motionZ = 0.0
+            val clip1Pos = room.getRealCoords(relativePlayerVec.subtract(Vec3(0.0624, 0.0, 0.0)))
+            val clip2Pos = room.getRealCoords(relativePlayerVec.subtract(Vec3(1.601, 0.0, 0.0)))
+            event.x = clip1Pos.xCoord
+            event.z = clip1Pos.zCoord
+            Scheduler.scheduleC03Task { mc.thePlayer.setPosition(clip2Pos.xCoord, clip2Pos.yCoord, clip2Pos.zCoord) }
+        }
+        else if (isClose(relativePlayerVec.xCoord, 5.7)) {
+            event.motionZ = 0.0
+            val clip1Pos = room.getRealCoords(relativePlayerVec.add(Vec3(0.0624, 0.0, 0.0)))
+            val clip2Pos = room.getRealCoords(relativePlayerVec.add(Vec3(1.601, 0.0, 0.0)))
+            event.x = clip1Pos.xCoord
+            event.z = clip1Pos.zCoord
+            Scheduler.scheduleC03Task { mc.thePlayer.setPosition(clip2Pos.xCoord, clip2Pos.yCoord, clip2Pos.zCoord) }
+        }
     }
 
 
