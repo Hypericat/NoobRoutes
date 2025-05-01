@@ -32,6 +32,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.utils.PacketUtils
 import org.lwjgl.input.Keyboard
 import kotlin.random.Random
 
@@ -250,6 +251,6 @@ object AutoSS : Module(
         devMessage("Clicked at: x: ${x}, y: ${y}, z: ${z}. Time: ${System.currentTimeMillis()}")
         clickedButton = Vec3(x.toDouble(), y.toDouble(), z.toDouble())
         lastClickAdded = System.currentTimeMillis()
-        mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(BlockPos(x, y, z), 4, mc.thePlayer.heldItem, 0.875f, 0.5f, 0.5f))
+        PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(BlockPos(x, y, z), 4, mc.thePlayer.heldItem, 0.875f, 0.5f, 0.5f))
     }
 }
