@@ -212,9 +212,6 @@ object Blaze : Module(
         }
 
         if (room.data.name == "Higher Blaze") {
-
-
-        }
             higherBlazeEWLocations.forEach {
                 val pos1 = room.getRealCoords(it).add(0.5, 1.0, 0.5)
                 Renderer.drawBox(
@@ -227,9 +224,8 @@ object Blaze : Module(
                         pos1.zCoord + 0.03
                     ), Color.GREEN, fillAlpha = 0, outlineWidth = 1.5F
                 )
-        }
-
-        if (room.data.name == "Lower Blaze") {
+            }
+        } else {
             val pos = room.getRealCoords(12, 70, 24).toVec3().add(0.5, 0.5, 0.5)
             Renderer.drawBox(
                 AxisAlignedBB(

@@ -109,7 +109,7 @@ object RotationUtils {
         shouldClick = true
     }
 
-    val offset get() = ((Scheduler.runTime % 2 * 2 - 1) * 1e-6).toFloat()
+    private val offset get() = ((Scheduler.runTime % 2 * 2 - 1) * 1e-6).toFloat()
 
 
     private var lastC08: Float = 0F
@@ -136,7 +136,7 @@ object RotationUtils {
 
     @SubscribeEvent
     fun onSendPacketReturn(event: PacketReturnEvent.Send){
-        if (event.packet is C03PacketPlayer && canSendC08 && shouldClick) {
+        if (event.packet is C03PacketPlayer && canSendC08 && shouldClick && !SwapManager.recentlySwapped) {
             shouldClick = false
             PlayerUtils.airClick()
         }
@@ -145,6 +145,10 @@ object RotationUtils {
     @SubscribeEvent
     fun onPacketSend(event: PacketEvent.Send){
         if (event.packet is C08PacketPlayerBlockPlacement) {
+            if (event.packet.placedBlockDirection == 255) {
+                this.lastC08 = 0F
+                return
+            }
             lastC08 = Scheduler.runTime
         }
     }

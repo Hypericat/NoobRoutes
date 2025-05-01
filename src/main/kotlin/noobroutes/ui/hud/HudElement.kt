@@ -30,7 +30,7 @@ import kotlin.math.max
 open class HudElement(
     x: Float = 0f,
     y: Float = 0f,
-    val displayToggle: Boolean,
+    private val displayToggle: Boolean,
     defaultScale: Float = 2f,
     val render: Render = { 0f to 0f },
     val settingName: String

@@ -16,9 +16,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
  * Taken from CGA
  */
 object SwapManager {
-    private var recentlySwapped = false
-
-
+    var recentlySwapped = false
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {

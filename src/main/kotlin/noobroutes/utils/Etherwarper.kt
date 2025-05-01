@@ -1,6 +1,7 @@
 package noobroutes.utils
 
 
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import noobroutes.Core.mc
 import noobroutes.events.impl.S08Event
 import noobroutes.utils.skyblock.PlayerUtils
@@ -8,6 +9,7 @@ import noobroutes.utils.skyblock.devMessage
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.events.impl.PacketEvent
 import noobroutes.utils.render.RenderUtils.renderVec
 import noobroutes.utils.skyblock.EtherWarpHelper
 
@@ -29,9 +31,6 @@ object Etherwarper {
         val rot = RotationUtils.getYawAndPitch(vec3, true)
         targetBlock = EtherWarpHelper.getEtherPos(mc.thePlayer.renderVec, rot.first, rot.second)
         RotationUtils.clickAt(rot.first, rot.second, silent)
-
-
-
     }
 
     @SubscribeEvent

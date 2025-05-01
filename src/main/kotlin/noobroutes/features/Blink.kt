@@ -287,6 +287,7 @@ object Blink{
             movementPackets.isNotEmpty() ||
             (mc.thePlayer.getDistanceSq(63.5, 127.0, 35.5) < 1.25 && event.packet is C05PacketPlayerLook) ||
             System.currentTimeMillis() - lastBlink < 1 //listen if it works it works
+            //gay - wadey
         ) {
             if (cancelled > 0) cancelled--
             return
