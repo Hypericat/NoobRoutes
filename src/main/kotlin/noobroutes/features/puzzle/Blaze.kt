@@ -136,7 +136,7 @@ object Blaze : Module(
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || Etherwarper.warping) return
+        if (event.phase != TickEvent.Phase.START || Etherwarper.warping || mc.thePlayer == null) return
         val room = DungeonUtils.currentRoom ?: return
         if (!room.data.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
 
@@ -277,7 +277,7 @@ object Blaze : Module(
             }
 
             SwapManager.SwapState.SWAPPED -> {
-                Scheduler.schedulePostPlayerTickTask(1) {
+                Scheduler.schedulePreTickTask {
                     RotationUtils.clickAt(rot.first, rot.second, silent)
                 }
             }
@@ -297,7 +297,6 @@ object Blaze : Module(
         lastShotTime = System.currentTimeMillis()
         lastShotTarget = currentBlazeTarget
         val rot = RotationUtils.getYawAndPitch(pos, true)
-        mc.thePlayer.heldItem.skyblockID
         val state = SwapManager.swapFromSBId(
             "ARTISANAL_SHORTBOW",
             "DRAGON_SHORTBOW",

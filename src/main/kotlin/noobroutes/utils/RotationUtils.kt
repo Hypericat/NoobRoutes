@@ -1,12 +1,16 @@
 package noobroutes.utils
 
 
+import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import noobroutes.Core.mc
 import noobroutes.features.Blink
 import noobroutes.utils.skyblock.PlayerUtils
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.PacketReturnEvent
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
@@ -90,9 +94,8 @@ object RotationUtils {
      * @param yaw The yaw angle to rotate to before performing the action.
      * @param pitch The pitch angle to rotate to before performing the action.
      * @param silent Whether the rotation should be performed silently without visually updating the player's angles. Defaults to false.
-     * @param sneakCheck Whether to check if the player is sneaking before executing the click action. Defaults to false.
      */
-    fun clickAt(yaw: Float, pitch: Float, silent: Boolean = false, sneakCheck: Boolean = false) {
+    fun clickAt(yaw: Float, pitch: Float, silent: Boolean = false) {
         if (rotated) {
             queuedRots.add(Rotation(yaw, pitch, true, silent))
             return
@@ -103,40 +106,51 @@ object RotationUtils {
             SilentRotator.doSilentRotation()
         }
         setAngles(yaw + offset, pitch)
-        Scheduler.schedulePostTickTask {
-            if (!sneakCheck || mc.thePlayer.isSneaking) PlayerUtils.airClick()
-        }
+        shouldClick = true
     }
 
     val offset get() = ((Scheduler.runTime % 2 * 2 - 1) * 1e-6).toFloat()
 
 
-    private var packetSent = false
-
-
+    private var lastC08: Float = 0F
     private var rotated = false
+    private val canSendC08 get() = Scheduler.runTime - lastC08 > 2
+    private var shouldClick = false
+
+    @SubscribeEvent
+    fun onClientTick(event: TickEvent.ClientTickEvent){
+        if (event.phase != TickEvent.Phase.START) return
+        if (queuedRots.isNotEmpty()) {
+            rotated = true
+            val rot = queuedRots.removeFirst()
+            if (rot.silent) SilentRotator.doSilentRotation()
+            Blink.rotSkip = true
+            setAngles(rot.yaw + offset, rot.pitch)
+            if (rot.click) {
+                shouldClick = true
+            }
+        }
+    }
+
 
 
     @SubscribeEvent
-    fun onPlayerTick(event: TickEvent.PlayerTickEvent) {
-        if (event.phase == TickEvent.Phase.START) {
-            rotated = false
+    fun onSendPacketReturn(event: PacketReturnEvent.Send){
+        if (event.packet is C03PacketPlayer && canSendC08 && shouldClick) {
+            shouldClick = false
+            PlayerUtils.airClick()
         }
-        if (event.phase != TickEvent.Phase.END || event.player != mc.thePlayer || mc.thePlayer == null || event.isCanceled || queuedRots.isEmpty()) return
-        val rot = queuedRots.removeFirst()
-        Blink.rotSkip = true
-        rotated = true
-        if (rot.silent) {
-            SilentRotator.doSilentRotation()
-        }
-        setAngles(rot.yaw + offset, rot.pitch)
-        if (rot.click) {
-            Scheduler.schedulePostTickTask {
-                PlayerUtils.airClick()
-            }
-        }
-
     }
+
+    @SubscribeEvent
+    fun onPacketSend(event: PacketEvent.Send){
+        if (event.packet is C08PacketPlayerBlockPlacement) {
+            lastC08 = Scheduler.runTime
+        }
+    }
+
+
+
 
 
 

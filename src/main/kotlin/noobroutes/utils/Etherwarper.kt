@@ -28,7 +28,7 @@ object Etherwarper {
         mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
         val rot = RotationUtils.getYawAndPitch(vec3, true)
         targetBlock = EtherWarpHelper.getEtherPos(mc.thePlayer.renderVec, rot.first, rot.second)
-        RotationUtils.clickAt(rot.first, rot.second, silent, true)
+        RotationUtils.clickAt(rot.first, rot.second, silent)
 
 
 
