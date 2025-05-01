@@ -47,7 +47,7 @@ object PlayerUtils {
      *
      * @author Odtheking, Bonsai
      */
-    fun alert(title: String, time: Int = 20, color: noobroutes.utils.render.Color = _root_ide_package_.noobroutes.utils.render.Color.Companion.WHITE, playSound: Boolean = true, displayText: Boolean = true) {
+    fun alert(title: String, time: Int = 20, color: noobroutes.utils.render.Color = _root_ide_package_.noobroutes.utils.render.Color.WHITE, playSound: Boolean = true, displayText: Boolean = true) {
         if (playSound) playLoudSound("note.pling", 100f, 1f)
         if (displayText) _root_ide_package_.noobroutes.utils.render.Renderer.displayTitle(title , time, color = color)
     }

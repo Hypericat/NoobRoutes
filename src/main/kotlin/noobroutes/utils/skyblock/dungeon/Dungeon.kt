@@ -7,6 +7,7 @@ import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
+import noobroutes.utils.skyblock.PlayerUtils
 
 // could add some system to look back at previous runs.
 class Dungeon(val floor: Floor) {
@@ -25,10 +26,10 @@ class Dungeon(val floor: Floor) {
 
     private fun getBoss(): Boolean {
         return when (floor.floorNumber) {
-            1 -> _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posX > -71 && _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posZ > -39
-            in 2..4 -> _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posX > -39 && _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posZ > -39
-            in 5..6 -> _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posX > -39 && _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posZ > -7
-            7 -> _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posX > -7 && _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posZ > -7
+            1 -> PlayerUtils.posX > -71 && PlayerUtils.posZ > -39
+            in 2..4 -> PlayerUtils.posX > -39 && PlayerUtils.posZ > -39
+            in 5..6 -> PlayerUtils.posX > -39 && PlayerUtils.posZ > -7
+            7 -> PlayerUtils.posX > -7 && PlayerUtils.posZ > -7
             else -> false
         }
     }
@@ -86,10 +87,10 @@ class Dungeon(val floor: Floor) {
         }
 
         updateDungeonTeammates(packet.entries)
-        _root_ide_package_.noobroutes.utils.runOnMCThread {
+        runOnMCThread {
             puzzles =
-                _root_ide_package_.noobroutes.utils.skyblock.dungeon.DungeonUtils.getDungeonPuzzles(
-                    _root_ide_package_.noobroutes.utils.getTabList
+                DungeonUtils.getDungeonPuzzles(
+                    getTabList
                 ) // transfer to packet based
         }
     }
@@ -144,12 +145,10 @@ class Dungeon(val floor: Floor) {
 
     private fun updateDungeonTeammates(tabList: List<S38PacketPlayerListItem.AddPlayerData>) {
         dungeonTeammates =
-            _root_ide_package_.noobroutes.utils.skyblock.dungeon.DungeonUtils.getDungeonTeammates(
+            DungeonUtils.getDungeonTeammates(
                 dungeonTeammates,
                 tabList
             )
         dungeonTeammatesNoSelf = ArrayList(dungeonTeammates.filter { it.entity != mc.thePlayer })
-
-
     }
 }

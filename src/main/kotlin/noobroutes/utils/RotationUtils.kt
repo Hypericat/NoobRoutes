@@ -7,10 +7,12 @@ import noobroutes.Core.mc
 import noobroutes.features.Blink
 import noobroutes.utils.skyblock.PlayerUtils
 import net.minecraft.util.Vec3
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
+import noobroutes.utils.Utils.isStart
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
@@ -119,7 +121,7 @@ object RotationUtils {
 
     @SubscribeEvent
     fun onClientTick(event: TickEvent.ClientTickEvent){
-        if (event.phase != TickEvent.Phase.START) return
+        if (!event.isStart) return
         if (queuedRots.isNotEmpty()) {
             rotated = true
             val rot = queuedRots.removeFirst()
@@ -132,8 +134,6 @@ object RotationUtils {
         }
     }
 
-
-
     @SubscribeEvent
     fun onSendPacketReturn(event: PacketReturnEvent.Send){
         if (event.packet is C03PacketPlayer && canSendC08 && shouldClick && !SwapManager.recentlySwapped) {
@@ -142,8 +142,9 @@ object RotationUtils {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun onPacketSend(event: PacketEvent.Send){
+        if (event.isCanceled) return
         if (event.packet is C08PacketPlayerBlockPlacement) {
             if (event.packet.placedBlockDirection == 255) {
                 this.lastC08 = 0F
@@ -152,12 +153,4 @@ object RotationUtils {
             lastC08 = Scheduler.runTime
         }
     }
-
-
-
-
-
-
-
-
 }

@@ -24,6 +24,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.Vec3
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.opengl.GL11
 import org.lwjgl.util.glu.GLU
 import java.util.*
@@ -38,6 +39,9 @@ object Utils {
     fun zPart(yaw: Float): Double {
         return cos(yaw * Math.PI /180)
     }
+
+    inline val TickEvent.isStart get() = this.phase == TickEvent.Phase.START
+    inline val TickEvent.isEnd get() = this.phase == TickEvent.Phase.END
 
     val rat = listOf(
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿",
