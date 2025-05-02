@@ -116,7 +116,7 @@ object RotationUtils {
 
     private var lastC08: Float = 0F
     private var rotated = false
-    val canSendC08 get() = Scheduler.runTime - lastC08 > 2
+    val canSendC08 get() = Scheduler.runTime - lastC08 > 4
     private var shouldClick = false
 
     @SubscribeEvent
