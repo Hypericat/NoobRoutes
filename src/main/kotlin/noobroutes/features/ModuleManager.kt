@@ -32,6 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.features.floor7.CoreClip
 import noobroutes.features.floor7.InstaMid
+import noobroutes.features.test.AuraTest
 
 /**
  * Class that contains all Modules and huds

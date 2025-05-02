@@ -95,7 +95,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         val etherwarpBlock = room.getRealCoords(15, 58, expectedZRelative)
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != etherwarpBlock) {
             val realSpot = Vec3(etherwarpBlock.x + 0.5, etherwarpBlock.y + 1.0, etherwarpBlock.z + 0.5)
-            Etherwarper.etherwarpToVec3(realSpot, silent)
+            Etherwarper.queueEtherwarpToVec3(realSpot, silent)
             return
         }
 
@@ -117,7 +117,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         BlockPos(15, 56, 19),
     )
 
-    @SubscribeEvent
+    //@SubscribeEvent
     fun doChest(event: TickEvent.ClientTickEvent) {
         if (!event.isStart || Etherwarper.warping || !doChest || didChest) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board" || mc.thePlayer.posY != 59.0) return
@@ -126,7 +126,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         val aboveChest = room.getRealCoords(15, 58, 22)
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != aboveChest) {
             val realSpot = Vec3(aboveChest.x + 0.5, aboveChest.y + 1.0, aboveChest.z + 0.5)
-            Etherwarper.etherwarpToVec3(realSpot, silent)
+            Etherwarper.queueEtherwarpToVec3(realSpot, silent)
             return
         }
         val chest = room.getRealCoords(BlockPos(15 ,56, 22))

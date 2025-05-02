@@ -8,6 +8,8 @@ import noobroutes.utils.toVec3
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.utils.Utils.isStart
+import noobroutes.utils.skyblock.devMessage
 
 object AuraTest : Module("Aura Test", category = Category.MISC, description = "") {
     val blockAuraList = mutableListOf<BlockPos>()
@@ -17,7 +19,7 @@ object AuraTest : Module("Aura Test", category = Category.MISC, description = ""
     private var lastClick = 0L
     @SubscribeEvent
     fun testAura(event: TickEvent.ClientTickEvent){
-        if (event.phase != TickEvent.Phase.START || System.currentTimeMillis() - lastClick < cooldown || mc.thePlayer == null) return
+        if (!event.isStart || System.currentTimeMillis() - lastClick < cooldown || mc.thePlayer == null) return
         blockAuraList.forEach { block  ->
             if (mc.thePlayer.getPositionEyes(0f).distanceTo(block.toVec3()) <= reach) {
                 AuraManager.auraBlock(block)

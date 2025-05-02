@@ -21,7 +21,7 @@ object RotationUtils {
 
     class Rotation(val yaw: Float, val pitch: Float, val click: Boolean = false, val silent: Boolean = false)
 
-    private var queuedRots = mutableListOf<Rotation>()
+    var queuedRots = mutableListOf<Rotation>()
 
     /**
      * Taken from cga
@@ -116,13 +116,13 @@ object RotationUtils {
 
     private var lastC08: Float = 0F
     private var rotated = false
-    private val canSendC08 get() = Scheduler.runTime - lastC08 > 2
+    val canSendC08 get() = Scheduler.runTime - lastC08 > 2
     private var shouldClick = false
 
     @SubscribeEvent
     fun onClientTick(event: TickEvent.ClientTickEvent){
         if (!event.isStart) return
-        if (queuedRots.isNotEmpty()) {
+        if (queuedRots.isNotEmpty() && canSendC08 && !SwapManager.recentlySwapped) {
             rotated = true
             val rot = queuedRots.removeFirst()
             if (rot.silent) SilentRotator.doSilentRotation()
