@@ -18,41 +18,21 @@ object CoreClip: Module(
     description = "clips u through the gold blocks into core"
 ) {
 
-    private var cd = 0
-    private var doWalk = false
-
     @SubscribeEvent
     fun onMotionPre(event: MotionUpdateEvent.Pre) {
         if (mc.thePlayer == null) return
-        if (cd > 0) {
-            cd--
-            return
-        }
         if (event.y != 115.0) return
         if (event.x !in 52.0..57.0) return
 
         if (isClose(event.z, 53.7)) {
             event.motionZ = 0.0
             event.z = 53.7624
-            doClip(55.301)
+            Scheduler.scheduleC03Task {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 55.301)}
         }
         else if (isClose(event.z, 55.3)){
             event.motionZ = 0.0
             event.z = 55.2376
-            doClip(53.699)
-        }
-    }
-
-    private fun doClip(coord: Double) {
-        doWalk = walking
-        AutoP3Utils.unPressKeys()
-        cd = 3
-        skip = true
-        Scheduler.scheduleC03Task {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, coord)}
-        Scheduler.scheduleC03Task(1) {
-            walking = doWalk
-            AutoP3Utils.rePressKeys()
-            skip = false
+            Scheduler.scheduleC03Task {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY, 53.699)}
         }
     }
 }

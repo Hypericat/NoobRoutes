@@ -91,7 +91,7 @@ object TicTacToe : Module(
         val room = DungeonUtils.currentRoom
         if (room == null || event.y != 69.0) return
         val relativePlayerVec: Vec3 = room.getRelativeCoords(Vec3(event.x, event.y, event.z))
-        if (relativePlayerVec.zCoord !in 15.29 .. 17.71) return
+        if (currentRoomName != "Tic Tac Toe") return
 
         if (isClose(relativePlayerVec.xCoord, 7.3)) {
             event.motionZ = 0.0
