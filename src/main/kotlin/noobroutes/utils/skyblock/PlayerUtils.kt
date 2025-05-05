@@ -7,6 +7,7 @@ import net.minecraft.client.settings.KeyBinding
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C0EPacketClickWindow
+import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
@@ -36,6 +37,9 @@ object PlayerUtils {
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
     }
 
+    fun stopVelocity(){
+        mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
+    }
 
 
 
@@ -82,6 +86,15 @@ object PlayerUtils {
             is ClickType.Shift -> windowClick(slotId, 0, 1)
         }
     }
+
+    fun distanceToPlayer(x: Int, y: Int, z: Int): Double {
+        return mc.thePlayer.positionVector.distanceTo(Vec3(x.toDouble(), y.toDouble(), z.toDouble()))
+    }
+    inline val Vec3.distanceToPlayerSq get() = mc.thePlayer.positionVector.squareDistanceTo(this)
+    inline val Vec3.distanceToPlayer get() = mc.thePlayer.positionVector.distanceTo(this)
+    inline val BlockPos.distanceToPlayer get() = mc.thePlayer.positionVector.distanceTo(Vec3(this))
+    inline val BlockPos.distanceToPlayerSq get() = mc.thePlayer.positionVector.squareDistanceTo(Vec3(this))
+
 
 
     fun unSneak(){

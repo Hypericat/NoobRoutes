@@ -4,24 +4,26 @@ package noobroutes.utils
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import noobroutes.Core.mc
-import noobroutes.features.Blink
-import noobroutes.utils.skyblock.PlayerUtils
 import net.minecraft.util.Vec3
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
-import noobroutes.utils.Utils.isStart
+import noobroutes.utils.Utils.isEnd
+import noobroutes.utils.skyblock.PlayerUtils
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
 object RotationUtils {
     private const val SNEAKHEIGHT = 0.0800000429153443
-
-    class Rotation(val yaw: Float, val pitch: Float, val click: Boolean = false, val silent: Boolean = false)
-
-    var queuedRots = mutableListOf<Rotation>()
+    class Rotation(val yaw: Float, val pitch: Float, val silent: Boolean = false, val action: Action?, var continuous: CompletionRequirement? = null)
+    enum class CompletionRequirement{
+        NonDirectionalC08
+    }
+    enum class Action{
+        LeftClick,
+        RightClick
+    }
 
     /**
      * Taken from cga
@@ -56,101 +58,83 @@ object RotationUtils {
     }
 
 
-    /**
-     * sets angle from relative yaw/pitch
-     * @param {number} yaw delta yaw
-     * @param {number} pitch delta pitch
-     */
     fun setAngles(yaw: Float, pitch: Float) {
         mc.thePlayer.rotationYaw = yaw
         mc.thePlayer.rotationPitch = pitch.coerceIn(-90f, 90f)
     }
 
-    /**
-     * sets angle to a vec3
-     */
+
     fun setAngleToVec3(vec3: Vec3, sneaking: Boolean = false) {
         val angles = getYawAndPitch(vec3.xCoord, vec3.yCoord, vec3.zCoord, sneaking)
         setAngles(angles.first, angles.second)
 
     }
 
-    private var lastSentRot: Pair<Float, Float> = Pair(0f, 0f)
-
-    fun rotateTo(yaw: Float, pitch: Float, silent: Boolean = false) {
-        if (rotated) {
-            queuedRots.add(Rotation(yaw, pitch, false, silent))
-            return
-        }
-        if (silent) {
-            SilentRotator.doSilentRotation()
-        }
-        setAngles(yaw + offset, pitch)
+    fun rotate(yaw: Float, pitch: Float, silent: Boolean = false , action: Action? = null, continuous: CompletionRequirement? = null) {
+        currentRotation = Rotation(yaw, pitch, silent,action, continuous)
     }
 
-    /**
-     * Simulates a click action by adjusting rotation angles to specified yaw and pitch.
-     * The method allows for additional control over whether the action is silent and whether to check
-     * for sneaking before executing the click.
-     *
-     * @param yaw The yaw angle to rotate to before performing the action.
-     * @param pitch The pitch angle to rotate to before performing the action.
-     * @param silent Whether the rotation should be performed silently without visually updating the player's angles. Defaults to false.
-     */
-    fun clickAt(yaw: Float, pitch: Float, silent: Boolean = false) {
-        if (rotated) {
-            queuedRots.add(Rotation(yaw, pitch, true, silent))
-            return
-        }
-        Blink.rotSkip = true
-        rotated = true
-        if (silent) {
-            SilentRotator.doSilentRotation()
-        }
-        setAngles(yaw + offset, pitch)
-        shouldClick = true
-    }
-
-    private val offset get() = ((Scheduler.runTime % 2 * 2 - 1) * 1e-6).toFloat()
-
-
-    private var lastC08: Float = 0F
-    private var rotated = false
-    val canSendC08 get() = Scheduler.runTime - lastC08 > 4
-    private var shouldClick = false
+    var currentRotation: Rotation? = null
+    var lastSentC08 = 0L
+    var shouldRightClick = false
+    var shouldLeftClick = false
+    inline val canSendC08 get() = Scheduler.runTime - lastSentC08 > 2
+    inline val offset get() = ((Scheduler.runTime % 2 * 2 - 1) * 1e-6).toFloat()
+    var targetYaw: Float? = null
+    var targetPitch: Float? = null
 
     @SubscribeEvent
-    fun onClientTick(event: TickEvent.ClientTickEvent){
-        if (!event.isStart) return
-        if (queuedRots.isNotEmpty() && canSendC08 && !SwapManager.recentlySwapped) {
-            rotated = true
-            val rot = queuedRots.removeFirst()
-            if (rot.silent) SilentRotator.doSilentRotation()
-            Blink.rotSkip = true
-            setAngles(rot.yaw + offset, rot.pitch)
-            if (rot.click) {
-                shouldClick = true
+    fun onTick(event: TickEvent.ClientTickEvent){
+        if (event.isEnd || mc.thePlayer == null) return
+        val rot = currentRotation ?: return
+        if (rot.silent) SilentRotator.doSilentRotation()
+        setAngles(rot.yaw + offset, rot.pitch)
+        targetYaw = rot.yaw + offset
+        targetPitch = rot.pitch
+        if (rot.continuous == null) {
+            when (rot.action) {
+                Action.RightClick -> {
+                    shouldRightClick = true
+                }
+                Action.LeftClick -> {
+                    shouldLeftClick = true
+                }
+                null -> {}
+            }
+            currentRotation = null
+        }
+    }
+
+    @SubscribeEvent
+    fun onPacket(event: PacketEvent.Send){
+        if (event.packet is C08PacketPlayerBlockPlacement && event.packet.placedBlockDirection == 255) {
+            lastSentC08 = 0L
+            currentRotation?.let {
+                if (it.continuous == CompletionRequirement.NonDirectionalC08) {
+                    it.continuous = null
+                }
             }
         }
     }
 
     @SubscribeEvent
-    fun onSendPacketReturn(event: PacketReturnEvent.Send){
-        if (event.packet is C03PacketPlayer && canSendC08 && shouldClick && !SwapManager.recentlySwapped) {
-            shouldClick = false
+    fun onPacketReturn(event: PacketReturnEvent.Send){
+        if (event.packet !is C03PacketPlayer || SwapManager.recentlySwapped || !canSendC08) return
+
+        if (event.packet.yaw != targetYaw || event.packet.pitch != targetPitch) return
+
+        if (shouldRightClick) {
+            shouldRightClick = false
             PlayerUtils.airClick()
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onPacketSend(event: PacketEvent.Send){
-        if (event.isCanceled) return
-        if (event.packet is C08PacketPlayerBlockPlacement) {
-            if (event.packet.placedBlockDirection == 255) {
-                this.lastC08 = 0F
-                return
-            }
-            lastC08 = Scheduler.runTime
-        }
-    }
+
+
+
+
+
+
+
+
 }

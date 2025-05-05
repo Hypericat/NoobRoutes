@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
 object Scheduler {
-    var runTime = 0f
+    var runTime = 0L
 
     private val scheduledPreTickTasks = Tasks()
     private val scheduledPostTickTasks = Tasks()

@@ -8,6 +8,7 @@ import noobroutes.utils.skyblock.devMessage
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C02PacketUseEntity.Action
+import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -17,6 +18,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 
 object AuraManager {
     class EntityAura(val entity: Entity, val action: Action)
@@ -188,6 +190,49 @@ object AuraManager {
         devMessage("sent c08")
         if (removeFirst) queuedBlocks.removeFirst()
     }
+
+    private fun digBlock(block: BlockPos){
+        if (distanceToPlayer(block.x, block.y, block.z) < 4) {
+            val blockState = mc.theWorld.getBlockState(block)
+            blockState.block.setBlockBoundsBasedOnState(mc.theWorld, block)
+            val aabb = aabbConvert(blockState.block.getSelectedBoundingBox(mc.theWorld, block), block)
+            val eyePos = mc.thePlayer.getPositionEyes(0f)
+            val centerPos = Vec3(block).addVector(
+                (aabb.minX + aabb.maxX) / 2,
+                (aabb.minY + aabb.maxY) / 2,
+                (aabb.minZ + aabb.maxZ) / 2
+            )
+            val movingObjectPosition: MovingObjectPosition = collisionRayTrace(
+                block,
+                aabb,
+                eyePos,
+                centerPos
+            ) ?: return
+            mc.netHandler.networkManager.sendPacket(
+                C07PacketPlayerDigging(
+                    C07PacketPlayerDigging.Action.START_DESTROY_BLOCK,
+                    block,
+                    movingObjectPosition.sideHit,
+                )
+            )
+            return
+        }
+    }
+
+    private fun aabbConvert(aabb: AxisAlignedBB, block: BlockPos): AxisAlignedBB {
+        val minX: Double = aabb.minX - block.x
+        val minY: Double = aabb.minY - block.y
+        val minZ: Double = aabb.minZ - block.z
+
+        val maxX: Double = aabb.maxX - block.x
+        val maxY: Double = aabb.maxY - block.y
+        val maxZ: Double = aabb.maxZ - block.z
+
+        return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
+    }
+
+
+
 
     /**
      * Modified from CGA

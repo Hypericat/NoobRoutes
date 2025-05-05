@@ -19,6 +19,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.utils.Utils.isStart
+import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
@@ -75,6 +76,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!event.isStart || doChest || didChest || Etherwarper.warping) return
+        
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board" || mc.thePlayer.posY != 59.0) return
         val room = DungeonUtils.currentRoom ?: return
         val solutionList = solutions
@@ -95,7 +97,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         val etherwarpBlock = room.getRealCoords(15, 58, expectedZRelative)
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != etherwarpBlock) {
             val realSpot = Vec3(etherwarpBlock.x + 0.5, etherwarpBlock.y + 1.0, etherwarpBlock.z + 0.5)
-            Etherwarper.queueEtherwarpToVec3(realSpot, silent)
+            Etherwarper.etherwarpToVec3(realSpot, silent)
             return
         }
 
@@ -103,9 +105,12 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         if ((firstLever != LeverBlock.WATER && timeRemaining <= 0) || (firstLever == LeverBlock.WATER && openedWaterTicks == -1) || (firstLever == LeverBlock.WATER && timeRemaining <= 0)) {
             if (firstLever == LeverBlock.WATER && openedWaterTicks == -1) openedWaterTicks = tickCounter
             firstLever.i++
-            AuraManager.auraBlock(firstLever.leverPos.toBlockPos())
+            //AuraManager.auraBlock(firstLever.leverPos.toBlockPos())
         }
     }
+
+
+
 
     private var doChest = false
     private var didChest = false
@@ -126,7 +131,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         val aboveChest = room.getRealCoords(15, 58, 22)
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != aboveChest) {
             val realSpot = Vec3(aboveChest.x + 0.5, aboveChest.y + 1.0, aboveChest.z + 0.5)
-            Etherwarper.queueEtherwarpToVec3(realSpot, silent)
+            Etherwarper.etherwarpToVec3(realSpot, silent)
             return
         }
         val chest = room.getRealCoords(BlockPos(15 ,56, 22))

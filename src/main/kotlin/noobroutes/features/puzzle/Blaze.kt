@@ -269,12 +269,12 @@ object Blaze : Module(
     private fun rotateAndClick(state: SwapManager.SwapState, rot: Pair<Float, Float>){
         when (state) {
             SwapManager.SwapState.ALREADY_HELD -> {
-                RotationUtils.clickAt(rot.first, rot.second, silent)
+                RotationUtils.rotate(rot.first, rot.second, silent, RotationUtils.Action.RightClick)
             }
 
             SwapManager.SwapState.SWAPPED -> {
                 Scheduler.schedulePreTickTask {
-                    RotationUtils.clickAt(rot.first, rot.second, silent)
+                    RotationUtils.rotate(rot.first, rot.second, silent, RotationUtils.Action.RightClick)
                 }
             }
 
@@ -300,7 +300,6 @@ object Blaze : Module(
             "ITEM_SPIRIT_BOW"
         )
         rotateAndClick(state, rot)
-
     }
 
 
