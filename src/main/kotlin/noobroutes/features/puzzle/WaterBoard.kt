@@ -72,10 +72,12 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         }
     }
 
+    private var clicked = false
+
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!event.isStart || doChest || didChest || Etherwarper.warping) return
+        if (!event.isStart || doChest || didChest || Etherwarper.warping || clicked) return
         
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board" || mc.thePlayer.posY != 59.0) return
         val room = DungeonUtils.currentRoom ?: return
@@ -105,7 +107,9 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         if ((firstLever != LeverBlock.WATER && timeRemaining <= 0) || (firstLever == LeverBlock.WATER && openedWaterTicks == -1) || (firstLever == LeverBlock.WATER && timeRemaining <= 0)) {
             if (firstLever == LeverBlock.WATER && openedWaterTicks == -1) openedWaterTicks = tickCounter
             firstLever.i++
-            //AuraManager.auraBlock(firstLever.leverPos.toBlockPos())
+            AuraManager.auraBlock(firstLever.leverPos.toBlockPos())
+            clicked = true
+            Scheduler.schedulePreTickTask(4) { clicked = false }
         }
     }
 

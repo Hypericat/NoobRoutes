@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.S08Event
 import noobroutes.utils.skyblock.PlayerUtils
 import org.lwjgl.input.Keyboard
 
@@ -41,8 +42,8 @@ object Etherwarper {
 
 
     @SubscribeEvent
-    fun onPacket(event: PacketEvent.Receive) {
-        if (event.packet is S08PacketPlayerPosLook) warping = false
+    fun onPacket(event: S08Event) { //u need the ct bypass cause zpew/zph
+        warping = false
     }
 
     @SubscribeEvent

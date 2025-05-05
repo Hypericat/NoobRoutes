@@ -116,19 +116,28 @@ object Blink{
         //text(cancelled.toString(), resolution.scaledWidth / 2, resolution.scaledHeight / 2.3, Color.WHITE, 13, align = TextAlign.Middle)
         text(cancelled.toString(), AutoP3.moveHud.x, AutoP3.moveHud.y, Color.WHITE, 13, align = TextAlign.Middle)
     }
-
+    private var lastMovementedC03: C04PacketPlayerPosition? = null
     @SubscribeEvent
     fun renderMovement(event:RenderWorldLastEvent) {
         if(!inBoss) return
-        if (movementPackets.isEmpty()) return
+        if (movementPackets.isEmpty() || lastMovementedC03 == null) return
         if (!mode) return
-        //val vec3List: List<Vec3> = movementPackets.map { packet -> Vec3(packet.positionX, packet.positionY, packet.positionZ) }
-        //Renderer.draw3DLine(vec3List, Color.WHITE, lineWidth = 1.5F)
         val firstPacket = movementPackets.first()
-        val xPos = firstPacket.positionX
-        val yPos = firstPacket.positionY
-        val zPos = firstPacket.positionZ
+        val beforeFirst = lastMovementedC03 ?: return
+        val xDiff = firstPacket.positionX - beforeFirst.positionX
+        val yDiff = firstPacket.positionY - beforeFirst.positionY
+        val zDiff = firstPacket.positionZ - beforeFirst.positionZ
+        val timeAlong = (System.currentTimeMillis() - lastC03) / 50.0
+        val xPos = beforeFirst.positionX + xDiff * timeAlong
+        val yPos = beforeFirst.positionY + yDiff * timeAlong
+        val zPos = beforeFirst.positionZ + zDiff * timeAlong
         Renderer.drawBox(AxisAlignedBB(xPos+0.3, yPos, zPos+0.3, xPos-0.3, yPos+1.8, zPos-0.3), Color.GREEN, fillAlpha = 0, outlineWidth = 1.5F)
+    }
+
+    private var lastC03 = System.currentTimeMillis()
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onLastC03(event: PacketEvent.Send) {
+        if (event.packet is C03PacketPlayer) lastC03 = System.currentTimeMillis()
     }
 
     @SubscribeEvent
@@ -171,7 +180,7 @@ object Blink{
             mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)
             lastBlink = System.currentTimeMillis()
         }
-        movementPackets.removeFirst()
+        lastMovementedC03 = movementPackets.removeFirst()
     }
 
     @SubscribeEvent
