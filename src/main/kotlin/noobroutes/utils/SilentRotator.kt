@@ -1,5 +1,6 @@
 package noobroutes.utils
 
+import net.minecraftforge.client.event.RenderHandEvent
 import noobroutes.Core.mc
 import net.minecraftforge.client.event.RenderPlayerEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -69,10 +70,10 @@ object SilentRotator {
         if (!pitchRenderer0Registered) return
         val thePlayer = event.entity ?: return
         if (mc.thePlayer == null || thePlayer != mc.thePlayer) return
-        renderPitch.now = thePlayer.rotationPitch
-        renderPitch.prev = thePlayer.prevRotationPitch
-        thePlayer.rotationPitch = renderPitch.realNow
-        thePlayer.prevRotationPitch = renderPitch.realPrev
+        renderPitch.realNow = thePlayer.rotationPitch
+        renderPitch.realPrev = thePlayer.prevRotationPitch
+        thePlayer.rotationPitch = renderPitch.now
+        thePlayer.prevRotationPitch = renderPitch.prev
     }
 
     @SubscribeEvent
@@ -83,7 +84,5 @@ object SilentRotator {
         thePlayer.rotationPitch = renderPitch.realNow
         thePlayer.prevRotationPitch = renderPitch.realPrev
     }
-
-
 
 }

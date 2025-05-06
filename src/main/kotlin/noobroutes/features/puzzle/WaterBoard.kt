@@ -72,12 +72,12 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         }
     }
 
-    private var clicked = false
+
 
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!event.isStart || doChest || didChest || Etherwarper.warping || clicked) return
+        if (!event.isStart || doChest || didChest || Etherwarper.warping) return
         
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board" || mc.thePlayer.posY != 59.0) return
         val room = DungeonUtils.currentRoom ?: return
@@ -85,6 +85,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
             .flatMap { (lever, times) -> times.drop(lever.i).map { Pair(lever, it) } }
             .sortedBy { (lever, time) -> time + if (lever == LeverBlock.WATER) 0.01 else 0.0 }
         val first = solutionList.firstOrNull()
+
         if (first == null) {
             doChest = true
             return
@@ -97,20 +98,36 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
             else -> return
         }
         val etherwarpBlock = room.getRealCoords(15, 58, expectedZRelative)
+        val nextEW = getNextEtherwarp(solutionList, expectedZRelative)
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != etherwarpBlock) {
-            val realSpot = Vec3(etherwarpBlock.x + 0.5, etherwarpBlock.y + 1.0, etherwarpBlock.z + 0.5)
-            Etherwarper.etherwarpToVec3(realSpot, silent)
+            if (RotationUtils.ticksRotated > 2) return RotationUtils.completePrerotateTask()
+            devMessage(RotationUtils.ticksRotated)
+            if (RotationUtils.ticksRotated == 0L) Etherwarper.preRotateEtherwarpToVec3(etherwarpBlock.toVec3().add(0.5, 1.0, 0.5), silent)
             return
         }
+
+
+        if (RotationUtils.ticksRotated == 0L && nextEW != null) Etherwarper.preRotateEtherwarpToVec3(room.getRealCoords(nextEW).add(0.5, 1.0, 0.5), silent)
 
         val timeRemaining = openedWaterTicks + (time * 20).toInt() - tickCounter
         if ((firstLever != LeverBlock.WATER && timeRemaining <= 0) || (firstLever == LeverBlock.WATER && openedWaterTicks == -1) || (firstLever == LeverBlock.WATER && timeRemaining <= 0)) {
             if (firstLever == LeverBlock.WATER && openedWaterTicks == -1) openedWaterTicks = tickCounter
             firstLever.i++
             AuraManager.auraBlock(firstLever.leverPos.toBlockPos())
-            clicked = true
-            Scheduler.schedulePreTickTask(4) { clicked = false }
         }
+    }
+
+
+    private fun getNextEtherwarp(solutionList: List<Pair<LeverBlock, Double>>, currentZ: Int): Vec3? {
+        return solutionList.firstOrNull {
+            val relativeFirst = it.first.relativePosition
+            val expectedZRelative = when (relativeFirst.zCoord) {
+                15.0, 20.0 -> relativeFirst.zCoord.toInt()
+                10.0, 5.0 -> 9
+                else -> 0
+            }
+            expectedZRelative == currentZ
+        }?.first?.relativePosition
     }
 
 
