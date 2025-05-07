@@ -1,19 +1,19 @@
 package noobroutes.utils
 
-import net.minecraft.client.settings.KeyBinding
-import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
-import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.S08Event
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
 
 
 object Etherwarper {
     var warping = false
+
 
     fun etherwarpToVec3(vec3: Vec3, silent: Boolean = false) {
         val rot = RotationUtils.getYawAndPitch(vec3)
@@ -38,8 +38,59 @@ object Etherwarper {
         }
     }
 
+    fun preRotateEtherwarpToVec3(vec3: Vec3, silent: Boolean = false){
+        val rot = RotationUtils.getYawAndPitch(vec3)
+        preRotateEtherwarp(rot.first, rot.second, silent)
+        //devMessage(vec3)
+    }
+
+    fun preRotateEtherwarp(yaw: Float, pitch: Float, silent: Boolean = false) {
+        if (warping || PlayerUtils.playerControlsKeycodes.any { Keyboard.isKeyDown(it)}) return
+        warping = true
+
+        PlayerUtils.sneak()
+        PlayerUtils.stopVelocity()
+        val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+        when (state) {
+            SwapManager.SwapState.ALREADY_HELD -> {
+                RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick, continuous = RotationUtils.CompletionRequirement.PreRotate)
+            }
+            SwapManager.SwapState.SWAPPED -> {
+                Scheduler.schedulePreTickTask {
+                    RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick, continuous = RotationUtils.CompletionRequirement.PreRotate)
+                }
+            }
+            else -> return
+        }
+    }
+
+    fun doubleTickEtherwarp(yaw: Float, pitch: Float, silent: Boolean){
+        if (warping) return
+        warping = true
+        PlayerUtils.sneak()
+        PlayerUtils.stopVelocity()
+        val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+        if (state == SwapManager.SwapState.ALREADY_HELD || state == SwapManager.SwapState.SWAPPED) {
+            RotationUtils.rotate(yaw, pitch, silent)
+            Scheduler.schedulePreTickTask(1) {
+                RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick)
+            }
+        }
+    }
 
 
+
+    private var serverTicks = 0L
+    @SubscribeEvent
+    fun onServerTick(event: TickEvent.ServerTickEvent){
+        if (serverTicks >= 4) {
+            warping = false
+            serverTicks = 0
+        }
+        if (warping && RotationUtils.ticksRotated == 0L) {
+            serverTicks++
+        }
+    }
 
     @SubscribeEvent
     fun onPacket(event: S08Event) { //u need the ct bypass cause zpew/zph

@@ -5,12 +5,16 @@ import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import noobroutes.Core.mc
 import net.minecraft.util.Vec3
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.Core.logger
+import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
@@ -18,8 +22,10 @@ object RotationUtils {
     private const val SNEAKHEIGHT = 0.0800000429153443
     class Rotation(val yaw: Float, val pitch: Float, val silent: Boolean = false, val action: Action?, var continuous: CompletionRequirement? = null)
     enum class CompletionRequirement{
-        NonDirectionalC08
+        NonDirectionalC08,
+        PreRotate
     }
+
     enum class Action{
         LeftClick,
         RightClick
@@ -82,15 +88,20 @@ object RotationUtils {
     inline val offset get() = ((Scheduler.runTime % 2 * 2 - 1) * 1e-6).toFloat()
     var targetYaw: Float? = null
     var targetPitch: Float? = null
+    var ticksRotated: Long = 0L
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: TickEvent.ClientTickEvent){
         if (event.isEnd || mc.thePlayer == null) return
         val rot = currentRotation ?: return
         if (rot.silent) SilentRotator.doSilentRotation()
-        setAngles(rot.yaw + offset, rot.pitch)
+        setAngles(rot.yaw + offset * if (rot.continuous != null) 100000 else 1, rot.pitch)
+        devMessage("tick| yaw: ${rot.yaw + offset * if (rot.continuous != null) 100000 else 1}, pitch: ${rot.pitch}")
         targetYaw = rot.yaw + offset
         targetPitch = rot.pitch
+        //devMessage(rot.continuous)
+        devMessage(Scheduler.runTime)
+        devMessage(offset)
         if (rot.continuous == null) {
             when (rot.action) {
                 Action.RightClick -> {
@@ -102,7 +113,10 @@ object RotationUtils {
                 null -> {}
             }
             currentRotation = null
+            ticksRotated = 0L
+            return
         }
+        ticksRotated++
     }
 
     @SubscribeEvent
@@ -118,18 +132,56 @@ object RotationUtils {
     }
 
     @SubscribeEvent
+    fun onKeyInput(event: InputEvent.Keyboard) {
+        if (PlayerUtils.playerControlsKeycodes.contains(event.keycode) && currentRotation != null) {
+            devMessage("cancelling prerotate")
+             try {
+                 if (currentRotation!!.continuous == CompletionRequirement.PreRotate) {
+                     currentRotation = null
+                     ticksRotated = 0L
+                     targetPitch = null
+                     targetYaw = null
+                 }
+             } catch (e: Exception) {
+                 logger.error(e)
+             }
+        }
+    }
+
+
+    @SubscribeEvent
     fun onPacketReturn(event: PacketReturnEvent.Send){
         if (event.packet !is C03PacketPlayer || SwapManager.recentlySwapped || !canSendC08) return
-
-        if (event.packet.yaw != targetYaw || event.packet.pitch != targetPitch) return
-
+        devMessage("yaw: ${event.packet.yaw}, pitch: ${event.packet.pitch}")
         if (shouldRightClick) {
             shouldRightClick = false
             PlayerUtils.airClick()
         }
     }
 
+    fun completePrerotateTask(){
+        devMessage("complete prerotate")
+        try {
+            if (currentRotation != null && currentRotation!!.continuous == CompletionRequirement.PreRotate) {
+                currentRotation!!.continuous = null
+            }
+        } catch (e: Exception) {
+            devMessage("Error Occurred Completing Task")
+            logger.error(e)
+        }
 
+    }
+
+    fun forceCompleteTask(){
+        try {
+            if (currentRotation != null) {
+                currentRotation!!.continuous = null
+            }
+        } catch (e: Exception) {
+            devMessage("Error Occurred Completing Task")
+            logger.error(e)
+        }
+    }
 
 
 

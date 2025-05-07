@@ -106,12 +106,15 @@ object PlayerUtils {
     }
 
 
-    val keyBindings = listOf(
+    inline val keyBindings get() =  listOf(
         mc.gameSettings.keyBindForward,
         mc.gameSettings.keyBindLeft,
         mc.gameSettings.keyBindRight,
-        mc.gameSettings.keyBindBack
+        mc.gameSettings.keyBindBack,
+        mc.gameSettings.keyBindJump
     )
+
+    inline val playerControlsKeycodes get() = keyBindings.map { it.keyCode}
 
     fun unPressKeys() {
         Keyboard.enableRepeatEvents(false)

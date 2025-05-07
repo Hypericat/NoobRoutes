@@ -16,6 +16,7 @@ import java.io.File
 import kotlin.coroutines.EmptyCoroutineContext
 
 object Core {
+    @JvmStatic
     val mc: Minecraft = Minecraft.getMinecraft()
 
 

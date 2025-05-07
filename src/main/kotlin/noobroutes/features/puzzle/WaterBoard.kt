@@ -15,10 +15,14 @@ import com.google.gson.JsonParser
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.features.render.ClickGUIModule.devMode
 import noobroutes.utils.Utils.isStart
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
 import java.io.InputStreamReader
@@ -72,13 +76,13 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         }
     }
 
-    private var clicked = false
 
+    private var currentTarget = BlockPos(0, 0, 0)
+    private var nextBlock = BlockPos(0, 0, 0)
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!event.isStart || doChest || didChest || Etherwarper.warping || clicked) return
-        
+        if (!event.isStart || doChest || didChest) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board" || mc.thePlayer.posY != 59.0) return
         val room = DungeonUtils.currentRoom ?: return
         val solutionList = solutions
@@ -96,11 +100,23 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
             10.0, 5.0 -> 9
             else -> return
         }
-        val etherwarpBlock = room.getRealCoords(15, 58, expectedZRelative)
-        if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != etherwarpBlock) {
-            val realSpot = Vec3(etherwarpBlock.x + 0.5, etherwarpBlock.y + 1.0, etherwarpBlock.z + 0.5)
-            Etherwarper.etherwarpToVec3(realSpot, silent)
+        val etherwarpBlock = room.getRealCoords(firstLever.relativePosition.getEtherwarpPosition())
+        currentTarget = etherwarpBlock.toBlockPos()
+        val nextEW = getNextEtherwarp(solutionList, expectedZRelative)
+
+        if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != etherwarpBlock.toBlockPos()) {
+            if (RotationUtils.ticksRotated > 2) return RotationUtils.completePrerotateTask()
+            if (RotationUtils.ticksRotated == 0L && !Etherwarper.warping) Etherwarper.preRotateEtherwarpToVec3(etherwarpBlock.add(0.5, 1.1, 0.5), silent)
             return
+        }
+
+
+        if (RotationUtils.ticksRotated == 0L && nextEW != null) {
+            if (!Etherwarper.warping) {
+                nextBlock = room.getRealCoords(nextEW).toBlockPos()
+                Etherwarper.preRotateEtherwarpToVec3(room.getRealCoords(nextEW).add(0.5, 1.1, 0.5), silent)
+                devMessage("nextEW:${room.getRealCoords(nextEW)}, etherwarpBlock:$etherwarpBlock")
+            }
         }
 
         val timeRemaining = openedWaterTicks + (time * 20).toInt() - tickCounter
@@ -108,9 +124,36 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
             if (firstLever == LeverBlock.WATER && openedWaterTicks == -1) openedWaterTicks = tickCounter
             firstLever.i++
             AuraManager.auraBlock(firstLever.leverPos.toBlockPos())
-            clicked = true
-            Scheduler.schedulePreTickTask(4) { clicked = false }
         }
+    }
+
+    @SubscribeEvent
+    fun onRender(event: RenderWorldLastEvent){
+        if (!devMode) return
+        Renderer.drawBlock(currentTarget, Color.GREEN)
+        Renderer.drawBlock(nextBlock, Color.BLUE)
+    }
+
+
+    private fun Vec3.getEtherwarpPosition(): Vec3 {
+        val expectedZRelative = when (this.zCoord) {
+            15.0, 20.0 -> this.zCoord
+            10.0, 5.0 -> 9.0
+            else -> 0.0
+        }
+        return Vec3(15.0, 58.0, expectedZRelative)
+    }
+
+    private fun getNextEtherwarp(solutionList: List<Pair<LeverBlock, Double>>, currentZ: Int): Vec3? {
+        return solutionList.firstOrNull {
+            val relativeFirst = it.first.relativePosition
+            val expectedZRelative = when (relativeFirst.zCoord) {
+                15.0, 20.0 -> relativeFirst.zCoord.toInt()
+                10.0, 5.0 -> 9
+                else -> 0
+            }
+            expectedZRelative != currentZ
+        }?.first?.relativePosition?.getEtherwarpPosition()
     }
 
 
