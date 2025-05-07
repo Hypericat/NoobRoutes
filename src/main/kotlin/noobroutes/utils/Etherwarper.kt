@@ -64,25 +64,23 @@ object Etherwarper {
         }
     }
 
-    fun doubleTickEtherwarp(){
+    fun doubleTickEtherwarp(yaw: Float, pitch: Float, silent: Boolean){
         if (warping) return
         warping = true
         PlayerUtils.sneak()
         PlayerUtils.stopVelocity()
         val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.ALREADY_HELD || state == SwapManager.SwapState.SWAPPED) {
-            RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick, continuous = RotationUtils.CompletionRequirement.PreRotate)
+            RotationUtils.rotate(yaw, pitch, silent)
             Scheduler.schedulePreTickTask(1) {
-                RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick, continuous = RotationUtils.CompletionRequirement.PreRotate)
+                RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick)
             }
-
         }
-
     }
 
 
 
-    var serverTicks = 0L
+    private var serverTicks = 0L
     @SubscribeEvent
     fun onServerTick(event: TickEvent.ServerTickEvent){
         if (serverTicks >= 4) {

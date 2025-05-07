@@ -11,9 +11,10 @@ object SilentRotator {
     var blockSilentRotation = false
     var pitchRenderer0Registered = false
     var pitchRenderer1Registered = false
+    var pitchRenderer3Registered = false
 
     private var realRotations: RealRotation = RealRotation(null, null, null, null)
-    private var renderPitch: RenderPitch = RenderPitch(0f, 0f, 0f, 0f)
+    var renderPitch: RenderPitch = RenderPitch(0f, 0f, 0f, 0f)
 
     fun doSilentRotation() {
         if (blockSilentRotation || mc.thePlayer == null) return
@@ -57,13 +58,16 @@ object SilentRotator {
         mc.thePlayer.rotationYawHead = mc.thePlayer.rotationYaw
         pitchRenderer0Registered = true
         pitchRenderer1Registered = true
+        pitchRenderer3Registered = true
     }
 
 
     fun unregisterRender() {
         pitchRenderer0Registered = false
         pitchRenderer1Registered = false
+        pitchRenderer3Registered = false
     }
+
 
     @SubscribeEvent
     fun pitchRenderer0(event: RenderPlayerEvent.Pre) {
@@ -83,6 +87,12 @@ object SilentRotator {
         if (mc.thePlayer == null || thePlayer != mc.thePlayer) return
         thePlayer.rotationPitch = renderPitch.realNow
         thePlayer.prevRotationPitch = renderPitch.realPrev
+    }
+
+    @SubscribeEvent
+    fun onHandRender(event: RenderHandEvent){
+        if (!pitchRenderer3Registered) return
+
     }
 
 }
