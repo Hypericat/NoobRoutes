@@ -46,7 +46,8 @@ enum class RingTypes {
     LEAP,
     MOTION,
     LAVA,
-    TNT
+    TNT,
+    JUMP
 }
 
 
@@ -139,8 +140,9 @@ object AutoP3: Module (
             mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord)
             Blink.rotSkip = true
         }
-        if (ring.walk) AutoP3Utils.walkAfter = true
         stopOrNot(ring)
+        AutoP3Utils.walkAfter = ring.walk && ring.type != RingTypes.JUMP
+        if (ring.walk && ring.type == RingTypes.JUMP) AutoP3Utils.startWalk(ring.direction.yaw)
         when(ring.type) {
             RingTypes.WALK -> {
                 AutoP3Utils.startWalk(ring.direction.yaw)
@@ -204,6 +206,11 @@ object AutoP3: Module (
                     return
                 }
                 Scheduler.schedulePreTickTask(1) { AuraManager.auraBlock(ring.blinkPackets[0].positionX.toInt(), ring.blinkPackets[0].positionY.toInt(), ring.blinkPackets[0].positionZ.toInt(), force = true) }
+            }
+            RingTypes.JUMP -> {
+                modMessage("jumping")
+                if (mc.thePlayer.onGround) mc.thePlayer.jump()
+                if (ring.walk) AutoP3Utils.startWalk(ring.direction.yaw)
             }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
@@ -353,6 +360,10 @@ object AutoP3: Module (
                 }
                 modMessage("added boom")
                 packets.add(C04PacketPlayerPosition(block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), false))
+            }
+            "jump" -> {
+                modMessage("jump added")
+                ringType = RingTypes.JUMP
             }
             else -> return modMessage("thats not a ring type stoopid")
         }

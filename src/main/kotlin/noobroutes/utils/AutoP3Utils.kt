@@ -99,7 +99,7 @@ object AutoP3Utils {
                 mc.thePlayer.motionZ = -Utils.zPart(direction) * speed
             }
             1 -> {
-                mc.thePlayer.jump()
+                if (mc.thePlayer.onGround) mc.thePlayer.jump()
                 val speed = mc.thePlayer.capabilities.walkSpeed * 5.5 / 0.91
                 mc.thePlayer.motionX = Utils.xPart(direction) * speed
                 mc.thePlayer.motionZ = Utils.zPart(direction) * speed
