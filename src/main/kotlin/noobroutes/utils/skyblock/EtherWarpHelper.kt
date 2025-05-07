@@ -27,13 +27,13 @@ object EtherWarpHelper {
     fun getEtherPos(pos: Vec3, yaw: Float, pitch: Float, distance: Double = 60.0, returnEnd: Boolean = false): EtherPos {
         mc.thePlayer ?: return EtherPos.NONE
 
-        val startPos: Vec3 = _root_ide_package_.noobroutes.utils.getPositionEyes(pos)
-        val endPos = _root_ide_package_.noobroutes.utils.getLook(yaw = yaw, pitch = pitch).normalize().multiply(factor = distance).add(startPos)
+        val startPos: Vec3 = getPositionEyes(pos)
+        val endPos = getLook(yaw = yaw, pitch = pitch).normalize().multiply(factor = distance).add(startPos)
 
         return traverseVoxels(startPos, endPos).takeUnless { it == EtherPos.NONE && returnEnd } ?: EtherPos(true, endPos.toBlockPos())
     }
 
-    fun getEtherPos(positionLook: noobroutes.utils.PositionLook = _root_ide_package_.noobroutes.utils.PositionLook(
+    fun getEtherPos(positionLook: PositionLook = PositionLook(
         mc.thePlayer.renderVec,
         mc.thePlayer.rotationYaw,
         mc.thePlayer.rotationPitch
