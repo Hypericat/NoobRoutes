@@ -99,6 +99,8 @@ object RotationUtils {
         targetYaw = rot.yaw + offset
         targetPitch = rot.pitch
         //devMessage(rot.continuous)
+        devMessage(Scheduler.runTime)
+        devMessage(offset)
         if (rot.continuous == null) {
             when (rot.action) {
                 Action.RightClick -> {
@@ -110,7 +112,6 @@ object RotationUtils {
                 null -> {}
             }
             currentRotation = null
-            //devMessage("Resetting")
             ticksRotated = 0L
             return
         }
@@ -131,12 +132,14 @@ object RotationUtils {
 
     @SubscribeEvent
     fun onKeyInput(event: InputEvent.Keyboard) {
-        if (PlayerUtils.keyBindingsKeyCodes.contains(event.keycode) && currentRotation != null) {
+        if (PlayerUtils.playerControlsKeycodes.contains(event.keycode) && currentRotation != null) {
             devMessage("cancelling prerotate")
              try {
                  if (currentRotation!!.continuous == CompletionRequirement.PreRotate) {
                      currentRotation = null
                      ticksRotated = 0L
+                     targetPitch = null
+                     targetYaw = null
                  }
              } catch (e: Exception) {
                  logger.error(e)
@@ -149,7 +152,9 @@ object RotationUtils {
     fun onPacketReturn(event: PacketReturnEvent.Send){
         if (event.packet !is C03PacketPlayer || SwapManager.recentlySwapped || !canSendC08) return
 
-        if (event.packet.yaw != targetYaw || event.packet.pitch != targetPitch) return
+        //if (event.packet.yaw != targetYaw || event.packet.pitch != targetPitch) return
+
+
 
         if (shouldRightClick) {
             shouldRightClick = false

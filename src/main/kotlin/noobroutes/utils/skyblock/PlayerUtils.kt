@@ -114,7 +114,7 @@ object PlayerUtils {
         mc.gameSettings.keyBindJump
     )
 
-    inline val keyBindingsKeyCodes get() = keyBindings.map { it.keyCode}
+    inline val playerControlsKeycodes get() = keyBindings.map { it.keyCode}
 
     fun unPressKeys() {
         Keyboard.enableRepeatEvents(false)

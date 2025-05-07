@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.S08Event
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
 
 
@@ -40,11 +41,13 @@ object Etherwarper {
     fun preRotateEtherwarpToVec3(vec3: Vec3, silent: Boolean = false){
         val rot = RotationUtils.getYawAndPitch(vec3)
         preRotateEtherwarp(rot.first, rot.second, silent)
+        //devMessage(vec3)
     }
 
     fun preRotateEtherwarp(yaw: Float, pitch: Float, silent: Boolean = false) {
-        if (warping) return
+        if (warping || PlayerUtils.playerControlsKeycodes.any { Keyboard.isKeyDown(it)}) return
         warping = true
+
         PlayerUtils.sneak()
         PlayerUtils.stopVelocity()
         val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
@@ -61,6 +64,24 @@ object Etherwarper {
         }
     }
 
+    fun doubleTickEtherwarp(){
+        if (warping) return
+        warping = true
+        PlayerUtils.sneak()
+        PlayerUtils.stopVelocity()
+        val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+        if (state == SwapManager.SwapState.ALREADY_HELD || state == SwapManager.SwapState.SWAPPED) {
+            RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick, continuous = RotationUtils.CompletionRequirement.PreRotate)
+            Scheduler.schedulePreTickTask(1) {
+                RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick, continuous = RotationUtils.CompletionRequirement.PreRotate)
+            }
+
+        }
+
+    }
+
+
+
     var serverTicks = 0L
     @SubscribeEvent
     fun onServerTick(event: TickEvent.ServerTickEvent){
@@ -68,10 +89,9 @@ object Etherwarper {
             warping = false
             serverTicks = 0
         }
-        if (warping) {
+        if (warping && RotationUtils.ticksRotated == 0L) {
             serverTicks++
         }
-
     }
 
     @SubscribeEvent
