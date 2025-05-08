@@ -95,13 +95,9 @@ object RotationUtils {
         if (event.isEnd || mc.thePlayer == null) return
         val rot = currentRotation ?: return
         if (rot.silent) SilentRotator.doSilentRotation()
-        setAngles(rot.yaw + offset * if (rot.continuous != null) 100000 else 1, rot.pitch)
-        devMessage("tick| yaw: ${rot.yaw + offset * if (rot.continuous != null) 100000 else 1}, pitch: ${rot.pitch}")
+        setAngles(rot.yaw + offset, rot.pitch)
         targetYaw = rot.yaw + offset
         targetPitch = rot.pitch
-        //devMessage(rot.continuous)
-        devMessage(Scheduler.runTime)
-        devMessage(offset)
         if (rot.continuous == null) {
             when (rot.action) {
                 Action.RightClick -> {
@@ -152,7 +148,6 @@ object RotationUtils {
     @SubscribeEvent
     fun onPacketReturn(event: PacketReturnEvent.Send){
         if (event.packet !is C03PacketPlayer || SwapManager.recentlySwapped || !canSendC08) return
-        devMessage("yaw: ${event.packet.yaw}, pitch: ${event.packet.pitch}")
         if (shouldRightClick) {
             shouldRightClick = false
             PlayerUtils.airClick()

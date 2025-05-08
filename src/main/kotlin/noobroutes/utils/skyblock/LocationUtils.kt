@@ -11,6 +11,10 @@ import net.minecraft.network.play.server.S3FPacketCustomPayload
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
+import noobroutes.utils.clock.Executor
+import noobroutes.utils.skyblock.dungeon.Dungeon
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.Floor
 
 object LocationUtils {
 
@@ -20,13 +24,13 @@ object LocationUtils {
 
     inline val isSinglePlayer get() = currentArea.isArea(Island.SinglePlayer)
 
-    var currentDungeon: noobroutes.utils.skyblock.dungeon.Dungeon? = null
+    var currentDungeon: Dungeon? = null
         private set
     var currentArea: Island = Island.Unknown
     var kuudraTier: Int = 0
 
     init {
-        _root_ide_package_.noobroutes.utils.clock.Executor(500, "LocationUtils") {
+        Executor(500, "LocationUtils") {
             if (!isInSkyblock)
                 isInSkyblock = isOnHypixel && mc.theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)
                     ?.let { cleanSB(it.displayName).contains("SKYBLOCK") } == true
@@ -38,10 +42,10 @@ object LocationUtils {
 
             if (currentArea.isArea(Island.Unknown)) currentArea = getArea()
 
-            if ((_root_ide_package_.noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons || currentArea.isArea(
+            if ((DungeonUtils.inDungeons || currentArea.isArea(
                     Island.SinglePlayer
                 )) && currentDungeon == null
-            ) currentDungeon = _root_ide_package_.noobroutes.utils.skyblock.dungeon.Dungeon(
+            ) currentDungeon = Dungeon(
                 getFloor() ?: return@Executor
             )
 
@@ -104,9 +108,9 @@ object LocationUtils {
     }
 
     fun getFloor(): noobroutes.utils.skyblock.dungeon.Floor? {
-        if (currentArea.isArea(Island.SinglePlayer)) return _root_ide_package_.noobroutes.utils.skyblock.dungeon.Floor.E
+        if (currentArea.isArea(Island.SinglePlayer)) return Floor.E
         for (i in sidebarLines) {
-            return _root_ide_package_.noobroutes.utils.skyblock.dungeon.Floor.valueOf(Regex("The Catacombs \\((\\w+)\\)\$").find(cleanSB(i))?.groupValues?.get(1) ?: continue)
+            return Floor.valueOf(Regex("The Catacombs \\((\\w+)\\)\$").find(cleanSB(i))?.groupValues?.get(1) ?: continue)
         }
         return null
     }

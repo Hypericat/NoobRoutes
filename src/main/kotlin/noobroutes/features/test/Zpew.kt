@@ -21,6 +21,7 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.utils.skyblock.PlayerUtils.getBlockPlayerIsLookingAt
 import kotlin.math.abs
 
 object Zpew : Module(
@@ -29,10 +30,9 @@ object Zpew : Module(
     description = "Temporary Zpew thing"
 ) {
 
-    private val zpewOffset by BooleanSetting(
-        "Offset",
-        description = "Offsets your position onto the block instead of 0.05 blocks above it"
-    )
+    private val sendPacket by BooleanSetting("Send Packet", description = "You send a C06 Packet, aka, it is actual zpew")
+    private val sendTPCommand by BooleanSetting("Send Tp Command", description = "Used for Single Player")
+    private val zpewOffset by BooleanSetting("Offset", description = "Offsets your position onto the block instead of 0.05 blocks above it")
     private val dingdingding by BooleanSetting("dingdingding", false, description = "")
 
     private val soundOptions = arrayListOf(
@@ -44,17 +44,8 @@ object Zpew : Module(
         "mob.guardian.land.hit",
         "Custom"
     )
-    private val soundSelector by SelectorSetting(
-        "Sound",
-        soundOptions[0],
-        soundOptions,
-        description = "Sound Selection"
-    ).withDependency { dingdingding }
-    private val customSound by StringSetting(
-        "Custom Sound",
-        soundOptions[0],
-        description = "Name of a custom sound to play. This is used when Custom is selected in the Sound setting."
-    ).withDependency { dingdingding && soundSelector == 6 }
+    private val soundSelector by SelectorSetting("Sound", soundOptions[0], soundOptions, description =  "Sound Selection").withDependency { dingdingding }
+    private val customSound by StringSetting("Custom Sound", soundOptions[0], description = "Name of a custom sound to play. This is used when Custom is selected in the Sound setting.").withDependency { dingdingding && soundSelector == 6 }
     private val pitch by NumberSetting("Pitch", 1.0, 0.1, 2.0, 0.1, description = "").withDependency { dingdingding }
 
 
@@ -116,32 +107,36 @@ object Zpew : Module(
         recentlySentC06s.add(SentC06(yaw, pitch, x, y, z, System.currentTimeMillis()))
 
         if (dingdingding) PlayerUtils.playLoudSound(getSound(), 100f, Zpew.pitch.toFloat())
+        if (sendTPCommand) Scheduler.schedulePreTickTask(0) { sendChatMessage("/tp $x $y $z")}
 
-        Scheduler.schedulePreTickTask(0) {
-            sendChatMessage("/tp $x $y $z")
+        if (sendPacket) Scheduler.scheduleHighPreTickTask {
+            mc.netHandler.addToSendQueue(
+                C03PacketPlayer.C06PacketPlayerPosLook(
+                    x,
+                    y,
+                    z,
+                    yaw,
+                    pitch,
+                    mc.thePlayer.onGround
+                )
+            )
+            if (zpewOffset) y -= 0.05
+            mc.thePlayer.setPosition(x, y, z)
+            mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
             updatePosition = true
-            //mc.netHandler.addToSendQueue(C06PacketPlayerPosLook(x, y, z, yaw, pitch, mc.thePlayer.onGround))
-            //if (zpewOffset) y -= 0.05
-            //mc.thePlayer.setPosition(x, y, z)
-            //mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
-            //updatePosition = true
         }
     }
 
-    fun isWithinTolerance(n1: Float, n2: Float, tolerance: Double = 1e-4): Boolean { // todo: move to MathUtils I think
-        return abs(n1 - n2) < tolerance
+    fun isWithinTolerance(n1: Float, n2: Float, tolerance: Double = 1e-4): Boolean {
+        return kotlin.math.abs(n1 - n2) < tolerance
     }
 
-    fun getBlockPlayerIsLookingAt(distance: Double = 5.0): Block? { // todo: move to PlayerUtils maybe
-        val rayTraceResult = mc.thePlayer.rayTrace(distance, 1f)
-        return rayTraceResult?.blockPos?.let { mc.theWorld.getBlockState(it).block }
-    }
+
 
 
     @SubscribeEvent
     fun onC08(event: PacketEvent.Send) {
-        if (mc.thePlayer == null) return
-        if (event.packet !is C08PacketPlayerBlockPlacement) return
+        if (mc.thePlayer == null || event.packet !is C08PacketPlayerBlockPlacement) return
 
         val dir = event.packet.placedBlockDirection
         if (dir != 255) return
@@ -170,7 +165,6 @@ object Zpew : Module(
         val yaw = event.packet.yaw
         val pitch = event.packet.pitch
 
-
         if (event.packet.isMoving) {
             lastX = x
             lastY = y
@@ -193,7 +187,7 @@ object Zpew : Module(
     @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook) return
-        if (DungeonUtils.inBoss || !LocationUtils.isInSkyblock) return
+        if (DungeonUtils.inBoss || (!LocationUtils.isInSkyblock && !ClickGUIModule.forceHypixel)) return
         if (recentlySentC06s.isEmpty()) return
 
         val sentC06 = recentlySentC06s[0]
@@ -215,6 +209,7 @@ object Zpew : Module(
 
         if (isCorrect) {
             devMessage("Correct")
+            if (sendPacket) event.isCanceled = true
             return
         }
 
