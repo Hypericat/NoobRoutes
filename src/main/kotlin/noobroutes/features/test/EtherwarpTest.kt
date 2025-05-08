@@ -41,6 +41,7 @@ object EtherwarpTest : Module("Ew Test", description = "testing etherwarp", cate
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || Etherwarper.warping) return
         for (etherwarp in etherwarps) {
             if (mc.thePlayer.positionVector.distanceTo(etherwarp.first) < 0.3) {
+                devMessage(etherwarp.first)
                 Etherwarper.etherwarpToVec3(etherwarp.second.add(0.5, 0.5, 0.5), silent)
                 return
             }

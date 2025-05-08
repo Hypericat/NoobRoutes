@@ -1,5 +1,6 @@
 package noobroutes.utils.skyblock
 
+import net.minecraft.block.Block
 import noobroutes.Core.mc
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
@@ -103,6 +104,11 @@ object PlayerUtils {
 
     fun sneak(){
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, true)
+    }
+
+    fun getBlockPlayerIsLookingAt(distance: Double = 5.0): Block? {
+        val rayTraceResult = mc.thePlayer.rayTrace(distance, 1f)
+        return rayTraceResult?.blockPos?.let { mc.theWorld.getBlockState(it).block }
     }
 
 
