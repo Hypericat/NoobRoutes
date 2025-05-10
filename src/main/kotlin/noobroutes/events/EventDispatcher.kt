@@ -73,8 +73,8 @@ object EventDispatcher {
     }
 
     private var lastEntityClick = System.currentTimeMillis()
-    @SubscribeEvent
 
+    @SubscribeEvent
     fun onPacketSent(event: PacketEvent.Send) {
         if (event.packet !is C02PacketUseEntity) return
         val entity = event.packet.getEntityFromWorld(mc.theWorld)

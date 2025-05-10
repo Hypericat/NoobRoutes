@@ -85,7 +85,7 @@ object Doorless: Module(
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
         expectedX = blockPosPlayer.x + 0.5
         expectedZ = blockPosPlayer.z + 0.5
-        prevRot = Pair(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
+        if (!faster) prevRot = Pair(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
 
         if (mc.isSingleplayer) {
             Scheduler.schedulePreTickTask(5) { sendChatMessage("/tp $expectedX ${blockPosPlayer.y + 2.0} $expectedZ") }
@@ -132,8 +132,8 @@ object Doorless: Module(
 
         Blocks.coal_block.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
         Blocks.stained_hardened_clay.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
-        mc.thePlayer.rotationYaw = prevRot.first
-        mc.thePlayer.rotationPitch = prevRot.second
+        if (!faster) mc.thePlayer.rotationYaw = prevRot.first
+        if (!faster) mc.thePlayer.rotationPitch = prevRot.second
         Scheduler.schedulePreTickTask { AutoP3Utils.rePressKeys() }
         Scheduler.schedulePreTickTask(15) {
             doingShit = false
