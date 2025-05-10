@@ -89,9 +89,7 @@ object Doorless: Module(
         doingShit = true
         event.isCanceled = true
         skip = true
-        val rot = getRot(blockPosPlayer)
-        PacketUtils.sendPacket(C06PacketPlayerPosLook(x, y, z, rot.first, rot.second, event.packet.isOnGround))
-        devMessage("$rot")
+        PacketUtils.sendPacket(C06PacketPlayerPosLook(x, y, z, getYaw(), getPitch(blockPosPlayer), event.packet.isOnGround))
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
         expectedX = blockPosPlayer.x + 0.5
         expectedZ = blockPosPlayer.z + 0.5
@@ -113,15 +111,18 @@ object Doorless: Module(
         event.isCanceled = true
     }
 
-    private fun getRot(orgPos: BlockPos): Pair<Float, Float> {
-        return if (isAir(orgPos.add(0, 3, 0))) Pair(0f, -90f)
-        else when(dir) {
-            0 -> Pair(90f, 0f)
-            1 -> Pair(-90f, 0f)
-            2 -> Pair(-180f, 0f)
-            3 -> Pair(0f, 0f)
-            else -> Pair(0f, -90f)
+    private fun getYaw(): Float {
+        return when(dir) {
+            0 -> 90f
+            1 -> -90f
+            2 -> -180f
+            3 -> 0f
+            else -> 0f
         }
+    }
+
+    private fun getPitch(orgPos: BlockPos): Float {
+        return if (isAir(orgPos.add(0, 3, 0))) -79f else 0f
     }
 
 
