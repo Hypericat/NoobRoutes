@@ -1,5 +1,6 @@
 package noobroutes.features.move
 
+import jdk.nashorn.internal.ir.Block
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.network.play.client.C03PacketPlayer
@@ -15,6 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.AutoP3Utils
@@ -22,7 +24,9 @@ import noobroutes.utils.PacketUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isClose
 import noobroutes.utils.getBlockAt
+import noobroutes.utils.isAir
 import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.sendChatMessage
 import noobroutes.utils.skyblock.sendCommand
 import noobroutes.utils.toBlockPos
@@ -34,8 +38,11 @@ object Doorless: Module(
     category = Category.MOVE,
     description = "allows u to go through doors"
 ) {
-    private val clipDistance by NumberSetting(name = "Clip Distance", description = "how far u clip", min = 0.0, max = 5.0, default = 4.0, increment = 0.1)
+    private val clipDistance by NumberSetting(name = "Clip Distance", description = "how far u clip", min = 0.0, max = 2, default = 0.5, increment = 0.1)
     private val faster by BooleanSetting("fast mode", default = false, description = "messes with packets (might ban)")
+    private val allowChiseled by BooleanSetting("Chiseled Toggle", default = false, description = "Include chiseled stone bricks as door blocks")
+    private val second by BooleanSetting("hclip", default = false, description = "hclips on second tick")
+    private val clip2Distance by NumberSetting(name = "hclip distance", description = "how far u hclip", min = 0.0, max = 5.0, default = 4.0, increment = 0.1).withDependency { second }
 
     private var doingShit = false
     private var clipped = false
@@ -44,6 +51,7 @@ object Doorless: Module(
     private var expectedZ = 0.0
     private var dir = 0
     private var prevRot = Pair(0f, 0f)
+    private var s08Pos = Pair(0.0, 0.0)
 
     @SubscribeEvent
     fun onC03(event: PacketEvent.Send) {
@@ -77,11 +85,13 @@ object Doorless: Module(
             else -> false
         }
         if (!shouldDoShit) return
-
+        devMessage(dir)
         doingShit = true
         event.isCanceled = true
         skip = true
-        PacketUtils.sendPacket(C06PacketPlayerPosLook(x, y, z, 0f, -90f, event.packet.isOnGround))
+        val rot = getRot(blockPosPlayer)
+        PacketUtils.sendPacket(C06PacketPlayerPosLook(x, y, z, rot.first, rot.second, event.packet.isOnGround))
+        devMessage("$rot")
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
         expectedX = blockPosPlayer.x + 0.5
         expectedZ = blockPosPlayer.z + 0.5
@@ -103,14 +113,29 @@ object Doorless: Module(
         event.isCanceled = true
     }
 
+    private fun getRot(orgPos: BlockPos): Pair<Float, Float> {
+        return if (isAir(orgPos.add(0, 3, 0))) Pair(0f, -90f)
+        else when(dir) {
+            0 -> Pair(90f, 0f)
+            1 -> Pair(-90f, 0f)
+            2 -> Pair(-180f, 0f)
+            3 -> Pair(0f, 0f)
+            else -> Pair(0f, -90f)
+        }
+    }
+
 
     @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook || !doingShit || clipped) return
+        s08Pos = Pair(event.packet.x, event.packet.z)
         clipped = true
         AutoP3Utils.unPressKeys()
-        if (!faster) Scheduler.schedulePreTickTask { clip() }
-        if (!faster) return
+        if (!faster) {
+            Scheduler.schedulePreTickTask { clip() }
+            return
+        }
+        Scheduler.schedulePreTickTask(1) { clip2() }
         event.isCanceled = true
         PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
         devMessage("sent packet")
@@ -126,13 +151,14 @@ object Doorless: Module(
             else -> return
         }
         mc.thePlayer.setPosition(
-            mc.thePlayer.posX + dx * clipDistance,
+            s08Pos.first + dx * clipDistance,
             69.0,
-            mc.thePlayer.posZ + dz * clipDistance
+            s08Pos.second + dz * clipDistance
         )
 
         Blocks.coal_block.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
         Blocks.stained_hardened_clay.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
+        Blocks.monster_egg.setBlockBounds(-1f, -1f, -1f, -1f, -1f, -1f)
         if (!faster) mc.thePlayer.rotationYaw = prevRot.first
         if (!faster) mc.thePlayer.rotationPitch = prevRot.second
         Scheduler.schedulePreTickTask { AutoP3Utils.rePressKeys() }
@@ -141,13 +167,30 @@ object Doorless: Module(
             clipped = false
             Blocks.coal_block.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
             Blocks.stained_hardened_clay.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
+            Blocks.monster_egg.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
         }
+    }
+
+    private fun clip2() {
+        if (!second) return
+        val (dx, dz) = when (dir) {
+            0 -> -1 to 0
+            1 -> 1 to 0
+            2 -> 0 to -1
+            3 -> 0 to 1
+            else -> return
+        }
+        mc.thePlayer.setPosition(
+            s08Pos.first + dx * (clip2Distance + clipDistance),
+            69.0,
+            s08Pos.second + dz * (clip2Distance + clipDistance)
+        )
     }
 
     private fun isDoorBlock(blockPosition: BlockPos): Boolean {
         val state = mc.theWorld.getBlockState(blockPosition)
         val block = state.block
         val meta = block.getMetaFromState(state)
-        return block == Blocks.coal_block || (block == Blocks.stained_hardened_clay && meta == 14)
+        return block == Blocks.coal_block || (block == Blocks.stained_hardened_clay && meta == 14) || (allowChiseled && block == Blocks.monster_egg && block.getMetaFromState(state) == 5)
     }
 }
