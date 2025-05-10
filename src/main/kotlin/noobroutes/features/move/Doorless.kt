@@ -33,9 +33,9 @@ object Doorless: Module(
     description = "allows u to go through doors"
 ) {
     private val clipDistance by NumberSetting(name = "Clip Distance", description = "how far u clip", min = 0.0, max = 5.0, default = 4.0, increment = 0.1)
-    private val dontSchedule by BooleanSetting("schedule", false, description = "dont schedule")
 
     private var doingShit = false
+    private var clipped = false
     private var expectedX = 0.0
     private var expectedZ = 0.0
     private var dir = 0
@@ -89,19 +89,13 @@ object Doorless: Module(
 
     @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
-        if (event.packet !is S08PacketPlayerPosLook || !doingShit) return
-        if (event.packet.x != expectedX || event.packet.z != expectedZ) {
-            devMessage("wrong coords")
-            return
-        }
-        doingShit = false
+        if (event.packet !is S08PacketPlayerPosLook || !doingShit || clipped) return
+        clipped = true
         AutoP3Utils.unPressKeys()
-        if (dontSchedule) clip()
-        else Scheduler.schedulePreTickTask { clip() }
+        Scheduler.schedulePreTickTask { clip() }
     }
 
     private fun clip() {
-        val playerPos = mc.thePlayer.positionVector.toBlockPos()
         val (dx, dz) = when (dir) {
             0 -> -1 to 0
             1 -> 1 to 0
@@ -111,20 +105,27 @@ object Doorless: Module(
         }
         mc.thePlayer.setPosition(
             mc.thePlayer.posX + dx * clipDistance,
-            mc.thePlayer.posY,
+            69.0,
             mc.thePlayer.posZ + dz * clipDistance
         )
-        for (i in 0..5) {
-            mc.theWorld.setBlockToAir(playerPos.add(Vec3i(dx * i, 0, dz * i)))
-            mc.theWorld.setBlockToAir(playerPos.add(Vec3i(dx * i, 1, dz * i)))
-            mc.theWorld.setBlockToAir(playerPos.add(Vec3i(dx * i, 2, dz * i)))
-        }
+
+        Blocks.coal_block.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
+        Blocks.stained_hardened_clay.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
         mc.thePlayer.rotationYaw = prevRot.first
         mc.thePlayer.rotationPitch = prevRot.second
-        Scheduler.schedulePreTickTask { AutoP3Utils.unPressKeys() }
+        Scheduler.schedulePreTickTask { AutoP3Utils.rePressKeys() }
+        Scheduler.schedulePreTickTask(15) {
+            doingShit = false
+            clipped = false
+            Blocks.coal_block.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
+            Blocks.stained_hardened_clay.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
+        }
     }
 
     private fun isDoorBlock(blockPosition: BlockPos): Boolean {
-        return getBlockAt(blockPosition) == Blocks.coal_block || (getBlockAt(blockPosition) == Blocks.stained_hardened_clay)
+        val state = mc.theWorld.getBlockState(blockPosition)
+        val block = state.block
+        val meta = block.getMetaFromState(state)
+        return block == Blocks.coal_block || (block == Blocks.stained_hardened_clay && meta == 14)
     }
 }
