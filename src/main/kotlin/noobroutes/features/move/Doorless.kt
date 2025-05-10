@@ -2,6 +2,7 @@ package noobroutes.features.move
 
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
+import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
@@ -9,6 +10,7 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraft.util.Vec3i
+import net.minecraftforge.client.event.sound.SoundEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
@@ -33,9 +35,11 @@ object Doorless: Module(
     description = "allows u to go through doors"
 ) {
     private val clipDistance by NumberSetting(name = "Clip Distance", description = "how far u clip", min = 0.0, max = 5.0, default = 4.0, increment = 0.1)
+    private val faster by BooleanSetting("fast mode", default = false, description = "messes with packets (might ban)")
 
     private var doingShit = false
     private var clipped = false
+    private var skip = false
     private var expectedX = 0.0
     private var expectedZ = 0.0
     private var dir = 0
@@ -76,6 +80,7 @@ object Doorless: Module(
 
         doingShit = true
         event.isCanceled = true
+        skip = true
         PacketUtils.sendPacket(C06PacketPlayerPosLook(x, y, z, 0f, -90f, event.packet.isOnGround))
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
         expectedX = blockPosPlayer.x + 0.5
@@ -88,11 +93,25 @@ object Doorless: Module(
     }
 
     @SubscribeEvent
+    fun cancelC03(event: PacketEvent.Send) {
+        if (!faster || !doingShit || event.packet !is C03PacketPlayer || clipped) return
+        if (skip) {
+            skip = false
+            return
+        }
+        event.isCanceled = true
+    }
+
+    @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook || !doingShit || clipped) return
         clipped = true
         AutoP3Utils.unPressKeys()
         Scheduler.schedulePreTickTask { clip() }
+        if (!faster) return
+        event.isCanceled = true
+        PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
+        PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
     }
 
     private fun clip() {
