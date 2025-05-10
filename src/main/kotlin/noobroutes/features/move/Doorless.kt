@@ -99,8 +99,10 @@ object Doorless: Module(
             skip = false
             return
         }
+        devMessage("cancelled packet")
         event.isCanceled = true
     }
+
 
     @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
@@ -111,7 +113,7 @@ object Doorless: Module(
         if (!faster) return
         event.isCanceled = true
         PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
-        PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
+        devMessage("sent packet")
     }
 
     private fun clip() {
