@@ -109,11 +109,12 @@ object Doorless: Module(
         if (event.packet !is S08PacketPlayerPosLook || !doingShit || clipped) return
         clipped = true
         AutoP3Utils.unPressKeys()
-        Scheduler.schedulePreTickTask { clip() }
+        if (!faster) Scheduler.schedulePreTickTask { clip() }
         if (!faster) return
         event.isCanceled = true
         PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
         devMessage("sent packet")
+        clip()
     }
 
     private fun clip() {

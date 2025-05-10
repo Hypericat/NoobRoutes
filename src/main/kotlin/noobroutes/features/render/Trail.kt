@@ -61,11 +61,12 @@ object Trail: Module(
         }
         positions.coerceMax(trailDistance)
     }
-    
+
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
+        val positionsCopy = positions.toList() //concurrent smth smth error moment
         if (!mode) {
-            val positionsUp = positions.map { it.add(0.0, 0.01, 0.0) }.toMutableList()
+            val positionsUp = positionsCopy.map { it.add(0.0, 0.01, 0.0) }.toMutableList()
             if (movementPackets.isEmpty() || !AutoP3.mode)  {
                 val viewEntity = mc.renderViewEntity
                 val camX = viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * event.partialTicks
@@ -74,10 +75,9 @@ object Trail: Module(
                 positionsUp.add(0, Vec3(camX, camY + 0.01, camZ))
             }
             Renderer.draw3DLine(positionsUp, Color.CYAN, depth = true)
-        }
-        else {
-            positions.forEach{
-                val aaBB = AxisAlignedBB(it.xCoord-0.03, it.yCoord, it.zCoord-0.03, it.xCoord+0.03, it.yCoord+0.06, it.zCoord+0.03)
+        } else {
+            positionsCopy.forEach {
+                val aaBB = AxisAlignedBB(it.xCoord - 0.03, it.yCoord, it.zCoord - 0.03, it.xCoord + 0.03, it.yCoord + 0.06, it.zCoord + 0.03)
                 drawBox(aaBB, Color.CYAN, depth = true, fillAlpha = 0)
             }
         }
