@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
+import java.lang.reflect.Field
 import kotlin.math.pow
 import kotlin.math.sin
 
@@ -188,7 +189,20 @@ object AutoP3Utils {
         Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 1.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.DARK_GRAY, depth = depth)
     }
 
+    val timerField: Field = mc::class.java.getDeclaredField("timer")
 
+    init {
+        timerField.isAccessible = true
+    }
+
+    fun setGameSpeed(speed: Float) {
+        try {
+            val timer = timerField.get(mc)
+            timer.javaClass.getDeclaredField("timerSpeed").setFloat(timer, speed)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
 
 }

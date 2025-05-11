@@ -302,6 +302,6 @@ object Blink{
             return
         }
         event.isCanceled = true
-        cancelled++
+        if (AutoP3.spedFor == 0) cancelled++
     }
 }

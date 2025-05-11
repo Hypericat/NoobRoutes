@@ -25,16 +25,21 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.features.Blink.lastBlink
 import noobroutes.features.Blink.lastBlinkRing
 import noobroutes.utils.render.RenderUtils
 import org.lwjgl.input.Keyboard
+import kotlin.concurrent.timer
 
 enum class RingTypes {
     WALK,
@@ -47,7 +52,8 @@ enum class RingTypes {
     MOTION,
     LAVA,
     TNT,
-    JUMP
+    JUMP,
+    SPED
 }
 
 
@@ -93,6 +99,7 @@ object AutoP3: Module (
     val moveHud by HudSetting("Move Hud", HudElement(100f, 50f, false, settingName = "Move Hud")).withDependency { blinkShit }
     var customBlinkLengthToggle by BooleanSetting("blink length", default = true, description = "allows for changing the blink length of waypoints").withDependency { blinkShit }
     val customBlinkLength by NumberSetting(name = "length", description = "well how long for the blink to be", min = 1, max = 40, default = 24).withDependency { blinkShit && customBlinkLengthToggle }
+    val timerSpeed by NumberSetting(name = "sped ring speed", description = "how much faster it goes (100 means 100x speed) also need tick check for high speeds", min = 2f, max = 100f, default = 10f).withDependency { blinkShit }
     val toggleSG by BooleanSetting("SG toggle", default = false, description = "Disable Secret guide in boss")
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
@@ -101,6 +108,7 @@ object AutoP3: Module (
     private var leapedIDs = mutableSetOf<Int>()
     var inBoss = false
     private val deletedRings  = mutableListOf<Ring>()
+    var spedFor = 0
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
@@ -113,7 +121,23 @@ object AutoP3: Module (
                 if (showEnd && ring.blinkPackets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
                 if (showLine) RenderUtils.drawGradient3DLine(vec3List, Color.GREEN, Color.RED, 1F, true)
             }
-            if (editMode) return@forEachIndexed
+            if (editMode || !frame) return@forEachIndexed
+            if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring) && ring.should) {
+                executeRing(ring)
+                if (ring.type != RingTypes.BLINK) ring.should = false
+            }
+            else if(AutoP3Utils.distanceToRingSq(ring.coords) > 0.25 || !AutoP3Utils.ringCheckY(ring)) ring.should = true
+        }
+        waitingTerm = rings[route]?.any { it.type == RingTypes.TERM && !it.should } == true
+        waitingLeap = rings[route]?.any { it.type == RingTypes.LEAP && !it.should } == true
+        if (!waitingLeap) leapedIDs = mutableSetOf<Int>()
+    }
+
+    @SubscribeEvent
+    fun tickRing(event: ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.END || frame) return
+        if(!inBoss) return
+        rings[route]?.forEachIndexed { i, ring ->
             if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring) && ring.should) {
                 executeRing(ring)
                 if (ring.type != RingTypes.BLINK) ring.should = false
@@ -215,12 +239,28 @@ object AutoP3: Module (
                 if (mc.thePlayer.onGround) mc.thePlayer.jump()
                 if (ring.walk) AutoP3Utils.startWalk(ring.direction.yaw)
             }
+            RingTypes.SPED -> {
+                if (ring.endY > Blink.cancelled) return
+                modMessage("speeding (solid trip)")
+                AutoP3Utils.setGameSpeed(timerSpeed)
+                spedFor = ring.endY.toInt()
+            }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onC03Highest(event: PacketEvent.Send) {
+        if (event.packet !is C03PacketPlayer || spedFor <= 0) return
+        spedFor--
+        if (spedFor == 0) AutoP3Utils.setGameSpeed(1f)
+    }
+
     fun stopOrNot(ring: Ring) {
-        if (ring.type == RingTypes.TNT || (ring.type == RingTypes.BLINK && lastBlinkRing == ring && System.currentTimeMillis() - lastBlink < 5000)) return
+        if (ring.type == RingTypes.TNT ||
+            (ring.type == RingTypes.BLINK && lastBlinkRing == ring && System.currentTimeMillis() - lastBlink < 5000) ||
+            ring.type == RingTypes.SPED
+        ) return
         else AutoP3Utils.unPressKeys()
     }
 
@@ -281,6 +321,11 @@ object AutoP3: Module (
             }
             "relativepos" -> {
                 modMessage(DungeonUtils.currentRoom?.getRelativeCoords(mc.objectMouseOver.blockPos))
+            }
+            "speed" -> {
+                if (args.size < 3) return
+                val speed = args[2].toFloatOrNull() ?: return
+                AutoP3Utils.setGameSpeed(speed)
             }
             else -> {
                 modMessage("All tests passed")
@@ -367,6 +412,16 @@ object AutoP3: Module (
             "jump" -> {
                 modMessage("jump added")
                 ringType = RingTypes.JUMP
+            }
+            "sped", "speed" -> {
+                if (args.size < 3) {
+                    modMessage("need a length arg (positive number)")
+                    return
+                }
+                val length = args[2].toDoubleOrNull() ?: return
+                modMessage("im sped")
+                ringType = RingTypes.SPED
+                endPos = length
             }
             else -> return modMessage("thats not a ring type stoopid")
         }
