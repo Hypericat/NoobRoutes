@@ -1,5 +1,6 @@
 package noobroutes.utils
 
+import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.AutoP3
@@ -17,6 +18,7 @@ import noobroutes.utils.render.Renderer
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
+import net.minecraft.util.Timer
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
@@ -24,7 +26,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
-import java.lang.reflect.Field
 import kotlin.math.pow
 import kotlin.math.sin
 
@@ -189,16 +190,12 @@ object AutoP3Utils {
         Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 1.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.DARK_GRAY, depth = depth)
     }
 
-    val timerField: Field = mc::class.java.getDeclaredField("timer")
 
-    init {
-        timerField.isAccessible = true
-    }
 
     fun setGameSpeed(speed: Float) {
         try {
-            val timer = timerField.get(mc)
-            timer.javaClass.getDeclaredField("timerSpeed").setFloat(timer, speed)
+            val accessor = mc as TimerFieldAccessor
+            accessor.setTimer(Timer(speed * 20))
         } catch (e: Exception) {
             e.printStackTrace()
         }

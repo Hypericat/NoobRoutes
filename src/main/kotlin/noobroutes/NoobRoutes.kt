@@ -73,7 +73,6 @@ class NoobRoutes {
             RotationUtils,
             SilentRotator,
             Etherwarper
-
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }

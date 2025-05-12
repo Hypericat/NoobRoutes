@@ -59,7 +59,6 @@ object ClickGUI : Screen() {
     }
 
     override fun draw() {
-
         GlStateManager.pushMatrix()
         translate(0f, 0f, 200f)
         if (anim.isAnimating()) {

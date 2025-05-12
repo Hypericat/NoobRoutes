@@ -208,7 +208,6 @@ object Zpew : Module(
                 )
 
         if (isCorrect) {
-            devMessage("Correct")
             if (sendPacket) event.isCanceled = true
             return
         }

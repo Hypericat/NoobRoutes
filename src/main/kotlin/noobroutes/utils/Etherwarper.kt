@@ -3,6 +3,8 @@ package noobroutes.utils
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import net.minecraft.world.World
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -54,14 +56,15 @@ object Etherwarper {
         }
     }
 
-    fun preRotateEtherwarpToVec3(vec3: Vec3, silent: Boolean = false){
+    fun preRotateEtherwarpToVec3(vec3: Vec3, silent: Boolean = false, noWarpingCheck: Boolean = false){
         val rot = RotationUtils.getYawAndPitch(vec3)
-        preRotateEtherwarp(rot.first, rot.second, silent)
+        preRotateEtherwarp(rot.first, rot.second, silent, noWarpingCheck)
         //devMessage(vec3)
     }
 
-    fun preRotateEtherwarp(yaw: Float, pitch: Float, silent: Boolean = false) {
-        if (warping || PlayerUtils.playerControlsKeycodes.any { Keyboard.isKeyDown(it)}) return
+    fun preRotateEtherwarp(yaw: Float, pitch: Float, silent: Boolean = false,  noWarpingCheck: Boolean = false) {
+        devMessage("$warping|$noWarpingCheck")
+        if ((warping && !noWarpingCheck) || PlayerUtils.playerControlsKeycodes.any { Keyboard.isKeyDown(it)}) return
         prevEWLocation?.let {
             if (it.distanceTo(mc.thePlayer.positionVector) < 0.4) return
         }
@@ -71,6 +74,7 @@ object Etherwarper {
             devMessage("Failed to get etherwarp")
             return
         }
+        devMessage("ew target")
         setEWTarget(yaw, pitch)
 
         PlayerUtils.sneak()
@@ -149,7 +153,10 @@ object Etherwarper {
     }
 
 
-
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Unload) {
+        warping = false
+    }
 
 
     @SubscribeEvent

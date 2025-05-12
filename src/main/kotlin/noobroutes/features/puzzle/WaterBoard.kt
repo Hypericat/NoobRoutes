@@ -106,7 +106,11 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != etherwarpBlock.toBlockPos()) {
             if (RotationUtils.ticksRotated > 2) return RotationUtils.completePrerotateTask()
-            if (RotationUtils.ticksRotated == 0L && !Etherwarper.warping) Etherwarper.preRotateEtherwarpToVec3(etherwarpBlock.add(0.5, 1.1, 0.5), silent)
+            if (RotationUtils.ticksRotated == 0L && !Etherwarper.warping) {
+                Etherwarper.warping = true
+                Scheduler.scheduleHighPreTickTask(1) { Etherwarper.preRotateEtherwarpToVec3(etherwarpBlock.add(0.5, 1.1, 0.5), silent, true) }
+
+            }
             return
         }
 
@@ -114,7 +118,8 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
         if (RotationUtils.ticksRotated == 0L && nextEW != null) {
             if (!Etherwarper.warping) {
                 nextBlock = room.getRealCoords(nextEW).toBlockPos()
-                Etherwarper.preRotateEtherwarpToVec3(room.getRealCoords(nextEW).add(0.5, 1.1, 0.5), silent)
+                Etherwarper.warping = true
+                Scheduler.scheduleHighPreTickTask(1) { Etherwarper.preRotateEtherwarpToVec3(room.getRealCoords(nextEW).add(0.5, 1.1, 0.5), silent, true) }
                 devMessage("nextEW:${room.getRealCoords(nextEW)}, etherwarpBlock:$etherwarpBlock")
             }
         }
