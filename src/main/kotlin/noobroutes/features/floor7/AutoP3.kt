@@ -29,15 +29,20 @@ import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S18PacketEntityTeleport
+import net.minecraft.util.Timer
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import noobroutes.Core
+import noobroutes.Core.mc
 import noobroutes.features.Blink.lastBlink
 import noobroutes.features.Blink.lastBlinkRing
+import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.render.RenderUtils
+import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
 import kotlin.concurrent.timer
 
@@ -244,14 +249,19 @@ object AutoP3: Module (
                 modMessage("speeding (solid trip)")
                 AutoP3Utils.setGameSpeed(timerSpeed)
                 spedFor = ring.endY.toInt()
+                modMessage(spedFor)
             }
             else -> modMessage("how tf did u manage to get a ring like this")
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onC03Highest(event: PacketEvent.Send) {
-        if (event.packet !is C03PacketPlayer || spedFor <= 0) return
+
+    @SubscribeEvent
+    fun spedTick(event: TickEvent.ClientTickEvent) {
+        val accessor = Core.mc as TimerFieldAccessor
+        devMessage(accessor.getTimer().timerSpeed)
+        if (event.phase != TickEvent.Phase.END || spedFor == 0) return
+        devMessage("speeding")
         spedFor--
         if (spedFor == 0) AutoP3Utils.setGameSpeed(1f)
     }
@@ -419,6 +429,10 @@ object AutoP3: Module (
                     return
                 }
                 val length = args[2].toDoubleOrNull() ?: return
+                if (length <= 0) {
+                    modMessage("positive number pls")
+                    return
+                }
                 modMessage("im sped")
                 ringType = RingTypes.SPED
                 endPos = length
