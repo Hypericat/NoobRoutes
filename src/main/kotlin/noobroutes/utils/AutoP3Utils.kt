@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import kotlin.math.pow
@@ -193,12 +194,12 @@ object AutoP3Utils {
 
 
     fun setGameSpeed(speed: Float) {
-        try {
-            val accessor = mc as TimerFieldAccessor
-            accessor.setTimer(Timer(speed * 20))
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        val accessor = mc as TimerFieldAccessor
+
+        devMessage(accessor.timer.timerSpeed)
+        accessor.timer.timerSpeed = speed
+        accessor.timer.updateTimer()
+        devMessage("Set Timer: $speed, ${System.currentTimeMillis()}")
     }
 
 

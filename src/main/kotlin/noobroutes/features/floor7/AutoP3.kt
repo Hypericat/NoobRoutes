@@ -41,6 +41,7 @@ import noobroutes.Core.mc
 import noobroutes.features.Blink.lastBlink
 import noobroutes.features.Blink.lastBlinkRing
 import noobroutes.mixin.accessors.TimerFieldAccessor
+import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
@@ -245,7 +246,13 @@ object AutoP3: Module (
                 if (ring.walk) AutoP3Utils.startWalk(ring.direction.yaw)
             }
             RingTypes.SPED -> {
-                if (ring.endY > Blink.cancelled) return
+                if (ring.endY > Blink.cancelled || spedFor > 0) return
+                if (ring.endY < 1.0) {
+                    modMessage("Broken Speed Ring, cancelling execution")
+                    return
+
+                }
+
                 modMessage("speeding (solid trip)")
                 AutoP3Utils.setGameSpeed(timerSpeed)
                 spedFor = ring.endY.toInt()
@@ -258,10 +265,7 @@ object AutoP3: Module (
 
     @SubscribeEvent
     fun spedTick(event: TickEvent.ClientTickEvent) {
-        val accessor = Core.mc as TimerFieldAccessor
-        devMessage(accessor.getTimer().timerSpeed)
         if (event.phase != TickEvent.Phase.END || spedFor == 0) return
-        devMessage("speeding")
         spedFor--
         if (spedFor == 0) AutoP3Utils.setGameSpeed(1f)
     }
