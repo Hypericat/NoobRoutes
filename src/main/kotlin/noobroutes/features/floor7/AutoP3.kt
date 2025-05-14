@@ -1,7 +1,7 @@
 package noobroutes.features.floor7
 
+import com.google.gson.Gson
 import noobroutes.Core.logger
-import noobroutes.Core.mc
 import noobroutes.config.DataManager
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.TermOpenEvent
@@ -25,27 +25,19 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S18PacketEntityTeleport
-import net.minecraft.util.Timer
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import noobroutes.Core
 import noobroutes.Core.mc
 import noobroutes.features.Blink.lastBlink
 import noobroutes.features.Blink.lastBlinkRing
-import noobroutes.mixin.accessors.TimerFieldAccessor
-import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.RenderUtils
-import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
-import kotlin.concurrent.timer
 
 enum class RingTypes {
     WALK,
@@ -73,7 +65,7 @@ data class Ring (
     val center: Boolean = false,
     var should: Boolean = false,
     val blinkPackets: List<C04PacketPlayerPosition> = emptyList(),
-    val endY: Double = 0.0
+    val misc: Double = 0.0
 )
 
 object AutoP3: Module (
@@ -82,7 +74,7 @@ object AutoP3: Module (
     category = Category.FLOOR7,
     description = "AutoP3"
 ) {
-    val gson = GsonBuilder().registerTypeAdapter(
+    val gson: Gson = GsonBuilder().registerTypeAdapter(
         object : TypeToken<MutableMap<String, MutableList<Ring>>>() {}.type,
         RingsMapTypeAdapter()
     ).setPrettyPrinting().create()
@@ -228,7 +220,7 @@ object AutoP3: Module (
                 modMessage("activating lava clip")
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
-                LavaClip.ringClip = ring.endY
+                LavaClip.ringClip = ring.misc
                 LavaClip.toggle()
             }
             RingTypes.TNT -> {
@@ -246,8 +238,8 @@ object AutoP3: Module (
                 if (ring.walk) AutoP3Utils.startWalk(ring.direction.yaw)
             }
             RingTypes.SPED -> {
-                if (ring.endY > Blink.cancelled || spedFor > 0) return
-                if (ring.endY < 1.0) {
+                if (ring.misc > Blink.cancelled || spedFor > 0) return
+                if (ring.misc < 1.0) {
                     modMessage("Broken Speed Ring, cancelling execution")
                     return
 
@@ -255,7 +247,7 @@ object AutoP3: Module (
 
                 modMessage("speeding (solid trip)")
                 AutoP3Utils.setGameSpeed(timerSpeed)
-                spedFor = ring.endY.toInt()
+                spedFor = ring.misc.toInt()
                 modMessage(spedFor)
             }
             else -> modMessage("how tf did u manage to get a ring like this")
@@ -446,7 +438,7 @@ object AutoP3: Module (
         val look = args.any { it == "look" }
         val center = args.any {it == "center"}
         val walk = args.any {it == "walk"} && ringType != RingTypes.WALK
-        actuallyAddRing(Ring(ringType, look = look, center = center, walk = walk, endY = endPos, blinkPackets = packets))
+        actuallyAddRing(Ring(ringType, look = look, center = center, walk = walk, misc = endPos, blinkPackets = packets))
     }
 
     fun actuallyAddRing(ring: Ring) {

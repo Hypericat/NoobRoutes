@@ -46,6 +46,7 @@ class RingsMapTypeAdapter : TypeAdapter<MutableMap<String, MutableList<Ring>>>()
                 out.name("walk").value(ring.walk)
                 out.name("look").value(ring.look)
                 out.name("center").value(ring.center)
+                out.name("misc").value(ring.misc)
 
                 out.endObject()
             }
@@ -75,6 +76,7 @@ class RingsMapTypeAdapter : TypeAdapter<MutableMap<String, MutableList<Ring>>>()
                 var walk = false
                 var look = false
                 var center = false
+                var miscArg = 0.0
 
                 while (reader.hasNext()) {
                     when (reader.nextName()) {
@@ -105,19 +107,22 @@ class RingsMapTypeAdapter : TypeAdapter<MutableMap<String, MutableList<Ring>>>()
                         "walk" -> walk = reader.nextBoolean()
                         "look" -> look = reader.nextBoolean()
                         "center" -> center = reader.nextBoolean()
+                        "misc" -> miscArg = reader.nextDouble()
+                        "endY" -> miscArg = reader.nextDouble()
                         else -> reader.skipValue()
                     }
                 }
 
                 ringList.add(
                     Ring(
-                    type = type,
-                    coords = Vec3(x, y, z),
-                    direction = LookVec(yaw, pitch),
-                    walk = walk,
-                    look = look,
-                    center = center
-                )
+                        type = type,
+                        coords = Vec3(x, y, z),
+                        direction = LookVec(yaw, pitch),
+                        walk = walk,
+                        look = look,
+                        center = center,
+                        misc = miscArg
+                    )
                 )
 
                 reader.endObject()

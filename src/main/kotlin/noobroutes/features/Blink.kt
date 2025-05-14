@@ -199,7 +199,7 @@ object Blink{
             movementPackets = ring.blinkPackets.toMutableList()
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionY = 0.0
-            endY = ring.endY
+            endY = ring.misc
             lastBlink = System.currentTimeMillis()
             lastBlinkRing = null
             return
@@ -217,7 +217,7 @@ object Blink{
         ring.blinkPackets.forEach { PacketUtils.sendPacket(it) }
         val lastPacket = ring.blinkPackets.size - 1
         mc.thePlayer.setPosition(ring.blinkPackets[lastPacket].positionX, ring.blinkPackets[lastPacket].positionY, ring.blinkPackets[lastPacket].positionZ)
-        mc.thePlayer.setVelocity(0.0, ring.endY, 0.0)
+        mc.thePlayer.setVelocity(0.0, ring.misc, 0.0)
         //modMessage("there are $cancelled hot C04s wanting to message u but only ${maxBlinks - blinksInstance} on this instance")
         modMessage("§c§l$cancelled§r§f c04s available, used §c${ring.blinkPackets.size}§f,  §7(${maxBlinks - blinksInstance} left on this instance)")
     }
@@ -238,7 +238,7 @@ object Blink{
         if (recordedPackets.size == getRecordingGoalLength(lastWaypoint)) {
             modMessage("finished recording")
             recording = false
-            AutoP3.actuallyAddRing(Ring(RingTypes.BLINK, coords = lastWaypoint.coords,  blinkPackets = recordedPackets, endY = mc.thePlayer.motionY))
+            AutoP3.actuallyAddRing(Ring(RingTypes.BLINK, coords = lastWaypoint.coords,  blinkPackets = recordedPackets, misc = mc.thePlayer.motionY))
         }
     }
 
