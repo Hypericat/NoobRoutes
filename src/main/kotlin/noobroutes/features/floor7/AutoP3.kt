@@ -128,6 +128,7 @@ object AutoP3: Module (
         if (event.phase != TickEvent.Phase.END || frame) return
         if(!inBoss) return
         rings[route]?.forEachIndexed { i, ring ->
+            if (editMode) return@forEachIndexed
             if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring) && ring.should) {
                 executeRing(ring)
                 if (ring.type != RingTypes.BLINK) ring.should = false
