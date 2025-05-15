@@ -3,6 +3,7 @@ package noobroutes.features.floor7.autop3.rings
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.Ring
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.skyblock.modMessage
 
@@ -15,7 +16,7 @@ class HClipRing(
     center: Boolean,
     rotate: Boolean,
     val walk: Boolean
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(listOf("hclip"), coords, yaw, term, leap, left, center, rotate) {
 
     override fun addRingData(obj: JsonObject) {
         if (walk) obj.addProperty("walk", true)

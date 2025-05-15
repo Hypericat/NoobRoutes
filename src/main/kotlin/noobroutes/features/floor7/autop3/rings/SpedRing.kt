@@ -5,6 +5,7 @@ import net.minecraft.util.Vec3
 import noobroutes.features.floor7.autop3.AutoP3.spedFor
 import noobroutes.features.floor7.autop3.AutoP3.timerSpeed
 import noobroutes.features.floor7.autop3.Blink
+import noobroutes.features.floor7.autop3.Ring
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.skyblock.modMessage
 
@@ -17,7 +18,7 @@ class SpedRing(
     center: Boolean,
     rotate: Boolean,
     val length: Int
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(listOf("speed", "sped"), coords, yaw, term, leap, left, center, rotate) {
 
     override fun addRingData(obj: JsonObject) {
        obj.addProperty("length", length)

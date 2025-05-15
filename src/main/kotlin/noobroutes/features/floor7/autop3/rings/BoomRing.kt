@@ -3,6 +3,7 @@ package noobroutes.features.floor7.autop3.rings
 import com.google.gson.JsonObject
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import noobroutes.features.floor7.autop3.Ring
 import noobroutes.utils.AuraManager
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
@@ -17,7 +18,7 @@ class BoomRing(
     center: Boolean,
     rotate: Boolean,
     val block: BlockPos
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(listOf("boom", "tnt"), coords, yaw, term, leap, left, center, rotate) {
 
     override fun addRingData(obj: JsonObject) {
         obj.addProperty("block", block)

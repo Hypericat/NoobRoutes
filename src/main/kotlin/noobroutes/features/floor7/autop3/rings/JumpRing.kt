@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.Ring
 import noobroutes.utils.AutoP3Utils
 
 class JumpRing (
@@ -13,7 +14,7 @@ class JumpRing (
     center: Boolean,
     rotate: Boolean,
     val walk: Boolean
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(listOf("jump"), coords, yaw, term, leap, left, center, rotate) {
 
     override fun doRing() {
         AutoP3Utils.unPressKeys()

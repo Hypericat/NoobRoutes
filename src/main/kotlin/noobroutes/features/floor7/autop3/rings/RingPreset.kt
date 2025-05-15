@@ -1,7 +1,7 @@
 package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.Vec3
-import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.Ring
 
 class RingPreset(
     coords: Vec3,
@@ -11,7 +11,7 @@ class RingPreset(
     left: Boolean,
     center: Boolean,
     rotate: Boolean
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(listOf("Name"), coords, yaw, term, leap, left, center, rotate) {
 
     override fun doRing() {
         super.doRing()

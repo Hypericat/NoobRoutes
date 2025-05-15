@@ -1,15 +1,16 @@
-package noobroutes.features.floor7.autop3.rings
+package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.AutoP3.fuckingLook
 import noobroutes.features.floor7.autop3.AutoP3.silentLook
-import noobroutes.features.floor7.autop3.Blink
 import noobroutes.utils.JsonHelper.addProperty
 
+
 abstract class Ring(
-    val coords: Vec3,
+    val names: List<String>,
+    val coords: Vec3 = Vec3(mc.thePlayer?.posX ?: 0.0, mc.thePlayer?.posY ?: 0.0, mc.thePlayer?.posZ ?: 0.0),
     val yaw: Float,
     val term: Boolean,
     val leap: Boolean,
@@ -17,7 +18,7 @@ abstract class Ring(
     val center: Boolean,
     val rotate: Boolean
 ) {
-
+    var should = false
 
 
     fun getAsJsonObject(): JsonObject{

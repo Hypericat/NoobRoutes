@@ -3,6 +3,7 @@ package noobroutes.features.floor7.autop3.rings
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.move.LavaClip
 import noobroutes.utils.AutoP3Utils
 
@@ -15,7 +16,7 @@ class LavaClipRing(
     center: Boolean,
     rotate: Boolean,
     val length: Double
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(listOf("lavaclip", "clip", "lava"), coords, yaw, term, leap, left, center, rotate) {
 
     override fun addRingData(obj: JsonObject) {
         obj.addProperty("length", length)
