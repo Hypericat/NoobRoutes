@@ -13,7 +13,7 @@ class StopRing(
     left: Boolean,
     center: Boolean,
     rotate: Boolean
-) : Ring(listOf("stop"), coords, yaw, term, leap, left, center, rotate) {
+) : Ring("Stop", coords, yaw, term, leap, left, center, rotate) {
 
     override fun doRing() {
         AutoP3Utils.unPressKeys()

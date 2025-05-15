@@ -16,7 +16,7 @@ class LavaClipRing(
     center: Boolean,
     rotate: Boolean,
     val length: Double
-) : Ring(listOf("lavaclip", "clip", "lava"), coords, yaw, term, leap, left, center, rotate) {
+) : Ring("LavaClip", coords, yaw, term, leap, left, center, rotate) {
 
     override fun addRingData(obj: JsonObject) {
         obj.addProperty("length", length)

@@ -16,7 +16,7 @@ class HClipRing(
     center: Boolean,
     rotate: Boolean,
     val walk: Boolean
-) : Ring(listOf("hclip"), coords, yaw, term, leap, left, center, rotate) {
+) : Ring("HClip", coords, yaw, term, leap, left, center, rotate) {
 
     override fun addRingData(obj: JsonObject) {
         if (walk) obj.addProperty("walk", true)

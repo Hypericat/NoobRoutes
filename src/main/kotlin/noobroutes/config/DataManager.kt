@@ -6,6 +6,9 @@ import java.io.File
 import java.io.IOException
 
 object DataManager {
+    private val gson = GsonBuilder().setPrettyPrinting().create()
+
+
     fun saveDataToFile(fileName: String, dataList: JsonArray) {
         val path = File(mc.mcDataDir, "config/noobroutes/$fileName.json")
         try {
@@ -13,7 +16,7 @@ object DataManager {
             if (!path.exists()) {
                 path.createNewFile()
             }
-            val gson = GsonBuilder().setPrettyPrinting().create()
+
             path.bufferedWriter().use {
                 val jsonArray = JsonArray().apply { dataList.forEach { jsonObject -> add(jsonObject) } }
                 it.write(gson.toJson(jsonArray))

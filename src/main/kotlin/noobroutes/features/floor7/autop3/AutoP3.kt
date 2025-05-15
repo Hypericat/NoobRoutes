@@ -23,7 +23,6 @@ import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.*
-import noobroutes.utils.adapters.RingAdapter
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
@@ -41,8 +40,6 @@ object AutoP3: Module (
     category = Category.FLOOR7,
     description = "AutoP3"
 ) {
-    val gson: Gson = GsonBuilder().registerTypeAdapter(Ring::class.java, RingAdapter()).setPrettyPrinting().create()
-
     private val route by StringSetting("Route", "", description = "Route to use")
     val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
     val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
@@ -391,18 +388,17 @@ object AutoP3: Module (
 
     fun saveRings(){
         try {
-            val outObj = JsonArray().apply {
-                rings.forEach {
-                    add("rin", JsonArray())
-                    add(JsonObject().apply {
-
-                    })
+            val outArray = JsonArray()
+            for ((routeName, rings) in rings) {
+                val ringArray = JsonArray().apply {
+                    for (ring in rings) {
+                        add(ring.getAsJsonObject())
+                    }
                 }
-
-
-
+                outArray.add(JsonObject().apply {
+                    add(routeName, ringArray)
+                })
             }
-
             DataManager.saveDataToFile("rings", outArray)
         } catch (e: Exception) {
             modMessage("error saving")
@@ -413,13 +409,8 @@ object AutoP3: Module (
     fun loadRings() {
         rings.clear()
         val fileArray = DataManager.loadDataFromFile("rings")
-        rings = fileArray.associate { jsonObject ->
-            val name = jsonObject.get("route").asString
-            val list: MutableList<Ring> = gson.fromJson(
-                jsonObject.get("rings"),
-                object : TypeToken<MutableList<Ring>>() {}.type
-            )
-            name to list
-        }.toMutableMap()
+
+
+
     }
 }

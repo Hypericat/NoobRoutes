@@ -12,7 +12,7 @@ class MotionRing(
     left: Boolean,
     center: Boolean,
     rotate: Boolean
-) : Ring(listOf("motion"), coords, yaw, term, leap, left, center, rotate) {
+) : Ring("Motion", coords, yaw, term, leap, left, center, rotate) {
 
     override fun doRing() {
         AutoP3Utils.unPressKeys()

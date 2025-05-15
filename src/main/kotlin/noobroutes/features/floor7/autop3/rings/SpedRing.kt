@@ -18,7 +18,7 @@ class SpedRing(
     center: Boolean,
     rotate: Boolean,
     val length: Int
-) : Ring(listOf("speed", "sped"), coords, yaw, term, leap, left, center, rotate) {
+) : Ring("Speed", coords, yaw, term, leap, left, center, rotate) {
 
     override fun addRingData(obj: JsonObject) {
        obj.addProperty("length", length)

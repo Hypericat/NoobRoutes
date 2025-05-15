@@ -16,7 +16,7 @@ import noobroutes.features.floor7.autop3.AutoP3.motionValue
 import noobroutes.features.floor7.autop3.AutoP3.waitingLeap
 import noobroutes.features.floor7.autop3.AutoP3.waitingTerm
 import noobroutes.features.floor7.autop3.Ring
-import noobroutes.features.floor7.autop3.RingTypes
+import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils.renderX
@@ -155,8 +155,8 @@ object AutoP3Utils {
     }
 
     fun ringCheckY(ring: Ring): Boolean {
-        if(AutoP3.frame) return (ring.coords.yCoord <= mc.thePlayer.renderY && ring.coords.yCoord + 1 > mc.thePlayer.renderY && ring.type != RingTypes.BLINK) || (ring.coords.yCoord == mc.thePlayer.renderY)
-        return (ring.coords.yCoord <= mc.thePlayer.posY && ring.coords.yCoord + 1 > mc.thePlayer.posY && ring.type != RingTypes.BLINK) || (ring.coords.yCoord == mc.thePlayer.posY)
+        if(AutoP3.frame) return (ring.coords.yCoord <= mc.thePlayer.renderY && ring.coords.yCoord + 1 > mc.thePlayer.renderY && ring !is BlinkRing) || (ring.coords.yCoord == mc.thePlayer.renderY)
+        return (ring.coords.yCoord <= mc.thePlayer.posY && ring.coords.yCoord + 1 > mc.thePlayer.posY && ring !is BlinkRing) || (ring.coords.yCoord == mc.thePlayer.posY)
     }
 
     @SubscribeEvent
@@ -177,7 +177,7 @@ object AutoP3Utils {
     }
 
     fun renderRing(ring: Ring) {
-        if (AutoP3.onlyCenter && ring.type != RingTypes.BLINK && !ring.center) return
+        if (AutoP3.onlyCenter && ring !is BlinkRing && !ring.center) return
         if (AutoP3.simpleRings) {
             Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
             return

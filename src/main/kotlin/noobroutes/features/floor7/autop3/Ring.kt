@@ -9,7 +9,7 @@ import noobroutes.utils.JsonHelper.addProperty
 
 
 abstract class Ring(
-    val names: List<String>,
+    val name: String,
     val coords: Vec3 = Vec3(mc.thePlayer?.posX ?: 0.0, mc.thePlayer?.posY ?: 0.0, mc.thePlayer?.posZ ?: 0.0),
     val yaw: Float,
     val term: Boolean,
@@ -23,7 +23,7 @@ abstract class Ring(
 
     fun getAsJsonObject(): JsonObject{
         val obj = JsonObject().apply {
-            addProperty("type", javaClass.simpleName)
+            addProperty("type", name)
             addProperty("coords", coords)
             addProperty("yaw", yaw)
             if (term) addProperty("term", true)

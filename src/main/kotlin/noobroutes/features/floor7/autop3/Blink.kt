@@ -13,6 +13,7 @@ import noobroutes.Core
 import noobroutes.Core.mc
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.PacketEvent
+import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.SecretGuideIntegration
@@ -209,33 +210,33 @@ object Blink{
         movementPackets.clear()
     }
 
-    fun doBlink(ring: Ring) {
+    fun doBlink(ring: BlinkRing) {
         if (movementPackets.isNotEmpty()) return
 
-        if (System.currentTimeMillis() - lastBlink >= 500 && (blinksInstance + ring.blinkPackets.size > AutoP3.maxBlinks || !AutoP3.blink)) {
+        if (System.currentTimeMillis() - lastBlink >= 500 && (blinksInstance + ring.packets.size > AutoP3.maxBlinks || !AutoP3.blink)) {
             modMessage("movementing")
-            movementPackets = ring.blinkPackets.toMutableList()
+            movementPackets = ring.packets.toMutableList()
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionY = 0.0
-            endY = ring.misc
+            endY = ring.endYVelo
             lastBlink = System.currentTimeMillis()
             lastBlinkRing = null
             return
         }
 
-        if (cancelled < ring.blinkPackets.size || blinksInstance + ring.blinkPackets.size > AutoP3.maxBlinks || System.currentTimeMillis() - lastBlink < 500) {
+        if (cancelled < ring.packets.size || blinksInstance + ring.packets.size > AutoP3.maxBlinks || System.currentTimeMillis() - lastBlink < 500) {
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
             return
         }
-        blinksInstance += ring.blinkPackets.size
+        blinksInstance += ring.packets.size
         lastBlink = System.currentTimeMillis()
         lastBlinkRing = ring
-        ring.blinkPackets.forEach { PacketUtils.sendPacket(it) }
-        val lastPacket = ring.blinkPackets.size - 1
-        mc.thePlayer.setPosition(ring.blinkPackets[lastPacket].positionX, ring.blinkPackets[lastPacket].positionY, ring.blinkPackets[lastPacket].positionZ)
-        mc.thePlayer.setVelocity(0.0, ring.misc, 0.0)
-        modMessage("§c§l$cancelled§r§f c04s available, used §c${ring.blinkPackets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
+        ring.packets.forEach { PacketUtils.sendPacket(it) }
+        val lastPacket = ring.packets.size - 1
+        mc.thePlayer.setPosition(ring.packets[lastPacket].positionX, ring.packets[lastPacket].positionY, ring.packets[lastPacket].positionZ)
+        mc.thePlayer.setVelocity(0.0, ring.endYVelo, 0.0)
+        modMessage("§c§l$cancelled§r§f c04s available, used §c${ring.packets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }
 
     @SubscribeEvent
@@ -273,7 +274,7 @@ object Blink{
         if (recordedPackets.size == getRecordingGoalLength(lastWaypoint)) {
             modMessage("finished recording")
             recording = false
-            AutoP3.actuallyAddRing(Ring(RingTypes.BLINK, coords = lastWaypoint.coords,  blinkPackets = recordedPackets, misc = mc.thePlayer.motionY))
+            AutoP3.actuallyAddRing(BlinkRing(coords = lastWaypoint.coords, packets = recordedPackets, endYVelo = mc.thePlayer.motionY))
         }
     }
 

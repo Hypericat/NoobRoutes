@@ -12,7 +12,7 @@ class WalkRing(
     left: Boolean,
     center: Boolean,
     rotate: Boolean
-) : Ring(listOf("walk"), coords, yaw, term, leap, left, center, rotate) {
+) : Ring("Walk", coords, yaw, term, leap, left, center, rotate) {
 
     override fun doRing() {
         AutoP3Utils.unPressKeys()

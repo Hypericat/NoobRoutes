@@ -18,15 +18,15 @@ import noobroutes.utils.skyblock.modMessage
 
 class BlinkRing(
     coords: Vec3,
-    yaw: Float,
-    term: Boolean,
-    leap: Boolean,
-    left: Boolean,
-    center: Boolean,
-    rotate: Boolean,
+    yaw: Float = 0f,
+    term: Boolean = false,
+    leap: Boolean = false,
+    left: Boolean = false,
+    center: Boolean = false,
+    rotate: Boolean = false,
     val packets: List<C04PacketPlayerPosition>,
     val endYVelo: Double
-) : Ring(listOf("blink"), coords, yaw, term, leap, left, center, rotate) {
+) : Ring("Blink", coords, yaw, term, leap, left, center, rotate) {
 
 
     override fun addRingData(obj: JsonObject) {

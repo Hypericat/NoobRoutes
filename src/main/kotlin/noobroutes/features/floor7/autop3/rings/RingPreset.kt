@@ -11,7 +11,7 @@ class RingPreset(
     left: Boolean,
     center: Boolean,
     rotate: Boolean
-) : Ring(listOf("Name"), coords, yaw, term, leap, left, center, rotate) {
+) : Ring("Name", coords, yaw, term, leap, left, center, rotate) {
 
     override fun doRing() {
         super.doRing()

@@ -18,7 +18,7 @@ class BoomRing(
     center: Boolean,
     rotate: Boolean,
     val block: BlockPos
-) : Ring(listOf("boom", "tnt"), coords, yaw, term, leap, left, center, rotate) {
+) : Ring("Boom", coords, yaw, term, leap, left, center, rotate) {
 
     override fun addRingData(obj: JsonObject) {
         obj.addProperty("block", block)
