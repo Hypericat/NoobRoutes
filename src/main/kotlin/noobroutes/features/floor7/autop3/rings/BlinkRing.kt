@@ -1,5 +1,6 @@
 package noobroutes.features.floor7.autop3.rings
 
+import com.google.gson.JsonObject
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.util.Vec3
@@ -26,6 +27,21 @@ class BlinkRing(
     val packets: List<C04PacketPlayerPosition>,
     val endYVelo: Double
 ) : Ring(coords, yaw, term, leap, left, center, rotate) {
+
+
+    override fun addRingData(obj: JsonObject) {
+        obj.apply {
+            add("packets", JsonObject().apply {
+                packets.forEach {
+                    addProperty("x", it.positionX)
+                    addProperty("y", it.positionY)
+                    addProperty("z", it.positionZ)
+                    addProperty("isOnGround", it.isOnGround)
+                }
+            })
+            addProperty("endYVelo", endYVelo)
+        }
+    }
 
     override fun doRing() {
         if (movementPackets.isNotEmpty()) return

@@ -1,5 +1,6 @@
 package noobroutes.features.floor7.autop3.rings
 
+import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.features.floor7.autop3.AutoP3.spedFor
 import noobroutes.features.floor7.autop3.AutoP3.timerSpeed
@@ -17,6 +18,10 @@ class SpedRing(
     rotate: Boolean,
     val length: Int
 ) : Ring(coords, yaw, term, leap, left, center, rotate) {
+
+    override fun addRingData(obj: JsonObject) {
+       obj.addProperty("length", length)
+    }
 
     override fun doRing() {
         super.doRing()

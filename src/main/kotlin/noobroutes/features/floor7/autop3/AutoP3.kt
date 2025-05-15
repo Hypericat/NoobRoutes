@@ -128,8 +128,8 @@ object AutoP3: Module (
     fun tickRing(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.END || frame) return
         if(!inBoss || mc.thePlayer.isSneaking) return
-        rings[route]?.forEachIndexed { i, ring ->
-            if (editMode) return@forEachIndexed
+        rings[route]?.forEach {ring ->
+            if (editMode) return@forEach
             if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring) && ring.should) {
                 executeRing(ring)
                 if (ring.type != RingTypes.BLINK) ring.should = false
