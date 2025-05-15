@@ -1,14 +1,14 @@
 package noobroutes.features.floor7
 
-import noobroutes.features.Category
-import noobroutes.features.Module
-import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.utils.Scheduler
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.utils.Scheduler
 import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 

@@ -1,6 +1,5 @@
 package noobroutes.features.move
 
-import jdk.nashorn.internal.ir.Block
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.network.play.client.C03PacketPlayer
@@ -11,7 +10,6 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraft.util.Vec3i
-import net.minecraftforge.client.event.sound.SoundEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
@@ -19,17 +17,10 @@ import noobroutes.features.Module
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.utils.AutoP3Utils
-import noobroutes.utils.PacketUtils
-import noobroutes.utils.Scheduler
+import noobroutes.utils.*
 import noobroutes.utils.Utils.isClose
-import noobroutes.utils.getBlockAt
-import noobroutes.utils.isAir
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.sendChatMessage
-import noobroutes.utils.skyblock.sendCommand
-import noobroutes.utils.toBlockPos
 import org.lwjgl.input.Keyboard
 
 object Doorless: Module(

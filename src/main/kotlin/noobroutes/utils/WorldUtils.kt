@@ -1,6 +1,5 @@
 package noobroutes.utils
 
-import noobroutes.Core.mc
 import net.minecraft.block.Block
 import net.minecraft.block.BlockButton
 import net.minecraft.block.BlockLever
@@ -9,6 +8,7 @@ import net.minecraft.block.BlockSkull
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.util.*
+import noobroutes.Core.mc
 
 
 /**

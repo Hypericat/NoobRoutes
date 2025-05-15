@@ -1,14 +1,11 @@
 package noobroutes.features.floor7
 
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.MotionUpdateEvent
-import noobroutes.features.Blink.skip
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.utils.AutoP3Utils
-import noobroutes.utils.AutoP3Utils.walking
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isClose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
 object CoreClip: Module(

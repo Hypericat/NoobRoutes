@@ -1,9 +1,9 @@
 package noobroutes.features.move
 
-import noobroutes.features.Category
-import noobroutes.features.Module
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.features.Category
+import noobroutes.features.Module
 
 object InstantSlow : Module("Instant Slow", description = "Instantly stops momentum when you are not pressing wasd while in creative fly.", category = Category.MOVE) {
 

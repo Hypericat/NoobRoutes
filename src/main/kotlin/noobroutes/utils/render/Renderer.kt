@@ -1,13 +1,5 @@
 package noobroutes.utils.render
 
-import noobroutes.Core.mc
-import noobroutes.ui.clickgui.util.ColorUtil.multiplyAlpha
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
-import noobroutes.utils.addVec
-import noobroutes.utils.getBlockAt
-import noobroutes.utils.render.RenderUtils.outlineBounds
-import noobroutes.utils.render.RenderUtils.renderVec
-import noobroutes.utils.toAABB
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
@@ -17,6 +9,14 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.Core.mc
+import noobroutes.ui.clickgui.util.ColorUtil.multiplyAlpha
+import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.utils.addVec
+import noobroutes.utils.getBlockAt
+import noobroutes.utils.render.RenderUtils.outlineBounds
+import noobroutes.utils.render.RenderUtils.renderVec
+import noobroutes.utils.toAABB
 import kotlin.math.max
 import kotlin.math.min
 

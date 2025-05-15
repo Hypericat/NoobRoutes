@@ -1,11 +1,5 @@
 package noobroutes.utils.skyblock.dungeon
 
-import noobroutes.Core.logger
-import noobroutes.Core.mc
-import noobroutes.utils.equalsOneOf
-import noobroutes.utils.getBlockIdAt
-import noobroutes.utils.postAndCatch
-import noobroutes.utils.skyblock.dungeon.tiles.*
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonIOException
 import com.google.gson.JsonSyntaxException
@@ -18,6 +12,13 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import noobroutes.Core.logger
+import noobroutes.Core.mc
+import noobroutes.events.BossEventDispatcher.inBoss
+import noobroutes.utils.equalsOneOf
+import noobroutes.utils.getBlockIdAt
+import noobroutes.utils.postAndCatch
+import noobroutes.utils.skyblock.dungeon.tiles.*
 import java.io.FileNotFoundException
 
 object ScanUtils {
@@ -25,23 +26,23 @@ object ScanUtils {
     private const val START = -185
 
     private var lastRoomPos: noobroutes.utils.Vec2 =
-        _root_ide_package_.noobroutes.utils.Vec2(0, 0)
-    private val roomList: Set<noobroutes.utils.skyblock.dungeon.tiles.RoomData> = loadRoomData()
-    var currentRoom: noobroutes.utils.skyblock.dungeon.tiles.Room? = null
+        noobroutes.utils.Vec2(0, 0)
+    private val roomList: Set<RoomData> = loadRoomData()
+    var currentRoom: Room? = null
         private set
-    var passedRooms: MutableSet<noobroutes.utils.skyblock.dungeon.tiles.Room> = mutableSetOf()
+    var passedRooms: MutableSet<Room> = mutableSetOf()
         private set
 
-    private fun loadRoomData(): Set<noobroutes.utils.skyblock.dungeon.tiles.RoomData> {
+    private fun loadRoomData(): Set<RoomData> {
         return try {
             GsonBuilder()
                 .registerTypeAdapter(
-                    _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.RoomData::class.java,
-                    _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.RoomDataDeserializer()
+                    RoomData::class.java,
+                    RoomDataDeserializer()
                 )
                 .create().fromJson(
                     (ScanUtils::class.java.getResourceAsStream("/rooms.json") ?: throw FileNotFoundException()).bufferedReader(),
-                    object : com.google.gson.reflect.TypeToken<Set<noobroutes.utils.skyblock.dungeon.tiles.RoomData>>() {}.type
+                    object : com.google.gson.reflect.TypeToken<Set<RoomData>>() {}.type
                 )
         } catch (e: Exception) {
             handleRoomDataError(e)
@@ -65,39 +66,39 @@ object ScanUtils {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.END || mc.theWorld == null || mc.thePlayer == null) return
-        if ((!_root_ide_package_.noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons && !_root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentArea.isArea(
-                _root_ide_package_.noobroutes.utils.skyblock.Island.SinglePlayer)) || _root_ide_package_.noobroutes.utils.skyblock.dungeon.DungeonUtils.inBoss
+        if ((!DungeonUtils.inDungeons && !noobroutes.utils.skyblock.LocationUtils.currentArea.isArea(
+                noobroutes.utils.skyblock.Island.SinglePlayer)) || inBoss
         ) {
-            currentRoom?.let { _root_ide_package_.noobroutes.events.impl.RoomEnterEvent(null)
+            currentRoom?.let { noobroutes.events.impl.RoomEnterEvent(null)
                 .postAndCatch() }
             return
         } // We want the current room to register as null if we are not in a dungeon
 
-        val roomCenter = getRoomCenter(_root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posX.toInt(), _root_ide_package_.noobroutes.utils.skyblock.PlayerUtils.posZ.toInt())
-        if (roomCenter == lastRoomPos && _root_ide_package_.noobroutes.utils.skyblock.LocationUtils.currentArea.isArea(
-                _root_ide_package_.noobroutes.utils.skyblock.Island.SinglePlayer)) return // extra SinglePlayer caching for invalid placed rooms
+        val roomCenter = getRoomCenter(noobroutes.utils.skyblock.PlayerUtils.posX.toInt(), noobroutes.utils.skyblock.PlayerUtils.posZ.toInt())
+        if (roomCenter == lastRoomPos && noobroutes.utils.skyblock.LocationUtils.currentArea.isArea(
+                noobroutes.utils.skyblock.Island.SinglePlayer)) return // extra SinglePlayer caching for invalid placed rooms
         lastRoomPos = roomCenter
 
         passedRooms.find { previousRoom -> previousRoom.roomComponents.any { it.vec2 == roomCenter } }?.let { room ->
-            if (currentRoom?.roomComponents?.none { it.vec2 == roomCenter } == true) _root_ide_package_.noobroutes.events.impl.RoomEnterEvent(
+            if (currentRoom?.roomComponents?.none { it.vec2 == roomCenter } == true) noobroutes.events.impl.RoomEnterEvent(
                 room
             ).postAndCatch()
             return
         } // We want to use cached rooms instead of scanning it again if we have already passed through it and if we are already in it we don't want to trigger the event
 
-        scanRoom(roomCenter)?.let { room -> if (room.rotation != _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.NONE) _root_ide_package_.noobroutes.events.impl.RoomEnterEvent(
+        scanRoom(roomCenter)?.let { room -> if (room.rotation != Rotations.NONE) noobroutes.events.impl.RoomEnterEvent(
             room
         ).postAndCatch() }
     }
 
-    private fun updateRotation(room: noobroutes.utils.skyblock.dungeon.tiles.Room) {
+    private fun updateRotation(room: Room) {
         val roomHeight = getTopLayerOfRoom(room.roomComponents.first().vec2)
         if (room.data.name == "Fairy") { // Fairy room doesn't have a clay block so we need to set it manually
             room.clayPos = room.roomComponents.firstOrNull()?.let { BlockPos(it.x - 15, roomHeight, it.z - 15) } ?: return
-            room.rotation = _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.SOUTH
+            room.rotation = Rotations.SOUTH
             return
         }
-        room.rotation = _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.entries.dropLast(1).find { rotation ->
+        room.rotation = Rotations.entries.dropLast(1).find { rotation ->
             room.roomComponents.any { component ->
                 BlockPos(component.x + rotation.x, roomHeight, component.z + rotation.z).let { blockPos ->
                     getBlockIdAt(blockPos) == 159 && (room.roomComponents.size == 1 || EnumFacing.HORIZONTALS.all { facing ->
@@ -111,27 +112,27 @@ object ScanUtils {
                     }).also { isCorrectClay -> if (isCorrectClay) room.clayPos = blockPos }
                 }
             }
-        } ?: _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.NONE // Rotation isn't found if we can't find the clay block
+        } ?: Rotations.NONE // Rotation isn't found if we can't find the clay block
     }
 
-    private fun scanRoom(vec2: noobroutes.utils.Vec2): noobroutes.utils.skyblock.dungeon.tiles.Room? =
+    private fun scanRoom(vec2: noobroutes.utils.Vec2): Room? =
         getCore(vec2).let { core -> getRoomData(core)?.let {
-            _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Room(
+            Room(
                 data = it,
                 roomComponents = findRoomComponentsRecursively(vec2, it.cores)
             )
         }?.apply { updateRotation(this) } }
 
-    private fun findRoomComponentsRecursively(vec2: noobroutes.utils.Vec2, cores: List<Int>, visited: MutableSet<noobroutes.utils.Vec2> = mutableSetOf(), tiles: MutableSet<noobroutes.utils.skyblock.dungeon.tiles.RoomComponent> = mutableSetOf()): MutableSet<noobroutes.utils.skyblock.dungeon.tiles.RoomComponent> {
+    private fun findRoomComponentsRecursively(vec2: noobroutes.utils.Vec2, cores: List<Int>, visited: MutableSet<noobroutes.utils.Vec2> = mutableSetOf(), tiles: MutableSet<RoomComponent> = mutableSetOf()): MutableSet<RoomComponent> {
         if (vec2 in visited) return tiles else visited.add(vec2)
         tiles.add(
-            _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.RoomComponent(
+            RoomComponent(
                 vec2.x,
                 vec2.z,
                 getCore(vec2).takeIf { it in cores } ?: return tiles))
         EnumFacing.HORIZONTALS.forEach { facing ->
             findRoomComponentsRecursively(
-                _root_ide_package_.noobroutes.utils.Vec2(
+                noobroutes.utils.Vec2(
                     vec2.x + (facing.frontOffsetX shl ROOM_SIZE_SHIFT),
                     vec2.z + (facing.frontOffsetZ shl ROOM_SIZE_SHIFT)
                 ), cores, visited, tiles)
@@ -139,13 +140,13 @@ object ScanUtils {
         return tiles
     }
 
-    private fun getRoomData(hash: Int): noobroutes.utils.skyblock.dungeon.tiles.RoomData? =
+    private fun getRoomData(hash: Int): RoomData? =
         roomList.find { hash in it.cores }
 
     fun getRoomCenter(posX: Int, posZ: Int): noobroutes.utils.Vec2 {
         val roomX = (posX - START + (1 shl (ROOM_SIZE_SHIFT - 1))) shr ROOM_SIZE_SHIFT
         val roomZ = (posZ - START + (1 shl (ROOM_SIZE_SHIFT - 1))) shr ROOM_SIZE_SHIFT
-        return _root_ide_package_.noobroutes.utils.Vec2(
+        return noobroutes.utils.Vec2(
             (roomX shl ROOM_SIZE_SHIFT) + START,
             (roomZ shl ROOM_SIZE_SHIFT) + START
         )
@@ -184,13 +185,13 @@ object ScanUtils {
     fun enterDungeonRoom(event: noobroutes.events.impl.RoomEnterEvent) {
         currentRoom = event.room
         if (passedRooms.none { it.data.name == currentRoom?.data?.name }) passedRooms.add(currentRoom ?: return)
-        _root_ide_package_.noobroutes.utils.skyblock.devMessage("${event.room?.data?.name} - ${event.room?.rotation} || clay: ${event.room?.clayPos}")
+        noobroutes.utils.skyblock.devMessage("${event.room?.data?.name} - ${event.room?.rotation} || clay: ${event.room?.clayPos}")
     }
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Unload) {
         passedRooms.clear()
         currentRoom = null
-        lastRoomPos = _root_ide_package_.noobroutes.utils.Vec2(0, 0)
+        lastRoomPos = noobroutes.utils.Vec2(0, 0)
     }
 }

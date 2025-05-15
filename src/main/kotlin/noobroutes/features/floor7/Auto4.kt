@@ -1,14 +1,5 @@
 package noobroutes.features.floor7
 
-import noobroutes.events.impl.PacketEvent
-import noobroutes.features.Blink
-import noobroutes.features.Category
-import noobroutes.features.Module
-import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.utils.AutoP3Utils
-import noobroutes.utils.PacketUtils
-import noobroutes.utils.RotationUtils.getYawAndPitch
-import noobroutes.utils.Scheduler
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
@@ -18,6 +9,15 @@ import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
+import noobroutes.events.impl.PacketEvent
+import noobroutes.features.Blink
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.PacketUtils
+import noobroutes.utils.RotationUtils.getYawAndPitch
+import noobroutes.utils.Scheduler
 import org.lwjgl.input.Keyboard
 
 object Auto4: Module(

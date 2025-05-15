@@ -1,14 +1,14 @@
 package noobroutes.utils.render
 
+import gg.essential.universal.UMatrixStack
+import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.Core.mc
 import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.shader.RoundedRect
 import noobroutes.utils.*
-import gg.essential.universal.UMatrixStack
-import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.texture.DynamicTexture
 import org.lwjgl.opengl.Display
 import org.lwjgl.opengl.GL11
 

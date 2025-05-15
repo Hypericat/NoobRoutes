@@ -1,6 +1,5 @@
 package noobroutes.utils
 
-import noobroutes.events.impl.*
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import net.minecraft.network.Packet
@@ -10,6 +9,7 @@ import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
+import noobroutes.events.impl.*
 
 object NettyS2DPacketInterceptor {
     @SubscribeEvent(priority = EventPriority.LOWEST)

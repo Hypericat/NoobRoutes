@@ -2,8 +2,8 @@ package noobroutes.utils
 
 
 
-import noobroutes.Core.mc
 import net.minecraft.network.Packet
+import noobroutes.Core.mc
 
 object PacketUtils {
 

@@ -1,7 +1,5 @@
 package noobroutes.utils
 
-import noobroutes.Core.mc
-import noobroutes.events.impl.PacketEvent
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraftforge.event.entity.living.LivingEvent
@@ -9,6 +7,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import noobroutes.Core.mc
+import noobroutes.events.impl.PacketEvent
 
 object Scheduler {
     var runTime = 0L

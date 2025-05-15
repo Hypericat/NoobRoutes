@@ -1,5 +1,7 @@
 package noobroutes.ui.hud
 
+import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.mc
 import noobroutes.features.Module
 import noobroutes.features.ModuleManager.huds
@@ -16,8 +18,6 @@ import noobroutes.utils.render.rectangleOutline
 import noobroutes.utils.render.scale
 import noobroutes.utils.render.translate
 import noobroutes.utils.startProfile
-import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.Display
 import kotlin.math.max
 

@@ -1,9 +1,5 @@
 package noobroutes.utils.skyblock
 
-import noobroutes.Core.mc
-import noobroutes.utils.equalsOneOf
-import noobroutes.utils.noControlCodes
-import noobroutes.utils.render.RenderUtils.bind
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
@@ -14,6 +10,10 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
+import noobroutes.Core.mc
+import noobroutes.utils.equalsOneOf
+import noobroutes.utils.noControlCodes
+import noobroutes.utils.render.RenderUtils.bind
 
 /**
  * Returns the ExtraAttribute Compound

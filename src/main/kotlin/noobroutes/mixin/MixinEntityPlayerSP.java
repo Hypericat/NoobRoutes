@@ -1,11 +1,11 @@
 package noobroutes.mixin;
 
-import noobroutes.events.impl.MotionUpdateEvent;
-import noobroutes.features.misc.NoDebuff;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import noobroutes.events.impl.MotionUpdateEvent;
+import noobroutes.features.misc.NoDebuff;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

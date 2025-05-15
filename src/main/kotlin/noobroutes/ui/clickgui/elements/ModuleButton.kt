@@ -1,5 +1,6 @@
 package noobroutes.ui.clickgui.elements
 
+import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.Module
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.*
@@ -17,7 +18,6 @@ import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
-import net.minecraft.client.renderer.texture.DynamicTexture
 import kotlin.math.floor
 
 /**

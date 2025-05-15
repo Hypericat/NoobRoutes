@@ -1,5 +1,14 @@
 package noobroutes.features.test
 
+import net.minecraft.init.Blocks
+import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.network.play.client.C0BPacketEntityAction
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
+import net.minecraft.network.play.server.S29PacketSoundEffect
+import net.minecraft.util.Vec3
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
@@ -11,18 +20,7 @@ import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.features.settings.impl.StringSetting
 import noobroutes.utils.Scheduler
 import noobroutes.utils.skyblock.*
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import net.minecraft.block.Block
-import net.minecraft.init.Blocks
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraft.network.play.client.C0BPacketEntityAction
-import net.minecraft.network.play.server.S08PacketPlayerPosLook
-import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraft.util.Vec3
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.utils.skyblock.PlayerUtils.getBlockPlayerIsLookingAt
-import kotlin.math.abs
 
 object Zpew : Module(
     name = "Zpew",
@@ -187,7 +185,7 @@ object Zpew : Module(
     @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook) return
-        if (DungeonUtils.inBoss || (!LocationUtils.isInSkyblock && !ClickGUIModule.forceHypixel)) return
+        if (inBoss || (!LocationUtils.isInSkyblock && !ClickGUIModule.forceHypixel)) return
         if (recentlySentC06s.isEmpty()) return
 
         val sentC06 = recentlySentC06s[0]

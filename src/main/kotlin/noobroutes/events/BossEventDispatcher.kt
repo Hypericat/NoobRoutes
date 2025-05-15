@@ -1,51 +1,94 @@
 package noobroutes.events
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockAir
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S22PacketMultiBlockChange
-import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.util.BlockPos
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.events.impl.*
-import noobroutes.utils.isAir
 import noobroutes.utils.postAndCatch
+import noobroutes.utils.skyblock.LocationUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.Floor
 
 object BossEventDispatcher {
 
+    private val necronStartRegex = Regex("\\[BOSS] Necron: (Finally, I heard so much about you.|You went further than any human before).*?")
+
     var currentTerminalPhase: TerminalPhase = TerminalPhase.Unknown
+    var currentBossPhase: Phase = Phase.Unknown
     private var lastInBoss = false
+    var inBoss = false
+
+    private inline val inBossCheck: Boolean
+        get() = LocationUtils.currentDungeon?.inBoss == true
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        inBoss = false
+        lastInBoss = false
+        currentBossPhase = Phase.Unknown
+        currentTerminalPhase = TerminalPhase.Unknown
+    }
 
     @SubscribeEvent
     fun onClientTick(event: ClientTickEvent){
         if (!DungeonUtils.inDungeons) return
-        val inBoss = DungeonUtils.inBoss
-        if (lastInBoss != inBoss) {
-            if (inBoss) {
+        val iB = inBossCheck
+        if (lastInBoss != iB) {
+            devMessage("something")
+            if (iB) {
+                inBoss = true
                 BossEvent.BossStart(DungeonUtils.floor).postAndCatch()
             } else {
+                inBoss = false
                 BossEvent.BossFinish(DungeonUtils.floor).postAndCatch()
             }
         }
+        lastInBoss = iB
     }
 
 
     @SubscribeEvent
     fun onChat(event: ChatPacketEvent) {
         when (event.message) {
+            "[BOSS] Maxor: WELL! WELL! WELL! LOOK WHO'S HERE!" -> {
+                currentBossPhase = Phase.P1
+                BossEvent.PhaseChange(DungeonUtils.floor, Phase.P1).postAndCatch()
+            }
             "[BOSS] Storm: Pathetic Maxor, just like expected." -> {
+                currentBossPhase = Phase.P2
                 BossEvent.PhaseChange(DungeonUtils.floor, Phase.P2).postAndCatch()
             }
+            "[BOSS] Goldor: Who dares trespass into my domain?" -> {
+                BossEvent.PhaseChange(DungeonUtils.floor, Phase.P3).postAndCatch()
+                BossEvent.TerminalPhaseChange(DungeonUtils.floor, TerminalPhase.S1).postAndCatch()
+                currentBossPhase = Phase.P3
+                currentTerminalPhase = TerminalPhase.S1
+            }
+            "The Core entrance is opening!" -> {
+                BossEvent.TerminalPhaseChange(DungeonUtils.floor, TerminalPhase.GoldorFight).postAndCatch()
+                currentTerminalPhase = TerminalPhase.GoldorFight
+            }
         }
-
+        if (necronStartRegex.matchEntire(event.message)?.groupValues != null) {
+            BossEvent.PhaseChange(DungeonUtils.floor, Phase.P4).postAndCatch()
+            currentBossPhase = Phase.P4
+            currentTerminalPhase = TerminalPhase.Unknown
+        }
+        if (event.message.contains("Defeated Maxor, Storm, Goldor, and Necron in.")) {
+            currentBossPhase = Phase.Unknown
+            currentTerminalPhase = TerminalPhase.Unknown
+            BossEvent.BossFinish(DungeonUtils.floor).postAndCatch()
+            inBoss = false
+        }
     }
 
     @SubscribeEvent
     fun onPacket(event: PacketEvent.Receive) {
-        if (event.packet !is S22PacketMultiBlockChange || !DungeonUtils.inBoss) return
+        if (event.packet !is S22PacketMultiBlockChange || !inBoss) return
         //leaving some space open just incase we need a block change for a different floor
         if (DungeonUtils.floor != Floor.F7 && DungeonUtils.floor != Floor.M7) return
         event.packet.changedBlocks.forEach {
@@ -65,9 +108,30 @@ object BossEventDispatcher {
                 }
             }
         }
-
-
     }
+
+    @SubscribeEvent
+    fun onBossEnd(event: BossEvent.BossFinish) {
+        devMessage("Boss finished!")
+    }
+    @SubscribeEvent
+    fun onBossStart(event: BossEvent.BossStart) {
+        devMessage("Boss started!")
+    }
+
+    @SubscribeEvent
+    fun onPhaseChange(event: BossEvent.PhaseChange) {
+        devMessage("Phase change phase! ${event.phase.name}")
+    }
+
+    @SubscribeEvent
+    fun onTermPhaseChange(event: BossEvent.TerminalPhaseChange) {
+        devMessage("Term phase change phase! ${event.phase.name}")
+    }
+
+
+
+
 
 
 }

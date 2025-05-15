@@ -1,9 +1,9 @@
 package noobroutes.utils
 
 import net.minecraftforge.client.event.RenderHandEvent
-import noobroutes.Core.mc
 import net.minecraftforge.client.event.RenderPlayerEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core.mc
 
 object SilentRotator {
     class RealRotation(var yaw: Float?, var pitch: Float?, var prevYaw: Float?, var prevPitch: Float?)

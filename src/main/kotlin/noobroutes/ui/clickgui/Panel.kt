@@ -1,6 +1,7 @@
 package noobroutes.ui.clickgui
 
 
+import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.Category
 import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
@@ -19,7 +20,6 @@ import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import noobroutes.utils.round
-import net.minecraft.client.renderer.texture.DynamicTexture
 import kotlin.math.floor
 
 

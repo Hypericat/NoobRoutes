@@ -1,12 +1,12 @@
 package noobroutes.features.move
 
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
 import org.lwjgl.input.Keyboard
 
 object InstantAcceleration: Module(

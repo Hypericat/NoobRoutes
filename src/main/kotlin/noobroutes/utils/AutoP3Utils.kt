@@ -1,6 +1,13 @@
 package noobroutes.utils
 
-import noobroutes.mixin.accessors.TimerFieldAccessor
+import net.minecraft.client.settings.KeyBinding
+import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
+import net.minecraft.util.Vec3
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.AutoP3
@@ -10,20 +17,12 @@ import noobroutes.features.floor7.AutoP3.waitingLeap
 import noobroutes.features.floor7.AutoP3.waitingTerm
 import noobroutes.features.floor7.Ring
 import noobroutes.features.floor7.RingTypes
+import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils.renderX
 import noobroutes.utils.render.RenderUtils.renderY
 import noobroutes.utils.render.RenderUtils.renderZ
 import noobroutes.utils.render.Renderer
-import net.minecraft.client.settings.KeyBinding
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.server.S08PacketPlayerPosLook
-import net.minecraft.util.Timer
-import net.minecraft.util.Vec3
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse

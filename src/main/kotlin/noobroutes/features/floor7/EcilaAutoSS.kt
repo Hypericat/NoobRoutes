@@ -9,6 +9,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
+import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.BlockChangeEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
@@ -16,6 +17,7 @@ import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.AuraManager
 
 //this is not in module manager yet, also need might need offtick?
+
 
 object EcilaAutoSS : Module(
     name = "EcilaAutoSS",
@@ -85,7 +87,7 @@ object EcilaAutoSS : Module(
 
     @SubscribeEvent
     fun onTick(event: RenderTickEvent) {
-        if (!AutoP3.inBoss) return
+        if (!inBoss) return
         val detect = mc.theWorld.getBlockState(BlockPos(110, 123, 92)).block
         if (mc.thePlayer.getDistanceSq(startButton) > 25.0 || mc.objectMouseOver == null) return
         var device = false

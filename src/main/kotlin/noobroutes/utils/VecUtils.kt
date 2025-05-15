@@ -1,8 +1,5 @@
 package noobroutes.utils
 
-import noobroutes.Core.mc
-import noobroutes.Core.scope
-import noobroutes.utils.render.RenderUtils.outlineBounds
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
@@ -11,6 +8,9 @@ import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.*
+import noobroutes.Core.mc
+import noobroutes.Core.scope
+import noobroutes.utils.render.RenderUtils.outlineBounds
 import kotlin.math.*
 
 data class Vec2(val x: Int, val z: Int)

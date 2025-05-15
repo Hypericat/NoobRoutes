@@ -1,22 +1,13 @@
 package noobroutes.features.floor7
 
 import net.minecraft.item.Item
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.MelodyOpenEvent
-import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.S2FPacketSetSlotEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.StringSetting
-import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.skyblock.sendCommand
-import noobroutes.utils.skyblock.unformattedName
-import net.minecraft.item.ItemStack
-import net.minecraft.network.play.client.C0EPacketClickWindow
-import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import noobroutes.utils.Utils
 import noobroutes.utils.skyblock.sendChatMessage
 import org.lwjgl.input.Keyboard
 

@@ -1,11 +1,5 @@
 package noobroutes.utils.render
 
-import noobroutes.Core.mc
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
-import noobroutes.utils.addVec
-import noobroutes.utils.corners
-import noobroutes.utils.render.RenderUtils.bind
-import noobroutes.utils.render.RenderUtils.renderVec
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -15,6 +9,12 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core.mc
+import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.utils.addVec
+import noobroutes.utils.corners
+import noobroutes.utils.render.RenderUtils.bind
+import noobroutes.utils.render.RenderUtils.renderVec
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
 import org.lwjgl.util.glu.Project

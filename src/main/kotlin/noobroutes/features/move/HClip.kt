@@ -1,5 +1,9 @@
 package noobroutes.features.move
 
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.Setting.Companion.withDependency
@@ -9,10 +13,6 @@ import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils
 import noobroutes.utils.skyblock.modMessage
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.atan2
 

@@ -1,25 +1,6 @@
 package noobroutes.features.floor7
 
 
-import noobroutes.Core.logger
-import noobroutes.events.impl.BlockChangeEvent
-import noobroutes.events.impl.ChatPacketEvent
-import noobroutes.features.Category
-import noobroutes.features.Module
-import noobroutes.features.render.ClickGUIModule.devMode
-import noobroutes.features.settings.Setting.Companion.withDependency
-import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.features.settings.impl.KeybindSetting
-import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.utils.RotationUtils.getYawAndPitch
-import noobroutes.utils.clock.Executor
-import noobroutes.utils.clock.Executor.Companion.register
-import noobroutes.utils.render.Color
-import noobroutes.utils.render.RenderUtils.drawStringInWorld
-import noobroutes.utils.render.Renderer
-import noobroutes.utils.skyblock.LocationUtils
-import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.sendCommand
 import net.minecraft.block.Block
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
@@ -32,9 +13,27 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core.logger
+import noobroutes.events.impl.BlockChangeEvent
+import noobroutes.events.impl.ChatPacketEvent
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.render.ClickGUIModule.devMode
+import noobroutes.features.settings.Setting.Companion.withDependency
+import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.features.settings.impl.KeybindSetting
+import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.RotationUtils.getYawAndPitch
+import noobroutes.utils.clock.Executor
+import noobroutes.utils.clock.Executor.Companion.register
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.RenderUtils.drawStringInWorld
+import noobroutes.utils.render.Renderer
+import noobroutes.utils.skyblock.LocationUtils
+import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.sendCommand
 import org.lwjgl.input.Keyboard
-import kotlin.random.Random
 
 /**
  * taken from cga

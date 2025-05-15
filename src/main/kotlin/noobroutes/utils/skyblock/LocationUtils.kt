@@ -1,17 +1,17 @@
 package noobroutes.utils.skyblock
 
-import noobroutes.Core.mc
-import noobroutes.features.render.ClickGUIModule
-import noobroutes.utils.cleanLine
-import noobroutes.utils.cleanSB
-import noobroutes.utils.clock.Executor.Companion.register
-import noobroutes.utils.sidebarLines
 import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.network.play.server.S3FPacketCustomPayload
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
+import noobroutes.Core.mc
+import noobroutes.features.render.ClickGUIModule
+import noobroutes.utils.cleanLine
+import noobroutes.utils.cleanSB
 import noobroutes.utils.clock.Executor
+import noobroutes.utils.clock.Executor.Companion.register
+import noobroutes.utils.sidebarLines
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.Floor

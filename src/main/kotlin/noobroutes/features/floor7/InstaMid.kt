@@ -1,12 +1,5 @@
 package noobroutes.features.floor7
 
-import noobroutes.events.impl.PacketEvent
-import noobroutes.features.Category
-import noobroutes.features.Module
-import noobroutes.features.floor7.AutoP3.inBoss
-import noobroutes.utils.PacketUtils
-import noobroutes.utils.noControlCodes
-import noobroutes.utils.skyblock.modMessage
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
@@ -15,6 +8,13 @@ import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S1BPacketEntityAttach
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.events.BossEventDispatcher.inBoss
+import noobroutes.events.impl.PacketEvent
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.utils.PacketUtils
+import noobroutes.utils.noControlCodes
+import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 
 object InstaMid: Module (

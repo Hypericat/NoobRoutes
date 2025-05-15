@@ -1,15 +1,6 @@
 package noobroutes.features.puzzle
 
 
-import noobroutes.events.impl.RoomEnterEvent
-import noobroutes.events.impl.ServerTickEvent
-import noobroutes.features.Category
-import noobroutes.features.Module
-import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.utils.*
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.modMessage
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import net.minecraft.init.Blocks
@@ -19,11 +10,20 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.events.impl.RoomEnterEvent
+import noobroutes.events.impl.ServerTickEvent
+import noobroutes.features.Category
+import noobroutes.features.Module
 import noobroutes.features.render.ClickGUIModule.devMode
+import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.utils.*
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets

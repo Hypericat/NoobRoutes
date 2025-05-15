@@ -1,9 +1,6 @@
 package noobroutes.utils.skyblock
 
 import net.minecraft.block.Block
-import noobroutes.Core.mc
-import noobroutes.utils.AutoP3Utils
-import noobroutes.utils.PacketUtils
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
@@ -11,6 +8,9 @@ import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core.mc
+import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.PacketUtils
 import org.lwjgl.input.Keyboard
 
 object PlayerUtils {

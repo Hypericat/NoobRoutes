@@ -1,10 +1,10 @@
 package noobroutes.ui.util.shader
 
-import noobroutes.Core.mc
-import noobroutes.utils.render.Color
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.shader.Framebuffer
+import noobroutes.Core.mc
+import noobroutes.utils.render.Color
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL20.glUseProgram
 

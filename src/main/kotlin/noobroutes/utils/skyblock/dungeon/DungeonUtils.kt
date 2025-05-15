@@ -1,7 +1,5 @@
 package noobroutes.utils.skyblock.dungeon
 
-import noobroutes.Core.mc
-import noobroutes.utils.*
 import net.minecraft.block.BlockSkull
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
@@ -13,8 +11,11 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core.mc
+import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.RoomEnterEvent
+import noobroutes.utils.*
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import kotlin.math.floor
@@ -31,8 +32,7 @@ object DungeonUtils {
     inline val floor: Floor
         get() = LocationUtils.currentDungeon?.floor ?: Floor.E
 
-    inline val inBoss: Boolean
-        get() = LocationUtils.currentDungeon?.inBoss == true
+
 
     inline val secretCount: Int
         get() = LocationUtils.currentDungeon?.dungeonStats?.secretsFound ?: 0

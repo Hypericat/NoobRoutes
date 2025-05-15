@@ -1,12 +1,12 @@
 package noobroutes.commands
 
+import net.minecraft.command.CommandBase
+import net.minecraft.command.ICommandSender
 import noobroutes.Core.mc
 import noobroutes.features.test.EtherwarpTest
 import noobroutes.utils.render.RenderUtils.renderVec
 import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.devMessage
-import net.minecraft.command.CommandBase
-import net.minecraft.command.ICommandSender
 
 class EtherwarpTestCommand : CommandBase() {
     override fun getCommandName(): String? {

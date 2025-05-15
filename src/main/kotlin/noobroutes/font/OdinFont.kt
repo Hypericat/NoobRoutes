@@ -1,12 +1,12 @@
 package noobroutes.font
 
+import net.minecraft.client.gui.FontRenderer
+import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.mc
 import noobroutes.utils.noControlCodes
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.TextPos
-import net.minecraft.client.gui.FontRenderer
-import net.minecraft.client.renderer.GlStateManager
 import kotlin.math.max
 
 object OdinFont {

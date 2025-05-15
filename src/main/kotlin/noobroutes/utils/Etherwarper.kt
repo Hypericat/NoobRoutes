@@ -1,16 +1,13 @@
 package noobroutes.utils
 
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
-import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
-import net.minecraft.world.World
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketReturnEvent
-import noobroutes.events.impl.S08Event
 import noobroutes.events.impl.ServerTickEvent
 import noobroutes.utils.render.RenderUtils.renderVec
 import noobroutes.utils.skyblock.EtherWarpHelper

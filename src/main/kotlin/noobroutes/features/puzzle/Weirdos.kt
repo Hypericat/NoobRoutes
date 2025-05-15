@@ -1,9 +1,15 @@
 package noobroutes.features.puzzle
 
+import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.network.play.client.C02PacketUseEntity
+import net.minecraft.util.BlockPos
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.floor7.AutoP3.inBoss
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.utils.AuraManager
 import noobroutes.utils.addRotationCoords
@@ -14,12 +20,6 @@ import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.currentRoomName
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.network.play.client.C02PacketUseEntity
-import net.minecraft.util.BlockPos
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 /**
  * Based on odin

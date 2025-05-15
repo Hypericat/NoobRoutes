@@ -1,10 +1,5 @@
 package noobroutes.utils
 
-import noobroutes.Core.logger
-import noobroutes.Core.mc
-import noobroutes.events.impl.PacketEvent
-import noobroutes.utils.BlockUtils.collisionRayTrace
-import noobroutes.utils.skyblock.devMessage
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C02PacketUseEntity.Action
@@ -18,7 +13,12 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import noobroutes.Core.logger
+import noobroutes.Core.mc
+import noobroutes.events.impl.PacketEvent
+import noobroutes.utils.BlockUtils.collisionRayTrace
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
+import noobroutes.utils.skyblock.devMessage
 
 object AuraManager {
     class EntityAura(val entity: Entity, val action: Action)

@@ -1,11 +1,11 @@
 package noobroutes.mixin;
 
 
-import noobroutes.events.impl.BlockChangeEvent;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import noobroutes.events.impl.BlockChangeEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

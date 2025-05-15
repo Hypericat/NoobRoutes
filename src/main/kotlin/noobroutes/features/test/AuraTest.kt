@@ -1,15 +1,14 @@
 package noobroutes.features.test
 
+import net.minecraft.util.BlockPos
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.AuraManager
-import noobroutes.utils.toVec3
-import net.minecraft.util.BlockPos
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.utils.Utils.isStart
-import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.toVec3
 
 object AuraTest : Module("Aura Test", category = Category.MISC, description = "") {
     val blockAuraList = mutableListOf<BlockPos>()

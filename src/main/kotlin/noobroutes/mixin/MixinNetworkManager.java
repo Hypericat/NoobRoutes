@@ -18,12 +18,12 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 
 package noobroutes.mixin;
 
-import noobroutes.events.impl.PacketEvent;
-import noobroutes.events.impl.PacketReturnEvent;
-import noobroutes.utils.ServerUtils;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
+import noobroutes.events.impl.PacketEvent;
+import noobroutes.events.impl.PacketReturnEvent;
+import noobroutes.utils.ServerUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

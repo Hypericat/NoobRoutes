@@ -1,6 +1,12 @@
 package noobroutes.features.move
 
 
+import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.network.play.server.S12PacketEntityVelocity
+import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
@@ -9,12 +15,6 @@ import noobroutes.utils.Scheduler
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.text
-import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.network.play.server.S12PacketEntityVelocity
-import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 
 object LavaClip: Module(
