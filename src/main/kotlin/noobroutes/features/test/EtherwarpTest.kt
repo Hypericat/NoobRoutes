@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.floor7.AutoP3
+import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.utils.Etherwarper

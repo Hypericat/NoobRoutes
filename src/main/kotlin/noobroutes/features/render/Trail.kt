@@ -10,10 +10,10 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.PacketEvent
-import noobroutes.features.Blink.movementPackets
+import noobroutes.features.floor7.autop3.Blink.movementPackets
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.floor7.AutoP3
+import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.DualSetting
 import noobroutes.features.settings.impl.NumberSetting

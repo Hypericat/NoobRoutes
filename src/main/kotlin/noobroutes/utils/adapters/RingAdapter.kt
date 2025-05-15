@@ -3,8 +3,8 @@ package noobroutes.utils.adapters
 import com.google.gson.*
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.util.Vec3
-import noobroutes.features.floor7.Ring
-import noobroutes.features.floor7.RingTypes
+import noobroutes.features.floor7.autop3.Ring
+import noobroutes.features.floor7.autop3.RingTypes
 import noobroutes.utils.LookVec
 import java.lang.reflect.Type
 

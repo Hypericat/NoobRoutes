@@ -10,13 +10,13 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
-import noobroutes.features.floor7.AutoP3
-import noobroutes.features.floor7.AutoP3.depth
-import noobroutes.features.floor7.AutoP3.motionValue
-import noobroutes.features.floor7.AutoP3.waitingLeap
-import noobroutes.features.floor7.AutoP3.waitingTerm
-import noobroutes.features.floor7.Ring
-import noobroutes.features.floor7.RingTypes
+import noobroutes.features.floor7.autop3.AutoP3
+import noobroutes.features.floor7.autop3.AutoP3.depth
+import noobroutes.features.floor7.autop3.AutoP3.motionValue
+import noobroutes.features.floor7.autop3.AutoP3.waitingLeap
+import noobroutes.features.floor7.autop3.AutoP3.waitingTerm
+import noobroutes.features.floor7.autop3.Ring
+import noobroutes.features.floor7.autop3.RingTypes
 import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils.renderX
@@ -183,8 +183,8 @@ object AutoP3Utils {
             return
         }
         //kotlin is disrespecting my carefully setup order of operations
-        Renderer.drawCylinder(ring.coords.add(Vec3(0.0, (0.45 * sin(System.currentTimeMillis().toDouble()/300)) + 0.528 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = AutoP3.depth)
-        Renderer.drawCylinder(ring.coords.add(Vec3(0.0, (-0.45 * sin(System.currentTimeMillis().toDouble()/300)) + 0.528 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = AutoP3.depth)
+        Renderer.drawCylinder(ring.coords.add(Vec3(0.0, (0.45 * sin(System.currentTimeMillis().toDouble()/300)) + 0.528 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
+        Renderer.drawCylinder(ring.coords.add(Vec3(0.0, (-0.45 * sin(System.currentTimeMillis().toDouble()/300)) + 0.528 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
         Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.503, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
         Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.DARK_GRAY, depth = depth)
         Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 1.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.DARK_GRAY, depth = depth)

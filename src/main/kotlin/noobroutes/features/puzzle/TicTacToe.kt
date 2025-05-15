@@ -95,8 +95,8 @@ object TicTacToe : Module(
 
         if (isClose(relativePlayerVec.xCoord, 7.3)) {
             event.motionZ = 0.0
-            val clip1Pos = room.getRealCoords(relativePlayerVec.subtract(Vec3(0.0624, 0.0, 0.0)))
-            val clip2Pos = room.getRealCoords(relativePlayerVec.subtract(Vec3(1.601, 0.0, 0.0)))
+            val clip1Pos = room.getRealCoords(relativePlayerVec.subtract(0.0624, 0.0, 0.0))
+            val clip2Pos = room.getRealCoords(relativePlayerVec.subtract(1.601, 0.0, 0.0))
             event.x = clip1Pos.xCoord
             event.z = clip1Pos.zCoord
             Scheduler.scheduleC03Task { mc.thePlayer.setPosition(clip2Pos.xCoord, clip2Pos.yCoord, clip2Pos.zCoord) }

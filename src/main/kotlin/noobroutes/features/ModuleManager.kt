@@ -11,6 +11,7 @@ import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.floor7.*
+import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.misc.*
 import noobroutes.features.move.*
 import noobroutes.features.puzzle.Blaze

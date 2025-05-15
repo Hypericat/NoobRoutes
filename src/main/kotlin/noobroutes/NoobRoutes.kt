@@ -14,7 +14,7 @@ import noobroutes.commands.EtherwarpTestCommand
 import noobroutes.commands.NoobRoutesCommand
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
-import noobroutes.features.Blink
+import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.ModuleManager
 import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.ClickGUI

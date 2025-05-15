@@ -1,6 +1,6 @@
-package noobroutes.features
+package noobroutes.features.floor7.autop3
+
 import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C03PacketPlayer.*
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.Vec3
@@ -9,17 +9,10 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core
 import noobroutes.Core.mc
-import noobroutes.events.BossEventDispatcher.inBoss
+import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.PacketEvent
-import noobroutes.features.floor7.AutoP3
-import noobroutes.features.floor7.AutoP3.blink
-import noobroutes.features.floor7.AutoP3.customBlinkLength
-import noobroutes.features.floor7.AutoP3.customBlinkLengthToggle
-import noobroutes.features.floor7.AutoP3.maxBlinks
-import noobroutes.features.floor7.AutoP3.mode
-import noobroutes.features.floor7.Ring
-import noobroutes.features.floor7.RingTypes
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.SecretGuideIntegration
@@ -47,14 +40,14 @@ object Blink{
     var lastBlink = System.currentTimeMillis()
     var lastBlinkRing: Ring? = null
 
-    var movementPackets = mutableListOf<C04PacketPlayerPosition>()
+    var movementPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
     private var endY = 0.0
     var skip = false
     private lateinit var lastWaypoint: BlinkWaypoints
 
     private var recording = false
-    private var recordedPackets = mutableListOf<C04PacketPlayerPosition>()
-    private lateinit var lastSentC03: C04PacketPlayerPosition
+    private var recordedPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
+    private lateinit var lastSentC03: C03PacketPlayer.C04PacketPlayerPosition
 
     fun blinkCommand(args: Array<out String>) {
         if (args.size < 2) return modMessage("need args")
@@ -75,7 +68,7 @@ object Blink{
                 try {
                     val amount = args[2].toInt()
                     blinksInstance -= amount
-                    modMessage("u now have ${maxBlinks - blinksInstance} packets left on this instance")
+                    modMessage("u now have ${AutoP3.maxBlinks - blinksInstance} packets left on this instance")
                 } catch (e: Exception) {
                     modMessage("need length amount to remove")
                 }
@@ -86,8 +79,14 @@ object Blink{
 
     @SubscribeEvent
     fun onC03(event: PacketEvent.Send) {
-        if (event.packet is C04PacketPlayerPosition) lastSentC03 = event.packet
-        else if (event.packet is C06PacketPlayerPosLook) lastSentC03 = C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)
+        if (event.packet is C03PacketPlayer.C04PacketPlayerPosition) lastSentC03 = event.packet
+        else if (event.packet is C03PacketPlayer.C06PacketPlayerPosLook) lastSentC03 =
+            C03PacketPlayer.C04PacketPlayerPosition(
+                event.packet.positionX,
+                event.packet.positionY,
+                event.packet.positionZ,
+                event.packet.isOnGround
+            )
     }
 
     @SubscribeEvent
@@ -95,8 +94,8 @@ object Blink{
         blinksInstance = 0
         cancelled = 0
         SecretGuideIntegration.setSecretGuideAura(true)
-        inBoss = false
-        customBlinkLengthToggle = false
+        BossEventDispatcher.inBoss = false
+        AutoP3.customBlinkLengthToggle = false
     }
 
     @SubscribeEvent
@@ -104,24 +103,31 @@ object Blink{
         blinksInstance = 0
         cancelled = 0
         SecretGuideIntegration.setSecretGuideAura(true)
-        inBoss = false
-        customBlinkLengthToggle = false
+        BossEventDispatcher.inBoss = false
+        AutoP3.customBlinkLengthToggle = false
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
-        if(!inBoss) return
+        if(!BossEventDispatcher.inBoss) return
         //val resolution = ScaledResolution(mc)
         //text(cancelled.toString(), resolution.scaledWidth / 2, resolution.scaledHeight / 2.3, Color.WHITE, 13, align = TextAlign.Middle)
-        text(cancelled.toString(), AutoP3.moveHud.x, AutoP3.moveHud.y, Color.WHITE, 13, align = TextAlign.Middle)
+        text(
+            cancelled.toString(),
+            AutoP3.moveHud.x,
+            AutoP3.moveHud.y,
+            Color.Companion.WHITE,
+            13,
+            align = TextAlign.Middle
+        )
     }
-    private var lastMovementedC03: C04PacketPlayerPosition? = null
+    private var lastMovementedC03: C03PacketPlayer.C04PacketPlayerPosition? = null
     @SubscribeEvent
-    fun renderMovement(event:RenderWorldLastEvent) {
-        if(!inBoss) return
+    fun renderMovement(event: RenderWorldLastEvent) {
+        if(!BossEventDispatcher.inBoss) return
         if (movementPackets.isEmpty() || lastMovementedC03 == null) return
-        if (!mode) return
+        if (!AutoP3.mode) return
         val firstPacket = movementPackets.first()
         val beforeFirst = lastMovementedC03 ?: return
         val xDiff = firstPacket.positionX - beforeFirst.positionX
@@ -131,7 +137,15 @@ object Blink{
         val xPos = beforeFirst.positionX + xDiff * timeAlong
         val yPos = beforeFirst.positionY + yDiff * timeAlong
         val zPos = beforeFirst.positionZ + zDiff * timeAlong
-        Renderer.drawBox(AxisAlignedBB(xPos+0.3, yPos, zPos+0.3, xPos-0.3, yPos+1.8, zPos-0.3), Color.GREEN, fillAlpha = 0, outlineWidth = 1.5F)
+        Renderer.drawBox(
+            AxisAlignedBB(
+                xPos + 0.3,
+                yPos,
+                zPos + 0.3,
+                xPos - 0.3,
+                yPos + 1.8,
+                zPos - 0.3
+            ), Color.Companion.GREEN, fillAlpha = 0, outlineWidth = 1.5F)
     }
 
     private var lastC03 = System.currentTimeMillis()
@@ -142,12 +156,18 @@ object Blink{
 
     @SubscribeEvent
     fun blinkWaypoints(event: RenderWorldLastEvent) {
-        if(!inBoss) return
+        if(!BossEventDispatcher.inBoss) return
         blinkStarts.forEach {
-            Renderer.drawCylinder(it.coords.add(Vec3(0.0, 0.5 * sin(System.currentTimeMillis().toDouble()/300) + 0.5 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.WHITE, depth = true)
+            Renderer.drawCylinder(it.coords.add(
+                Vec3(
+                    0.0,
+                    0.5 * sin(System.currentTimeMillis().toDouble() / 300) + 0.5,
+                    0.0
+                )
+            ), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.Companion.WHITE, depth = true)
             if (AutoP3.editMode) return
             if (AutoP3Utils.distanceToRingSq(it.coords) < 0.25 && mc.thePlayer.posY == it.coords.yCoord && it.active) {
-                recordedPackets = mutableListOf<C04PacketPlayerPosition>()
+                recordedPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
                 startRecording(it)
                 it.active = false
             }
@@ -157,7 +177,7 @@ object Blink{
 
     private fun startRecording(waypoint: BlinkWaypoints) {
         modMessage("started recording")
-        recordedPackets = mutableListOf<C04PacketPlayerPosition>()
+        recordedPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
         recordedPackets.add(lastSentC03)
         lastWaypoint = waypoint
         recording = true
@@ -174,7 +194,7 @@ object Blink{
         event.isCanceled = true
         skip = true
         PacketUtils.sendPacket(movementPackets[0])
-        if (!mode) mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)
+        if (!AutoP3.mode) mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)
         if (movementPackets.size == 1) {
             mc.thePlayer.motionY = endY
             mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)
@@ -194,7 +214,7 @@ object Blink{
 
 
 
-        if (System.currentTimeMillis() - lastBlink >= 500 && (blinksInstance + ring.blinkPackets.size > maxBlinks || !blink)) {
+        if (System.currentTimeMillis() - lastBlink >= 500 && (blinksInstance + ring.blinkPackets.size > AutoP3.maxBlinks || !AutoP3.blink)) {
             modMessage("movementing")
             movementPackets = ring.blinkPackets.toMutableList()
             mc.thePlayer.motionX = 0.0
@@ -205,7 +225,7 @@ object Blink{
             return
         }
 
-        if (cancelled < ring.blinkPackets.size || blinksInstance + ring.blinkPackets.size > maxBlinks || System.currentTimeMillis() - lastBlink < 500) {
+        if (cancelled < ring.blinkPackets.size || blinksInstance + ring.blinkPackets.size > AutoP3.maxBlinks || System.currentTimeMillis() - lastBlink < 500) {
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
             return
@@ -219,7 +239,7 @@ object Blink{
         mc.thePlayer.setPosition(ring.blinkPackets[lastPacket].positionX, ring.blinkPackets[lastPacket].positionY, ring.blinkPackets[lastPacket].positionZ)
         mc.thePlayer.setVelocity(0.0, ring.misc, 0.0)
         //modMessage("there are $cancelled hot C04s wanting to message u but only ${maxBlinks - blinksInstance} on this instance")
-        modMessage("§c§l$cancelled§r§f c04s available, used §c${ring.blinkPackets.size}§f,  §7(${maxBlinks - blinksInstance} left on this instance)")
+        modMessage("§c§l$cancelled§r§f c04s available, used §c${ring.blinkPackets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }
 
     @SubscribeEvent
@@ -227,13 +247,32 @@ object Blink{
         if (!recording || event.packet !is C03PacketPlayer) return
         if (event.isCanceled) return
         modMessage("recording ${recordedPackets.size}")
-        if (event.packet is C04PacketPlayerPosition) {
-            if (recordedPackets.last() == C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)) return
+        if (event.packet is C03PacketPlayer.C04PacketPlayerPosition) {
+            if (recordedPackets.last() == C03PacketPlayer.C04PacketPlayerPosition(
+                    event.packet.positionX,
+                    event.packet.positionY,
+                    event.packet.positionZ,
+                    event.packet.isOnGround
+                )
+            ) return
             recordedPackets.add(event.packet)
         }
-        else if (event.packet is C06PacketPlayerPosLook) {
-            if (recordedPackets.last() == C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)) return
-            recordedPackets.add(C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround))
+        else if (event.packet is C03PacketPlayer.C06PacketPlayerPosLook) {
+            if (recordedPackets.last() == C03PacketPlayer.C04PacketPlayerPosition(
+                    event.packet.positionX,
+                    event.packet.positionY,
+                    event.packet.positionZ,
+                    event.packet.isOnGround
+                )
+            ) return
+            recordedPackets.add(
+                C03PacketPlayer.C04PacketPlayerPosition(
+                    event.packet.positionX,
+                    event.packet.positionY,
+                    event.packet.positionZ,
+                    event.packet.isOnGround
+                )
+            )
         }
         if (recordedPackets.size == getRecordingGoalLength(lastWaypoint)) {
             modMessage("finished recording")
@@ -243,12 +282,12 @@ object Blink{
     }
 
     fun getRecordingGoalLength(waypoint: BlinkWaypoints): Int {
-        return if (customBlinkLengthToggle) customBlinkLength else waypoint.length
+        return if (AutoP3.customBlinkLengthToggle) AutoP3.customBlinkLength else waypoint.length
     }
 
     @SubscribeEvent
     fun s08(event: PacketEvent.Receive) {
-        if (!inBoss) return
+        if (!BossEventDispatcher.inBoss) return
         if (event.packet is S08PacketPlayerPosLook) c03AfterS08 = 2
     }
 
@@ -256,7 +295,7 @@ object Blink{
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun canceller(event: PacketEvent.Send) {
-        if(!inBoss) return
+        if(!BossEventDispatcher.inBoss) return
         if (event.packet !is C03PacketPlayer) return
         if (rotSkip) {
             rotSkip = false
@@ -269,15 +308,24 @@ object Blink{
             return
         }
         if (rotate != null) {
-            if (event.packet is C04PacketPlayerPosition || event.packet is C06PacketPlayerPosLook) {
+            if (event.packet is C03PacketPlayer.C04PacketPlayerPosition || event.packet is C03PacketPlayer.C06PacketPlayerPosLook) {
                 event.isCanceled = true
                 awaitingRotation = true
-                PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.positionX, event.packet.positionY, event.packet.positionZ, rotate!!, 0F, event.packet.isOnGround))
+                PacketUtils.sendPacket(
+                    C03PacketPlayer.C06PacketPlayerPosLook(
+                        event.packet.positionX,
+                        event.packet.positionY,
+                        event.packet.positionZ,
+                        rotate!!,
+                        0F,
+                        event.packet.isOnGround
+                    )
+                )
             }
             else {
                 event.isCanceled = true
                 awaitingRotation = true
-                PacketUtils.sendPacket(C05PacketPlayerLook(rotate!!, 0F, event.packet.isOnGround))
+                PacketUtils.sendPacket(C03PacketPlayer.C05PacketPlayerLook(rotate!!, 0F, event.packet.isOnGround))
             }
             rotate = null
             if(cancelled > 0) cancelled--
@@ -294,7 +342,7 @@ object Blink{
             !mc.thePlayer.onGround || mc.thePlayer.motionX != 0.0 ||
             mc.thePlayer.motionZ != 0.0 ||
             movementPackets.isNotEmpty() ||
-            (mc.thePlayer.getDistanceSq(63.5, 127.0, 35.5) < 1.25 && event.packet is C05PacketPlayerLook) ||
+            (mc.thePlayer.getDistanceSq(63.5, 127.0, 35.5) < 1.25 && event.packet is C03PacketPlayer.C05PacketPlayerLook) ||
             System.currentTimeMillis() - lastBlink < 1 //listen if it works it works
             //gay - wadey
         ) {

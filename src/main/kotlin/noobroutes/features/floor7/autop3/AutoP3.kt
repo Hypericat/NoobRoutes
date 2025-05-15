@@ -1,4 +1,4 @@
-package noobroutes.features.floor7
+package noobroutes.features.floor7.autop3
 
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
@@ -16,9 +16,9 @@ import noobroutes.config.DataManager
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.TermOpenEvent
-import noobroutes.features.Blink
-import noobroutes.features.Blink.lastBlink
-import noobroutes.features.Blink.lastBlinkRing
+import noobroutes.features.floor7.autop3.Blink
+import noobroutes.features.floor7.autop3.Blink.lastBlink
+import noobroutes.features.floor7.autop3.Blink.lastBlinkRing
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.misc.SexAura
@@ -76,10 +76,11 @@ object AutoP3: Module (
     private val route by StringSetting("Route", "", description = "Route to use")
     val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
     val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
-    private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
+    val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
     val frame by BooleanSetting("Check per Frame", false, description = "check each frame if the player is in a ring. Routes are easier to setup with per frame but possibly less consistent on low fps. Per tick is harder to setup but 100% consistent. Everything done on frame can also be done on tick")
     val motionValue by NumberSetting(name = "motion value", description = "how much yeet to put into the motion", min = 0f, max = 1000f, default = 509f)
-    private val silentLook by BooleanSetting("Silent Look", false, description = "when activating a look ring only rotate serverside (may lead to desync)")
+    val silentLook by BooleanSetting("Silent Look", false, description = "when activating a look ring only rotate serverside (may lead to desync)")
+    val fuckingLook by BooleanSetting("Loud Look", false, description = "always look for if u want to make ur autop3 seem mroe legit or smth")
     val simpleRings by BooleanSetting("Simple Rings", false, description = "switches complicated rings with simple circles")
     val onlyCenter by BooleanSetting("Only Starts", false, description = "only renders rings with the center property(should be only start rings) and blinks")
     private val blinkShit by DropdownSetting(name = "Blink Settings")
@@ -126,7 +127,7 @@ object AutoP3: Module (
     @SubscribeEvent
     fun tickRing(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.END || frame) return
-        if(!inBoss) return
+        if(!inBoss || mc.thePlayer.isSneaking) return
         rings[route]?.forEachIndexed { i, ring ->
             if (editMode) return@forEachIndexed
             if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring) && ring.should) {
@@ -145,6 +146,7 @@ object AutoP3: Module (
             if (!silentLook) mc.thePlayer.rotationYaw = ring.direction.yaw
             Blink.rotate = ring.direction.yaw
         }
+        if (fuckingLook) mc.thePlayer.rotationYaw = ring.direction.yaw
         if (ring.center && mc.thePlayer.onGround) {
             mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord)
             Blink.rotSkip = true
@@ -205,7 +207,7 @@ object AutoP3: Module (
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
                 LavaClip.ringClip = ring.misc
-                LavaClip.toggle()
+                toggle()
             }
             RingTypes.TNT -> {
                 modMessage("tnting")
@@ -240,7 +242,7 @@ object AutoP3: Module (
 
 
     @SubscribeEvent
-    fun spedTick(event: TickEvent.ClientTickEvent) {
+    fun spedTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.END || spedFor == 0) return
         spedFor--
         if (spedFor == 0) AutoP3Utils.setGameSpeed(1f)
