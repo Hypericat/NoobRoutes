@@ -30,7 +30,7 @@ object Blink{
 
     var cancelled = 0
 
-    private var blinksInstance = 0
+    var blinksInstance = 0
 
     var rotate: Float? = null
     private var awaitingRotation = false
@@ -41,7 +41,7 @@ object Blink{
     var lastBlinkRing: Ring? = null
 
     var movementPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
-    private var endY = 0.0
+    var endY = 0.0
     var skip = false
     private lateinit var lastWaypoint: BlinkWaypoints
 
@@ -212,8 +212,6 @@ object Blink{
     fun doBlink(ring: Ring) {
         if (movementPackets.isNotEmpty()) return
 
-
-
         if (System.currentTimeMillis() - lastBlink >= 500 && (blinksInstance + ring.blinkPackets.size > AutoP3.maxBlinks || !AutoP3.blink)) {
             modMessage("movementing")
             movementPackets = ring.blinkPackets.toMutableList()
@@ -230,7 +228,6 @@ object Blink{
             mc.thePlayer.motionZ = 0.0
             return
         }
-        //modMessage("blinking with ${ring.blinkPackets.size} of those suckers")
         blinksInstance += ring.blinkPackets.size
         lastBlink = System.currentTimeMillis()
         lastBlinkRing = ring
@@ -238,7 +235,6 @@ object Blink{
         val lastPacket = ring.blinkPackets.size - 1
         mc.thePlayer.setPosition(ring.blinkPackets[lastPacket].positionX, ring.blinkPackets[lastPacket].positionY, ring.blinkPackets[lastPacket].positionZ)
         mc.thePlayer.setVelocity(0.0, ring.misc, 0.0)
-        //modMessage("there are $cancelled hot C04s wanting to message u but only ${maxBlinks - blinksInstance} on this instance")
         modMessage("§c§l$cancelled§r§f c04s available, used §c${ring.blinkPackets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }
 

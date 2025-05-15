@@ -155,16 +155,16 @@ object AutoP3: Module (
         AutoP3Utils.walkAfter = ring.walk && ring.type != RingTypes.JUMP
         if (ring.walk && ring.type == RingTypes.JUMP) AutoP3Utils.startWalk(ring.direction.yaw)
         when(ring.type) {
-            RingTypes.WALK -> {
+            RingTypes.WALK -> { //done
                 AutoP3Utils.startWalk(ring.direction.yaw)
                 modMessage("walking")
             }
-            RingTypes.STOP -> {
+            RingTypes.STOP -> { //done
                 modMessage("stopping")
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
             }
-            RingTypes.HCLIP -> {
+            RingTypes.HCLIP -> { //done
                 modMessage("hclipping")
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
@@ -176,25 +176,25 @@ object AutoP3: Module (
                 if (lastBlinkRing == ring && System.currentTimeMillis() - lastBlink < 5000) return
                 Blink.doBlink(ring)
             }
-            RingTypes.TERM -> {
+            RingTypes.TERM -> { //no
                 modMessage("waiting")
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
                 AutoP3Utils.direction = ring.direction.yaw
             }
-            RingTypes.LEAP -> {
+            RingTypes.LEAP -> { //no
                 modMessage("waiting")
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
                 AutoP3Utils.direction = ring.direction.yaw
             }
-            RingTypes.YEET -> {
+            RingTypes.YEET -> { //done
                 modMessage("yeeting")
                 AutoP3Utils.direction = ring.direction.yaw
                 AutoP3Utils.yeetTicks = 0
                 AutoP3Utils.yeeting = true
             }
-            RingTypes.MOTION -> {
+            RingTypes.MOTION -> { //removed
                 modMessage("motioning")
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
@@ -202,14 +202,14 @@ object AutoP3: Module (
                 AutoP3Utils.awaitingTick = true
                 AutoP3Utils.direction = ring.direction.yaw
             }
-            RingTypes.LAVA -> {
+            RingTypes.LAVA -> { //done
                 modMessage("activating lava clip")
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
                 LavaClip.ringClip = ring.misc
                 toggle()
             }
-            RingTypes.TNT -> {
+            RingTypes.TNT -> { //done
                 modMessage("tnting")
                 SwapManager.swapFromName("TNT")
                 if (ring.blinkPackets.isEmpty()) {
@@ -218,7 +218,7 @@ object AutoP3: Module (
                 }
                 Scheduler.schedulePreTickTask(1) { AuraManager.auraBlock(ring.blinkPackets[0].positionX.toInt(), ring.blinkPackets[0].positionY.toInt(), ring.blinkPackets[0].positionZ.toInt(), force = true) }
             }
-            RingTypes.JUMP -> {
+            RingTypes.JUMP -> { //done
                 modMessage("jumping")
                 if (mc.thePlayer.onGround) mc.thePlayer.jump()
                 if (ring.walk) AutoP3Utils.startWalk(ring.direction.yaw)
