@@ -55,9 +55,9 @@ class RingAdapter : JsonSerializer<Ring>, JsonDeserializer<Ring> {
             LookVec(0f, 0f)
         }
 
-        val walk = obj.has("walk")
-        val look = obj.has("look")
-        val center = obj.has("center")
+        val walk = obj.get("walk")?.asBoolean ?: false
+        val look = obj.get("look")?.asBoolean ?: false
+        val center = obj.get("center")?.asBoolean ?: false
         val misc = obj.get("misc")?.asDouble ?: obj.get("endY")?.asDouble ?: 0.0
         val blinks = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
         if (obj.has("blinkPackets") || obj.has("blink_packets")) {
