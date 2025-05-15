@@ -1,11 +1,11 @@
 package noobroutes.features.move
 
+import net.minecraft.network.play.server.S27PacketExplosion
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.floor7.AutoP3
-import net.minecraft.network.play.server.S27PacketExplosion
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
 object NoTnT: Module(
@@ -16,6 +16,6 @@ object NoTnT: Module(
 ) {
     @SubscribeEvent
     fun onKb(event: PacketEvent.Receive) {
-        if (event.packet is S27PacketExplosion && AutoP3.inBoss) event.isCanceled = true
+        if (event.packet is S27PacketExplosion && inBoss) event.isCanceled = true
     }
 }

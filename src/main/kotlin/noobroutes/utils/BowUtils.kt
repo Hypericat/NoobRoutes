@@ -1,9 +1,5 @@
 package noobroutes.utils
 
-import noobroutes.Core.mc
-import noobroutes.features.render.ClickGUIModule.devMode
-import noobroutes.utils.render.Color
-import noobroutes.utils.render.Renderer
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityArrow
@@ -12,6 +8,10 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core.mc
+import noobroutes.features.render.ClickGUIModule.devMode
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.Renderer
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin

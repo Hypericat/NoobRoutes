@@ -1,11 +1,5 @@
 package noobroutes.utils
 
-import noobroutes.Core
-import noobroutes.Core.logger
-import noobroutes.Core.mc
-import noobroutes.features.ModuleManager
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
-import noobroutes.utils.skyblock.skyblockID
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
@@ -25,6 +19,12 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.Core
+import noobroutes.Core.logger
+import noobroutes.Core.mc
+import noobroutes.features.ModuleManager
+import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.utils.skyblock.skyblockID
 import org.lwjgl.opengl.GL11
 import org.lwjgl.util.glu.GLU
 import java.util.*

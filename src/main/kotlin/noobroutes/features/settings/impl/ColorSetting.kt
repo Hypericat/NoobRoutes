@@ -1,8 +1,8 @@
 package noobroutes.features.settings.impl
 
-import noobroutes.utils.render.Color
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
+import noobroutes.utils.render.Color
 
 /**
  * Setting that represents a [Color].

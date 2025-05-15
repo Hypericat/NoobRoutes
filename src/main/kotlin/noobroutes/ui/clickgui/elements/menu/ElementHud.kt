@@ -1,5 +1,6 @@
 package noobroutes.ui.clickgui.elements.menu
 
+import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.HudSetting
 import noobroutes.font.OdinFont
@@ -22,7 +23,6 @@ import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
-import net.minecraft.client.renderer.texture.DynamicTexture
 
 
 /**

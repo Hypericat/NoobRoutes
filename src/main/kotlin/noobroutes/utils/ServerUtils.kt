@@ -1,7 +1,5 @@
 package noobroutes.utils
 
-import noobroutes.Core.mc
-import noobroutes.utils.clock.Executor.Companion.register
 import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C16PacketClientStatus
 import net.minecraft.network.play.server.S01PacketJoinGame
@@ -9,6 +7,8 @@ import net.minecraft.network.play.server.S03PacketTimeUpdate
 import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core.mc
+import noobroutes.utils.clock.Executor.Companion.register
 
 object ServerUtils {
     private val packets = ArrayList<Packet<*>>()

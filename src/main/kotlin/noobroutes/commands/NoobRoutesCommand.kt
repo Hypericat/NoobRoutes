@@ -1,9 +1,9 @@
 package noobroutes.commands
 
-import noobroutes.Core.display
-import noobroutes.ui.clickgui.ClickGUI
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
+import noobroutes.Core.display
+import noobroutes.ui.clickgui.ClickGUI
 import org.apache.logging.log4j.LogManager
 
 class NoobRoutesCommand : CommandBase() {

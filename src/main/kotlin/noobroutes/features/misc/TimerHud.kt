@@ -1,15 +1,15 @@
 package noobroutes.features.misc
 
+import net.minecraft.client.gui.ScaledResolution
+import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.text
 import noobroutes.utils.skyblock.modMessage
-import net.minecraft.client.gui.ScaledResolution
-import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
 object TimerHud: Module(

@@ -1,11 +1,21 @@
 package noobroutes.features
+import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.client.C03PacketPlayer.*
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
+import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.Vec3
+import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
+import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.AutoP3
 import noobroutes.features.floor7.AutoP3.blink
 import noobroutes.features.floor7.AutoP3.customBlinkLength
 import noobroutes.features.floor7.AutoP3.customBlinkLengthToggle
-import noobroutes.features.floor7.AutoP3.inBoss
 import noobroutes.features.floor7.AutoP3.maxBlinks
 import noobroutes.features.floor7.AutoP3.mode
 import noobroutes.features.floor7.Ring
@@ -18,16 +28,6 @@ import noobroutes.utils.render.Renderer
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.text
 import noobroutes.utils.skyblock.modMessage
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C03PacketPlayer.*
-import net.minecraft.network.play.server.S08PacketPlayerPosLook
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.sin
 
 object Blink{
@@ -199,7 +199,7 @@ object Blink{
             movementPackets = ring.blinkPackets.toMutableList()
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionY = 0.0
-            endY = ring.endY
+            endY = ring.misc
             lastBlink = System.currentTimeMillis()
             lastBlinkRing = null
             return
@@ -217,7 +217,7 @@ object Blink{
         ring.blinkPackets.forEach { PacketUtils.sendPacket(it) }
         val lastPacket = ring.blinkPackets.size - 1
         mc.thePlayer.setPosition(ring.blinkPackets[lastPacket].positionX, ring.blinkPackets[lastPacket].positionY, ring.blinkPackets[lastPacket].positionZ)
-        mc.thePlayer.setVelocity(0.0, ring.endY, 0.0)
+        mc.thePlayer.setVelocity(0.0, ring.misc, 0.0)
         //modMessage("there are $cancelled hot C04s wanting to message u but only ${maxBlinks - blinksInstance} on this instance")
         modMessage("§c§l$cancelled§r§f c04s available, used §c${ring.blinkPackets.size}§f,  §7(${maxBlinks - blinksInstance} left on this instance)")
     }
@@ -238,7 +238,7 @@ object Blink{
         if (recordedPackets.size == getRecordingGoalLength(lastWaypoint)) {
             modMessage("finished recording")
             recording = false
-            AutoP3.actuallyAddRing(Ring(RingTypes.BLINK, coords = lastWaypoint.coords,  blinkPackets = recordedPackets, endY = mc.thePlayer.motionY))
+            AutoP3.actuallyAddRing(Ring(RingTypes.BLINK, coords = lastWaypoint.coords,  blinkPackets = recordedPackets, misc = mc.thePlayer.motionY))
         }
     }
 

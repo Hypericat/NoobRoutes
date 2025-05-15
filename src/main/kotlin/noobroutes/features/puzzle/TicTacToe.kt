@@ -1,16 +1,5 @@
 package noobroutes.features.puzzle
 
-import noobroutes.events.impl.RoomEnterEvent
-import noobroutes.features.Category
-import noobroutes.features.Module
-import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.utils.AuraManager
-import noobroutes.utils.isAir
-import noobroutes.utils.render.Color
-import noobroutes.utils.render.Renderer
-import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.currentRoomName
-import noobroutes.utils.toVec3
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -23,11 +12,22 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.events.impl.MotionUpdateEvent
+import noobroutes.events.impl.RoomEnterEvent
+import noobroutes.features.Category
+import noobroutes.features.Module
+import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.utils.AuraManager
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isClose
+import noobroutes.utils.isAir
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.Renderer
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.currentRoomName
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
+import noobroutes.utils.toVec3
 import kotlin.experimental.and
 
 object TicTacToe : Module(

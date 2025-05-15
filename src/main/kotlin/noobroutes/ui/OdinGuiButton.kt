@@ -1,12 +1,12 @@
 package noobroutes.ui
 
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiButton
+import net.minecraft.client.renderer.GlStateManager
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.util.ColorUtil.darker
 import noobroutes.utils.render.*
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiButton
-import net.minecraft.client.renderer.GlStateManager
 
 class OdinGuiButton(
     buttonId: Int, x: Int, y: Int, width: Int, height: Int, buttonText: String?, private val textSize: Float) : GuiButton(

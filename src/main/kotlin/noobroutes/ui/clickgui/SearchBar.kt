@@ -1,5 +1,6 @@
 package noobroutes.ui.clickgui
 
+import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.mc
 import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.animations.impl.ColorAnimation
@@ -9,7 +10,6 @@ import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.util.MouseUtils
 import noobroutes.utils.render.*
-import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
 
 object SearchBar {

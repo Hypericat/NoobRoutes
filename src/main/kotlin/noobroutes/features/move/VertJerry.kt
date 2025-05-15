@@ -1,10 +1,10 @@
 package noobroutes.features.move
 
+import net.minecraft.network.play.server.S12PacketEntityVelocity
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import net.minecraft.network.play.server.S12PacketEntityVelocity
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
 object VertJerry: Module(

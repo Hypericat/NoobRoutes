@@ -1,9 +1,9 @@
 package noobroutes.commands
 
-import noobroutes.features.floor7.AutoP3
-import noobroutes.utils.skyblock.modMessage
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
+import noobroutes.features.floor7.AutoP3
+import noobroutes.utils.skyblock.modMessage
 
 class AutoP3Command: CommandBase() {
     override fun getCommandName(): String {

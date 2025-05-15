@@ -1,5 +1,16 @@
 package noobroutes.features.misc
 
+import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.settings.KeyBinding
+import net.minecraft.entity.Entity
+import net.minecraft.network.Packet
+import net.minecraft.network.play.client.C02PacketUseEntity
+import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.server.S38PacketPlayerListItem
+import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
@@ -12,17 +23,6 @@ import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
 import noobroutes.utils.skyblock.modMessage
-import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.settings.KeyBinding
-import net.minecraft.entity.Entity
-import net.minecraft.network.Packet
-import net.minecraft.network.play.client.C02PacketUseEntity
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.server.S38PacketPlayerListItem
-import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket
 import org.lwjgl.input.Keyboard
 import kotlin.math.PI
 import kotlin.math.sin

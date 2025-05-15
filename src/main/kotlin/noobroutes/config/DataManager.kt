@@ -1,7 +1,7 @@
 package noobroutes.config
 
-import noobroutes.Core.mc
 import com.google.gson.*
+import noobroutes.Core.mc
 import java.io.File
 import java.io.IOException
 
@@ -10,8 +10,6 @@ object DataManager {
         val path = File(mc.mcDataDir, "config/noobroutes/$fileName.json")
         try {
             path.parentFile?.mkdirs() ?: throw IOException("Failed to create directories")
-
-
             if (!path.exists()) {
                 path.createNewFile()
             }

@@ -1,10 +1,18 @@
 package noobroutes
 
+import net.minecraft.client.Minecraft
+import net.minecraftforge.client.ClientCommandHandler
+import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.common.Mod
+import net.minecraftforge.fml.common.event.FMLInitializationEvent
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import noobroutes.Core.mc
 import noobroutes.commands.AuraTestCommand
 import noobroutes.commands.AutoP3Command
 import noobroutes.commands.EtherwarpTestCommand
 import noobroutes.commands.NoobRoutesCommand
+import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
 import noobroutes.features.Blink
 import noobroutes.features.ModuleManager
@@ -17,13 +25,6 @@ import noobroutes.utils.render.RenderUtils2D
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.dungeon.ScanUtils
-import net.minecraft.client.Minecraft
-import net.minecraftforge.client.ClientCommandHandler
-import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.Mod
-import net.minecraftforge.fml.common.event.FMLInitializationEvent
-import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import java.io.File
 
 
@@ -72,7 +73,8 @@ class NoobRoutes {
             BowUtils,
             RotationUtils,
             SilentRotator,
-            Etherwarper
+            Etherwarper,
+            BossEventDispatcher
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }

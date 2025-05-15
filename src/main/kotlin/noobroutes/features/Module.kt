@@ -1,5 +1,7 @@
 package noobroutes.features
 
+import net.minecraft.network.Packet
+import net.minecraftforge.common.MinecraftForge
 import noobroutes.Core
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.AlwaysActive
@@ -10,8 +12,6 @@ import noobroutes.utils.clock.Executable
 import noobroutes.utils.clock.Executor
 import noobroutes.utils.clock.Executor.Companion.register
 import noobroutes.utils.skyblock.modMessage
-import net.minecraft.network.Packet
-import net.minecraftforge.common.MinecraftForge
 import org.lwjgl.input.Keyboard
 import kotlin.reflect.full.hasAnnotation
 

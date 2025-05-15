@@ -1,15 +1,17 @@
 package noobroutes.features
 
+import net.minecraft.network.Packet
+import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.floor7.*
-import noobroutes.features.misc.BlinkKeybind
-import noobroutes.features.misc.NoDebuff
-import noobroutes.features.misc.SexAura
-import noobroutes.features.misc.TimerHud
+import noobroutes.features.misc.*
 import noobroutes.features.move.*
 import noobroutes.features.puzzle.Blaze
 import noobroutes.features.puzzle.TicTacToe
@@ -25,14 +27,6 @@ import noobroutes.ui.hud.HudElement
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.profile
 import noobroutes.utils.render.getTextWidth
-import net.minecraft.network.Packet
-import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import noobroutes.features.floor7.CoreClip
-import noobroutes.features.floor7.InstaMid
-import noobroutes.features.test.AuraTest
 
 /**
  * Class that contains all Modules and huds
@@ -85,7 +79,8 @@ object ModuleManager {
         Blaze,
         InstantSlow,
         EtherwarpTest,
-        Doorless
+        Doorless,
+        SecretGuideManager
     )
 
     init {

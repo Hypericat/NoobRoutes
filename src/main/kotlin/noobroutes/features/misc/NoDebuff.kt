@@ -1,9 +1,5 @@
 package noobroutes.features.misc
 
-import noobroutes.events.impl.PacketEvent
-import noobroutes.features.Module
-import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.utils.equalsOneOf
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.network.play.server.S2APacketParticles
@@ -12,6 +8,10 @@ import net.minecraftforge.client.event.EntityViewRenderEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.events.impl.PacketEvent
+import noobroutes.features.Module
+import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.utils.equalsOneOf
 
 object NoDebuff : Module(
     name = "No Debuff",

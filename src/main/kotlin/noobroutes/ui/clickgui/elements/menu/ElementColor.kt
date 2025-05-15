@@ -1,5 +1,6 @@
 package noobroutes.ui.clickgui.elements.menu
 
+import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
@@ -24,7 +25,6 @@ import noobroutes.utils.equalsOneOf
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.bind
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
-import net.minecraft.client.renderer.texture.DynamicTexture
 import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 

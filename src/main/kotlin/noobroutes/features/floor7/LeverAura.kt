@@ -1,13 +1,14 @@
 package noobroutes.features.floor7
 
+import net.minecraft.util.BlockPos
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.AuraManager
 import noobroutes.utils.toVec3
-import net.minecraft.util.BlockPos
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 
 
@@ -42,7 +43,7 @@ object LeverAura: Module(
 
     @SubscribeEvent
     fun doShit(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !AutoP3.inBoss) return
+        if (event.phase != TickEvent.Phase.START || !inBoss) return
         val eyePos = mc.thePlayer.getPositionEyes(0f)
         levers.forEach { lever ->
             if (eyePos.distanceTo(lever.coords.toVec3()) > range) return@forEach

@@ -1,9 +1,9 @@
 package noobroutes.mixin;
 
-import noobroutes.events.impl.RenderOverlayNoCaching;
-import noobroutes.features.misc.NoDebuff;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
+import noobroutes.events.impl.RenderOverlayNoCaching;
+import noobroutes.features.misc.NoDebuff;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

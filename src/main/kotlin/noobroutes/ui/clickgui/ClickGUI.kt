@@ -1,5 +1,10 @@
 package noobroutes.ui.clickgui
 
+import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.OpenGlHelper
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.util.ResourceLocation
 import noobroutes.Core.display
 import noobroutes.Core.logger
 import noobroutes.config.Config
@@ -17,11 +22,6 @@ import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.utils.render.*
-import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.OpenGlHelper
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.ResourceLocation
 import org.lwjgl.input.Mouse
 import kotlin.math.sign
 

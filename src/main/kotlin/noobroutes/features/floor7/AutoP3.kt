@@ -1,11 +1,24 @@
 package noobroutes.features.floor7
 
+import com.google.gson.*
+import com.google.gson.reflect.TypeToken
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.network.play.server.S18PacketEntityTeleport
+import net.minecraft.util.Vec3
+import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.config.DataManager
+import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.TermOpenEvent
 import noobroutes.features.Blink
+import noobroutes.features.Blink.lastBlink
+import noobroutes.features.Blink.lastBlinkRing
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.misc.SexAura
@@ -14,38 +27,14 @@ import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.*
-import noobroutes.utils.adapters.RingsMapTypeAdapter
+import noobroutes.utils.adapters.RingAdapter
 import noobroutes.utils.render.Color
+import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
-import com.google.gson.reflect.TypeToken
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
-import net.minecraft.network.play.server.S08PacketPlayerPosLook
-import net.minecraft.network.play.server.S18PacketEntityTeleport
-import net.minecraft.util.Timer
-import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import noobroutes.Core
-import noobroutes.Core.mc
-import noobroutes.features.Blink.lastBlink
-import noobroutes.features.Blink.lastBlinkRing
-import noobroutes.mixin.accessors.TimerFieldAccessor
-import noobroutes.utils.Utils.isEnd
-import noobroutes.utils.render.RenderUtils
-import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
-import kotlin.concurrent.timer
 
 enum class RingTypes {
     WALK,
@@ -73,7 +62,7 @@ data class Ring (
     val center: Boolean = false,
     var should: Boolean = false,
     val blinkPackets: List<C04PacketPlayerPosition> = emptyList(),
-    val endY: Double = 0.0
+    val misc: Double = 0.0
 )
 
 object AutoP3: Module (
@@ -82,10 +71,7 @@ object AutoP3: Module (
     category = Category.FLOOR7,
     description = "AutoP3"
 ) {
-    val gson = GsonBuilder().registerTypeAdapter(
-        object : TypeToken<MutableMap<String, MutableList<Ring>>>() {}.type,
-        RingsMapTypeAdapter()
-    ).setPrettyPrinting().create()
+    val gson: Gson = GsonBuilder().registerTypeAdapter(Ring::class.java, RingAdapter()).setPrettyPrinting().create()
 
     private val route by StringSetting("Route", "", description = "Route to use")
     val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
@@ -106,19 +92,17 @@ object AutoP3: Module (
     var customBlinkLengthToggle by BooleanSetting("blink length", default = true, description = "allows for changing the blink length of waypoints").withDependency { blinkShit }
     val customBlinkLength by NumberSetting(name = "length", description = "well how long for the blink to be", min = 1, max = 40, default = 24).withDependency { blinkShit && customBlinkLengthToggle }
     val timerSpeed by NumberSetting(name = "sped ring speed", description = "how much faster it goes (100 means 100x speed) also need tick check for high speeds", min = 2f, max = 100f, default = 10f).withDependency { blinkShit }
-    val toggleSG by BooleanSetting("SG toggle", default = false, description = "Disable Secret guide in boss")
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     var waitingTerm = false
     var waitingLeap = false
     private var leapedIDs = mutableSetOf<Int>()
-    var inBoss = false
     private val deletedRings  = mutableListOf<Ring>()
     var spedFor = 0
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
-        if(!inBoss) return
+        if (!inBoss) return
         rings[route]?.forEachIndexed { i, ring ->
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
             AutoP3Utils.renderRing(ring)
@@ -154,15 +138,6 @@ object AutoP3: Module (
         waitingTerm = rings[route]?.any { it.type == RingTypes.TERM && !it.should } == true
         waitingLeap = rings[route]?.any { it.type == RingTypes.LEAP && !it.should } == true
         if (!waitingLeap) leapedIDs = mutableSetOf<Int>()
-    }
-
-    @SubscribeEvent
-    fun onStart(event: PacketEvent.Receive) {
-        if (event.packet !is S08PacketPlayerPosLook) return
-        if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) {
-            if (toggleSG && !inBoss) SecretGuideIntegration.setSecretGuideAura(false)
-            inBoss = true
-        }
     }
 
     private fun executeRing(ring: Ring) {
@@ -229,7 +204,7 @@ object AutoP3: Module (
                 modMessage("activating lava clip")
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
-                LavaClip.ringClip = ring.endY
+                LavaClip.ringClip = ring.misc
                 LavaClip.toggle()
             }
             RingTypes.TNT -> {
@@ -247,8 +222,8 @@ object AutoP3: Module (
                 if (ring.walk) AutoP3Utils.startWalk(ring.direction.yaw)
             }
             RingTypes.SPED -> {
-                if (ring.endY > Blink.cancelled || spedFor > 0) return
-                if (ring.endY < 1.0) {
+                if (ring.misc > Blink.cancelled || spedFor > 0) return
+                if (ring.misc < 1.0) {
                     modMessage("Broken Speed Ring, cancelling execution")
                     return
 
@@ -256,7 +231,7 @@ object AutoP3: Module (
 
                 modMessage("speeding (solid trip)")
                 AutoP3Utils.setGameSpeed(timerSpeed)
-                spedFor = ring.endY.toInt()
+                spedFor = ring.misc.toInt()
                 modMessage(spedFor)
             }
             else -> modMessage("how tf did u manage to get a ring like this")
@@ -447,7 +422,7 @@ object AutoP3: Module (
         val look = args.any { it == "look" }
         val center = args.any {it == "center"}
         val walk = args.any {it == "walk"} && ringType != RingTypes.WALK
-        actuallyAddRing(Ring(ringType, look = look, center = center, walk = walk, endY = endPos, blinkPackets = packets))
+        actuallyAddRing(Ring(ringType, look = look, center = center, walk = walk, misc = endPos, blinkPackets = packets))
     }
 
     fun actuallyAddRing(ring: Ring) {
@@ -486,28 +461,34 @@ object AutoP3: Module (
 
     fun saveRings(){
         try {
-            val jsonArray = JsonArray().apply {
-                rings.forEach { (routeName, ringList) ->
+            val fullJson = gson.toJson(rings)
+            val root = JsonParser().parse(fullJson).asJsonObject
+            val outArray = JsonArray().apply {
+                for ((routeName, ringsElem) in root.entrySet()) {
                     add(JsonObject().apply {
                         addProperty("route", routeName)
-                        add("rings", gson.toJsonTree(ringList))
+                        add("rings", ringsElem)
                     })
                 }
             }
-            DataManager.saveDataToFile("rings", jsonArray)
+
+            DataManager.saveDataToFile("rings", outArray)
         } catch (e: Exception) {
             modMessage("error saving")
             logger.error("error saving rings", e)
         }
     }
 
-    fun loadRings(){
+    fun loadRings() {
         rings.clear()
-        val jsonObjects = DataManager.loadDataFromFile("rings")
-        jsonObjects.forEach { jsonObject ->
-            val routeName = jsonObject.get("route").asString
-            val ringList = gson.fromJson<MutableList<Ring>>(jsonObject.get("rings"), object : TypeToken<MutableList<Ring>>() {}.type)
-            rings[routeName] = ringList
-        }
+        val fileArray = DataManager.loadDataFromFile("rings")
+        rings = fileArray.associate { jsonObject ->
+            val name = jsonObject.get("route").asString
+            val list: MutableList<Ring> = gson.fromJson(
+                jsonObject.get("rings"),
+                object : TypeToken<MutableList<Ring>>() {}.type
+            )
+            name to list
+        }.toMutableMap()
     }
 }

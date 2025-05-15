@@ -1,5 +1,12 @@
 package noobroutes.features.misc
 
+import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.network.play.client.C01PacketChatMessage
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.BooleanSetting
@@ -8,13 +15,6 @@ import noobroutes.utils.PacketUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.sendCommand
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.network.play.client.C01PacketChatMessage
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Keyboard
 
 object SexAura : Module(

@@ -1,8 +1,5 @@
 package noobroutes.utils.render
 
-import noobroutes.Core
-import noobroutes.Core.mc
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import gg.essential.universal.shader.BlendState
 import gg.essential.universal.shader.UShader
 import net.minecraft.client.renderer.GlStateManager
@@ -19,6 +16,9 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core
+import noobroutes.Core.mc
+import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13

@@ -1,15 +1,15 @@
 package noobroutes
 
-import noobroutes.config.Config
-import noobroutes.features.floor7.AutoP3
-import noobroutes.font.OdinFont
-import noobroutes.ui.clickgui.ClickGUI
-import noobroutes.ui.util.shader.RoundedRect
 import kotlinx.coroutines.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.config.Config
+import noobroutes.features.floor7.AutoP3
+import noobroutes.font.OdinFont
+import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.ui.util.shader.RoundedRect
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.io.File

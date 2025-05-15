@@ -1,10 +1,10 @@
 package noobroutes.utils.skyblock
 
+import net.minecraft.util.BlockPos
+import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.utils.*
 import noobroutes.utils.render.RenderUtils.renderVec
-import net.minecraft.util.BlockPos
-import net.minecraft.util.Vec3
 import kotlin.math.*
 
 object EtherWarpHelper {

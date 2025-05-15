@@ -1,5 +1,6 @@
 package noobroutes.ui.hud
 
+import net.minecraft.client.renderer.GlStateManager
 import noobroutes.config.Config
 import noobroutes.features.ModuleManager.huds
 import noobroutes.font.OdinFont
@@ -12,7 +13,6 @@ import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.clock.Executor
 import noobroutes.utils.clock.Executor.Companion.register
 import noobroutes.utils.render.*
-import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.Display
 import kotlin.math.sign
 

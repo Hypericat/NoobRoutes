@@ -1,7 +1,7 @@
 package noobroutes.utils
 
-import noobroutes.Core.mc
 import net.minecraft.scoreboard.ScorePlayerTeam
+import noobroutes.Core.mc
 
 fun cleanSB(scoreboard: String?): String {
     return scoreboard.noControlCodes.filter { it.code in 21..126 }

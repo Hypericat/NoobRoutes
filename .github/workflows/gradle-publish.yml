@@ -1,0 +1,38 @@
+name: Run Gradle Build
+on:
+  - push
+  - pull_request
+
+jobs:
+  gradle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.1.1
+
+      - name: Setup Java
+        uses: actions/setup-java@v4.0.0
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: gradle-cache-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}-${{ github.run_id }}
+          restore-keys: |
+            gradle-cache-${{ runner.os }}-
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Execute Gradle build
+        run: ./gradlew build
+
+      - name: Upload built mod JAR
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4.3.0
+        with:
+          name: mod-jar
+          path: build/libs/*.jar
