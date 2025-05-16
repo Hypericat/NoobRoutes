@@ -1,7 +1,6 @@
 package noobroutes.features.floor7.autop3
 
 import com.google.gson.*
-import com.google.gson.reflect.TypeToken
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S18PacketEntityTeleport
@@ -388,18 +387,16 @@ object AutoP3: Module (
 
     fun saveRings(){
         try {
-            val outArray = JsonArray()
+            val outObj = JsonObject()
             for ((routeName, rings) in rings) {
                 val ringArray = JsonArray().apply {
                     for (ring in rings) {
                         add(ring.getAsJsonObject())
                     }
                 }
-                outArray.add(JsonObject().apply {
-                    add(routeName, ringArray)
-                })
+                outObj.add(routeName, ringArray)
             }
-            DataManager.saveDataToFile("rings", outArray)
+            DataManager.saveDataToFile("rings", outObj)
         } catch (e: Exception) {
             modMessage("error saving")
             logger.error("error saving rings", e)
@@ -408,9 +405,29 @@ object AutoP3: Module (
 
     fun loadRings() {
         rings.clear()
-        val fileArray = DataManager.loadDataFromFile("rings")
+        val fileType = DataManager.fileType("rings") ?: return
+        if (fileType == "JsonPrimitive" || fileType == "JsonNull") return
+        if (fileType == "JsonArray") {
+            val file = DataManager.loadDataFromFileArray("rings")
+            file.forEach { route ->
+                val name = route.get("route")
+                route.get("rings").asJsonArray.forEach {
+                    val obj = it.asJsonObject
+                    val type = obj.get("type").asString
 
+                }
+            }
+        } else {
+            val file = DataManager.loadDataFromFileObject("rings")
+            file.forEach {
+                it.value.forEach { ring ->
 
+                }
+            }
+        }
+    }
+
+    private fun addRing(){
 
     }
 }

@@ -14,7 +14,7 @@ class JumpRing (
     center: Boolean,
     rotate: Boolean,
     val walk: Boolean
-) : Ring("jump", coords, yaw, term, leap, left, center, rotate) {
+) : Ring("Jump", coords, yaw, term, leap, left, center, rotate) {
 
     override fun doRing() {
         AutoP3Utils.unPressKeys()
