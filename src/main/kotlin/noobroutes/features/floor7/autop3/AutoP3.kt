@@ -207,7 +207,7 @@ object AutoP3: Module (
                 mc.thePlayer.motionX = 0.0
                 mc.thePlayer.motionZ = 0.0
                 LavaClip.ringClip = ring.misc
-                toggle()
+                LavaClip.toggle()
             }
             RingTypes.TNT -> { //done
                 modMessage("tnting")
