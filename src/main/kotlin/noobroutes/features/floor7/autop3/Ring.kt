@@ -7,9 +7,11 @@ import noobroutes.features.floor7.autop3.AutoP3.fuckingLook
 import noobroutes.features.floor7.autop3.AutoP3.silentLook
 import noobroutes.utils.JsonHelper.addProperty
 
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class RingType(val name: String)
 
 abstract class Ring(
-    val name: String,
     val coords: Vec3 = Vec3(mc.thePlayer?.posX ?: 0.0, mc.thePlayer?.posY ?: 0.0, mc.thePlayer?.posZ ?: 0.0),
     val yaw: Float,
     val term: Boolean,
@@ -19,10 +21,11 @@ abstract class Ring(
     val rotate: Boolean
 ) {
     var triggered = false
+    val type = javaClass.getAnnotation(RingType::class.java)?.name ?: "Unknown"
 
     fun getAsJsonObject(): JsonObject{
         val obj = JsonObject().apply {
-            addProperty("type", name)
+            addProperty("type", type)
             addProperty("coords", coords)
             addProperty("yaw", yaw)
             if (term) addProperty("term", true)

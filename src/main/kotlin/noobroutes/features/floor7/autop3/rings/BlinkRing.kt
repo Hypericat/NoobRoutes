@@ -13,10 +13,12 @@ import noobroutes.features.floor7.autop3.Blink.lastBlink
 import noobroutes.features.floor7.autop3.Blink.lastBlinkRing
 import noobroutes.features.floor7.autop3.Blink.movementPackets
 import noobroutes.features.floor7.autop3.Ring
+import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.skyblock.modMessage
 
+@RingType("Blink")
 class BlinkRing(
     coords: Vec3,
     yaw: Float = 0f,
@@ -27,7 +29,7 @@ class BlinkRing(
     rotate: Boolean = false,
     val packets: List<C04PacketPlayerPosition>,
     val endYVelo: Double
-) : Ring("Blink", coords, yaw, term, leap, left, center, rotate) {
+) : Ring(coords, yaw, term, leap, left, center, rotate) {
 
 
     override fun addRingData(obj: JsonObject) {

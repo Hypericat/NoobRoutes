@@ -2,8 +2,10 @@ package noobroutes.features.floor7.autop3
 
 import com.google.gson.*
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S18PacketEntityTeleport
+import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -70,6 +72,14 @@ object AutoP3: Module (
     private var awaitingLeap = mutableSetOf<Ring>()
     private var awaitingTerm = mutableSetOf<Ring>()
     private var awaitingLeft = mutableSetOf<Ring>()
+
+    val reflections = Reflections("noobroutes.features.floor7.autop3.rings")
+
+    val ringTypes = reflections
+        .getTypesAnnotatedWith(RingType::class.java)
+        .associateBy { clazz ->
+            clazz.getAnnotation(RingType::class.java).name
+        }
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
@@ -453,31 +463,162 @@ object AutoP3: Module (
         }
     }
 
+
     fun loadRings() {
         rings.clear()
-        val fileType = DataManager.fileType("rings") ?: return
-        if (fileType == "JsonPrimitive" || fileType == "JsonNull") return
-        if (fileType == "JsonArray") {
-            val file = DataManager.loadDataFromFileArray("rings")
-            file.forEach { route ->
-                val name = route.get("route")
-                route.get("rings").asJsonArray.forEach {
-                    val obj = it.asJsonObject
-                    val type = obj.get("type").asString
+        try {
+            val fileType = DataManager.fileType("rings") ?: return
+            if (fileType == "JsonPrimitive" || fileType == "JsonNull") return
+            if (fileType == "JsonArray") {
+                val file = DataManager.loadDataFromFileArray("rings")
+                file.forEach { route ->
+                    val name = route.get("route").asString
+                    val ringsList = mutableListOf<Ring>()
+                    route.get("rings").asJsonArray.forEach {
+                        val obj = it.asJsonObject
+                        val type = obj.get("type").asString
+                        val positionType = obj.get("coords")
+
+                        val coords = when {
+                            positionType.isJsonObject -> {
+                                val positionObj = positionType.asJsonObject
+                                Vec3(
+                                    positionObj.get("field_72450_a")?.asDouble ?: obj.get("x")?.asDouble ?: 0.0,
+                                    positionObj.get("field_72448_b")?.asDouble ?: obj.get("y")?.asDouble ?: 0.0,
+                                    positionObj.get("field_72449_c")?.asDouble ?: obj.get("z")?.asDouble ?: 0.0
+                                )
+                            }
+
+                            positionType.isJsonArray -> {
+                                val arr = positionType.asJsonArray
+                                Vec3(
+                                    arr[0]?.asDouble ?: 0.0,
+                                    arr[1]?.asDouble ?: 0.0,
+                                    arr[2]?.asDouble ?: 0.0
+                                )
+                            }
+
+                            else -> {
+                                Vec3(0.0, 0.0, 0.0)
+                            }
+                        }
+                        val dirElem = obj.get("direction") ?: obj.get("directions")
+                        val direction: LookVec = if (dirElem != null && dirElem.isJsonObject) {
+                            val o = dirElem.asJsonObject
+                            val yaw = o.get("yaw")?.asFloat ?: o.get("field_yaw")?.asFloat ?: 0f
+                            val pitch = o.get("pitch")?.asFloat ?: o.get("field_pitch")?.asFloat ?: 0f
+                            LookVec(yaw, pitch)
+                        } else {
+                            LookVec(0f, 0f)
+                        }
+
+                        val walk = obj.get("walk")?.asBoolean ?: false
+                        val look = obj.get("look")?.asBoolean ?: false
+                        val center = obj.get("center")?.asBoolean ?: false
+                        val misc = obj.get("misc")?.asDouble ?: obj.get("endY")?.asDouble ?: 0.0
+                        val blinks = mutableListOf<C04PacketPlayerPosition>()
+                        if (obj.has("blinkPackets") || obj.has("blink_packets")) {
+                            val arr =
+                                obj.getAsJsonArray(if (obj.has("blinkPackets")) "blinkPackets" else "blink_packets")
+                            arr.forEach { el ->
+                                val p = el.asJsonObject
+                                val x = p.get("x")?.asDouble ?: p.get("field_149479_a")?.asDouble ?: 0.0
+                                val y = p.get("y")?.asDouble ?: p.get("field_149477_b")?.asDouble ?: 0.0
+                                val z = p.get("z")?.asDouble ?: p.get("field_149478_c")?.asDouble ?: 0.0
+                                val g = p.get("onGround")?.asBoolean ?: p.get("field_149474_g")?.asBoolean ?: false
+                                blinks.add(C04PacketPlayerPosition(x, y, z, g))
+                            }
+                        }
+                        when (type) {
+                            "YEET" -> {
+                                ringsList.add(MotionRing(coords, direction.yaw, false, false, false, center, look))
+                            }
+
+                            "WALK" -> {
+                                ringsList.add(WalkRing(coords, direction.yaw, false, false, false, center, look))
+                            }
+
+                            "STOP" -> {
+                                ringsList.add(StopRing(coords, direction.yaw, false, false, false, center, look))
+                            }
+
+                            "HCLIP" -> {
+                                ringsList.add(HClipRing(coords, direction.yaw, false, false, false, center, look, walk))
+                            }
+
+                            "BLINK" -> {
+                                ringsList.add(
+                                    BlinkRing(
+                                        coords,
+                                        direction.yaw,
+                                        false,
+                                        false,
+                                        false,
+                                        center,
+                                        look,
+                                        blinks,
+                                        misc
+                                    )
+                                )
+                            }
+
+                            "LAVA" -> {
+                                ringsList.add(
+                                    LavaClipRing(
+                                        coords,
+                                        direction.yaw,
+                                        false,
+                                        false,
+                                        false,
+                                        center,
+                                        look,
+                                        misc
+                                    )
+                                )
+                            }
+
+                            "TERM" -> {
+                                ringsList.add(WalkRing(coords, direction.yaw, true, false, false, center, look))
+                            }
+
+                            "LEAP" -> {
+                                ringsList.add(WalkRing(coords, direction.yaw, false, true, false, center, look))
+                            }
+
+                            "TNT" -> {
+                                ringsList.add(
+                                    BoomRing(
+                                        coords,
+                                        direction.yaw,
+                                        false,
+                                        false,
+                                        false,
+                                        center,
+                                        look,
+                                        BlockPos(blinks[0].positionX, blinks[0].positionY, blinks[0].positionZ)
+                                    )
+                                )
+                            }
+                        }
+                    }
+                    rings[name] = ringsList
 
                 }
-            }
-        } else {
-            val file = DataManager.loadDataFromFileObject("rings")
-            file.forEach {
-                it.value.forEach { ring ->
+            } else {
+                val file = DataManager.loadDataFromFileObject("rings")
+                file.forEach {
+                    it.value.forEach { ring ->
 
+                    }
                 }
             }
+        } catch (e: Exception) {
+            modMessage("Error Loading Rings, Please Send Log to Wadey")
+            logger.info(e)
         }
     }
 
     private fun addRing(){
-
+        HClipRing()
     }
 }

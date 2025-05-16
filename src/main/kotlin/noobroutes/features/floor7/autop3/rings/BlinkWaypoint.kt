@@ -2,7 +2,9 @@ package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.Vec3
 import noobroutes.features.floor7.autop3.Ring
+import noobroutes.features.floor7.autop3.RingType
 
+@RingType("Name")
 class BlinkWaypoint(
     coords: Vec3,
     yaw: Float,
@@ -12,7 +14,7 @@ class BlinkWaypoint(
     center: Boolean,
     rotate: Boolean,
     val length: Int
-) : Ring("Name", coords, yaw, term, leap, left, center, rotate) {
+) : Ring(coords, yaw, term, leap, left, center, rotate) {
 
     override fun doRing() {
 
