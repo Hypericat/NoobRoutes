@@ -486,10 +486,10 @@ object AutoP3: Module (
         val fileArray = DataManager.loadDataFromFile("rings")
         rings = fileArray.associate { jsonObject ->
             val name = jsonObject.get("route").asString
-            val list: MutableList<Ring> = gson.fromJson(
-                jsonObject.get("rings"),
-                object : TypeToken<MutableList<Ring>>() {}.type
-            )
+            val list = mutableListOf<Ring>()
+            jsonObject.getAsJsonArray("rings").forEach {
+                list.add(gson.fromJson(it, Ring::class.java))
+            }
             name to list
         }.toMutableMap()
     }
