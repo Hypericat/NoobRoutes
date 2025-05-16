@@ -23,6 +23,22 @@ object DataManager {
             e.printStackTrace()
         }
     }
+    fun saveDataToFile(fileName: String, dataList: JsonObject) {
+        val path = File(mc.mcDataDir, "config/noobroutes/$fileName.json")
+        try {
+            path.parentFile?.mkdirs() ?: throw IOException("Failed to create directories")
+            if (!path.exists()) {
+                path.createNewFile()
+            }
+            val gson = GsonBuilder().setPrettyPrinting().create()
+            path.bufferedWriter().use {
+                it.write(gson.toJson(dataList))
+            }
+        } catch (e: IOException) {
+            println("Error saving to ${path.path}")
+            e.printStackTrace()
+        }
+    }
 
     fun loadDataFromFile(fileName: String): List<JsonObject> {
         val path = File(mc.mcDataDir, "config/noobroutes/$fileName.json")
