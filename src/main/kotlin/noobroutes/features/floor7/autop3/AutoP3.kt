@@ -67,9 +67,9 @@ object AutoP3: Module (
     private var leapedIDs = mutableSetOf<Int>()
     private val deletedRings  = mutableListOf<Ring>()
     var spedFor = 0
-    private var awaitingLeap = mutableListOf<Ring>()
-    private var awaitingTerm = mutableListOf<Ring>()
-    private var awaitingLeft = mutableListOf<Ring>()
+    private var awaitingLeap = mutableSetOf<Ring>()
+    private var awaitingTerm = mutableSetOf<Ring>()
+    private var awaitingLeft = mutableSetOf<Ring>()
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
@@ -110,7 +110,7 @@ object AutoP3: Module (
                     awaitingLeft.add(ring)
                     return
                 }
-                ring.doRing()
+                ring.run()
             }
             else if (!inRing) {
                 ring.triggered = false
@@ -134,7 +134,7 @@ object AutoP3: Module (
     @SubscribeEvent
     fun awaitingOpen(event: TermOpenEvent) {
         if (awaitingTerm.isEmpty()) return
-        awaitingTerm.forEach { it.doRing() }
+        awaitingTerm.forEach { it.run() }
     }
 
     @SubscribeEvent
@@ -142,9 +142,9 @@ object AutoP3: Module (
         if (awaitingLeap.isEmpty() && awaitingTerm.isEmpty() && awaitingLeft.isEmpty()) return
         val isLeft = Mouse.getEventButton() == 0
         if (!isLeft || !Mouse.getEventButtonState()) return
-        awaitingLeap.forEach { it.doRing() }
-        awaitingTerm.forEach { it.doRing() }
-        awaitingLeft.forEach { it.doRing() }
+        awaitingLeap.addAll(awaitingTerm) //retard protection (no duplicates)
+        awaitingLeap.addAll(awaitingLeft)
+        awaitingLeap.forEach { it.run() }
     }
 
     @SubscribeEvent
@@ -158,7 +158,7 @@ object AutoP3: Module (
         if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistanceSq(x,y,z) < 5) leapedIDs.add(event.packet.entityId)
         if (leapedIDs.size == leapPlayers()) {
             modMessage("everyone leaped")
-            awaitingLeap.forEach { it.doRing() }
+            awaitingLeap.forEach { it.run() }
         }
     }
 

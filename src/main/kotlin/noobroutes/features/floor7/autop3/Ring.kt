@@ -38,7 +38,6 @@ abstract class Ring(
     open fun addRingData(obj: JsonObject) {}
 
     open fun doRing() { //fuck u wadey
-        if (center && !mc.thePlayer.onGround) return //add shit so it does when on ground
         if (rotate) {
             if (!silentLook) mc.thePlayer.rotationYaw = yaw
             Blink.rotate = yaw
@@ -50,5 +49,13 @@ abstract class Ring(
             mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord)
             Blink.rotSkip = true
         }
+    }
+
+    fun run() {
+        if (center && !mc.thePlayer.onGround) {
+            triggered = false
+            return
+        }
+        doRing()
     }
 }

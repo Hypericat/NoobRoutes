@@ -48,21 +48,22 @@ class BlinkRing(
 
     override fun doRing() {
         if (movementPackets.isNotEmpty()) return
-        val hasEnoughPackets = cancelled >= packets.size
-        val hasEnoughLeftOnInstance = blinksInstance + packets.size > AutoP3.maxBlinks
-        val notOnCd = System.currentTimeMillis() - lastBlink >= 500
-        val cannotBlink = !AutoP3.blink || hasEnoughLeftOnInstance.not()
-        val blinkOnCooldownOrCancelled = !hasEnoughPackets || !notOnCd
 
         AutoP3Utils.unPressKeys()
 
-        if (!cannotBlink && blinkOnCooldownOrCancelled) {
+        val canBlinkNow = System.currentTimeMillis() - lastBlink >= 500
+        val notEnoughPackets = cancelled < packets.size
+        val exceedsBlinkLimit = blinksInstance + packets.size > AutoP3.maxBlinks
+        val blinkDisabled = !AutoP3.blink
+        
+        if (!canBlinkNow || notEnoughPackets) {
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
             return
         }
-
-        if (cannotBlink) {
+        
+        if (exceedsBlinkLimit || blinkDisabled) {
+            modMessage("movementing")
             movementPackets = packets.toMutableList()
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionY = 0.0
@@ -71,12 +72,12 @@ class BlinkRing(
             lastBlinkRing = null
             return
         }
-
+        
         blinksInstance += packets.size
         lastBlink = System.currentTimeMillis()
-        //lastBlinkRing = ring
+        lastBlinkRing = this
         packets.forEach { PacketUtils.sendPacket(it) }
-        val lastPacket = packets[packets.size - 1]
+        val lastPacket = packets.last()
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
         mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
         modMessage("§c§l$cancelled§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
