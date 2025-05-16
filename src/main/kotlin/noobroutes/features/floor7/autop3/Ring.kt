@@ -18,8 +18,7 @@ abstract class Ring(
     val center: Boolean,
     val rotate: Boolean
 ) {
-    var should = false
-
+    var triggered = false
 
     fun getAsJsonObject(): JsonObject{
         val obj = JsonObject().apply {

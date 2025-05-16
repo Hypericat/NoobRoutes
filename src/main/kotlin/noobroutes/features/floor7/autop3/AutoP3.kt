@@ -7,6 +7,7 @@ import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.logger
@@ -16,21 +17,23 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.TermOpenEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.floor7.autop3.Blink.blinkStarts
 import noobroutes.features.floor7.autop3.rings.*
 import noobroutes.features.misc.SexAura
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.*
+import noobroutes.utils.AutoP3Utils.walking
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
-
-
+import org.lwjgl.input.Mouse
 
 
 object AutoP3: Module (
@@ -61,11 +64,12 @@ object AutoP3: Module (
     val timerSpeed by NumberSetting(name = "sped ring speed", description = "how much faster it goes (100 means 100x speed) also need tick check for high speeds", min = 2f, max = 100f, default = 10f).withDependency { blinkShit }
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
-    var waitingTerm = false
-    var waitingLeap = false
     private var leapedIDs = mutableSetOf<Int>()
     private val deletedRings  = mutableListOf<Ring>()
     var spedFor = 0
+    private var awaitingLeap = mutableListOf<Ring>()
+    private var awaitingTerm = mutableListOf<Ring>()
+    private var awaitingLeft = mutableListOf<Ring>()
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
@@ -73,21 +77,11 @@ object AutoP3: Module (
         rings[route]?.forEachIndexed { i, ring ->
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
             AutoP3Utils.renderRing(ring)
-            if (ring is BlinkRing) {
-                val vec3List: List<Vec3> = ring.packets.map { packet -> Vec3(packet.positionX, packet.positionY + 0.01, packet.positionZ) }
-                if (showEnd && ring.packets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
-                if (showLine) RenderUtils.drawGradient3DLine(vec3List, Color.GREEN, Color.RED, 1F, true)
-            }
-            if (editMode || !frame) return@forEachIndexed
-            if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring) && ring.should) {
-                ring.doRing()
-                if (ring !is BlinkRing) ring.should = false
-            }
-            else if(AutoP3Utils.distanceToRingSq(ring.coords) > 0.25 || !AutoP3Utils.ringCheckY(ring)) ring.should = true
+            if (ring !is BlinkRing) return@forEachIndexed
+            val vec3List: List<Vec3> = ring.packets.map { packet -> Vec3(packet.positionX, packet.positionY + 0.01, packet.positionZ) }
+            if (showEnd && ring.packets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
+            if (showLine) RenderUtils.drawGradient3DLine(vec3List, Color.GREEN, Color.RED, 1F, true)
         }
-        waitingTerm = rings[route]?.any { it.term && !it.should } == true
-        waitingLeap = rings[route]?.any { it.leap && !it.should } == true
-        if (!waitingLeap) leapedIDs = mutableSetOf<Int>()
     }
 
     @SubscribeEvent
@@ -96,15 +90,36 @@ object AutoP3: Module (
         if(!inBoss || mc.thePlayer.isSneaking) return
         rings[route]?.forEach {ring ->
             if (editMode) return@forEach
-            if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring) && ring.should) {
+            val inRing = AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)
+            if (inRing && !ring.triggered) {
+                ring.triggered = ring !is BlinkRing
+                if (ring.leap || ring.term || ring.left) {
+                    AutoP3Utils.unPressKeys()
+                    mc.thePlayer.motionX = 0.0
+                    mc.thePlayer.motionZ = 0.0
+                }
+                if (ring.leap) {
+                    awaitingLeap.add(ring)
+                    return
+                }
+                if (ring.term) {
+                    awaitingTerm.add(ring)
+                    return
+                }
+                if (ring.left) {
+                    awaitingLeft.add(ring)
+                    return
+                }
                 ring.doRing()
-                if (ring !is BlinkRing) ring.should = false
             }
-            else if(AutoP3Utils.distanceToRingSq(ring.coords) > 0.25 || !AutoP3Utils.ringCheckY(ring)) ring.should = true
+            else if (!inRing) {
+                ring.triggered = false
+                if (ring.leap) awaitingLeap.remove(ring)
+                if (ring.term) awaitingTerm.remove(ring)
+                if (ring.left) awaitingLeft.remove(ring)
+            }
         }
-        waitingTerm = rings[route]?.any { it.term && !it.should } == true
-        waitingLeap = rings[route]?.any { it.leap && !it.should } == true
-        if (!waitingLeap) leapedIDs = mutableSetOf<Int>()
+        if (awaitingLeap.isEmpty()) leapedIDs = mutableSetOf<Int>()
     }
 
 
@@ -118,22 +133,32 @@ object AutoP3: Module (
 
     @SubscribeEvent
     fun awaitingOpen(event: TermOpenEvent) {
-        if (!waitingTerm) return
-        AutoP3Utils.walking = true
+        if (awaitingTerm.isEmpty()) return
+        awaitingTerm.forEach { it.doRing() }
+    }
+
+    @SubscribeEvent
+    fun onLeftMouse(event: InputEvent.MouseInputEvent) {
+        if (awaitingLeap.isEmpty() && awaitingTerm.isEmpty() && awaitingLeft.isEmpty()) return
+        val isLeft = Mouse.getEventButton() == 0
+        if (!isLeft || !Mouse.getEventButtonState()) return
+        awaitingLeap.forEach { it.doRing() }
+        awaitingTerm.forEach { it.doRing() }
+        awaitingLeft.forEach { it.doRing() }
     }
 
     @SubscribeEvent
     fun awaitingLeap(event: PacketEvent.Receive) {
-        if (!waitingLeap || event.packet !is S18PacketEntityTeleport) return
+        if (awaitingLeap.isEmpty() || event.packet !is S18PacketEntityTeleport) return
         val entity  = mc.theWorld.getEntityByID(event.packet.entityId)
         if (entity !is EntityPlayer) return
         val x = event.packet.x/32.0 //don't fucking ask why its like this
         val y = event.packet.y/32.0
         val z = event.packet.z/32.0
-        if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistanceSq(x,y,z) < 1.25) leapedIDs.add(event.packet.entityId)
+        if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistanceSq(x,y,z) < 5) leapedIDs.add(event.packet.entityId)
         if (leapedIDs.size == leapPlayers()) {
             modMessage("everyone leaped")
-            AutoP3Utils.walking = true
+            awaitingLeap.forEach { it.doRing() }
         }
     }
 
@@ -183,11 +208,7 @@ object AutoP3: Module (
                 modMessage("All tests passed")
             }
         }
-
-
-
     }
-
 
     private fun restoreRing() {
         if (deletedRings.isEmpty())  {
@@ -200,11 +221,12 @@ object AutoP3: Module (
     }
 
     private fun addNormalRing(args: Array<out String>?) {
+        if (mc.thePlayer == null) return
         if (args == null || args.size < 2) {
             modMessage("Rings: walk, hclip, stop, term, leap, yeet, motion")
             return
         }
-        val coords = Vec3(mc.thePlayer?.posX ?: 0.0, mc.thePlayer?.posY ?: 0.0, mc.thePlayer?.posZ ?: 0.0)
+        val coords = mc.thePlayer.positionVector
         val center = args.any {it == "center"}
         val walk = args.any {it == "walk"}
         val term = args.any {it == "term"}
@@ -218,7 +240,7 @@ object AutoP3: Module (
                 modMessage("added walk")
                 actuallyAddRing(WalkRing(
                     coords,
-                    mc.thePlayer?.rotationYaw ?: 0f,
+                    mc.thePlayer.rotationYaw,
                     term,
                     leap,
                     left,
@@ -232,7 +254,7 @@ object AutoP3: Module (
                 modMessage("added hclip")
                 actuallyAddRing(HClipRing(
                     coords,
-                    mc.thePlayer?.rotationYaw ?: 0f,
+                    mc.thePlayer.rotationYaw,
                     term,
                     leap,
                     left,
@@ -246,7 +268,7 @@ object AutoP3: Module (
                 modMessage("added stop")
                 actuallyAddRing(StopRing(
                     coords,
-                    mc.thePlayer?.rotationYaw ?: 0f,
+                    mc.thePlayer.rotationYaw,
                     term,
                     leap,
                     left,
@@ -259,7 +281,7 @@ object AutoP3: Module (
                 modMessage("motion added")
                 actuallyAddRing(MotionRing(
                     coords,
-                    mc.thePlayer?.rotationYaw ?: 0f,
+                    mc.thePlayer.rotationYaw,
                     term,
                     leap,
                     left,
@@ -280,7 +302,7 @@ object AutoP3: Module (
                 }
                 actuallyAddRing(LavaClipRing(
                     coords,
-                    mc.thePlayer?.rotationYaw ?: 0f,
+                    mc.thePlayer.rotationYaw,
                     term,
                     leap,
                     left,
@@ -299,7 +321,7 @@ object AutoP3: Module (
                 modMessage("added boom")
                 actuallyAddRing(BoomRing(
                     coords,
-                    mc.thePlayer?.rotationYaw ?: 0f,
+                    mc.thePlayer.rotationYaw,
                     term,
                     leap,
                     left,
@@ -312,7 +334,7 @@ object AutoP3: Module (
                 modMessage("jump added")
                 actuallyAddRing(JumpRing(
                     coords,
-                    mc.thePlayer?.rotationYaw ?: 0f,
+                    mc.thePlayer.rotationYaw,
                     term,
                     leap,
                     left,
@@ -334,7 +356,7 @@ object AutoP3: Module (
                 modMessage("im sped")
                 actuallyAddRing(SpedRing(
                     coords,
-                    mc.thePlayer?.rotationYaw ?: 0f,
+                    mc.thePlayer.rotationYaw,
                     term,
                     leap,
                     left,
@@ -344,6 +366,33 @@ object AutoP3: Module (
                 ))
 
             }
+            "blink" -> {
+                if (args.size < 3) {
+                    modMessage("need a length arg (positive number)")
+                    return
+                }
+                val length = args[2].toIntOrNull()
+                if (length == null){
+                    modMessage("need a length arg (positive number)")
+                    return
+                }
+                if (length < 1) {
+                    modMessage("need a number greater than 0")
+                    return
+                }
+                val waypoint = BlinkWaypoint(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate,
+                    length
+                )
+                waypoint.triggered = true
+                blinkStarts.add(waypoint)
+            }
             else -> return modMessage("thats not a ring type stoopid")
 
 
@@ -352,6 +401,7 @@ object AutoP3: Module (
     }
 
     fun actuallyAddRing(ring: Ring) {
+        ring.triggered = true
         rings[route]?.add(ring) ?: run { rings[route] = mutableListOf(ring) }
         saveRings()
     }

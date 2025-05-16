@@ -51,16 +51,18 @@ class BlinkRing(
         val hasEnoughPackets = cancelled >= packets.size
         val hasEnoughLeftOnInstance = blinksInstance + packets.size > AutoP3.maxBlinks
         val notOnCd = System.currentTimeMillis() - lastBlink >= 500
+        val cannotBlink = !AutoP3.blink || hasEnoughLeftOnInstance.not()
+        val blinkOnCooldownOrCancelled = !hasEnoughPackets || !notOnCd
 
         AutoP3Utils.unPressKeys()
 
-        if ((!hasEnoughPackets || !notOnCd) && !(!hasEnoughLeftOnInstance || !AutoP3.blink)) {
+        if (!cannotBlink && blinkOnCooldownOrCancelled) {
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
             return
         }
 
-        if (!hasEnoughLeftOnInstance || !AutoP3.blink) {
+        if (cannotBlink) {
             movementPackets = packets.toMutableList()
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionY = 0.0

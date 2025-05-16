@@ -9,11 +9,11 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import noobroutes.Core
 import noobroutes.Core.mc
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.rings.BlinkRing
+import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.SecretGuideIntegration
@@ -26,8 +26,7 @@ import kotlin.math.sin
 
 object Blink{
 
-    data class BlinkWaypoints (val coords: Vec3 = mc.thePlayer.positionVector, val length: Int, var active: Boolean = false)
-    private val blinkStarts = mutableListOf<BlinkWaypoints>()
+    val blinkStarts = mutableListOf<BlinkWaypoint>()
 
     var cancelled = 0
 
@@ -44,7 +43,7 @@ object Blink{
     var movementPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
     var endY = 0.0
     var skip = false
-    private lateinit var lastWaypoint: BlinkWaypoints
+    private lateinit var lastWaypoint: BlinkWaypoint
 
     private var recording = false
     private var recordedPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
@@ -53,14 +52,6 @@ object Blink{
     fun blinkCommand(args: Array<out String>) {
         if (args.size < 2) return modMessage("need args")
         when (args[1]) {
-            "add" -> {
-                try {
-                    val length = args[2].toInt()
-                    blinkStarts.add(BlinkWaypoints(length = length))
-                } catch (e: Exception) {
-                    modMessage("need length arg")
-                }
-            }
             "clear" -> {
                 blinkStarts.clear()
                 modMessage("cleared waypoints. If u want to delete blinks just use /noob delete")
@@ -167,16 +158,16 @@ object Blink{
                 )
             ), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.Companion.WHITE, depth = true)
             if (AutoP3.editMode) return
-            if (AutoP3Utils.distanceToRingSq(it.coords) < 0.25 && mc.thePlayer.posY == it.coords.yCoord && it.active) {
+            if (AutoP3Utils.distanceToRingSq(it.coords) < 0.25 && mc.thePlayer.posY == it.coords.yCoord && !it.triggered) {
                 recordedPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
                 startRecording(it)
-                it.active = false
+                it.triggered = true
             }
-            else if(AutoP3Utils.distanceToRingSq(it.coords) > 0.25 || mc.thePlayer.posY != it.coords.yCoord) it.active = true
+            else if(AutoP3Utils.distanceToRingSq(it.coords) > 0.25 || mc.thePlayer.posY != it.coords.yCoord) it.triggered = false
         }
     }
 
-    private fun startRecording(waypoint: BlinkWaypoints) {
+    private fun startRecording(waypoint: BlinkWaypoint) {
         modMessage("started recording")
         recordedPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
         recordedPackets.add(lastSentC03)
@@ -274,11 +265,21 @@ object Blink{
         if (recordedPackets.size == getRecordingGoalLength(lastWaypoint)) {
             modMessage("finished recording")
             recording = false
-            AutoP3.actuallyAddRing(BlinkRing(coords = lastWaypoint.coords, packets = recordedPackets, endYVelo = mc.thePlayer.motionY))
+            AutoP3.actuallyAddRing(BlinkRing(
+                lastWaypoint.coords,
+                lastWaypoint.yaw,
+                lastWaypoint.term,
+                lastWaypoint.leap,
+                lastWaypoint.left,
+                lastWaypoint.center,
+                lastWaypoint.rotate,
+                recordedPackets,
+                mc.thePlayer.motionY
+            ))
         }
     }
 
-    fun getRecordingGoalLength(waypoint: BlinkWaypoints): Int {
+    fun getRecordingGoalLength(waypoint: BlinkWaypoint): Int {
         return if (AutoP3.customBlinkLengthToggle) AutoP3.customBlinkLength else waypoint.length
     }
 

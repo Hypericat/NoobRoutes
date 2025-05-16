@@ -13,8 +13,6 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3.depth
 import noobroutes.features.floor7.autop3.AutoP3.motionValue
-import noobroutes.features.floor7.autop3.AutoP3.waitingLeap
-import noobroutes.features.floor7.autop3.AutoP3.waitingTerm
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.mixin.accessors.TimerFieldAccessor
@@ -150,12 +148,10 @@ object AutoP3Utils {
     }
 
     fun distanceToRingSq(coords: Vec3): Double {
-        if(AutoP3.frame) return (coords.xCoord-mc.thePlayer.renderX).pow(2)+(coords.zCoord-mc.thePlayer.renderZ).pow(2)
         return (coords.xCoord-mc.thePlayer.posX).pow(2)+(coords.zCoord-mc.thePlayer.posZ).pow(2)
     }
 
     fun ringCheckY(ring: Ring): Boolean {
-        if(AutoP3.frame) return (ring.coords.yCoord <= mc.thePlayer.renderY && ring.coords.yCoord + 1 > mc.thePlayer.renderY && ring !is BlinkRing) || (ring.coords.yCoord == mc.thePlayer.renderY)
         return (ring.coords.yCoord <= mc.thePlayer.posY && ring.coords.yCoord + 1 > mc.thePlayer.posY && ring !is BlinkRing) || (ring.coords.yCoord == mc.thePlayer.posY)
     }
 
@@ -167,13 +163,6 @@ object AutoP3Utils {
         if (!Keyboard.getEventKeyState()) return
         walking = false
         yeeting = false
-    }
-
-    @SubscribeEvent
-    fun onLeftMouse(event: InputEvent.MouseInputEvent) {
-        if (!waitingTerm && !waitingLeap) return
-        val isLeft = Mouse.getEventButton() == 0
-        if (isLeft && Mouse.getEventButtonState()) walking = true
     }
 
     fun renderRing(ring: Ring) {
