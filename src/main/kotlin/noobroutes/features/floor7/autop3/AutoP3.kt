@@ -71,6 +71,7 @@ object AutoP3: Module (
     private var awaitingLeap = mutableSetOf<Ring>()
     private var awaitingTerm = mutableSetOf<Ring>()
     private var awaitingLeft = mutableSetOf<Ring>()
+    private var activatedBlinks = mutableSetOf<BlinkRing>()
 
     val ringRegistry = AutoP3Utils.discoverRings("noobroutes.features.floor7.autop3.rings")
 
@@ -96,6 +97,7 @@ object AutoP3: Module (
             val inRing = AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)
             if (inRing && !ring.triggered) {
                 ring.triggered = ring !is BlinkRing
+                ring.doRingArgs()
                 if (ring.leap || ring.term || ring.left) {
                     AutoP3Utils.unPressKeys()
                     mc.thePlayer.motionX = 0.0
@@ -137,7 +139,10 @@ object AutoP3: Module (
     @SubscribeEvent
     fun awaitingOpen(event: TermOpenEvent) {
         if (awaitingTerm.isEmpty()) return
-        awaitingTerm.forEach { it.run() }
+        awaitingTerm.forEach {
+            it.run()
+            if (it is BlinkRing) activatedBlinks.add(it)
+        }
     }
 
     @SubscribeEvent
@@ -147,7 +152,10 @@ object AutoP3: Module (
         if (!isLeft || !Mouse.getEventButtonState()) return
         awaitingLeap.addAll(awaitingTerm) //retard protection (no duplicates)
         awaitingLeap.addAll(awaitingLeft)
-        awaitingLeap.forEach { it.run() }
+        awaitingLeap.forEach {
+            it.run()
+            if (it is BlinkRing) activatedBlinks.add(it)
+        }
         awaitingLeap.clear()
         awaitingTerm.clear()
         awaitingLeft.clear()
@@ -166,7 +174,10 @@ object AutoP3: Module (
         if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistanceSq(x,y,z) < 5) leapedIDs.add(event.packet.entityId)
         if (leapedIDs.size == leapPlayers()) {
             modMessage("everyone leaped")
-            awaitingLeap.forEach { it.run() }
+            awaitingLeap.forEach {
+                it.run()
+                if (it is BlinkRing) activatedBlinks.add(it)
+            }
         }
     }
 
@@ -412,6 +423,19 @@ object AutoP3: Module (
         ring.triggered = true
         rings[route]?.add(ring) ?: run { rings[route] = mutableListOf(ring) }
         saveRings()
+    }
+
+    @SubscribeEvent
+    fun doTriggeredBlink(event: ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.END || activatedBlinks.isEmpty()) return
+        for (ring in activatedBlinks) {
+            if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)) {
+                ring.run()
+            }
+            else {
+                activatedBlinks.remove(ring)
+            }
+        }
     }
 
     private fun deleteNormalRing(args: Array<out String>) {

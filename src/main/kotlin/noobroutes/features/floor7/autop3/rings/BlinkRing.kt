@@ -71,7 +71,7 @@ class BlinkRing(
         val exceedsBlinkLimit = blinksInstance + packets.size > AutoP3.maxBlinks
         val blinkDisabled = !AutoP3.blink
         
-        if (!canBlinkNow || notEnoughPackets) {
+        if (!canBlinkNow || (notEnoughPackets && !exceedsBlinkLimit)) {
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
             return

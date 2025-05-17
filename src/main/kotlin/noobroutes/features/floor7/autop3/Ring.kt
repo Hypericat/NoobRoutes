@@ -93,7 +93,11 @@ abstract class Ring(
 
     open fun addRingData(obj: JsonObject) {}
 
-    open fun doRing() { //fuck u wadey
+    open fun doRing() {
+    }
+
+    fun doRingArgs() {
+        if (center && !mc.thePlayer.onGround) return
         if (rotate) {
             if (!silentLook) mc.thePlayer.rotationYaw = yaw
             Blink.rotate = yaw
