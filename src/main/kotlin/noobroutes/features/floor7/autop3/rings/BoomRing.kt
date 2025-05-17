@@ -12,23 +12,18 @@ import noobroutes.utils.json.JsonUtils.addProperty
 
 @RingType("Boom")
 class BoomRing(
-    coords: Vec3,
-    yaw: Float,
-    term: Boolean,
-    leap: Boolean,
-    left: Boolean,
-    center: Boolean,
-    rotate: Boolean,
-    var block: BlockPos
+    coords: Vec3 = Vec3(0.0, 0.0, 0.0),
+    yaw: Float = 0f,
+    term: Boolean = false,
+    leap: Boolean = false,
+    left: Boolean = false,
+    center: Boolean = false,
+    rotate: Boolean = false,
+    var block: BlockPos = BlockPos(0, 0, 0),
 ) : Ring(coords, yaw, term, leap, left, center, rotate) {
 
     init {
         addBlockPos("block", {block}, {block = it})
-    }
-
-
-    override fun addRingData(obj: JsonObject) {
-        obj.addProperty("block", block)
     }
 
     override fun doRing() {

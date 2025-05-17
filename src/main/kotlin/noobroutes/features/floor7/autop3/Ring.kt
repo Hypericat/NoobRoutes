@@ -56,7 +56,7 @@ abstract class Ring(
 
 
     open fun loadRingData(obj: JsonObject){
-
+        internalRingData.forEach { it.readFrom(obj) }
     }
     protected fun addBoolean(name: String, getter: () -> Boolean, setter: (Boolean) -> Unit){
         internalRingData.add(SyncBoolean(name, getter, setter))

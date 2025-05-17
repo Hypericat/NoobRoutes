@@ -1,5 +1,6 @@
 package noobroutes.features.floor7.autop3.rings
 
+import codes.som.anthony.koffee.types.double
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
@@ -9,19 +10,20 @@ import noobroutes.features.move.LavaClip
 import noobroutes.utils.AutoP3Utils
 @RingType("LavaClip")
 class LavaClipRing(
-    coords: Vec3,
-    yaw: Float,
-    term: Boolean,
-    leap: Boolean,
-    left: Boolean,
-    center: Boolean,
-    rotate: Boolean,
-    val length: Double
+    coords: Vec3 = Vec3(0.0, 0.0, 0.0),
+    yaw: Float = 0f,
+    term: Boolean = false,
+    leap: Boolean = false,
+    left: Boolean = false,
+    center: Boolean = false,
+    rotate: Boolean = false,
+    var length: Double = 0.0
 ) : Ring(coords, yaw, term, leap, left, center, rotate) {
 
-    override fun addRingData(obj: JsonObject) {
-        obj.addProperty("length", length)
+    init {
+        addDouble("length", {length}, {length = it})
     }
+
 
     override fun doRing() {
         AutoP3Utils.unPressKeys()

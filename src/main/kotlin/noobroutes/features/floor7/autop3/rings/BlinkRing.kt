@@ -20,16 +20,30 @@ import noobroutes.utils.skyblock.modMessage
 
 @RingType("Blink")
 class BlinkRing(
-    coords: Vec3,
+    coords: Vec3 = Vec3(0.0, 0.0, 0.0),
     yaw: Float = 0f,
     term: Boolean = false,
     leap: Boolean = false,
     left: Boolean = false,
     center: Boolean = false,
     rotate: Boolean = false,
-    val packets: List<C04PacketPlayerPosition>,
-    val endYVelo: Double
+    var packets: List<C04PacketPlayerPosition> = listOf(),
+    var endYVelo: Double = 0.0
 ) : Ring(coords, yaw, term, leap, left, center, rotate) {
+
+
+    init {
+        addDouble("endYVelo", {endYVelo}, {endYVelo = it})
+    }
+
+    override fun loadRingData(obj: JsonObject) {
+        val packetsLoaded = mutableListOf<C04PacketPlayerPosition>()
+        obj.get("packets").asJsonArray.forEach {
+            val packet = it.asJsonObject
+            packetsLoaded.add(C04PacketPlayerPosition(packet.get("x").asDouble, packet.get("y").asDouble, packet.get("z").asDouble, packet.get("isOnGround").asBoolean))
+        }
+        packets = packetsLoaded
+    }
 
 
     override fun addRingData(obj: JsonObject) {
@@ -44,7 +58,6 @@ class BlinkRing(
                     })
                 }
             })
-            addProperty("endYVelo", endYVelo)
         }
     }
 

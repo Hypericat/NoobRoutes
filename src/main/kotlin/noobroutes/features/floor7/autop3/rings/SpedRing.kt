@@ -11,18 +11,19 @@ import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.skyblock.modMessage
 @RingType("Speed")
 class SpedRing(
-    coords: Vec3,
-    yaw: Float,
-    term: Boolean,
-    leap: Boolean,
-    left: Boolean,
-    center: Boolean,
-    rotate: Boolean,
-    val length: Int
+    coords: Vec3 = Vec3(0.0, 0.0, 0.0),
+    yaw: Float = 0f,
+    term: Boolean = false,
+    leap: Boolean = false,
+    left: Boolean = false,
+    center: Boolean = false,
+    rotate: Boolean = false,
+    var length: Int = 0
 ) : Ring(coords, yaw, term, leap, left, center, rotate) {
 
-    override fun addRingData(obj: JsonObject) {
-       obj.addProperty("length", length)
+
+    init {
+        addInt("length", {length}, {length = it})
     }
 
     override fun doRing() {

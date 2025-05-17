@@ -148,6 +148,11 @@ object AutoP3: Module (
         awaitingLeap.addAll(awaitingTerm) //retard protection (no duplicates)
         awaitingLeap.addAll(awaitingLeft)
         awaitingLeap.forEach { it.run() }
+        awaitingLeap.clear()
+        awaitingTerm.clear()
+        awaitingLeft.clear()
+
+
     }
 
     @SubscribeEvent
@@ -598,29 +603,24 @@ object AutoP3: Module (
                 }
             } else {
                 val file = DataManager.loadDataFromFileObject("rings")
-                ringRegistry.forEach {
-                    devMessage("simpleName: ${it.value.simpleName}, key: ${it.key}")
-                }
                 file.forEach { route ->
                     val ringsInJson = mutableListOf<Ring>()
                     route.value.forEach { it ->
                         val ring = it.asJsonObject
                         val ringType = ring.get("type")?.asString ?: "Unknown"
-                        if (ringType == "Blink") {
-                            return@forEach
-                        }
+                        devMessage("something happen")
                         val ringClass = ringRegistry[ringType]
-                        val instance = ringClass?.java?.getDeclaredConstructor()?.newInstance()
-                        instance?.coords = ring.get("coords").asVec3
-                        instance?.yaw = ring.get("yaw")?.asFloat ?: 0f
-                        instance?.term = ring.get("term")?.asBoolean ?: false
-                        instance?.leap = ring.get("leap")?.asBoolean ?: false
-                        instance?.center = ring.get("center")?.asBoolean ?: false
-                        instance?.rotate = ring.get("rotate")?.asBoolean ?: false
-                        instance?.left = ring.get("left")?.asBoolean ?: false
-                        instance?.loadRingData(ring)
-
-
+                        val instance: Ring = ringClass?.java?.getDeclaredConstructor()?.newInstance() ?: return@forEach
+                        instance.coords = ring.get("coords").asVec3
+                        instance.yaw = ring.get("yaw")?.asFloat ?: 0f
+                        instance.term = ring.get("term")?.asBoolean ?: false
+                        instance.leap = ring.get("leap")?.asBoolean ?: false
+                        instance.center = ring.get("center")?.asBoolean ?: false
+                        instance.rotate = ring.get("rotate")?.asBoolean ?: false
+                        instance.left = ring.get("left")?.asBoolean ?: false
+                        instance.loadRingData(ring)
+                        devMessage("instance ${instance.type}: ${instance.coords}, ${instance.yaw}, ${instance.term}, ${instance.leap}, ${instance.center}, ${instance.rotate}, ${instance.left}")
+                        ringsInJson.add(instance)
                     }
                     rings[route.key] = ringsInJson
                 }
