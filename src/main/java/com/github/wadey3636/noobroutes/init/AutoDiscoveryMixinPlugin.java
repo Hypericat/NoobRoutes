@@ -137,6 +137,7 @@ public class AutoDiscoveryMixinPlugin implements IMixinConfigPlugin {
      */
     private void walkDir(Path classRoot) {
         System.out.println("Trying to find mixins from directory");
+        System.out.println(classRoot.resolve(getMixinBaseDir()));
         try (Stream<Path> classes = Files.walk(classRoot.resolve(getMixinBaseDir()))) {
             classes.map(it -> classRoot.relativize(it).toString())
                     .forEach(this::tryAddMixinClass);

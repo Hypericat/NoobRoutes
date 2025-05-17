@@ -19,20 +19,23 @@ import noobroutes.features.floor7.autop3.RingType
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.render.Color
-import noobroutes.utils.render.RenderUtils.renderX
-import noobroutes.utils.render.RenderUtils.renderY
-import noobroutes.utils.render.RenderUtils.renderZ
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
-import java.io.File
+import java.io.IOException
+import java.net.MalformedURLException
+import java.net.URISyntaxException
+import java.net.URL
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.jar.JarFile
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import kotlin.math.log
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.reflect.KClass
+import kotlin.text.replace
 
 object AutoP3Utils {
 
@@ -195,69 +198,117 @@ object AutoP3Utils {
         devMessage("Set Timer: $speed, ${System.currentTimeMillis()}")
     }
 
+
+
+
+    var foundRings = mutableMapOf<String, KClass<out Ring>>()
+
     fun discoverRings(packageName: String): Map<String, KClass<out Ring>> {
-        val result = mutableMapOf<String, KClass<out Ring>>()
-        val classLoader = Thread.currentThread().contextClassLoader
+        foundRings = mutableMapOf()
         val path = packageName.replace('.', '/')
-
-        val classUri = classLoader.getResource(path)
-            ?: throw RuntimeException("Package path not found: $path")
-
-        val basePath = Paths.get(classUri.toURI())
-
-        if (Files.isDirectory(basePath)) {
-            // In dev environment
-            Files.walk(basePath).forEach { filePath ->
-                if (filePath.toString().endsWith(".class")) {
-                    val relativePath = basePath.relativize(filePath).toString()
-                    val className = "$packageName." + relativePath
-                        .removeSuffix(".class")
-                        .replace(File.separatorChar, '.')
-
-                    try {
-                        val clazz = Class.forName(className)
-                        if (Ring::class.java.isAssignableFrom(clazz)) {
-                            val annotation = clazz.getAnnotation(RingType::class.java)
-                            if (annotation != null) {
-                                @Suppress("UNCHECKED_CAST")
-                                result[annotation.name] = clazz.kotlin as KClass<out Ring>
-                            }
-                        }
-                    } catch (e: Throwable) {
-                        println("Skipping $className due to error: ${e.message}")
-                    }
-                }
-            }
-        } else {
-            //Non-Dev Environment
-            val jarPath = File(classUri.toURI()).toString()
-            val jarFile = JarFile(jarPath)
-
-            jarFile.entries().iterator().forEachRemaining { entry ->
-                if (!entry.name.endsWith(".class")) return@forEachRemaining
-                if (!entry.name.startsWith(path)) return@forEachRemaining
-
-                val className = entry.name
-                    .removeSuffix(".class")
-                    .replace('/', '.')
-
-                try {
-                    val clazz = Class.forName(className)
-                    if (Ring::class.java.isAssignableFrom(clazz)) {
-                        val annotation = clazz.getAnnotation(RingType::class.java)
-                        if (annotation != null) {
-                            @Suppress("UNCHECKED_CAST")
-                            result[annotation.name] = clazz.kotlin as KClass<out Ring>
-                        }
-                    }
-                } catch (e: Throwable) {
-                   logger.error("Skipping $className due to error: ${e.message}")
-                }
-            }
+        val classURL = this.javaClass.protectionDomain.codeSource.location
+        logger.info(classURL)
+        val file = try {
+            Paths.get(getBaseUrlForClassUrl(classURL).toURI())
+        } catch (e: URISyntaxException) {
+            logger.error("URI ERROR IN AUTO P3 UTILS: $e")
+            return emptyMap()
         }
-
-        return result
+        logger.info("Base directory: $file")
+        if (Files.isDirectory(file)) {
+            walkDir(file, path)
+        } else {
+            walkJar(file, path)
+        }
+        logger.info("Found rings: ${foundRings.keys}")
+        return foundRings
     }
 
+    private fun walkDir(classRoot: Path, directory: String) {
+        logger.info("Trying to find rings from directory")
+        logger.info(classRoot.resolve(directory))
+        val editedDir = directory.replace("/", ".")
+        try {
+            Files.walk(classRoot.resolve(directory)).use { classes ->
+                classes.map<String?> { it: Path? -> classRoot.relativize(it).toString() }
+                    .forEach { className: String? ->
+                        logger.info("Found class: $className")
+                        tryAddRingClass(className, editedDir)
+                    }
+            }
+        } catch (e: IOException) {
+            throw java.lang.RuntimeException(e)
+        }
+    }
+
+
+
+    fun tryAddRingClass(className: String?, directory: String) {
+        if (className == null) return
+        val norm = (if (className.endsWith(".class")) className.substring(
+            0,
+            className.length - ".class".length
+        ) else className)
+            .replace("\\", "/")
+            .replace("/", ".")
+        logger.info("Found class: $norm, directory: $directory, ${norm.startsWith("$directory.")}")
+
+        if (norm.startsWith("$directory.") && !norm.endsWith(".")) {
+            logger.info("something happening")
+            val clazz = Class.forName(norm)
+            val annotation = clazz.getAnnotation(RingType::class.java)
+            if (annotation == null) return
+            logger.info("Found annotation: $annotation")
+            @Suppress("UNCHECKED_CAST")
+            foundRings[annotation.name] = clazz.kotlin as KClass<out Ring>
+
+        }
+    }
+
+
+    fun getBaseUrlForClassUrl(classUrl: URL): URL {
+        val string = classUrl.toString()
+        if (classUrl.protocol == "jar") {
+            try {
+                return URL(string.substring(4).split("!".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0])
+            } catch (e: MalformedURLException) {
+                throw java.lang.RuntimeException(e)
+            }
+        }
+        if (string.endsWith(".class")) {
+            try {
+                return URL(
+                    string.replace("\\", "/")
+                        .replace(
+                            javaClass.getCanonicalName()
+                                .replace(".", "/") + ".class", ""
+                        ))
+            } catch (e: MalformedURLException) {
+                throw java.lang.RuntimeException(e)
+            }
+        }
+        return classUrl
+    }
+
+    private fun walkJar(file: Path, directory: String) {
+        println("Trying to find rings from jar file")
+        val editedDir = directory.replace("/", ".")
+        try {
+            ZipInputStream(Files.newInputStream(file)).use { zis ->
+                var next: ZipEntry?
+                while ((zis.getNextEntry().also { next = it }) != null) {
+                    val name = next!!.name
+                    if (!name.startsWith(directory) || !name.endsWith(".class")) {
+                        zis.closeEntry()
+                        continue
+                    }
+                    tryAddRingClass(next!!.getName(), editedDir)
+                    zis.closeEntry()
+                }
+            }
+        } catch (e: IOException) {
+            throw java.lang.RuntimeException(e)
+        }
+    }
 
 }

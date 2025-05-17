@@ -75,6 +75,7 @@ object AutoP3: Module (
 
     val ringRegistry = AutoP3Utils.discoverRings("noobroutes.features.floor7.autop3.rings")
 
+
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         if (!inBoss) return
@@ -513,23 +514,38 @@ object AutoP3: Module (
 
                             positionType.isJsonArray -> {
                                 val arr = positionType.asJsonArray
-                                Vec3(
-                                    arr[0]?.asDouble ?: 0.0,
-                                    arr[1]?.asDouble ?: 0.0,
-                                    arr[2]?.asDouble ?: 0.0
-                                )
+                                if (arr.size() > 0) {
+                                    Vec3(
+                                        arr[0]?.asDouble ?: 0.0,
+                                        arr[1]?.asDouble ?: 0.0,
+                                        arr[2]?.asDouble ?: 0.0
+                                    )
+                                } else {
+                                    Vec3(obj.get("x")?.asDouble ?: 0.0, obj.get("y")?.asDouble ?: 0.0, obj.get("z")?.asDouble ?: 0.0)
+                                }
+
                             }
 
                             else -> {
                                 Vec3(0.0, 0.0, 0.0)
                             }
                         }
+
+
                         val dirElem = obj.get("direction") ?: obj.get("directions")
-                        val direction: LookVec = if (dirElem != null && dirElem.isJsonObject) {
-                            val o = dirElem.asJsonObject
-                            val yaw = o.get("yaw")?.asFloat ?: o.get("field_yaw")?.asFloat ?: 0f
-                            val pitch = o.get("pitch")?.asFloat ?: o.get("field_pitch")?.asFloat ?: 0f
-                            LookVec(yaw, pitch)
+                        val direction: LookVec = if (dirElem != null) when {
+                            dirElem.isJsonObject -> {
+                                val o = dirElem.asJsonObject
+                                val yaw = o.get("yaw")?.asFloat ?: o.get("field_yaw")?.asFloat ?: 0f
+                                val pitch = o.get("pitch")?.asFloat ?: o.get("field_pitch")?.asFloat ?: 0f
+                                LookVec(yaw, pitch)
+                            }
+                            dirElem.isJsonArray -> {
+                                LookVec(obj.get("yaw").asFloat, obj.get("pitch").asFloat)
+                            }
+                            else -> {
+                                LookVec(0f, 0f)
+                            }
                         } else {
                             LookVec(0f, 0f)
                         }
@@ -625,6 +641,7 @@ object AutoP3: Module (
                     }
                     rings[name] = ringsList
                 }
+                saveRings()
             } else {
                 val file = DataManager.loadDataFromFileObject("rings")
                 file.forEach { route ->
@@ -632,7 +649,6 @@ object AutoP3: Module (
                     route.value.forEach { it ->
                         val ring = it.asJsonObject
                         val ringType = ring.get("type")?.asString ?: "Unknown"
-                        devMessage("something happen")
                         val ringClass = ringRegistry[ringType]
                         val instance: Ring = ringClass?.java?.getDeclaredConstructor()?.newInstance() ?: return@forEach
                         instance.coords = ring.get("coords").asVec3
