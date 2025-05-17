@@ -9,71 +9,61 @@ import noobroutes.utils.LookVec
 import java.lang.reflect.Type
 
 class RingAdapter : JsonSerializer<Ring>, JsonDeserializer<Ring> {
-    override fun deserialize(
-        json: JsonElement,
-        typeOfT: Type,
-        context: JsonDeserializationContext
-    ): Ring {
+    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Ring {
         val obj = json.asJsonObject
         val type = RingTypes.valueOf(obj.get("type").asString)
 
+        // Fix: fallback to x/y/z if coords is missing or empty
         val coordsElem = obj.get("coords")
-        val coords: Vec3 = when {
-            coordsElem.isJsonObject -> {
-                val o = coordsElem.asJsonObject
-                val x = o.get("x")?.asDouble
-                    ?: o.get("field_72450_a")?.asDouble
-                    ?: o.get("field_72450_a_old")?.asDouble  // if you have other variants
-                    ?: 0.0
-                val y = o.get("y")?.asDouble
-                    ?: o.get("field_72448_b")?.asDouble
-                    ?: 0.0
-                val z = o.get("z")?.asDouble
-                    ?: o.get("field_72449_c")?.asDouble
-                    ?: 0.0
-                Vec3(x, y, z)
-            }
-            coordsElem.isJsonArray -> {
-                val arr = coordsElem.asJsonArray
-                Vec3(
-                    arr?.get(0)?.asDouble ?: 0.0,
-                    arr?.get(1)?.asDouble ?: 0.0,
-                    arr?.get(2)?.asDouble ?: 0.0
-                 )
-            }
-            else -> Vec3(0.0, 0.0, 0.0)
+        val coords: Vec3 = if (coordsElem != null && coordsElem.isJsonObject) {
+            val o = coordsElem.asJsonObject
+            val x = o.get("x")?.asDouble ?: 0.0
+            val y = o.get("y")?.asDouble ?: 0.0
+            val z = o.get("z")?.asDouble ?: 0.0
+            Vec3(x, y, z)
+        } else {
+            Vec3(
+                obj.get("x")?.asDouble ?: 0.0,
+                obj.get("y")?.asDouble ?: 0.0,
+                obj.get("z")?.asDouble ?: 0.0
+            )
         }
 
-
-        val dirElem = obj.get("direction") ?: obj.get("directions")
+        val dirElem = obj.get("direction")
         val direction: LookVec = if (dirElem != null && dirElem.isJsonObject) {
             val o = dirElem.asJsonObject
-            val yaw   = o.get("yaw")?.asFloat ?: o.get("field_yaw")?.asFloat ?: 0f
-            val pitch = o.get("pitch")?.asFloat ?: o.get("field_pitch")?.asFloat ?: 0f
+            val yaw = o.get("yaw")?.asFloat ?: 0f
+            val pitch = o.get("pitch")?.asFloat ?: 0f
             LookVec(yaw, pitch)
         } else {
-            LookVec(0f, 0f)
+            LookVec(
+                obj.get("yaw")?.asFloat ?: 0f,
+                obj.get("pitch")?.asFloat ?: 0f
+            )
         }
 
         val walk = obj.get("walk")?.asBoolean ?: false
         val look = obj.get("look")?.asBoolean ?: false
         val center = obj.get("center")?.asBoolean ?: false
         val misc = obj.get("misc")?.asDouble ?: obj.get("endY")?.asDouble ?: 0.0
-        val blinks = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
-        if (obj.has("blinkPackets") || obj.has("blink_packets")) {
-            val arr = obj.getAsJsonArray(if (obj.has("blinkPackets")) "blinkPackets" else "blink_packets")
-            arr.forEach { el ->
-                val p = el.asJsonObject
-                val x = p.get("x")?.asDouble ?: p.get("field_149479_a")?.asDouble ?: 0.0
-                val y = p.get("y")?.asDouble ?: p.get("field_149477_b")?.asDouble ?: 0.0
-                val z = p.get("z")?.asDouble ?: p.get("field_149478_c")?.asDouble ?: 0.0
-                val g = p.get("onGround")?.asBoolean ?: p.get("field_149474_g")?.asBoolean ?: false
-                blinks.add(C03PacketPlayer.C04PacketPlayerPosition(x, y, z, g))
-            }
-        }
-        return Ring(type, coords, direction, walk, look, center, false, blinks, misc)
 
+        val blinks = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
+        val blinkArr = obj.getAsJsonArray("blink_packets") ?: obj.getAsJsonArray("blinkPackets")
+        blinkArr?.forEach { el ->
+            val p = el.asJsonObject
+            val x = p.get("x")?.asDouble ?: 0.0
+            val y = p.get("y")?.asDouble ?: 0.0
+            val z = p.get("z")?.asDouble ?: 0.0
+            val g = p.get("isOnGround")?.asBoolean
+                ?: p.get("onGround")?.asBoolean
+                ?: p.get("field_149474_g")?.asBoolean
+                ?: false
+            blinks.add(C03PacketPlayer.C04PacketPlayerPosition(x, y, z, g))
+        }
+
+        return Ring(type, coords, direction, walk, look, center, false, blinks, misc)
     }
+
 
     override fun serialize(
         src: Ring,
