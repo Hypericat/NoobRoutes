@@ -2,7 +2,6 @@ package noobroutes.features.floor7.autop3
 
 import com.google.gson.*
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.BlockPos
@@ -26,7 +25,6 @@ import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.*
-import noobroutes.utils.AutoP3Utils.walking
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
@@ -36,6 +34,7 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
+import noobroutes.utils.json.JsonUtils.asVec3
 
 
 object AutoP3: Module (
@@ -73,13 +72,7 @@ object AutoP3: Module (
     private var awaitingTerm = mutableSetOf<Ring>()
     private var awaitingLeft = mutableSetOf<Ring>()
 
-    val reflections = Reflections("noobroutes.features.floor7.autop3.rings")
-
-    val ringTypes = reflections
-        .getTypesAnnotatedWith(RingType::class.java)
-        .associateBy { clazz ->
-            clazz.getAnnotation(RingType::class.java).name
-        }
+    val ringRegistry = AutoP3Utils.discoverRings("noobroutes.features.floor7.autop3.rings")
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
@@ -602,14 +595,34 @@ object AutoP3: Module (
                         }
                     }
                     rings[name] = ringsList
-
                 }
             } else {
                 val file = DataManager.loadDataFromFileObject("rings")
-                file.forEach {
-                    it.value.forEach { ring ->
+                ringRegistry.forEach {
+                    devMessage("simpleName: ${it.value.simpleName}, key: ${it.key}")
+                }
+                file.forEach { route ->
+                    val ringsInJson = mutableListOf<Ring>()
+                    route.value.forEach { it ->
+                        val ring = it.asJsonObject
+                        val ringType = ring.get("type")?.asString ?: "Unknown"
+                        if (ringType == "Blink") {
+                            return@forEach
+                        }
+                        val ringClass = ringRegistry[ringType]
+                        val instance = ringClass?.java?.getDeclaredConstructor()?.newInstance()
+                        instance?.coords = ring.get("coords").asVec3
+                        instance?.yaw = ring.get("yaw")?.asFloat ?: 0f
+                        instance?.term = ring.get("term")?.asBoolean ?: false
+                        instance?.leap = ring.get("leap")?.asBoolean ?: false
+                        instance?.center = ring.get("center")?.asBoolean ?: false
+                        instance?.rotate = ring.get("rotate")?.asBoolean ?: false
+                        instance?.left = ring.get("left")?.asBoolean ?: false
+                        instance?.loadRingData(ring)
+
 
                     }
+                    rings[route.key] = ringsInJson
                 }
             }
         } catch (e: Exception) {
@@ -619,6 +632,6 @@ object AutoP3: Module (
     }
 
     private fun addRing(){
-        HClipRing()
+
     }
 }

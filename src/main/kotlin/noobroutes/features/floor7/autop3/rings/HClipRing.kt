@@ -4,9 +4,10 @@ import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.Ring
+import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.skyblock.modMessage
-
+@RingType("HClip")
 class HClipRing(
     coords: Vec3,
     yaw: Float,
@@ -15,11 +16,11 @@ class HClipRing(
     left: Boolean,
     center: Boolean,
     rotate: Boolean,
-    val walk: Boolean
-) : Ring("HClip", coords, yaw, term, leap, left, center, rotate) {
+    var walk: Boolean
+) : Ring(coords, yaw, term, leap, left, center, rotate) {
 
-    override fun addRingData(obj: JsonObject) {
-        if (walk) obj.addProperty("walk", true)
+    init {
+        addBoolean("walk", {walk}, {walk = it})
     }
 
     override fun doRing() {
