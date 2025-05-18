@@ -97,7 +97,6 @@ abstract class Ring(
     }
 
     fun doRingArgs() {
-        if (center && !mc.thePlayer.onGround) return
         if (rotate) {
             if (!silentLook) mc.thePlayer.rotationYaw = yaw
             Blink.rotate = yaw
@@ -105,7 +104,7 @@ abstract class Ring(
         if (fuckingLook) {
             mc.thePlayer.rotationYaw = yaw
         }
-        if (center) {
+        if (center && mc.thePlayer.onGround) {
             mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord)
             Blink.rotSkip = true
         }

@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.events.impl.InputEvent
+import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.utils.Utils.isEnd
@@ -90,12 +91,39 @@ object RotationUtils {
     var targetPitch: Float? = null
     var ticksRotated: Long = 0L
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    //@SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: TickEvent.ClientTickEvent){
         if (event.isEnd || mc.thePlayer == null) return
         val rot = currentRotation ?: return
-        if (rot.silent) SilentRotator.doSilentRotation()
+        //if (rot.silent) SilentRotator.doSilentRotation()
         setAngles(rot.yaw + offset, rot.pitch)
+        targetYaw = rot.yaw + offset
+        targetPitch = rot.pitch
+        if (rot.continuous == null) {
+            when (rot.action) {
+                Action.RightClick -> {
+                    shouldRightClick = true
+                }
+                Action.LeftClick -> {
+                    shouldLeftClick = true
+                }
+                null -> {}
+            }
+            currentRotation = null
+            ticksRotated = 0L
+            return
+        }
+        ticksRotated++
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onMotion(event: MotionUpdateEvent.Pre){
+        if (mc.thePlayer == null) return
+        val rot = currentRotation ?: return
+        //if (rot.silent) SilentRotator.doSilentRotation()
+        //setAngles(rot.yaw + offset, rot.pitch)
+        event.yaw = rot.yaw + offset
+        event.pitch = rot.pitch
         targetYaw = rot.yaw + offset
         targetPitch = rot.pitch
         if (rot.continuous == null) {

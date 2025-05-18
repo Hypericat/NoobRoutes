@@ -97,7 +97,7 @@ object AutoP3: Module (
             if (editMode) return@forEach
             val inRing = AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)
             if (inRing && !ring.triggered) {
-                ring.triggered = ring !is BlinkRing
+                ring.triggered = ring !is BlinkRing || ring.left || ring.leap || ring.term
                 ring.doRingArgs()
                 if (ring.leap || ring.term || ring.left) {
                     AutoP3Utils.unPressKeys()
@@ -219,10 +219,16 @@ object AutoP3: Module (
             "relativepos" -> {
                 modMessage(DungeonUtils.currentRoom?.getRelativeCoords(mc.objectMouseOver.blockPos))
             }
-            "speed" -> {
+            /*"speed" -> {
                 if (args.size < 3) return
                 val speed = args[2].toFloatOrNull() ?: return
                 AutoP3Utils.setGameSpeed(speed)
+            }*/
+            "rotate" -> {
+                if (args.size < 4) return
+                val yaw = args[2].toFloatOrNull() ?: return
+                val pitch = args[3].toFloatOrNull() ?: return
+                RotationUtils.rotate(yaw, pitch, false)
             }
             else -> {
                 modMessage("All tests passed")

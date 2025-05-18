@@ -79,10 +79,11 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
     private var currentTarget = BlockPos(0, 0, 0)
     private var nextBlock = BlockPos(0, 0, 0)
+    private var c08Delay = false
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!event.isStart || doChest || didChest) return
+        if (!event.isStart || doChest || didChest || c08Delay) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board" || mc.thePlayer.posY != 59.0) return
         val room = DungeonUtils.currentRoom ?: return
         val solutionList = solutions
