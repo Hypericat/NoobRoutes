@@ -17,9 +17,9 @@ class RingAdapter : JsonSerializer<Ring>, JsonDeserializer<Ring> {
         val coordsElem = obj.get("coords")
         val coords: Vec3 = if (coordsElem != null && coordsElem.isJsonObject) {
             val o = coordsElem.asJsonObject
-            val x = o.get("x")?.asDouble ?: 0.0
-            val y = o.get("y")?.asDouble ?: 0.0
-            val z = o.get("z")?.asDouble ?: 0.0
+            val x = o.get("x")?.asDouble ?: o.get("field_72450_a")?.asDouble  ?: 0.0
+            val y = o.get("y")?.asDouble ?: o.get("field_72448_b")?.asDouble ?: 0.0
+            val z = o.get("z")?.asDouble ?: o.get("field_72449_c")?.asDouble ?: 0.0
             Vec3(x, y, z)
         } else {
             Vec3(
@@ -51,9 +51,9 @@ class RingAdapter : JsonSerializer<Ring>, JsonDeserializer<Ring> {
         val blinkArr = obj.getAsJsonArray("blink_packets") ?: obj.getAsJsonArray("blinkPackets")
         blinkArr?.forEach { el ->
             val p = el.asJsonObject
-            val x = p.get("x")?.asDouble ?: 0.0
-            val y = p.get("y")?.asDouble ?: 0.0
-            val z = p.get("z")?.asDouble ?: 0.0
+            val x = p.get("x")?.asDouble ?: p.get("field_149479_a")?.asDouble ?: 0.0
+            val y = p.get("y")?.asDouble ?: p.get("field_149477_b")?.asDouble ?: 0.0
+            val z = p.get("z")?.asDouble ?: p.get("field_149478_c")?.asDouble ?: 0.0
             val g = p.get("isOnGround")?.asBoolean
                 ?: p.get("onGround")?.asBoolean
                 ?: p.get("field_149474_g")?.asBoolean

@@ -1,6 +1,7 @@
 package noobroutes.config
 
 import com.google.gson.*
+import noobroutes.Core.logger
 import noobroutes.Core.mc
 import java.io.File
 import java.io.IOException
@@ -46,6 +47,7 @@ object DataManager {
             path.bufferedReader().use { reader ->
                 val jsonContent = reader.readText()
                 val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+                //if (!JsonParser().parse(jsonContent).isJsonArray) {logger.info("Something broke"); return emptyList() }
                 val jsonArray = gson.fromJson(jsonContent, JsonArray::class.java)
                 jsonArray.map { it.asJsonObject }
             }
