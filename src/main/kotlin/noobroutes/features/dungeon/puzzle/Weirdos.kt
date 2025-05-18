@@ -1,4 +1,4 @@
-package noobroutes.features.puzzle
+package noobroutes.features.dungeon.puzzle
 
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
@@ -24,7 +24,7 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons
 /**
  * Based on odin
  */
-object Weirdos : Module("Weirdos", description = "Solves weirdos puzzle", category = Category.PUZZLE) {
+object Weirdos : Module("Weirdos", description = "Solves weirdos puzzle", category = Category.DUNGEON) {
     private var correctPos: BlockPos? = null
     private var wrongPositions = mutableListOf<BlockPos>()
     private var clickedChest = false

@@ -10,14 +10,13 @@ import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
+import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.floor7.*
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.misc.*
 import noobroutes.features.move.*
-import noobroutes.features.puzzle.Blaze
-import noobroutes.features.puzzle.TicTacToe
-import noobroutes.features.puzzle.WaterBoard
-import noobroutes.features.puzzle.Weirdos
+import noobroutes.features.dungeon.puzzle.TicTacToe
+import noobroutes.features.dungeon.puzzle.Weirdos
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.render.Trail
 import noobroutes.features.settings.impl.KeybindSetting
@@ -71,17 +70,18 @@ object ModuleManager {
         InstaMid,
         Auto4,
         LeverAura,
-        WaterBoard,
+        //WaterBoard,
         TicTacToe,
         //AuraTest,
         Weirdos,
         MelodyMessage,
         AutoSS,
-        Blaze,
+        //Blaze,
         InstantSlow,
-        EtherwarpTest,
+        //EtherwarpTest,
         Doorless,
-        SecretGuideManager
+        SecretGuideManager,
+        AutoRoute
     )
 
     init {

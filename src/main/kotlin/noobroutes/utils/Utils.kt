@@ -32,6 +32,10 @@ import kotlin.math.*
 
 object Utils {
 
+    inline val Float.xPart: Double get() = xPart(this)
+    inline val Float.zPart: Double get() = zPart(this)
+
+
     fun xPart(yaw: Float): Double {
         return -sin(yaw * Math.PI /180)
     }

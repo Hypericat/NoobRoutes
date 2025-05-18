@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import noobroutes.Core.mc
 import noobroutes.commands.AuraTestCommand
 import noobroutes.commands.AutoP3Command
+import noobroutes.commands.AutoRouteCommand
 import noobroutes.commands.EtherwarpTestCommand
 import noobroutes.commands.NoobRoutesCommand
 import noobroutes.events.BossEventDispatcher
@@ -45,8 +46,9 @@ class NoobRoutes {
         listOf(
             NoobRoutesCommand(),
             AutoP3Command(),
-            AuraTestCommand(),
-            EtherwarpTestCommand()
+            //AuraTestCommand(),
+            //EtherwarpTestCommand(),
+            AutoRouteCommand()
         ).forEach {
             ClientCommandHandler.instance.registerCommand(it)
         }

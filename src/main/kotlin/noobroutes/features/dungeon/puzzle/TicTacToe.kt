@@ -1,4 +1,4 @@
-package noobroutes.features.puzzle
+package noobroutes.features.dungeon.puzzle
 
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.init.Blocks
@@ -32,7 +32,7 @@ import kotlin.experimental.and
 
 object TicTacToe : Module(
     "Tic Tac Toe",
-    category = Category.PUZZLE,
+    category = Category.DUNGEON,
     description = "Automatically completes the Tic Tac Toe Puzzle"
 ){
     private val reach by NumberSetting("Reach", 4.5, 1, 6, 0.1, description = "The distance you can aura buttons from")

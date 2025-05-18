@@ -41,6 +41,8 @@ object PlayerUtils {
     fun stopVelocity(){
         mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
     }
+    inline val movementKeysPressed: Boolean get() = playerControlsKeycodes.any { Keyboard.isKeyDown(it) }
+
 
 
 
@@ -125,8 +127,6 @@ object PlayerUtils {
     fun unPressKeys() {
         Keyboard.enableRepeatEvents(false)
         AutoP3Utils.keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
-
-
     }
 
     fun rePressKeys() {

@@ -15,7 +15,7 @@ import kotlin.math.floor
 object Simulation : Module(
     name = "Simulation",
     Keyboard.KEY_NONE,
-    category = Category.FLOOR7,
+    category = Category.MISC,
     description = "Simulates 500 Speed / lava bounces"
 ) {
     private val speed by BooleanSetting("500 Speed", true, description = "Simulates 500 Speed in singleplayer")

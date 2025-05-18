@@ -242,7 +242,7 @@ object AutoP3: Module (
             return
         }
         actuallyAddRing(deletedRings.last())
-        modMessage("${deletedRings.last()} added back")
+        modMessage("${deletedRings.last().type} added back")
         deletedRings.removeLast()
     }
 
@@ -575,19 +575,44 @@ object AutoP3: Module (
                         }
                         when (type) {
                             "YEET" -> {
-                                ringsList.add(MotionRing(coords, direction.yaw, false, false, false, center, look))
+                                ringsList.add(MotionRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look
+                                ))
                             }
 
                             "WALK" -> {
-                                ringsList.add(WalkRing(coords, direction.yaw, false, false, false, center, look))
+                                ringsList.add(WalkRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look
+                                ))
                             }
 
                             "STOP" -> {
-                                ringsList.add(StopRing(coords, direction.yaw, false, false, false, center, look))
+                                ringsList.add(StopRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look
+                                ))
                             }
 
                             "HCLIP" -> {
-                                ringsList.add(HClipRing(coords, direction.yaw, false, false, false, center, look, walk))
+                                ringsList.add(HClipRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look,
+                                    walk = walk
+                                ))
                             }
 
                             "BLINK" -> {
@@ -597,11 +622,11 @@ object AutoP3: Module (
                                         direction.yaw,
                                         false,
                                         false,
-                                        false,
-                                        center,
-                                        look,
-                                        blinks,
-                                        misc
+                                        left = false,
+                                        center = center,
+                                        rotate = look,
+                                        packets = blinks,
+                                        endYVelo = misc
                                     )
                                 )
                             }
@@ -612,21 +637,33 @@ object AutoP3: Module (
                                         coords,
                                         direction.yaw,
                                         false,
-                                        false,
-                                        false,
-                                        center,
-                                        look,
-                                        misc
+                                        leap = false,
+                                        left = false,
+                                        center = center,
+                                        rotate = look,
+                                        length = misc
                                     )
                                 )
                             }
 
                             "TERM" -> {
-                                ringsList.add(WalkRing(coords, direction.yaw, true, false, false, center, look))
+                                ringsList.add(WalkRing(coords, direction.yaw,
+                                    term = true,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look
+                                ))
                             }
 
                             "LEAP" -> {
-                                ringsList.add(WalkRing(coords, direction.yaw, false, true, false, center, look))
+                                ringsList.add(WalkRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = true,
+                                    left = false,
+                                    center = center,
+                                    rotate = look
+                                ))
                             }
 
                             "TNT" -> {
@@ -634,14 +671,34 @@ object AutoP3: Module (
                                     BoomRing(
                                         coords,
                                         direction.yaw,
-                                        false,
-                                        false,
-                                        false,
-                                        center,
-                                        look,
-                                        BlockPos(blinks[0].positionX, blinks[0].positionY, blinks[0].positionZ)
+                                        term = false,
+                                        leap = false,
+                                        left = false,
+                                        center = center,
+                                        rotate = look,
+                                        block = BlockPos(blinks[0].positionX, blinks[0].positionY, blinks[0].positionZ)
                                     )
                                 )
+                            }
+                            "JUMP" -> {
+                                ringsList.add(JumpRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look,
+                                    walk = walk
+                                ))
+                            }
+                            "SPED" -> {
+                                ringsList.add(SpedRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look,
+                                    length = misc.toInt()
+                                ))
                             }
                         }
                     }
@@ -665,7 +722,6 @@ object AutoP3: Module (
                         instance.rotate = ring.get("rotate")?.asBoolean ?: false
                         instance.left = ring.get("left")?.asBoolean ?: false
                         instance.loadRingData(ring)
-                        devMessage("instance ${instance.type}: ${instance.coords}, ${instance.yaw}, ${instance.term}, ${instance.leap}, ${instance.center}, ${instance.rotate}, ${instance.left}")
                         ringsInJson.add(instance)
                     }
                     rings[route.key] = ringsInJson

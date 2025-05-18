@@ -74,9 +74,8 @@ object EtherWarpHelper {
         return EtherPos.NONE
     }
 
-
+    val degToRad = Math.PI / 180;
     /**
-     * DOES NOT WORK
      * taken from MeowClient
      *
      * @param {*} maxDistance
@@ -86,70 +85,67 @@ object EtherWarpHelper {
      * @param {*} pitch
      * @returns [x, y, z] | null
      */
-    fun rayTraceBlock(maxDistance: Int = 50, partialTicks: Float = 1f, forceSneak: Boolean = false, yaw: Float = mc.thePlayer.rotationYaw, pitch: Float = mc.thePlayer.rotationPitch, renderVec: Vec3 = mc.thePlayer.renderVec): Vec3? {
+    fun rayTraceBlock(
+        maxDistance: Int = 50,
+        partialTicks: Float = 1f,
+        forceSneak: Boolean = false,
+        yaw: Float = mc.thePlayer.rotationYaw,
+        pitch: Float = mc.thePlayer.rotationPitch,
+        playerX: Double? = null, playerY: Double? = null, playerZ: Double? = null
+    ): Vec3? {
+        val eyeX = playerX ?: (mc.thePlayer.lastTickPosX + (mc.thePlayer.posX - mc.thePlayer.lastTickPosX) * partialTicks)
+        val eyeHeight = mc.thePlayer.eyeHeight - if (!mc.thePlayer.isSneaking && forceSneak) 0.0800000429153443 else 0.0
+        val eyeY = playerY
+            ?: ((mc.thePlayer.lastTickPosY + (mc.thePlayer.posY - mc.thePlayer.lastTickPosY) * partialTicks) + eyeHeight)
+        val eyeZ = playerZ ?: (mc.thePlayer.lastTickPosZ + (mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ) * partialTicks)
+        val roundedYaw = (yaw.round(14) * degToRad).toDouble()
+        val roundedPitch = (pitch.round(14) * degToRad).toDouble()
+        val cosPitch = cos(roundedPitch)
+        val dx = -cosPitch * sin(roundedYaw)
+        val dy = -sin(roundedPitch)
+        val dz = cosPitch * cos(roundedYaw)
 
-        var yaw = yaw.round(14).toDouble()
-        var pitch = pitch.round(14).toDouble()
+        var x = floor(eyeX)
+        var y = floor(eyeY)
+        var z = floor(eyeZ)
 
-        yaw *= Math.PI / 180f
-        pitch *= Math.PI / 180f
+        val stepX = if (dx < 0) -1 else 1
+        val stepY = if (dy < 0) -1 else 1
+        val stepZ = if (dz < 0) -1 else 1
 
+        val tDeltaX = abs(1 / dx)
+        val tDeltaY = abs(1 / dy)
+        val tDeltaZ = abs(1 / dz)
 
-        val cosPitch = cos(pitch);
+        var tMaxX = (if (dx < 0) eyeX - x else x + 1 - eyeX) * tDeltaX
+        var tMaxY = (if (dy < 0) eyeY - y else y + 1 - eyeY) * tDeltaY
+        var tMaxZ = (if (dz < 0) eyeZ - z else z + 1 - eyeZ) * tDeltaZ
 
-        val dx = -cosPitch * sin(yaw);
-        val dy = -sin(pitch);
-        val dz = cosPitch * cos(yaw);
-
-        var x = floor(renderVec.xCoord);
-        var y = floor(renderVec.yCoord);
-        var z = floor(renderVec.zCoord);
-
-        val stepX = if (dx < 0) -1 else 1;
-        val stepY = if (dy < 0) -1 else 1;
-        val stepZ = if (dz < 0) -1 else 1;
-
-        val tDeltaX = abs(1 / dx);
-        val tDeltaY = abs(1 / dy);
-        val tDeltaZ = abs(1 / dz);
-
-        var tMaxX = (if (dx < 0) renderVec.xCoord - x else x + 1 - renderVec.xCoord) * tDeltaX;
-        var tMaxY = (if (dy < 0) renderVec.yCoord - y else y + 1 - renderVec.yCoord) * tDeltaY;
-        var tMaxZ = (if (dz < 0) renderVec.zCoord - z else z + 1 - renderVec.zCoord) * tDeltaZ;
-
-        if (!isAir(BlockPos(x, y, z))) {
-            return Vec3(renderVec.xCoord, renderVec.yCoord, renderVec.zCoord)
-        }
-
-        for (i in 0 until maxDistance) {
-
-            val c = minOf(tMaxX, tMaxY, tMaxZ);
-
-            val hit = listOf<Double>(
-                renderVec.xCoord + dx * c,
-                renderVec.yCoord + dy * c,
-                renderVec.zCoord + dz * c
-            ).map {
-                coord -> (coord * 1e10).roundToInt() * 1e-10
+        if (!isAir(BlockPos(x, y, z))) return Vec3(eyeX, eyeY, eyeZ)
+        var i = 0
+        while (i < maxDistance) {
+            i++
+            val c = minOf(tMaxX, tMaxY, tMaxZ)
+            val hit = listOf(
+                eyeX + dx * c,
+                eyeY + dy * c,
+                eyeZ + dz * c
+            ).map { coord ->
+                round(coord * 1e10) * 1e-10
             }
-
             if (tMaxX < tMaxY && tMaxX < tMaxZ) {
-                x += stepX;
-                tMaxX += tDeltaX;
+                x += stepX
+                tMaxX += tDeltaX
             } else if (tMaxY < tMaxZ) {
-                y += stepY;
-                tMaxY += tDeltaY;
+                y += stepY
+                tMaxY += tDeltaY
             } else {
-                z += stepZ;
-                tMaxZ += tDeltaZ;
+                z += stepZ
+                tMaxZ += tDeltaZ
             }
-
-            if (!isAir(BlockPos(x,y,z))) {
-                return Vec3(hit[0], hit[1], hit[2])
-            }
+            if (!isAir(BlockPos(x, y, z))) return Vec3(hit[0], hit[1], hit[2])
         }
-
-        return null;
+        return null
     }
 
 

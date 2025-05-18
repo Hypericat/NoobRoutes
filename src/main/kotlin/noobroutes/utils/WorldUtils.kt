@@ -35,6 +35,12 @@ fun getLookingBlock(){
 }
 
 
+fun isBlock(blockPos: BlockPos, vararg blocks: Block): Boolean {
+    val block = getBlockAt(blockPos)
+    return blocks.any {it == block}
+}
+
+
 /**
  * Checks if the block at the specified `BlockPos` is a gold block in the Minecraft world.
  *
