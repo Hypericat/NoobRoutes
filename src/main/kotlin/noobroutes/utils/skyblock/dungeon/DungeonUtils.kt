@@ -236,6 +236,7 @@ object DungeonUtils {
     fun Room.getRelativeCoords(pos: Vec3) = pos.subtractVec(x = clayPos.x, z = clayPos.z).rotateToNorth(rotation)
     fun Room.getRealCoords(pos: Vec3) = pos.rotateAroundNorth(rotation).addVec(x = clayPos.x, z = clayPos.z)
     fun Room.getRelativeCoords(x: Double, y: Double, z: Double) = getRelativeCoords(Vec3(x, y, z))
+
     fun Room.getRealYaw(yaw: Float): Float {
         val realYaw = when (this.rotation) {
             Rotations.NORTH -> yaw

@@ -48,7 +48,7 @@ class NoobRoutes {
             AutoP3Command(),
             //AuraTestCommand(),
             //EtherwarpTestCommand(),
-            AutoRouteCommand()
+            //AutoRouteCommand()
         ).forEach {
             ClientCommandHandler.instance.registerCommand(it)
         }
