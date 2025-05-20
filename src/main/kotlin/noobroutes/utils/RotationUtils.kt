@@ -54,6 +54,27 @@ object RotationUtils {
         return Pair(normalizedYaw.toFloat(), pitch.toFloat())
     }
 
+    fun getYawAndPitchOrigin(originX: Double, originY: Double, originZ: Double, x: Double, y: Double, z: Double, sneaking: Boolean = false): Pair<Float, Float> {
+        val dx = x - originX
+        val dy = y - (originY + 1.62f - if (sneaking) SNEAKHEIGHT else 0.0)
+        val dz = z - originZ
+
+        val horizontalDistance = sqrt(dx * dx + dz * dz)
+
+        val yaw = Math.toDegrees(atan2(-dx, dz))
+        val pitch = -Math.toDegrees(atan2(dy, horizontalDistance))
+
+        val normalizedYaw = if (yaw < -180) yaw + 360 else yaw
+
+        return Pair(normalizedYaw.toFloat(), pitch.toFloat())
+    }
+
+    fun getYawAndPitchOrigin(origin: Vec3, target: Vec3, sneaking: Boolean = false): Pair<Float, Float>{
+        return getYawAndPitchOrigin(origin.xCoord, origin.yCoord, origin.zCoord, target.xCoord, target.yCoord, target.zCoord, sneaking)
+    }
+
+
+
     /**
      * Gets the angle to aim at a Vec3.
      *

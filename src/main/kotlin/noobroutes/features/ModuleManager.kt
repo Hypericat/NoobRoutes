@@ -81,7 +81,7 @@ object ModuleManager {
         //EtherwarpTest,
         Doorless,
         SecretGuideManager,
-        //AutoRoute
+        AutoRoute
     )
 
     init {

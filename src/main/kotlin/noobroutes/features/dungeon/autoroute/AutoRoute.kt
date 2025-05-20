@@ -12,7 +12,6 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.client.event.sound.SoundEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
@@ -265,6 +264,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             rotating = false
             return
         }
+        val inNodes = mutableListOf<Node>()
         nodes[room.data.name]?.forEach { node ->
             val realCoord = room.getRealCoords(node.pos)
             val inNode = if (node.chain) (
@@ -274,16 +274,26 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             ) else realCoord.distanceToPlayer <= 0.5
             if (inNode && !triggerNodes.contains(node)) {
                 triggerNodes.add(node)
-                rotating = false
-                if (node.awaitSecrets > 0) {
-                    node.awaitRun(event, room)
-                    return@forEach
-                }
-                node.run(event, room)
+                inNodes.add(node)
             } else if (!inNode && triggerNodes.contains(node)) {
                 triggerNodes.remove(node)
             }
         }
+
+
+        inNodes.forEach { node ->
+            rotating = false
+            if (node.awaitSecrets > 0) {
+                node.awaitRun(event, room)
+                return@forEach
+            }
+            Scheduler.schedulePreTickTask { node.runTick(room) }
+            node.run(event, room)
+        }
+
+
+
+
     }
 
     fun handleAutoRouteCommand(args: Array<out String>) {

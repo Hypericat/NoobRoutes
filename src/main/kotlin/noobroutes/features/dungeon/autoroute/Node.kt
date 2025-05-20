@@ -48,6 +48,14 @@ abstract class Node(
         return obj
     }
 
+    open fun awaitRunTick(){
+
+    }
+
+    open fun runTick(room: Room){
+
+    }
+
 
     fun calcFloorPos(c: Double, v: Double): Double{
         return if (c < 0) {
