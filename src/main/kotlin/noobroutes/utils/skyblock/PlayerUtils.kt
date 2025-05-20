@@ -41,6 +41,8 @@ object PlayerUtils {
     fun stopVelocity(){
         mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
     }
+    inline val movementKeysPressed: Boolean get() = playerControlsKeycodes.any { Keyboard.isKeyDown(it) }
+
 
 
 
@@ -102,6 +104,10 @@ object PlayerUtils {
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.keyCode))
     }
 
+    fun forceUnSneak(){
+        KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, false)
+    }
+
     fun sneak(){
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, true)
     }
@@ -125,8 +131,6 @@ object PlayerUtils {
     fun unPressKeys() {
         Keyboard.enableRepeatEvents(false)
         AutoP3Utils.keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
-
-
     }
 
     fun rePressKeys() {

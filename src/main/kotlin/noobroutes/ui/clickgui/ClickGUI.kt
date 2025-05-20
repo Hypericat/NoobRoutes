@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ResourceLocation
 import noobroutes.Core.display
-import noobroutes.Core.logger
 import noobroutes.config.Config
 import noobroutes.features.Category
 import noobroutes.features.render.ClickGUIModule
@@ -46,13 +45,6 @@ object ClickGUI : Screen() {
     fun init() {
         for (category in Category.entries) {
             panels.add(Panel(category))
-        }
-        panels.forEach{
-            logger.info(it.moduleButtons)
-            logger.info(it.displayName)
-            logger.info(it.x)
-            logger.info(it.y)
-            logger.info(it.category)
         }
 
 

@@ -16,18 +16,14 @@ import noobroutes.utils.skyblock.unformattedName
  * Taken from CGA
  */
 object SwapManager {
-    var recentlySwapped = false
+    var lastSwap = 0L
+    inline val recentlySwapped get() = System.currentTimeMillis() - lastSwap < 50L
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase == TickEvent.Phase.END) {
-            recentlySwapped = false
-        }
-    }
+
 
     @SubscribeEvent
     fun onPacket(event: PacketEvent.Send){
-        if (event.packet is C09PacketHeldItemChange) recentlySwapped = true
+        if (event.packet is C09PacketHeldItemChange) lastSwap = System.currentTimeMillis()
     }
 
 
@@ -66,7 +62,7 @@ object SwapManager {
                             modMessage("yo somethings wrong $itemName")
                             return SwapState.TOO_FAST
                         }
-                        recentlySwapped = true
+                        lastSwap = System.currentTimeMillis()
                         mc.thePlayer.inventory.currentItem = i
                         return SwapState.SWAPPED
                     } else {
@@ -101,7 +97,7 @@ object SwapManager {
                             modMessage("yo somethings wrong $itemName")
                             return SwapState.TOO_FAST
                         }
-                        recentlySwapped = true
+                        lastSwap = System.currentTimeMillis()
                         mc.thePlayer.inventory.currentItem = i
                         return SwapState.SWAPPED
                     } else {
@@ -136,7 +132,7 @@ object SwapManager {
                             modMessage("yo somethings wrong $itemName")
                             return SwapState.TOO_FAST
                         }
-                        recentlySwapped = true
+                        lastSwap = System.currentTimeMillis()
                         mc.thePlayer.inventory.currentItem = i
                         return SwapState.SWAPPED
                     } else {
@@ -167,7 +163,7 @@ object SwapManager {
                 modMessage("u swapping too faaaast")
                 return SwapState.TOO_FAST
             }
-            recentlySwapped = true
+            lastSwap = System.currentTimeMillis()
             mc.thePlayer.inventory.currentItem = slot
             return SwapState.SWAPPED
         } else return SwapState.ALREADY_HELD

@@ -3,24 +3,27 @@ package noobroutes.features.floor7.autop3.rings
 import com.google.gson.JsonObject
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import noobroutes.features.floor7.autop3.Ring
+import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AuraManager
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
-import noobroutes.utils.JsonHelper.addProperty
+import noobroutes.utils.json.JsonUtils.addProperty
 
+@RingType("Boom")
 class BoomRing(
-    coords: Vec3,
-    yaw: Float,
-    term: Boolean,
-    leap: Boolean,
-    left: Boolean,
-    center: Boolean,
-    rotate: Boolean,
-    val block: BlockPos
+    coords: Vec3 = Vec3(0.0, 0.0, 0.0),
+    yaw: Float = 0f,
+    term: Boolean = false,
+    leap: Boolean = false,
+    left: Boolean = false,
+    center: Boolean = false,
+    rotate: Boolean = false,
+    var block: BlockPos = BlockPos(0, 0, 0),
 ) : Ring(coords, yaw, term, leap, left, center, rotate) {
 
-    override fun addRingData(obj: JsonObject) {
-        obj.addProperty("block", block)
+    init {
+        addBlockPos("block", {block}, {block = it})
     }
 
     override fun doRing() {

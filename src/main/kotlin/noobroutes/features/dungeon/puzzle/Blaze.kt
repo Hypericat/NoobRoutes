@@ -1,4 +1,4 @@
-package noobroutes.features.puzzle
+package noobroutes.features.dungeon.puzzle
 
 
 import net.minecraft.entity.item.EntityArmorStand
@@ -27,7 +27,7 @@ import noobroutes.utils.skyblock.dungeon.tiles.Room
 object Blaze : Module(
     "Blaze",
     description = "Automatically completes the higher or lower puzzle",
-    category = Category.PUZZLE
+    category = Category.DUNGEON
 ) {
 
     private var lastShotTime = 0L

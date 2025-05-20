@@ -6,6 +6,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.tileentity.TileEntitySkull
 import net.minecraft.util.BlockPos
+import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -18,6 +19,7 @@ import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.utils.*
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import kotlin.math.floor
 import kotlin.math.roundToLong
 
@@ -233,6 +235,30 @@ object DungeonUtils {
 
     fun Room.getRelativeCoords(pos: Vec3) = pos.subtractVec(x = clayPos.x, z = clayPos.z).rotateToNorth(rotation)
     fun Room.getRealCoords(pos: Vec3) = pos.rotateAroundNorth(rotation).addVec(x = clayPos.x, z = clayPos.z)
+    fun Room.getRelativeCoords(x: Double, y: Double, z: Double) = getRelativeCoords(Vec3(x, y, z))
+
+    fun Room.getRealYaw(yaw: Float): Float {
+        val realYaw = when (this.rotation) {
+            Rotations.NORTH -> yaw
+            Rotations.WEST -> yaw - 90
+            Rotations.SOUTH -> yaw - 180
+            Rotations.EAST -> yaw - 270
+            else -> yaw
+        }
+        return MathHelper.wrapAngleTo180_float(realYaw)
+    }
+    fun Room.getRelativeYaw(yaw: Float): Float {
+        val relativeYaw = when (this.rotation) {
+            Rotations.NORTH -> yaw
+            Rotations.WEST -> yaw + 90
+            Rotations.SOUTH -> yaw + 180
+            Rotations.EAST -> yaw + 270
+            else -> yaw
+        }
+        return MathHelper.wrapAngleTo180_float(relativeYaw)
+    }
+
+
     fun Room.getRelativeCoords(pos: BlockPos) = getRelativeCoords(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
     fun Room.getRealCoords(pos: BlockPos) = getRealCoords(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
     fun Room.getRelativeCoords(x: Int, y: Int, z: Int) = getRelativeCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()

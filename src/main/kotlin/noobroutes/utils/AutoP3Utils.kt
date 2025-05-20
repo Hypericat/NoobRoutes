@@ -8,26 +8,34 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3.depth
 import noobroutes.features.floor7.autop3.AutoP3.motionValue
-import noobroutes.features.floor7.autop3.AutoP3.waitingLeap
-import noobroutes.features.floor7.autop3.AutoP3.waitingTerm
 import noobroutes.features.floor7.autop3.Ring
-import noobroutes.features.floor7.autop3.RingTypes
+import noobroutes.features.floor7.autop3.RingType
+import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.render.Color
-import noobroutes.utils.render.RenderUtils.renderX
-import noobroutes.utils.render.RenderUtils.renderY
-import noobroutes.utils.render.RenderUtils.renderZ
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
+import java.io.IOException
+import java.net.MalformedURLException
+import java.net.URISyntaxException
+import java.net.URL
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import kotlin.math.log
 import kotlin.math.pow
 import kotlin.math.sin
+import kotlin.reflect.KClass
+import kotlin.text.replace
 
 object AutoP3Utils {
 
@@ -150,13 +158,11 @@ object AutoP3Utils {
     }
 
     fun distanceToRingSq(coords: Vec3): Double {
-        if(AutoP3.frame) return (coords.xCoord-mc.thePlayer.renderX).pow(2)+(coords.zCoord-mc.thePlayer.renderZ).pow(2)
         return (coords.xCoord-mc.thePlayer.posX).pow(2)+(coords.zCoord-mc.thePlayer.posZ).pow(2)
     }
 
     fun ringCheckY(ring: Ring): Boolean {
-        if(AutoP3.frame) return (ring.coords.yCoord <= mc.thePlayer.renderY && ring.coords.yCoord + 1 > mc.thePlayer.renderY && ring.type != RingTypes.BLINK) || (ring.coords.yCoord == mc.thePlayer.renderY)
-        return (ring.coords.yCoord <= mc.thePlayer.posY && ring.coords.yCoord + 1 > mc.thePlayer.posY && ring.type != RingTypes.BLINK) || (ring.coords.yCoord == mc.thePlayer.posY)
+        return (ring.coords.yCoord <= mc.thePlayer.posY && ring.coords.yCoord + 1 > mc.thePlayer.posY && ring !is BlinkRing) || (ring.coords.yCoord == mc.thePlayer.posY)
     }
 
     @SubscribeEvent
@@ -169,15 +175,8 @@ object AutoP3Utils {
         yeeting = false
     }
 
-    @SubscribeEvent
-    fun onLeftMouse(event: InputEvent.MouseInputEvent) {
-        if (!waitingTerm && !waitingLeap) return
-        val isLeft = Mouse.getEventButton() == 0
-        if (isLeft && Mouse.getEventButtonState()) walking = true
-    }
-
     fun renderRing(ring: Ring) {
-        if (AutoP3.onlyCenter && ring.type != RingTypes.BLINK && !ring.center) return
+        if (AutoP3.onlyCenter && ring !is BlinkRing && !ring.center) return
         if (AutoP3.simpleRings) {
             Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
             return
@@ -190,8 +189,6 @@ object AutoP3Utils {
         Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 1.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.DARK_GRAY, depth = depth)
     }
 
-
-
     fun setGameSpeed(speed: Float) {
         val accessor = mc as TimerFieldAccessor
 
@@ -201,5 +198,117 @@ object AutoP3Utils {
         devMessage("Set Timer: $speed, ${System.currentTimeMillis()}")
     }
 
+
+
+
+    var foundRings = mutableMapOf<String, KClass<out Ring>>()
+
+    fun discoverRings(packageName: String): Map<String, KClass<out Ring>> {
+        foundRings = mutableMapOf()
+        val path = packageName.replace('.', '/')
+        val classURL = this.javaClass.protectionDomain.codeSource.location
+        logger.info(classURL)
+        val file = try {
+            Paths.get(getBaseUrlForClassUrl(classURL).toURI())
+        } catch (e: URISyntaxException) {
+            logger.error("URI ERROR IN AUTO P3 UTILS: $e")
+            return emptyMap()
+        }
+        logger.info("Base directory: $file")
+        if (Files.isDirectory(file)) {
+            walkDir(file, path)
+        } else {
+            walkJar(file, path)
+        }
+        logger.info("Found rings: ${foundRings.keys}")
+        return foundRings
+    }
+
+    private fun walkDir(classRoot: Path, directory: String) {
+        logger.info("Trying to find rings from directory")
+        logger.info(classRoot.resolve(directory))
+        val editedDir = directory.replace("/", ".")
+        try {
+            Files.walk(classRoot.resolve(directory)).use { classes ->
+                classes.map<String?> { it: Path? -> classRoot.relativize(it).toString() }
+                    .forEach { className: String? ->
+                        logger.info("Found class: $className")
+                        tryAddRingClass(className, editedDir)
+                    }
+            }
+        } catch (e: IOException) {
+            throw java.lang.RuntimeException(e)
+        }
+    }
+
+
+
+    fun tryAddRingClass(className: String?, directory: String) {
+        if (className == null) return
+        val norm = (if (className.endsWith(".class")) className.substring(
+            0,
+            className.length - ".class".length
+        ) else className)
+            .replace("\\", "/")
+            .replace("/", ".")
+        logger.info("Found class: $norm, directory: $directory, ${norm.startsWith("$directory.")}")
+
+        if (norm.startsWith("$directory.") && !norm.endsWith(".")) {
+            logger.info("something happening")
+            val clazz = Class.forName(norm)
+            val annotation = clazz.getAnnotation(RingType::class.java)
+            if (annotation == null) return
+            logger.info("Found annotation: $annotation")
+            @Suppress("UNCHECKED_CAST")
+            foundRings[annotation.name] = clazz.kotlin as KClass<out Ring>
+
+        }
+    }
+
+
+    fun getBaseUrlForClassUrl(classUrl: URL): URL {
+        val string = classUrl.toString()
+        if (classUrl.protocol == "jar") {
+            try {
+                return URL(string.substring(4).split("!".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0])
+            } catch (e: MalformedURLException) {
+                throw java.lang.RuntimeException(e)
+            }
+        }
+        if (string.endsWith(".class")) {
+            try {
+                return URL(
+                    string.replace("\\", "/")
+                        .replace(
+                            javaClass.getCanonicalName()
+                                .replace(".", "/") + ".class", ""
+                        ))
+            } catch (e: MalformedURLException) {
+                throw java.lang.RuntimeException(e)
+            }
+        }
+        return classUrl
+    }
+
+    private fun walkJar(file: Path, directory: String) {
+        println("Trying to find rings from jar file")
+        val editedDir = directory.replace("/", ".")
+        try {
+            ZipInputStream(Files.newInputStream(file)).use { zis ->
+                var next: ZipEntry?
+                while ((zis.getNextEntry().also { next = it }) != null) {
+                    val name = next!!.name
+                    if (!name.startsWith(directory) || !name.endsWith(".class")) {
+                        zis.closeEntry()
+                        continue
+                    }
+                    tryAddRingClass(next!!.getName(), editedDir)
+                    zis.closeEntry()
+                }
+            }
+        } catch (e: IOException) {
+            throw java.lang.RuntimeException(e)
+        }
+    }
 
 }

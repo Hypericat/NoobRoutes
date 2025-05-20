@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.events.impl.InputEvent
+import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.utils.Utils.isEnd
@@ -53,6 +54,27 @@ object RotationUtils {
         return Pair(normalizedYaw.toFloat(), pitch.toFloat())
     }
 
+    fun getYawAndPitchOrigin(originX: Double, originY: Double, originZ: Double, x: Double, y: Double, z: Double, sneaking: Boolean = false): Pair<Float, Float> {
+        val dx = x - originX
+        val dy = y - (originY + 1.62f - if (sneaking) SNEAKHEIGHT else 0.0)
+        val dz = z - originZ
+
+        val horizontalDistance = sqrt(dx * dx + dz * dz)
+
+        val yaw = Math.toDegrees(atan2(-dx, dz))
+        val pitch = -Math.toDegrees(atan2(dy, horizontalDistance))
+
+        val normalizedYaw = if (yaw < -180) yaw + 360 else yaw
+
+        return Pair(normalizedYaw.toFloat(), pitch.toFloat())
+    }
+
+    fun getYawAndPitchOrigin(origin: Vec3, target: Vec3, sneaking: Boolean = false): Pair<Float, Float>{
+        return getYawAndPitchOrigin(origin.xCoord, origin.yCoord, origin.zCoord, target.xCoord, target.yCoord, target.zCoord, sneaking)
+    }
+
+
+
     /**
      * Gets the angle to aim at a Vec3.
      *
@@ -90,12 +112,39 @@ object RotationUtils {
     var targetPitch: Float? = null
     var ticksRotated: Long = 0L
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    //@SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: TickEvent.ClientTickEvent){
         if (event.isEnd || mc.thePlayer == null) return
         val rot = currentRotation ?: return
-        if (rot.silent) SilentRotator.doSilentRotation()
+        //if (rot.silent) SilentRotator.doSilentRotation()
         setAngles(rot.yaw + offset, rot.pitch)
+        targetYaw = rot.yaw + offset
+        targetPitch = rot.pitch
+        if (rot.continuous == null) {
+            when (rot.action) {
+                Action.RightClick -> {
+                    shouldRightClick = true
+                }
+                Action.LeftClick -> {
+                    shouldLeftClick = true
+                }
+                null -> {}
+            }
+            currentRotation = null
+            ticksRotated = 0L
+            return
+        }
+        ticksRotated++
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onMotion(event: MotionUpdateEvent.Pre){
+        if (mc.thePlayer == null) return
+        val rot = currentRotation ?: return
+        //if (rot.silent) SilentRotator.doSilentRotation()
+        //setAngles(rot.yaw + offset, rot.pitch)
+        event.yaw = rot.yaw + offset
+        event.pitch = rot.pitch
         targetYaw = rot.yaw + offset
         targetPitch = rot.pitch
         if (rot.continuous == null) {
@@ -177,7 +226,6 @@ object RotationUtils {
             logger.error(e)
         }
     }
-
 
 
 

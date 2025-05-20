@@ -1,69 +1,41 @@
 package noobroutes.features.floor7.autop3
 
 import com.google.gson.*
-import com.google.gson.reflect.TypeToken
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S18PacketEntityTeleport
+import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.logger
-import noobroutes.Core.mc
 import noobroutes.config.DataManager
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.TermOpenEvent
-import noobroutes.features.floor7.autop3.Blink
-import noobroutes.features.floor7.autop3.Blink.lastBlink
-import noobroutes.features.floor7.autop3.Blink.lastBlinkRing
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.floor7.autop3.Blink.blinkStarts
+import noobroutes.features.floor7.autop3.rings.*
 import noobroutes.features.misc.SexAura
-import noobroutes.features.move.LavaClip
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.*
-import noobroutes.utils.adapters.RingAdapter
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
+import org.lwjgl.input.Mouse
+import noobroutes.utils.json.JsonUtils.asVec3
 
-enum class RingTypes {
-    WALK,
-    YEET,
-    HCLIP,
-    STOP,
-    BLINK,
-    TERM,
-    LEAP,
-    MOTION,
-    LAVA,
-    TNT,
-    JUMP,
-    SPED
-}
-
-
-
-data class Ring (
-    val type: RingTypes,
-    val coords: Vec3 = Vec3(mc.thePlayer?.posX ?: 0.0, mc.thePlayer?.posY ?: 0.0, mc.thePlayer?.posZ ?: 0.0),
-    val direction: LookVec = LookVec(mc.thePlayer?.rotationYaw ?: 0f, mc.thePlayer?.rotationPitch ?: 0f),
-    val walk: Boolean = false,
-    val look: Boolean = false,
-    val center: Boolean = false,
-    var should: Boolean = false,
-    val blinkPackets: List<C04PacketPlayerPosition> = emptyList(),
-    val misc: Double = 0.0
-)
 
 object AutoP3: Module (
     name = "AutoP3",
@@ -71,8 +43,6 @@ object AutoP3: Module (
     category = Category.FLOOR7,
     description = "AutoP3"
 ) {
-    val gson: Gson = GsonBuilder().registerTypeAdapter(Ring::class.java, RingAdapter()).setPrettyPrinting().create()
-
     private val route by StringSetting("Route", "", description = "Route to use")
     val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
     val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
@@ -95,11 +65,16 @@ object AutoP3: Module (
     val timerSpeed by NumberSetting(name = "sped ring speed", description = "how much faster it goes (100 means 100x speed) also need tick check for high speeds", min = 2f, max = 100f, default = 10f).withDependency { blinkShit }
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
-    var waitingTerm = false
-    var waitingLeap = false
     private var leapedIDs = mutableSetOf<Int>()
     private val deletedRings  = mutableListOf<Ring>()
     var spedFor = 0
+    private var awaitingLeap = mutableSetOf<Ring>()
+    private var awaitingTerm = mutableSetOf<Ring>()
+    private var awaitingLeft = mutableSetOf<Ring>()
+    private var activatedBlinks = mutableSetOf<BlinkRing>()
+
+    val ringRegistry = AutoP3Utils.discoverRings("noobroutes.features.floor7.autop3.rings")
+
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
@@ -107,21 +82,11 @@ object AutoP3: Module (
         rings[route]?.forEachIndexed { i, ring ->
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
             AutoP3Utils.renderRing(ring)
-            if (ring.type == RingTypes.BLINK) {
-                val vec3List: List<Vec3> = ring.blinkPackets.map { packet -> Vec3(packet.positionX, packet.positionY + 0.01, packet.positionZ) }
-                if (showEnd && ring.blinkPackets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
-                if (showLine) RenderUtils.drawGradient3DLine(vec3List, Color.GREEN, Color.RED, 1F, true)
-            }
-            if (editMode || !frame) return@forEachIndexed
-            if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring) && ring.should) {
-                executeRing(ring)
-                if (ring.type != RingTypes.BLINK) ring.should = false
-            }
-            else if(AutoP3Utils.distanceToRingSq(ring.coords) > 0.25 || !AutoP3Utils.ringCheckY(ring)) ring.should = true
+            if (ring !is BlinkRing) return@forEachIndexed
+            val vec3List: List<Vec3> = ring.packets.map { packet -> Vec3(packet.positionX, packet.positionY + 0.01, packet.positionZ) }
+            if (showEnd && ring.packets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
+            if (showLine) RenderUtils.drawGradient3DLine(vec3List, Color.GREEN, Color.RED, 1F, true)
         }
-        waitingTerm = rings[route]?.any { it.type == RingTypes.TERM && !it.should } == true
-        waitingLeap = rings[route]?.any { it.type == RingTypes.LEAP && !it.should } == true
-        if (!waitingLeap) leapedIDs = mutableSetOf<Int>()
     }
 
     @SubscribeEvent
@@ -130,114 +95,37 @@ object AutoP3: Module (
         if(!inBoss || mc.thePlayer.isSneaking) return
         rings[route]?.forEach {ring ->
             if (editMode) return@forEach
-            if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring) && ring.should) {
-                executeRing(ring)
-                if (ring.type != RingTypes.BLINK) ring.should = false
-            }
-            else if(AutoP3Utils.distanceToRingSq(ring.coords) > 0.25 || !AutoP3Utils.ringCheckY(ring)) ring.should = true
-        }
-        waitingTerm = rings[route]?.any { it.type == RingTypes.TERM && !it.should } == true
-        waitingLeap = rings[route]?.any { it.type == RingTypes.LEAP && !it.should } == true
-        if (!waitingLeap) leapedIDs = mutableSetOf<Int>()
-    }
-
-    private fun executeRing(ring: Ring) {
-        if (ring.look) {
-            if (!silentLook) mc.thePlayer.rotationYaw = ring.direction.yaw
-            Blink.rotate = ring.direction.yaw
-        }
-        if (fuckingLook) mc.thePlayer.rotationYaw = ring.direction.yaw
-        if (ring.center && mc.thePlayer.onGround) {
-            mc.thePlayer.setPosition(ring.coords.xCoord, mc.thePlayer.posY, ring.coords.zCoord)
-            Blink.rotSkip = true
-        }
-        stopOrNot(ring)
-        AutoP3Utils.walkAfter = ring.walk && ring.type != RingTypes.JUMP
-        if (ring.walk && ring.type == RingTypes.JUMP) AutoP3Utils.startWalk(ring.direction.yaw)
-        when(ring.type) {
-            RingTypes.WALK -> { //done
-                AutoP3Utils.startWalk(ring.direction.yaw)
-                modMessage("walking")
-            }
-            RingTypes.STOP -> { //done
-                modMessage("stopping")
-                mc.thePlayer.motionX = 0.0
-                mc.thePlayer.motionZ = 0.0
-            }
-            RingTypes.HCLIP -> { //done
-                modMessage("hclipping")
-                mc.thePlayer.motionX = 0.0
-                mc.thePlayer.motionZ = 0.0
-                if(mc.thePlayer.onGround) mc.thePlayer.jump()
-                AutoP3Utils.awaitingTick = true
-                AutoP3Utils.direction = ring.direction.yaw
-            }
-            RingTypes.BLINK -> {
-                if (lastBlinkRing == ring && System.currentTimeMillis() - lastBlink < 5000) return
-                Blink.doBlink(ring)
-            }
-            RingTypes.TERM -> { //no
-                modMessage("waiting")
-                mc.thePlayer.motionX = 0.0
-                mc.thePlayer.motionZ = 0.0
-                AutoP3Utils.direction = ring.direction.yaw
-            }
-            RingTypes.LEAP -> { //no
-                modMessage("waiting")
-                mc.thePlayer.motionX = 0.0
-                mc.thePlayer.motionZ = 0.0
-                AutoP3Utils.direction = ring.direction.yaw
-            }
-            RingTypes.YEET -> { //done
-                modMessage("yeeting")
-                AutoP3Utils.direction = ring.direction.yaw
-                AutoP3Utils.yeetTicks = 0
-                AutoP3Utils.yeeting = true
-            }
-            RingTypes.MOTION -> { //removed
-                modMessage("motioning")
-                mc.thePlayer.motionX = 0.0
-                mc.thePlayer.motionZ = 0.0
-                if(mc.thePlayer.onGround) mc.thePlayer.jump()
-                AutoP3Utils.awaitingTick = true
-                AutoP3Utils.direction = ring.direction.yaw
-            }
-            RingTypes.LAVA -> { //done
-                modMessage("activating lava clip")
-                mc.thePlayer.motionX = 0.0
-                mc.thePlayer.motionZ = 0.0
-                LavaClip.ringClip = ring.misc
-                LavaClip.toggle()
-            }
-            RingTypes.TNT -> { //done
-                modMessage("tnting")
-                SwapManager.swapFromName("TNT")
-                if (ring.blinkPackets.isEmpty()) {
-                    modMessage("how tf is this empty, send this in noobroutes dc")
+            val inRing = AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)
+            if (inRing && !ring.triggered) {
+                ring.triggered = ring !is BlinkRing || ring.left || ring.leap || ring.term
+                ring.doRingArgs()
+                if (ring.leap || ring.term || ring.left) {
+                    AutoP3Utils.unPressKeys()
+                    mc.thePlayer.motionX = 0.0
+                    mc.thePlayer.motionZ = 0.0
+                }
+                if (ring.leap) {
+                    awaitingLeap.add(ring)
                     return
                 }
-                Scheduler.schedulePreTickTask(1) { AuraManager.auraBlock(ring.blinkPackets[0].positionX.toInt(), ring.blinkPackets[0].positionY.toInt(), ring.blinkPackets[0].positionZ.toInt(), force = true) }
-            }
-            RingTypes.JUMP -> { //done
-                modMessage("jumping")
-                if (mc.thePlayer.onGround) mc.thePlayer.jump()
-                if (ring.walk) AutoP3Utils.startWalk(ring.direction.yaw)
-            }
-            RingTypes.SPED -> {
-                if (ring.misc > Blink.cancelled || spedFor > 0) return
-                if (ring.misc < 1.0) {
-                    modMessage("Broken Speed Ring, cancelling execution")
+                if (ring.term) {
+                    awaitingTerm.add(ring)
                     return
-
                 }
-
-                modMessage("speeding (solid trip)")
-                AutoP3Utils.setGameSpeed(timerSpeed)
-                spedFor = ring.misc.toInt()
-                modMessage(spedFor)
+                if (ring.left) {
+                    awaitingLeft.add(ring)
+                    return
+                }
+                ring.run()
             }
-            else -> modMessage("how tf did u manage to get a ring like this")
+            else if (!inRing) {
+                ring.triggered = false
+                if (ring.leap) awaitingLeap.remove(ring)
+                if (ring.term) awaitingTerm.remove(ring)
+                if (ring.left) awaitingLeft.remove(ring)
+            }
         }
+        if (awaitingLeap.isEmpty()) leapedIDs = mutableSetOf<Int>()
     }
 
 
@@ -248,32 +136,49 @@ object AutoP3: Module (
         if (spedFor == 0) AutoP3Utils.setGameSpeed(1f)
     }
 
-    fun stopOrNot(ring: Ring) {
-        if (ring.type == RingTypes.TNT ||
-            (ring.type == RingTypes.BLINK && lastBlinkRing == ring && System.currentTimeMillis() - lastBlink < 5000) ||
-            ring.type == RingTypes.SPED
-        ) return
-        else AutoP3Utils.unPressKeys()
-    }
 
     @SubscribeEvent
     fun awaitingOpen(event: TermOpenEvent) {
-        if (!waitingTerm) return
-        AutoP3Utils.walking = true
+        if (awaitingTerm.isEmpty()) return
+        awaitingTerm.forEach {
+            it.run()
+            if (it is BlinkRing) activatedBlinks.add(it)
+        }
+    }
+
+    @SubscribeEvent
+    fun onLeftMouse(event: InputEvent.MouseInputEvent) {
+        if (awaitingLeap.isEmpty() && awaitingTerm.isEmpty() && awaitingLeft.isEmpty()) return
+        val isLeft = Mouse.getEventButton() == 0
+        if (!isLeft || !Mouse.getEventButtonState()) return
+        awaitingLeap.addAll(awaitingTerm) //retard protection (no duplicates)
+        awaitingLeap.addAll(awaitingLeft)
+        awaitingLeap.forEach {
+            it.run()
+            if (it is BlinkRing) activatedBlinks.add(it)
+        }
+        awaitingLeap.clear()
+        awaitingTerm.clear()
+        awaitingLeft.clear()
+
+
     }
 
     @SubscribeEvent
     fun awaitingLeap(event: PacketEvent.Receive) {
-        if (!waitingLeap || event.packet !is S18PacketEntityTeleport) return
+        if (awaitingLeap.isEmpty() || event.packet !is S18PacketEntityTeleport) return
         val entity  = mc.theWorld.getEntityByID(event.packet.entityId)
         if (entity !is EntityPlayer) return
         val x = event.packet.x/32.0 //don't fucking ask why its like this
         val y = event.packet.y/32.0
         val z = event.packet.z/32.0
-        if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistanceSq(x,y,z) < 1.25) leapedIDs.add(event.packet.entityId)
+        if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistanceSq(x,y,z) < 5) leapedIDs.add(event.packet.entityId)
         if (leapedIDs.size == leapPlayers()) {
             modMessage("everyone leaped")
-            AutoP3Utils.walking = true
+            awaitingLeap.forEach {
+                it.run()
+                if (it is BlinkRing) activatedBlinks.add(it)
+            }
         }
     }
 
@@ -314,20 +219,22 @@ object AutoP3: Module (
             "relativepos" -> {
                 modMessage(DungeonUtils.currentRoom?.getRelativeCoords(mc.objectMouseOver.blockPos))
             }
-            "speed" -> {
+            /*"speed" -> {
                 if (args.size < 3) return
                 val speed = args[2].toFloatOrNull() ?: return
                 AutoP3Utils.setGameSpeed(speed)
+            }*/
+            "rotate" -> {
+                if (args.size < 4) return
+                val yaw = args[2].toFloatOrNull() ?: return
+                val pitch = args[3].toFloatOrNull() ?: return
+                RotationUtils.rotate(yaw, pitch, false)
             }
             else -> {
                 modMessage("All tests passed")
             }
         }
-
-
-
     }
-
 
     private fun restoreRing() {
         if (deletedRings.isEmpty())  {
@@ -340,96 +247,202 @@ object AutoP3: Module (
     }
 
     private fun addNormalRing(args: Array<out String>?) {
+        if (mc.thePlayer == null) return
         if (args == null || args.size < 2) {
             modMessage("Rings: walk, hclip, stop, term, leap, yeet, motion")
             return
         }
-        val ringType: RingTypes
+        val coords = mc.thePlayer.positionVector
+        val center = args.any {it == "center"}
+        val walk = args.any {it == "walk"}
+        val term = args.any {it == "term"}
+        val leap = args.any { it == "leap" }
+        val left = args.any {it == "left"}
+        val rotate = args.any {it == "rotate" || it == "look"}
         var endPos = 0.0
         var packets = mutableListOf<C04PacketPlayerPosition>()
-        when(args[1].lowercase()) {
+        when (args[1].lowercase()) {
             "walk" -> {
                 modMessage("added walk")
-                ringType = RingTypes.WALK
+                actuallyAddRing(WalkRing(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate
+                )
+                )
             }
+
             "hclip" -> {
                 modMessage("added hclip")
-                ringType = RingTypes.HCLIP
+                actuallyAddRing(HClipRing(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate,
+                    walk
+                )
+                )
             }
             "stop" -> {
                 modMessage("added stop")
-                ringType = RingTypes.STOP
-            }
-            "term" -> {
-                modMessage("added await term")
-                ringType = RingTypes.TERM
-                AutoP3Utils.direction = mc.thePlayer.rotationYaw
-            }
-            "leap" -> {
-                modMessage("added await leap")
-                ringType = RingTypes.LEAP
-                AutoP3Utils.direction = mc.thePlayer.rotationYaw
-            }
-            "yeet" -> {
-                modMessage("yeet added")
-                ringType = RingTypes.YEET
+                actuallyAddRing(StopRing(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate
+                )
+                )
             }
             "motion" -> {
                 modMessage("motion added")
-                ringType = RingTypes.MOTION
+                actuallyAddRing(MotionRing(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate
+                )
+                )
             }
             "lava" -> {
                 if (args.size < 3) {
                     modMessage("need a length arg (positive number)")
                     return
                 }
-                ringType = RingTypes.LAVA
                 val endY = args[2].toDoubleOrNull()
                 if (endY == null) {
                     modMessage("need a length arg (positive number)")
                     return
                 }
-                endPos = endY
+                actuallyAddRing(LavaClipRing(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate,
+                    endY
+                ))
+
             }
             "tnt", "boom" -> {
-                ringType = RingTypes.TNT
                 val block = mc.objectMouseOver.blockPos
                 if (isAir(block)) {
                     modMessage("must look at a block")
                     return
                 }
                 modMessage("added boom")
-                packets.add(C04PacketPlayerPosition(block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), false))
+                actuallyAddRing(BoomRing(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate,
+                    block
+                ))
             }
             "jump" -> {
                 modMessage("jump added")
-                ringType = RingTypes.JUMP
+                actuallyAddRing(JumpRing(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate,
+                    walk
+                ))
             }
             "sped", "speed" -> {
                 if (args.size < 3) {
                     modMessage("need a length arg (positive number)")
                     return
                 }
-                val length = args[2].toDoubleOrNull() ?: return
-                if (length <= 0) {
-                    modMessage("positive number pls")
+                val length = args[2].toIntOrNull() ?: return
+                if (length < 1) {
+                    modMessage("need a number greater than 0")
                     return
                 }
                 modMessage("im sped")
-                ringType = RingTypes.SPED
-                endPos = length
+                actuallyAddRing(SpedRing(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate,
+                    length
+                ))
+
+            }
+            "blink" -> {
+                if (args.size < 3) {
+                    modMessage("need a length arg (positive number)")
+                    return
+                }
+                val length = args[2].toIntOrNull()
+                if (length == null){
+                    modMessage("need a length arg (positive number)")
+                    return
+                }
+                if (length < 1) {
+                    modMessage("need a number greater than 0")
+                    return
+                }
+                val waypoint = BlinkWaypoint(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate,
+                    length
+                )
+                waypoint.triggered = true
+                blinkStarts.add(waypoint)
             }
             else -> return modMessage("thats not a ring type stoopid")
+
+
         }
-        val look = args.any { it == "look" }
-        val center = args.any {it == "center"}
-        val walk = args.any {it == "walk"} && ringType != RingTypes.WALK
-        actuallyAddRing(Ring(ringType, look = look, center = center, walk = walk, misc = endPos, blinkPackets = packets))
+
     }
 
     fun actuallyAddRing(ring: Ring) {
+        ring.triggered = true
         rings[route]?.add(ring) ?: run { rings[route] = mutableListOf(ring) }
         saveRings()
+    }
+
+    @SubscribeEvent
+    fun doTriggeredBlink(event: ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.END || activatedBlinks.isEmpty()) return
+        for (ring in activatedBlinks) {
+            if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)) {
+                ring.run()
+            }
+            else {
+                activatedBlinks.remove(ring)
+            }
+        }
     }
 
     private fun deleteNormalRing(args: Array<out String>) {
@@ -463,34 +476,264 @@ object AutoP3: Module (
 
     fun saveRings(){
         try {
-            val fullJson = gson.toJson(rings)
-            val root = JsonParser().parse(fullJson).asJsonObject
-            val outArray = JsonArray().apply {
-                for ((routeName, ringsElem) in root.entrySet()) {
-                    add(JsonObject().apply {
-                        addProperty("route", routeName)
-                        add("rings", ringsElem)
-                    })
+            val outObj = JsonObject()
+            for ((routeName, rings) in rings) {
+                val ringArray = JsonArray().apply {
+                    for (ring in rings) {
+                        add(ring.getAsJsonObject())
+                    }
                 }
+                outObj.add(routeName, ringArray)
             }
-
-            DataManager.saveDataToFile("rings", outArray)
+            DataManager.saveDataToFile("rings", outObj)
         } catch (e: Exception) {
             modMessage("error saving")
             logger.error("error saving rings", e)
         }
     }
 
+
     fun loadRings() {
         rings.clear()
-        val fileArray = DataManager.loadDataFromFile("rings")
-        rings = fileArray.associate { jsonObject ->
-            val name = jsonObject.get("route").asString
-            val list = mutableListOf<Ring>()
-            jsonObject.getAsJsonArray("rings").forEach {
-                list.add(gson.fromJson(it, Ring::class.java))
+        try {
+            val fileType = DataManager.fileType("rings") ?: return
+            if (fileType == "JsonPrimitive" || fileType == "JsonNull") return
+            if (fileType == "JsonArray") {
+                val file = DataManager.loadDataFromFileArray("rings")
+                file.forEach { route ->
+                    val name = route.get("route").asString
+                    val ringsList = mutableListOf<Ring>()
+                    route.get("rings").asJsonArray.forEach {
+                        val obj = it.asJsonObject
+                        val type = obj.get("type").asString
+                        val positionType = obj.get("coords")
+
+                        val coords = when {
+                            positionType.isJsonObject -> {
+                                val positionObj = positionType.asJsonObject
+                                Vec3(
+                                    positionObj.get("field_72450_a")?.asDouble ?: obj.get("x")?.asDouble ?: 0.0,
+                                    positionObj.get("field_72448_b")?.asDouble ?: obj.get("y")?.asDouble ?: 0.0,
+                                    positionObj.get("field_72449_c")?.asDouble ?: obj.get("z")?.asDouble ?: 0.0
+                                )
+                            }
+
+                            positionType.isJsonArray -> {
+                                val arr = positionType.asJsonArray
+                                if (arr.size() > 0) {
+                                    Vec3(
+                                        arr[0]?.asDouble ?: 0.0,
+                                        arr[1]?.asDouble ?: 0.0,
+                                        arr[2]?.asDouble ?: 0.0
+                                    )
+                                } else {
+                                    Vec3(obj.get("x")?.asDouble ?: 0.0, obj.get("y")?.asDouble ?: 0.0, obj.get("z")?.asDouble ?: 0.0)
+                                }
+
+                            }
+
+                            else -> {
+                                Vec3(0.0, 0.0, 0.0)
+                            }
+                        }
+
+
+                        val dirElem = obj.get("direction") ?: obj.get("directions")
+                        val direction: LookVec = if (dirElem != null) when {
+                            dirElem.isJsonObject -> {
+                                val o = dirElem.asJsonObject
+                                val yaw = o.get("yaw")?.asFloat ?: o.get("field_yaw")?.asFloat ?: 0f
+                                val pitch = o.get("pitch")?.asFloat ?: o.get("field_pitch")?.asFloat ?: 0f
+                                LookVec(yaw, pitch)
+                            }
+                            dirElem.isJsonArray -> {
+                                LookVec(obj.get("yaw").asFloat, obj.get("pitch").asFloat)
+                            }
+                            else -> {
+                                LookVec(0f, 0f)
+                            }
+                        } else {
+                            LookVec(0f, 0f)
+                        }
+
+                        val walk = obj.get("walk")?.asBoolean ?: false
+                        val look = obj.get("look")?.asBoolean ?: false
+                        val center = obj.get("center")?.asBoolean ?: false
+                        val misc = obj.get("misc")?.asDouble ?: obj.get("endY")?.asDouble ?: 0.0
+                        val blinks = mutableListOf<C04PacketPlayerPosition>()
+                        if (obj.has("blinkPackets") || obj.has("blink_packets")) {
+                            val arr =
+                                obj.getAsJsonArray(if (obj.has("blinkPackets")) "blinkPackets" else "blink_packets")
+                            arr.forEach { el ->
+                                val p = el.asJsonObject
+                                val x = p.get("x")?.asDouble ?: p.get("field_149479_a")?.asDouble ?: 0.0
+                                val y = p.get("y")?.asDouble ?: p.get("field_149477_b")?.asDouble ?: 0.0
+                                val z = p.get("z")?.asDouble ?: p.get("field_149478_c")?.asDouble ?: 0.0
+                                val g = p.get("onGround")?.asBoolean ?: p.get("field_149474_g")?.asBoolean ?: false
+                                blinks.add(C04PacketPlayerPosition(x, y, z, g))
+                            }
+                        }
+                        when (type) {
+                            "YEET" -> {
+                                ringsList.add(MotionRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look
+                                ))
+                            }
+
+                            "WALK" -> {
+                                ringsList.add(WalkRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look
+                                ))
+                            }
+
+                            "STOP" -> {
+                                ringsList.add(StopRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look
+                                ))
+                            }
+
+                            "HCLIP" -> {
+                                ringsList.add(HClipRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look,
+                                    walk = walk
+                                ))
+                            }
+
+                            "BLINK" -> {
+                                ringsList.add(
+                                    BlinkRing(
+                                        coords,
+                                        direction.yaw,
+                                        false,
+                                        false,
+                                        left = false,
+                                        center = center,
+                                        rotate = look,
+                                        packets = blinks,
+                                        endYVelo = misc
+                                    )
+                                )
+                            }
+
+                            "LAVA" -> {
+                                ringsList.add(
+                                    LavaClipRing(
+                                        coords,
+                                        direction.yaw,
+                                        false,
+                                        leap = false,
+                                        left = false,
+                                        center = center,
+                                        rotate = look,
+                                        length = misc
+                                    )
+                                )
+                            }
+
+                            "TERM" -> {
+                                ringsList.add(WalkRing(coords, direction.yaw,
+                                    term = true,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look
+                                ))
+                            }
+
+                            "LEAP" -> {
+                                ringsList.add(WalkRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = true,
+                                    left = false,
+                                    center = center,
+                                    rotate = look
+                                ))
+                            }
+
+                            "TNT" -> {
+                                ringsList.add(
+                                    BoomRing(
+                                        coords,
+                                        direction.yaw,
+                                        term = false,
+                                        leap = false,
+                                        left = false,
+                                        center = center,
+                                        rotate = look,
+                                        block = BlockPos(blinks[0].positionX, blinks[0].positionY, blinks[0].positionZ)
+                                    )
+                                )
+                            }
+                            "JUMP" -> {
+                                ringsList.add(JumpRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look,
+                                    walk = walk
+                                ))
+                            }
+                            "SPED" -> {
+                                ringsList.add(SpedRing(coords, direction.yaw,
+                                    term = false,
+                                    leap = false,
+                                    left = false,
+                                    center = center,
+                                    rotate = look,
+                                    length = misc.toInt()
+                                ))
+                            }
+                        }
+                    }
+                    rings[name] = ringsList
+                }
+                saveRings()
+            } else {
+                val file = DataManager.loadDataFromFileObject("rings")
+                file.forEach { route ->
+                    val ringsInJson = mutableListOf<Ring>()
+                    route.value.forEach { it ->
+                        val ring = it.asJsonObject
+                        val ringType = ring.get("type")?.asString ?: "Unknown"
+                        val ringClass = ringRegistry[ringType]
+                        val instance: Ring = ringClass?.java?.getDeclaredConstructor()?.newInstance() ?: return@forEach
+                        instance.coords = ring.get("coords").asVec3
+                        instance.yaw = ring.get("yaw")?.asFloat ?: 0f
+                        instance.term = ring.get("term")?.asBoolean ?: false
+                        instance.leap = ring.get("leap")?.asBoolean ?: false
+                        instance.center = ring.get("center")?.asBoolean ?: false
+                        instance.rotate = ring.get("rotate")?.asBoolean ?: false
+                        instance.left = ring.get("left")?.asBoolean ?: false
+                        instance.loadRingData(ring)
+                        ringsInJson.add(instance)
+                    }
+                    rings[route.key] = ringsInJson
+                }
             }
-            name to list
-        }.toMutableMap()
+        } catch (e: Exception) {
+            modMessage("Error Loading Rings, Please Send Log to Wadey")
+            logger.info(e)
+        }
+    }
+
+    private fun addRing(){
+
     }
 }

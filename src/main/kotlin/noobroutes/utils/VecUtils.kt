@@ -10,6 +10,7 @@ import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.*
 import noobroutes.Core.mc
 import noobroutes.Core.scope
+import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.render.RenderUtils.outlineBounds
 import kotlin.math.*
 
@@ -143,12 +144,12 @@ operator fun Vec3.get(index: Int): Double =
  * @param rotation The rotation to rotate around
  * @return The rotated Vec3
  */
-fun Vec3.rotateAroundNorth(rotation: noobroutes.utils.skyblock.dungeon.tiles.Rotations): Vec3 =
+fun Vec3.rotateAroundNorth(rotation: Rotations): Vec3 =
     when (rotation) {
-        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.NORTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
-        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.WEST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
-        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.SOUTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
-        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.EAST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
+        Rotations.NORTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
+        Rotations.WEST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
+        Rotations.SOUTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
+        Rotations.EAST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
         else -> this
     }
 
@@ -157,12 +158,12 @@ fun Vec3.rotateAroundNorth(rotation: noobroutes.utils.skyblock.dungeon.tiles.Rot
  * @param rotation The rotation to rotate to
  * @return The rotated Vec3
  */
-fun Vec3.rotateToNorth(rotation: noobroutes.utils.skyblock.dungeon.tiles.Rotations): Vec3 =
+fun Vec3.rotateToNorth(rotation: Rotations): Vec3 =
     when (rotation) {
-        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.NORTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
-        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.WEST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
-        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.SOUTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
-        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.EAST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
+        Rotations.NORTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
+        Rotations.WEST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
+        Rotations.SOUTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
+        Rotations.EAST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
         else -> this
     }
 
@@ -355,6 +356,7 @@ fun calculateCoefficientsFromVectors(x: Vec3, y: Vec3): Triple<Double, Double, D
 fun Vec3.coerceYIn(min: Double, max: Double): Vec3 =
     Vec3(xCoord, yCoord.coerceIn(min, max), zCoord)
 
+
 /**
  * Gets the Vec3 position of the given S29PacketSoundEffect.
  * @author Bonsai
@@ -526,9 +528,9 @@ fun bezier(t: Float, initial: Float, p1: Float, p2: Float, final: Float): Float 
 
 fun BlockPos.addRotationCoords(rotation: noobroutes.utils.skyblock.dungeon.tiles.Rotations, x: Int, z: Int): BlockPos =
     when (rotation) {
-        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.NORTH -> BlockPos(this.x + x, this.y, this.z + z)
-        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.SOUTH -> BlockPos(this.x - x, this.y, this.z - z)
-        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.WEST ->  BlockPos(this.x + z, this.y, this.z - x)
-        _root_ide_package_.noobroutes.utils.skyblock.dungeon.tiles.Rotations.EAST ->  BlockPos(this.x - z, this.y, this.z + x)
+        Rotations.NORTH -> BlockPos(this.x + x, this.y, this.z + z)
+        Rotations.SOUTH -> BlockPos(this.x - x, this.y, this.z - z)
+        Rotations.WEST ->  BlockPos(this.x + z, this.y, this.z - x)
+        Rotations.EAST ->  BlockPos(this.x - z, this.y, this.z + x)
         else -> this
     }

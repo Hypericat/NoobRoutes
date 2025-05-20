@@ -6,14 +6,18 @@ import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C0CPacketInput
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S1BPacketEntityAttach
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.BossEventDispatcher.inBoss
+import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.noControlCodes
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 
@@ -23,9 +27,11 @@ object InstaMid: Module (
     category = Category.FLOOR7,
     description = "teleports u back to where u were before necron picked u up (ideally mid)"
 ) {
+    private val forceSneak by BooleanSetting("Force Sneak", description = "Makes the player unable to unsneak while insta mid is active")
     private var cancelling = false
     private var sent = false
 
+    private var forceSneakingActive = false
     @SubscribeEvent
     fun onSend(event: PacketEvent.Send)  {
         if (!cancelling || (event.packet !is C03PacketPlayer && event.packet !is C0CPacketInput)) return
@@ -35,9 +41,14 @@ object InstaMid: Module (
             cancelling = false
             sent = true
             PacketUtils.sendPacket(C06PacketPlayerPosLook(54.0, 65.0, 76.0, 0F, 0F, false))
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.keyCode))
+            forceSneakingActive = false
+            PlayerUtils.unSneak()
         }
 
+    }
+    @SubscribeEvent
+    fun onRenderWorldLast(event: RenderWorldLastEvent){
+        if (forceSneak && forceSneakingActive) PlayerUtils.sneak()
     }
 
     @SubscribeEvent
@@ -49,10 +60,12 @@ object InstaMid: Module (
     }
 
     @SubscribeEvent
-    fun onChat(event: PacketEvent.Receive) {
-        if (event.packet !is S02PacketChat || event.packet.type.toInt() != 0) return
-        val message = event.packet.chatComponent.unformattedText.noControlCodes
-        if (message == "[BOSS] Necron: You went further than any human before, congratulations.") KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, true)
+    fun onChat(event: ChatPacketEvent) {
+
+        if (event.message == "[BOSS] Necron: You went further than any human before, congratulations.") {
+            forceSneakingActive = true
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, true)
+        }
     }
 
     @SubscribeEvent

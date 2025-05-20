@@ -1,4 +1,4 @@
-package noobroutes.features.puzzle
+package noobroutes.features.dungeon.puzzle
 
 
 import com.google.gson.JsonObject
@@ -28,7 +28,7 @@ import org.lwjgl.input.Keyboard
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, description = "Automatic Waterboard Solver") {
+object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, description = "Automatic Waterboard Solver") {
     val silent by BooleanSetting("Silent", false, description = "Serverside Rotations")
     private var waterSolutions: JsonObject
 
@@ -79,10 +79,11 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.PUZZLE, des
 
     private var currentTarget = BlockPos(0, 0, 0)
     private var nextBlock = BlockPos(0, 0, 0)
+    private var c08Delay = false
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!event.isStart || doChest || didChest) return
+        if (!event.isStart || doChest || didChest || c08Delay) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board" || mc.thePlayer.posY != 59.0) return
         val room = DungeonUtils.currentRoom ?: return
         val solutionList = solutions
