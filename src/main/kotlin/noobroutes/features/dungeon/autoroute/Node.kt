@@ -13,18 +13,25 @@ import kotlin.math.floor
 
 abstract class Node(
     val name: String,
+    val priority: Int,
     var pos: Vec3,
     var awaitSecrets: Int = 0,
     var maybeSecret: Boolean = false,
     var delay: Long = 0,
     var center: Boolean = false,
     var stop: Boolean = false,
-    var chain: Boolean = false,
+    var chain: Boolean = false
 ) {
+    enum class RunStatus {
+        NotExecuted,
+        Unfinished,
+        Complete
+    }
 
+    var runStatus = RunStatus.NotExecuted
 
-    abstract fun awaitRun(event: MotionUpdateEvent.Pre, room: Room)
-    abstract fun run(event: MotionUpdateEvent.Pre, room: Room)
+    abstract fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room)
+    abstract fun motion(event: MotionUpdateEvent.Pre, room: Room)
     abstract fun render(room: Room)
     abstract fun nodeAddInfo(obj: JsonObject)
 
@@ -48,11 +55,11 @@ abstract class Node(
         return obj
     }
 
-    open fun awaitRunTick(){
+    open fun awaitTick(room: Room){
 
     }
 
-    open fun runTick(room: Room){
+    open fun tick(room: Room){
 
     }
 

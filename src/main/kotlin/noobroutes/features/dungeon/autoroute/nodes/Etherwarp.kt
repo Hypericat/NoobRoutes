@@ -37,6 +37,7 @@ class Etherwarp(
     chain: Boolean = false,
 ) : Node(
     "Etherwarp",
+    2,
     pos,
     awaitSecret,
     maybeSecret,
@@ -46,18 +47,20 @@ class Etherwarp(
     chain
 ) {
 
-    override fun awaitRunTick() {
+    override fun awaitTick(room: Room) {
         SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
+        if (!silent) setAngles(angles.first, angles.second)
     }
 
-    override fun awaitRun(event: MotionUpdateEvent.Pre, room: Room) {
+    override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         AutoRoute.rotatingYaw = angles.first
         AutoRoute.rotatingPitch = angles.second
         AutoRoute.rotating = true
     }
 
-    override fun runTick(room: Room) {
+    override fun tick(room: Room) {
         devMessage("run tick:${System.currentTimeMillis()}")
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         if (stop) PlayerUtils.stopVelocity()
@@ -68,7 +71,7 @@ class Etherwarp(
     }
 
 
-    override fun run(event: MotionUpdateEvent.Pre, room: Room) {
+    override fun motion(event: MotionUpdateEvent.Pre, room: Room) {
         devMessage("run motion:${System.currentTimeMillis()}")
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         event.yaw = angles.first

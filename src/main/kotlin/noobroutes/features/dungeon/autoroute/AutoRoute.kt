@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.config.DataManager
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
@@ -30,17 +31,11 @@ import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.features.settings.impl.DropdownSetting
 import noobroutes.features.settings.impl.KeybindSetting
+import noobroutes.utils.*
 import noobroutes.utils.RotationUtils.offset
-import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.getEntitiesOfType
 import noobroutes.utils.Utils.isEnd
-import noobroutes.utils.floor
-import noobroutes.utils.getBlockAt
-import noobroutes.utils.isBlock
-import noobroutes.utils.noControlCodes
-import noobroutes.utils.positionVector
 import noobroutes.utils.render.Color
-import noobroutes.utils.round
 import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
@@ -187,13 +182,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onBat(event: TickEvent.ClientTickEvent) {
         if (event.isEnd) return
-        if (sneakDuration > 0) {
-            devMessage("current:$sneakDuration, after:${sneakDuration - 1}")
-            sneakDuration--
-            if (sneakDuration == 0) PlayerUtils.unSneak()
-        }
+
         if (!batSpawnRegistered) return
         val bats = mc.theWorld.getEntitiesOfType<EntityBat>()
         for (bat in bats) {
@@ -248,9 +239,10 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     var rotating = false
     var rotatingYaw: Float? = null
     var rotatingPitch: Float? = null
+    private var nodesToRun = mutableListOf<Node>()
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun motionUpdateEvent(event: MotionUpdateEvent.Pre) {
+    fun motion(event: MotionUpdateEvent){
         if (rotating) {
             rotatingYaw?.let {
                 event.yaw = it + offset
@@ -258,6 +250,16 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             rotatingPitch?.let {
                 event.pitch = it + offset
             }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onTick(e: ClientTickEvent) {
+        if (e.isEnd) return
+        if (sneakDuration > 0) {
+            devMessage("current:$sneakDuration, after:${sneakDuration - 1}")
+            sneakDuration--
+            if (sneakDuration == 0) PlayerUtils.unSneak()
         }
         val room = DungeonUtils.currentRoom
         if (room == null || room.data.name == "Unknown" || nodes[room.data.name] == null || editMode || PlayerUtils.movementKeysPressed) {
@@ -280,15 +282,31 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             }
         }
 
+        inNodes.sortWith(compareByDescending { it.priority })
+        if (inNodes.first().name == "Boom") {
+            inNodes.coerceMax(2)
+        } else inNodes.coerceMax(1)
 
-        inNodes.forEach { node ->
-            rotating = false
-            if (node.awaitSecrets > 0) {
-                node.awaitRun(event, room)
-                return@forEach
+        nodesToRun = inNodes
+
+
+        nodesToRun.first().let { node ->
+            if (node.runStatus == Node.RunStatus.NotExecuted) {
+                rotating = false
+                if (node.awaitSecrets > 0) {
+                    Scheduler.schedulePreMovementUpdateTask {
+                        node.awaitMotion((it as MotionUpdateEvent.Pre), room)
+                    }
+                    node.awaitTick(room)
+                    return
+                }
+                node.tick(room)
+                Scheduler.schedulePreMovementUpdateTask {
+                    node.motion((it as MotionUpdateEvent.Pre), room)
+                }
+
             }
-            Scheduler.schedulePreTickTask { node.runTick(room) }
-            node.run(event, room)
+            if (node.runStatus == Node.RunStatus.Complete) nodesToRun.removeFirst()
         }
 
 

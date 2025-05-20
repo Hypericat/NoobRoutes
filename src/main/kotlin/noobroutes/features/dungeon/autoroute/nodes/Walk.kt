@@ -9,10 +9,6 @@ import noobroutes.features.dungeon.autoroute.AutoRoute.depth
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.AutoP3Utils.startWalk
-import noobroutes.utils.RotationUtils.setAngles
-import noobroutes.utils.Scheduler
-import noobroutes.utils.json.JsonUtils.addProperty
-import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
@@ -28,20 +24,27 @@ class Walk(
     center: Boolean = false,
     stop: Boolean = false,
     chain: Boolean = false,
-) : Node("Walk", pos = pos, awaitSecrets = awaitSecret, maybeSecret = maybeSecret, delay = delay, center = center, stop = stop, chain = chain) {
+) : Node("Walk", 5,  pos = pos, awaitSecrets = awaitSecret, maybeSecret = maybeSecret, delay = delay, center = center, stop = stop, chain = chain) {
 
-
-    override fun awaitRun(event: MotionUpdateEvent.Pre, room: Room) {
-
+    override fun awaitTick(room: Room) {
+        PlayerUtils.forceUnSneak()
+        val yaw = room.getRealYaw(yaw)
+        if (!silent) mc.thePlayer.rotationYaw = yaw
     }
 
-    override fun run(
+    override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
+    }
+
+    override fun tick(room: Room) {
+        PlayerUtils.forceUnSneak()
+        runStatus
+    }
+
+    override fun motion(
         event: MotionUpdateEvent.Pre,
         room: Room
     ) {
         val yaw = room.getRealYaw(yaw)
-        PlayerUtils.forceUnSneak()
-        if (!silent) Scheduler.schedulePreTickTask { mc.thePlayer.rotationYaw = yaw }
         startWalk(yaw)
     }
 
