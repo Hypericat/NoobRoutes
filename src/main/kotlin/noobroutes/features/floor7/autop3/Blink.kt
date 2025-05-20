@@ -21,6 +21,7 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.text
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.sin
 
@@ -293,8 +294,11 @@ object Blink{
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun canceller(event: PacketEvent.Send) {
+
         if(!BossEventDispatcher.inBoss) return
+
         if (event.packet !is C03PacketPlayer) return
+
         if (rotSkip) {
             rotSkip = false
             return
