@@ -1,4 +1,4 @@
-package noobroutes.features.test
+package noobroutes.features.move
 
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C03PacketPlayer
@@ -19,12 +19,13 @@ import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.features.settings.impl.StringSetting
 import noobroutes.utils.Scheduler
+import noobroutes.utils.equalsOneOf
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.PlayerUtils.getBlockPlayerIsLookingAt
 
 object Zpew : Module(
     name = "Zpew",
-    category = Category.MISC,
+    category = Category.MOVE,
     description = "Temporary Zpew thing"
 ) {
 
@@ -73,6 +74,22 @@ object Zpew : Module(
 
         return recentFails.size < MAXFAILSPERFAILPERIOD
     }
+
+    fun holdingTeleportItem(): Boolean {
+        val held = mc.thePlayer.heldItem
+        if (held.skyblockID.equalsOneOf("ASPECT_OF_THE_VOID", "ASPECT_OF_THE_END")) return true
+        val scrolls = held.extraAttributes?.
+
+
+
+
+    }
+
+    fun do0PingAotv(vec3: Vec3){
+        if (isSneaking) return
+        if ()
+    }
+
 
     private fun doZeroPingEtherWarp() {
         val etherBlock = EtherWarpHelper.getEtherPos(
@@ -236,6 +253,9 @@ object Zpew : Module(
         else
             customSound
     }
+
+
+
 
     data class SentC06(
         val yaw: Float,

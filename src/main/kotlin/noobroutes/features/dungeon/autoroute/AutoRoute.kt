@@ -33,6 +33,7 @@ import noobroutes.features.settings.impl.DropdownSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.utils.*
 import noobroutes.utils.RotationUtils.offset
+import noobroutes.utils.Utils.containsOneOf
 import noobroutes.utils.Utils.getEntitiesOfType
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
@@ -54,7 +55,7 @@ import kotlin.math.floor
 
 
 /**
- * Taken from AK47
+ * Modified from AK47 and MeowClient
  */
 
 object AutoRoute : Module("Autoroute", description = "Ak47 modified", category = Category.DUNGEON) {
@@ -66,6 +67,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     val etherwarpColor by ColorSetting("Etherwarp", default = Color.GREEN, description = "Color of etherwarp nodes").withDependency { renderRoutes && colorSettings }
     val walkColor by ColorSetting("Walk", default = Color.GREEN, description = "Color of walk nodes").withDependency { renderRoutes && colorSettings }
     val pearlClipColor by ColorSetting("Pearlclip", default = Color.GREEN, description = "Color of pearlclip nodes").withDependency { renderRoutes && colorSettings }
+    val aotvColor by ColorSetting("Aotv", default = Color.GREEN, description = "Color of Aotv nodes").withDependency { renderRoutes && colorSettings }
+
+
 
     var editMode by BooleanSetting("Edit Mode", description = "Prevents nodes from triggering")
     val editModeBind by KeybindSetting("Edit Mode Toggle", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress {
@@ -320,7 +324,10 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             devMessage("Not in a Room")
             return
         }
-
+        val center = args.containsOneOf("center", "align", ignoreCase = true)
+        val chain = args.containsOneOf("chain", ignoreCase = true)
+        val maybeSecret = args.containsOneOf("maybe", "maybesecret", ignoreCase = true)
+        val
 
         when (args[0].lowercase()) {
             "add", "create", "erect" -> {
@@ -353,6 +360,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                         }
                         addNode(room, PearlClip(playerCoords, distance))
                     }
+
+
+
                 }
 
 

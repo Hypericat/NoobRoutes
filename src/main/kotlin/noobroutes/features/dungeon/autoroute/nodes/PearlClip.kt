@@ -69,7 +69,7 @@ class PearlClip(
     }
 
     override fun render(room: Room) {
-        Renderer.drawCylinder(room.getRealCoords(pos.add(Vec3(0.0, 0.03, 0.0))), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, AutoRoute.pearlClipColor, depth = depth)
+
         Renderer.drawStringInWorld("pearlclip: $distance", pos.add(Vec3(0.0, 0.03, 0.0)), AutoRoute.pearlClipColor, depth = depth)
     }
 

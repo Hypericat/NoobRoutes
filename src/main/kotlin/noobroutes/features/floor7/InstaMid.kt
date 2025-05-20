@@ -72,5 +72,6 @@ object InstaMid: Module (
     fun onUnload(event: WorldEvent.Unload) { //incase leave during pickup stage
         sent = false
         cancelling = false
+        forceSneakingActive = false
     }
 }

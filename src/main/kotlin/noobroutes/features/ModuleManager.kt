@@ -20,8 +20,7 @@ import noobroutes.features.dungeon.puzzle.Weirdos
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.render.Trail
 import noobroutes.features.settings.impl.KeybindSetting
-import noobroutes.features.test.EtherwarpTest
-import noobroutes.features.test.Zpew
+import noobroutes.features.move.Zpew
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.capitalizeFirst

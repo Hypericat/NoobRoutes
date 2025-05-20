@@ -4,9 +4,13 @@ import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
+import noobroutes.features.dungeon.autoroute.AutoRoute.depth
 import noobroutes.utils.AutoP3Utils.walking
 import noobroutes.utils.json.JsonUtils.addProperty
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -72,6 +76,9 @@ abstract class Node(
         }
     }
 
+    internal fun drawNode(room: Room, color: Color) {
+        Renderer.drawCylinder(room.getRealCoords(pos.add(Vec3(0.0, 0.03, 0.0))), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, color, depth = depth)
+    }
 
     fun center(){
         if (mc.thePlayer.posZ < 0 || mc.thePlayer.posZ > 0) mc.thePlayer.setPosition(
