@@ -69,8 +69,8 @@ class PearlClip(
     }
 
     override fun render(room: Room) {
-
-        Renderer.drawStringInWorld("pearlclip: $distance", pos.add(Vec3(0.0, 0.03, 0.0)), AutoRoute.pearlClipColor, depth = depth)
+        drawNode(room, AutoRoute.pearlClipColor)
+        Renderer.drawStringInWorld("PearlClip: $distance", pos.add(Vec3(0.0, 0.6, 0.0)), AutoRoute.pearlClipColor, depth = depth)
     }
 
     override fun nodeAddInfo(obj: JsonObject) {

@@ -246,7 +246,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     private var nodesToRun = mutableListOf<Node>()
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun motion(event: MotionUpdateEvent){
+    fun motion(event: MotionUpdateEvent.Pre){
         if (rotating) {
             rotatingYaw?.let {
                 event.yaw = it + offset
@@ -285,16 +285,16 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 triggerNodes.remove(node)
             }
         }
+        if (inNodes.isNotEmpty()) {
+            inNodes.sortWith(compareByDescending { it.priority })
+            if (inNodes.firstOrNull()?.name == "Boom") {
+                inNodes.coerceMax(2)
+            } else inNodes.coerceMax(1)
 
-        inNodes.sortWith(compareByDescending { it.priority })
-        if (inNodes.first().name == "Boom") {
-            inNodes.coerceMax(2)
-        } else inNodes.coerceMax(1)
+            nodesToRun = inNodes
+        }
 
-        nodesToRun = inNodes
-
-
-        nodesToRun.first().let { node ->
+        nodesToRun.removeFirstOrNull()?.let { node ->
             if (node.runStatus == Node.RunStatus.NotExecuted) {
                 rotating = false
                 if (node.awaitSecrets > 0) {
@@ -327,12 +327,13 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         val center = args.containsOneOf("center", "align", ignoreCase = true)
         val chain = args.containsOneOf("chain", ignoreCase = true)
         val maybeSecret = args.containsOneOf("maybe", "maybesecret", ignoreCase = true)
-        val
+        val stop = args.containsOneOf("stop", ignoreCase = true)
+        val awaitSecrets = args.firstOrNull {it.startsWith("await:", ignoreCase = true) }?.substringAfter("await:")?.toIntOrNull() ?: 0
 
         when (args[0].lowercase()) {
             "add", "create", "erect" -> {
                 if (args.size < 2) {
-                    modMessage("nodes: etherwarp, walk, pearlclip")
+                    modMessage("nodes: etherwarp, walk, pearlclip, aotv")
                     return
                 }
                 val playerCoords = room.getRelativeCoords(floor(PlayerUtils.posX) + 0.5, floor(PlayerUtils.posY), floor(PlayerUtils.posZ) + 0.5)
@@ -344,10 +345,10 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                             return
                         }
                         val target = room.getRelativeCoords(raytrace)
-                        addNode(room, Etherwarp(playerCoords, target))
+                        addNode(room, Etherwarp(playerCoords, target, awaitSecrets, maybeSecret, 0, center, stop, chain))
                     }
                     "walk" -> {
-                        addNode(room, Walk(playerCoords, room.getRelativeYaw(mc.thePlayer.rotationYaw.round(14).toFloat())))
+                        addNode(room, Walk(playerCoords, room.getRelativeYaw(mc.thePlayer.rotationYaw.round(14).toFloat()), awaitSecrets, maybeSecret, 0, center, stop, chain))
                     }
                     "pearlclip" -> {
                         if (args.size < 3) {
@@ -358,7 +359,11 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                             modMessage("Provide a Number thanks")
                             return
                         }
-                        addNode(room, PearlClip(playerCoords, distance))
+                        addNode(room, PearlClip(playerCoords, distance, awaitSecrets, maybeSecret, 0, center, stop, chain))
+                    }
+                    "aotv", "teleport" -> {
+
+
                     }
 
 

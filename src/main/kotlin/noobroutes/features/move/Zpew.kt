@@ -78,8 +78,8 @@ object Zpew : Module(
     fun holdingTeleportItem(): Boolean {
         val held = mc.thePlayer.heldItem
         if (held.skyblockID.equalsOneOf("ASPECT_OF_THE_VOID", "ASPECT_OF_THE_END")) return true
-        val scrolls = held.extraAttributes?.
-
+        val scrolls = held.extraAttributes
+        return false
 
 
 
@@ -87,7 +87,7 @@ object Zpew : Module(
 
     fun do0PingAotv(vec3: Vec3){
         if (isSneaking) return
-        if ()
+        if (holdingTeleportItem()) return
     }
 
 
@@ -138,8 +138,8 @@ object Zpew : Module(
             if (zpewOffset) y -= 0.05
             mc.thePlayer.setPosition(x, y, z)
             mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
-            updatePosition = true
         }
+        updatePosition = true
     }
 
     fun isWithinTolerance(n1: Float, n2: Float, tolerance: Double = 1e-4): Boolean {
