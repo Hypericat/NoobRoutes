@@ -58,7 +58,10 @@ class PearlClip(
         AutoRoute.pearlSoundRegistered = true
         AutoRoute.clipDistance = distance
         if (!silent) mc.thePlayer.rotationPitch = 90f
-        PlayerUtils.airClick()
+        PlayerUtils.forceUnSneak()
+        Scheduler.schedulePreTickTask {
+            PlayerUtils.airClick()
+        }
     }
 
     override fun motion(

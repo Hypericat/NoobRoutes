@@ -1,25 +1,30 @@
 package noobroutes.features.dungeon.autoroute.nodes
 
 import com.google.gson.JsonObject
+import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.aotvColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.edgeRoutes
+import noobroutes.features.dungeon.autoroute.AutoRoute.serverSneak
 import noobroutes.features.dungeon.autoroute.Node
-import noobroutes.utils.RotationUtils
+import noobroutes.features.move.Zpew
+import noobroutes.utils.*
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
-import noobroutes.utils.add
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.json.JsonUtils.addProperty
+import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.modMessage
 
 class Aotv(
     pos: Vec3,
-    var target: Vec3 = Vec3(0.0,0.0,0.0),
+    var target: BlockPos = BlockPos(0,0,0),
     var yaw: Float = 0f,
     var pitch: Float = 0f,
     awaitSecret: Int = 0,
@@ -40,7 +45,6 @@ class Aotv(
     chain
 ) {
 
-
     override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
         AutoRoute.rotatingPitch = pitch
         AutoRoute.rotatingYaw = room.getRealYaw(yaw)
@@ -54,6 +58,32 @@ class Aotv(
 
     override fun tick(room: Room) {
         if (!AutoRoute.silent) RotationUtils.setAngles(room.getRealYaw(yaw), pitch)
+        if (stop) PlayerUtils.stopVelocity()
+        if (center) center()
+        val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+        stopWalk()
+        if (state == SwapManager.SwapState.TOO_FAST) {
+            modMessage("Tried to 0 tick swap gg")
+            return
+        }
+        val tpTarget = room.getRealCoords(target)
+
+        if (!serverSneak || mc.thePlayer.isSneaking || state != SwapManager.SwapState.ALREADY_HELD) {
+            PlayerUtils.forceUnSneak()
+            AutoRoute.rotatingPitch = pitch
+            AutoRoute.rotatingYaw = room.getRealYaw(yaw)
+            AutoRoute.rotating = true
+            Scheduler.schedulePreTickTask(1) {
+                PlayerUtils.airClick()
+                Zpew.doZeroPingAotv(tpTarget)
+            }
+            return
+        }
+
+        Scheduler.schedulePreTickTask {
+            PlayerUtils.airClick()
+            Zpew.doZeroPingAotv(tpTarget)
+        }
 
     }
 
@@ -62,11 +92,11 @@ class Aotv(
         drawNode(room, aotvColor)
         if (edgeRoutes) {
             val targetCoords = room.getRealCoords(target)
-            val yaw = RotationUtils.getYawAndPitchOrigin(room.getRealCoords(pos), targetCoords, true).first
+            val yaw = RotationUtils.getYawAndPitchOrigin(room.getRealCoords(pos), targetCoords.toVec3(), true).first
             Renderer.draw3DLine(
                 listOf(
                     room.getRealCoords(pos).add(yaw.xPart * 0.6, 0.0, yaw.zPart * 0.6),
-                    targetCoords,
+                    targetCoords.toVec3(),
                 ),
                 aotvColor
             )
@@ -74,7 +104,7 @@ class Aotv(
             Renderer.draw3DLine(
                 listOf(
                     room.getRealCoords(pos),
-                    room.getRealCoords(target)
+                    room.getRealCoords(target).toVec3()
                 ),
                 aotvColor
             )

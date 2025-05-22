@@ -9,6 +9,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
+import noobroutes.events.impl.PacketEvent
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import org.lwjgl.input.Keyboard
@@ -33,7 +34,11 @@ object PlayerUtils {
         }
     }
 
+
+
+    private val canClick get() = System.currentTimeMillis() - lastGuiClickSent > 50
     fun airClick(){
+        if (!canClick) return
         devMessage("Clicked")
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
     }
@@ -65,16 +70,19 @@ object PlayerUtils {
 
     fun getPositionString() = "x: ${posX.toInt()}, y: ${posY.toInt()}, z: ${posZ.toInt()}"
 
-    private var lastClickSent = 0L
+    private var lastGuiClickSent = 0L
+    private var lastC08Sent = 0L
 
     @SubscribeEvent
-    fun onPacketSend(event: noobroutes.events.impl.PacketEvent.Send) {
-        if (event.packet !is C0EPacketClickWindow) return
-        lastClickSent = System.currentTimeMillis()
+    fun onPacketSend(event: PacketEvent.Send) {
+        when (event.packet) {
+            is C0EPacketClickWindow -> lastGuiClickSent = System.currentTimeMillis()
+            is C08PacketPlayerBlockPlacement -> lastC08Sent = System.currentTimeMillis()
+        }
     }
 
     fun windowClick(slotId: Int, button: Int, mode: Int) {
-        if (lastClickSent + 45 > System.currentTimeMillis())
+        if (lastGuiClickSent + 45 > System.currentTimeMillis())
         mc.thePlayer?.openContainer?.let {
             if (it !is ContainerChest || slotId !in 0 until it.inventorySlots.size) return
             mc.netHandler?.networkManager?.sendPacket(C0EPacketClickWindow(it.windowId, slotId, button, mode, it.inventory[slotId], it.getNextTransactionID(mc.thePlayer?.inventory)))
@@ -93,6 +101,7 @@ object PlayerUtils {
     fun distanceToPlayer(x: Int, y: Int, z: Int): Double {
         return mc.thePlayer.positionVector.distanceTo(Vec3(x.toDouble(), y.toDouble(), z.toDouble()))
     }
+
     inline val Vec3.distanceToPlayerSq get() = mc.thePlayer.positionVector.squareDistanceTo(this)
     inline val Vec3.distanceToPlayer get() = mc.thePlayer.positionVector.distanceTo(this)
     inline val BlockPos.distanceToPlayer get() = mc.thePlayer.positionVector.distanceTo(Vec3(this))

@@ -155,10 +155,11 @@ object Scheduler {
         }
     }
 
+
     @SubscribeEvent(priority = EventPriority.LOW)
     fun lowS08Event(event: PacketEvent.Receive){
         if (event.packet !is S08PacketPlayerPosLook) return
-        scheduledLowS08Tasks.doTasks(event)
+        if (scheduledLowS08Tasks.doTasks(event)) event.isCanceled = true
     }
 
     @SubscribeEvent

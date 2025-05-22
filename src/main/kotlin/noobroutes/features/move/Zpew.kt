@@ -1,11 +1,14 @@
 package noobroutes.features.move
 
 import net.minecraft.init.Blocks
+import net.minecraft.nbt.NBTTagList
+import net.minecraft.nbt.NBTTagString
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C0BPacketEntityAction
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
+import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.BossEventDispatcher.inBoss
@@ -78,16 +81,52 @@ object Zpew : Module(
     fun holdingTeleportItem(): Boolean {
         val held = mc.thePlayer.heldItem
         if (held.skyblockID.equalsOneOf("ASPECT_OF_THE_VOID", "ASPECT_OF_THE_END")) return true
-        val scrolls = held.extraAttributes
-        return false
+        val scrolls = held.extraAttributes?.getTag("ability_scroll") ?: return false
+        if (scrolls !is NBTTagList) return false
 
-
-
+        val scrollsString = mutableListOf<String>()
+        for (i in 0 until scrolls.tagCount()) {
+            if (scrolls.get(i) is NBTTagString) scrollsString.add((scrolls.get(i) as NBTTagString).string)
+        }
+        return scrollsString.containsAll(listOf("IMPLOSION_SCROLL", "WITHER_SHIELD_SCROLL", "SHADOW_WARP_SCROLL"))
     }
 
-    fun do0PingAotv(vec3: Vec3){
-        if (isSneaking) return
-        if (holdingTeleportItem()) return
+    fun doZeroPingAotv(pos: BlockPos){
+        if (!holdingTeleportItem() || !checkAllowedFails()) return
+        if (isSneaking && mc.thePlayer.heldItem.skyblockID.equalsOneOf("ASPECT_OF_THE_VOID", "ASPECT_OF_THE_END")) return
+        var yaw = lastYaw
+        var pitch = lastPitch
+
+        yaw %= 360
+        if (yaw < 0) yaw += 360
+        if (yaw > 360) yaw -= 360
+
+        val x = pos.x + 0.5
+        var y = pos.y.toDouble()
+        val z = pos.z + 0.5
+
+        lastX = x
+        lastY = y
+        lastZ = z
+        updatePosition = false
+        recentlySentC06s.add(SentC06(yaw, pitch, x, y, z, System.currentTimeMillis()))
+        if (dingdingding) PlayerUtils.playLoudSound(getSound(), 100f, Zpew.pitch.toFloat())
+        if (sendTPCommand) Scheduler.schedulePreTickTask(0) { sendChatMessage("/tp $x $y $z")}
+        if (sendPacket) Scheduler.scheduleHighPreTickTask {
+            mc.netHandler.addToSendQueue(
+                C03PacketPlayer.C06PacketPlayerPosLook(
+                    x,
+                    y,
+                    z,
+                    yaw,
+                    pitch,
+                    mc.thePlayer.onGround
+                )
+            )
+            mc.thePlayer.setPosition(x, y, z)
+            mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
+        }
+        updatePosition = true
     }
 
 

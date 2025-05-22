@@ -34,8 +34,10 @@ abstract class Node(
 
     var runStatus = RunStatus.NotExecuted
 
-    abstract fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room)
-    abstract fun motion(event: MotionUpdateEvent.Pre, room: Room)
+    open fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {}
+    open fun motion(event: MotionUpdateEvent.Pre, room: Room) {}
+    open fun awaitTick(room: Room) {}
+    open fun tick(room: Room) {}
     abstract fun render(room: Room)
     abstract fun nodeAddInfo(obj: JsonObject)
 
@@ -59,13 +61,7 @@ abstract class Node(
         return obj
     }
 
-    open fun awaitTick(room: Room){
 
-    }
-
-    open fun tick(room: Room){
-
-    }
 
 
     fun calcFloorPos(c: Double, v: Double): Double{

@@ -32,18 +32,8 @@ class Walk(
         if (!silent) mc.thePlayer.rotationYaw = yaw
     }
 
-    override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
-    }
-
     override fun tick(room: Room) {
         PlayerUtils.forceUnSneak()
-        runStatus
-    }
-
-    override fun motion(
-        event: MotionUpdateEvent.Pre,
-        room: Room
-    ) {
         val yaw = room.getRealYaw(yaw)
         startWalk(yaw)
     }
