@@ -23,14 +23,23 @@ import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.features.settings.impl.StringSetting
 import noobroutes.utils.Scheduler
 import noobroutes.utils.equalsOneOf
+import noobroutes.utils.getBlockAt
+import noobroutes.utils.getBlockIdAt
+import noobroutes.utils.getBlockStateAt
+import noobroutes.utils.multiply
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.PlayerUtils.getBlockPlayerIsLookingAt
+import noobroutes.utils.toBlockPos
+import kotlin.math.floor
 
 object Zpew : Module(
     name = "Zpew",
     category = Category.MOVE,
     description = "Temporary Zpew thing"
 ) {
+
+    private val zpt by BooleanSetting("Zero Ping Aotv", description = "Zero ping teleport for right clicking aotv")
+    private val zph by BooleanSetting("Zero Ping Hyperion", description = "Zero Ping Hyperion wow")
 
     private val sendPacket by BooleanSetting("Send Packet", description = "You send a C06 Packet, aka, it is actual zpew")
     private val sendTPCommand by BooleanSetting("Send Tp Command", description = "Used for Single Player")
@@ -304,4 +313,57 @@ object Zpew : Module(
         val z: Double,
         val sentAt: Long
     )
+
+    val steps = 100
+
+    fun predictTeleport(distance: Float): Vec3? {
+        val cur = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ)
+        val forward = PlayerUtils.yawPitchVector(lastYaw, lastPitch).multiply(1 / steps)
+        var i = 0
+        while (i > distance * steps) {
+            i++
+            if (i % steps == 0 && !cur.isSpecial && !cur.blockAbove.isSpecial) {
+                cur.add(forward.multiply(-steps))
+                if (i == 0 || !cur.isIgnored || !cur.blockAbove.isIgnored) return null
+                return Vec3(floor(cur.xCoord) + 0.5, floor(cur.yCoord), floor(cur.zCoord) + 0.5)
+            }
+            //if (!cur.isIgnored2 && )
+        }
+        return null
+    }
+
+    fun inBB(vec3: Vec3): Boolean {
+        val block = getBlockAt(vec3.toBlockPos())
+        //val bb = block.collisionRayTrace(mc.theWorld, vec3.toBlockPos())
+        return false
+    }
+
+
+    inline val Vec3.isSpecial: Boolean get() = special.contains(getBlockIdAt(this.toBlockPos()))
+    inline val Vec3.isIgnored: Boolean get() = ignored.contains(getBlockIdAt(this.toBlockPos()))
+    inline val Vec3.isIgnored2: Boolean get() = ignored2.contains(getBlockIdAt(this.toBlockPos()))
+
+
+    inline val Vec3.blockAbove get() = Vec3(this.xCoord, this.yCoord + 1, this.zCoord)
+    val special = listOf(65, 106, 111)
+    val ignored = listOf(0, 51, 8, 9, 10, 11, 171, 331, 39, 40, 115, 132, 77, 143, 66, 27, 28, 157)
+    val ignored2 = listOf(44, 182, 126)
+
+
+    fun getTeleportInfo(): Int? {
+        val held = mc.thePlayer.heldItem
+        if (zpt && held.skyblockID.equalsOneOf("ASPECT_OF_THE_VOID", "ASPECT_OF_THE_END")) {
+            val tuners = held.tuners ?: 0
+            if (!isSneaking) {
+                return 8 + tuners
+            }
+            return null
+        }
+        if (zph && held.skyblockID.equalsOneOf("NECRON_BLADE", "HYPERION", "VALKYRIE", "ASTRAEA", "SCYLLA")) {
+            return 10
+        }
+        return null
+    }
+
+
 }

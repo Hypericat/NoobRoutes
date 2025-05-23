@@ -12,6 +12,7 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -388,7 +389,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                                 modMessage("Invalid Packet")
                                 return@scheduleLowS08Task
                             }
-                            val target = BlockPos(s08.x, s08.y, s08.z)
+                            val target = room.getRelativeCoords(BlockPos(s08.x, s08.y, s08.z))
                             Scheduler.schedulePreTickTask {
                                 if (args[1].lowercase().equalsOneOf("aotv", "teleport")) {
                                     addNode(room, Aotv(playerCoords, target, yaw, pitch, awaitSecrets, maybeSecret, 0, center, stop, chain))
@@ -441,6 +442,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         PlayerUtils.sneak()
         sneakDuration = 3
     }
+
+
+
 
 
 
