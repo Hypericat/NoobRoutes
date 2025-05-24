@@ -53,7 +53,7 @@ object PlayerUtils {
     private val canClick get() = System.currentTimeMillis() - lastGuiClickSent > 50
     fun airClick(){
         if (!canClick) return
-        devMessage("Clicked")
+        devMessage("Clicked: ${System.currentTimeMillis()}")
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
     }
 

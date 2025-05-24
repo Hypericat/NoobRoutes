@@ -138,7 +138,10 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     @SubscribeEvent
     fun onKeyInput(event: InputEvent.KeyInputEvent) {
         val key = Keyboard.getEventKey()
-        if (key == mc.gameSettings.keyBindSneak.keyCode && sneakDuration > 0) PlayerUtils.sneak()
+        if (key == mc.gameSettings.keyBindSneak.keyCode && sneakDuration > 0) {
+            devMessage("force sneaking")
+            PlayerUtils.sneak()
+        }
     }
 
     @SubscribeEvent
@@ -232,7 +235,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     fun onTick(event: ClientTickEvent) {
         if (event.isEnd) return
         if (sneakDuration > 0) {
-            devMessage("current:$sneakDuration, after:${sneakDuration - 1}")
             sneakDuration--
             if (sneakDuration == 0) PlayerUtils.unSneak()
         }
@@ -264,7 +266,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
             nodesToRun = inNodes
         }
-
         nodesToRun.removeFirstOrNull()?.let { node ->
             lastRoute = System.currentTimeMillis()
             if (node.runStatus == Node.RunStatus.NotExecuted) {
@@ -277,14 +278,17 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                     node.awaitTick(room)
                     return
                 }
+                devMessage("runTick: ${System.currentTimeMillis()}")
                 node.tick(room)
                 Scheduler.schedulePreMovementUpdateTask {
+                    devMessage("motionUpdate: ${System.currentTimeMillis()}")
                     node.motion((it as MotionUpdateEvent.Pre), room)
                 }
 
             }
             if (node.runStatus == Node.RunStatus.Complete) nodesToRun.removeFirst()
         }
+
     }
 
     fun handleAutoRouteCommand(args: Array<out String>) {
@@ -405,9 +409,13 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
     fun routeSneak(){
         PlayerUtils.sneak()
-        sneakDuration = 3
+        sneakDuration = 2
     }
 
+    fun routeUnSneak(){
+        sneakDuration = 0
+        PlayerUtils.forceUnSneak()
+    }
 
 
 

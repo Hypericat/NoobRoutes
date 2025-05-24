@@ -61,24 +61,26 @@ class Etherwarp(
     }
 
     override fun tick(room: Room) {
-        devMessage("run tick:${System.currentTimeMillis()}")
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (!silent) setAngles(angles.first, angles.second)
         stopWalk()
-        PlayerUtils.sneak()
+        AutoRoute.routeSneak()
     }
 
 
     override fun motion(event: MotionUpdateEvent.Pre, room: Room) {
-        devMessage("run motion:${System.currentTimeMillis()}")
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         event.yaw = angles.first
         event.pitch = angles.second
-        if (!mc.thePlayer.isSneaking || !serverSneak) {
+        if (!serverSneak) {
             AutoRoute.rotatingYaw = angles.first
             AutoRoute.rotatingPitch = angles.second
             AutoRoute.rotating = true
+            Scheduler.schedulePreTickTask {
+                ether()
+            }
+            return
         }
         if (mc.thePlayer.heldItem.skyblockID != "ASPECT_OF_THE_VOID") {
             AutoRoute.rotatingYaw = angles.first

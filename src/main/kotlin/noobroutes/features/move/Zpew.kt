@@ -10,6 +10,7 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.logger
 import noobroutes.events.BossEventDispatcher
@@ -227,7 +228,7 @@ object Zpew : Module(
         doZeroPingAotv(prediction.toBlockPos())
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onC03(event: PacketEvent.Send) {
         if (event.packet !is C03PacketPlayer) return
         if (!updatePosition) return

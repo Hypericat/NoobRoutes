@@ -70,12 +70,15 @@ class Aotv(
         val tpTarget = room.getRealCoords(target)
 
         if (mc.thePlayer.isSneaking || serverSneak || state != SwapManager.SwapState.ALREADY_HELD) {
-            PlayerUtils.forceUnSneak()
+            AutoRoute.routeUnSneak()
             AutoRoute.rotatingPitch = pitch
             AutoRoute.rotatingYaw = room.getRealYaw(yaw)
             AutoRoute.rotating = true
             Scheduler.schedulePreTickTask(1) {
                 PlayerUtils.airClick()
+                AutoRoute.rotating = false
+                AutoRoute.rotatingPitch = null
+                AutoRoute.rotatingYaw = null
                 Zpew.doZeroPingAotv(tpTarget)
             }
             return
