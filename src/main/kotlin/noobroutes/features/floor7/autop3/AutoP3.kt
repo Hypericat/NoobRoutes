@@ -141,8 +141,8 @@ object AutoP3: Module (
     fun awaitingOpen(event: TermOpenEvent) {
         if (awaitingTerm.isEmpty()) return
         awaitingTerm.forEach {
-            it.run()
             if (it is BlinkRing) activatedBlinks.add(it)
+            else it.run()
         }
     }
 
@@ -154,8 +154,8 @@ object AutoP3: Module (
         awaitingLeap.addAll(awaitingTerm) //retard protection (no duplicates)
         awaitingLeap.addAll(awaitingLeft)
         awaitingLeap.forEach {
-            it.run()
             if (it is BlinkRing) activatedBlinks.add(it)
+            else it.run()
         }
         awaitingLeap.clear()
         awaitingTerm.clear()
@@ -176,8 +176,8 @@ object AutoP3: Module (
         if (leapedIDs.size == leapPlayers()) {
             modMessage("everyone leaped")
             awaitingLeap.forEach {
-                it.run()
                 if (it is BlinkRing) activatedBlinks.add(it)
+                else it.run()
             }
         }
     }
