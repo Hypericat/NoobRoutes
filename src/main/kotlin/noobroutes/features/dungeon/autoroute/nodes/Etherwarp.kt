@@ -8,6 +8,7 @@ import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
 import noobroutes.features.dungeon.autoroute.AutoRoute.edgeRoutes
 import noobroutes.features.dungeon.autoroute.AutoRoute.ether
+import noobroutes.features.dungeon.autoroute.AutoRoute.serverSneak
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.RotationUtils
@@ -18,7 +19,6 @@ import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
 import noobroutes.utils.add
 import noobroutes.utils.json.JsonUtils.addProperty
-import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
@@ -63,11 +63,10 @@ class Etherwarp(
     override fun tick(room: Room) {
         devMessage("run tick:${System.currentTimeMillis()}")
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
-        if (stop) PlayerUtils.stopVelocity()
-        if (center) center()
         SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (!silent) setAngles(angles.first, angles.second)
         stopWalk()
+        PlayerUtils.sneak()
     }
 
 
@@ -76,7 +75,7 @@ class Etherwarp(
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         event.yaw = angles.first
         event.pitch = angles.second
-        if (!mc.thePlayer.isSneaking) {
+        if (!mc.thePlayer.isSneaking || !serverSneak) {
             AutoRoute.rotatingYaw = angles.first
             AutoRoute.rotatingPitch = angles.second
             AutoRoute.rotating = true

@@ -37,7 +37,10 @@ abstract class Node(
     open fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {}
     open fun motion(event: MotionUpdateEvent.Pre, room: Room) {}
     open fun awaitTick(room: Room) {}
-    open fun tick(room: Room) {}
+    open fun tick(room: Room) {
+        if (stop) PlayerUtils.stopVelocity()
+        if (center) center()
+    }
     abstract fun render(room: Room)
     abstract fun nodeAddInfo(obj: JsonObject)
 

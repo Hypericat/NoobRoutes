@@ -17,6 +17,7 @@ import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
 import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.ModuleManager
+import noobroutes.features.dungeon.autoroute.SecretUtils
 import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.*
@@ -76,7 +77,8 @@ class NoobRoutes {
             RotationUtils,
             SilentRotator,
             Etherwarper,
-            BossEventDispatcher
+            BossEventDispatcher,
+            SecretUtils
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }

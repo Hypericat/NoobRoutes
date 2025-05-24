@@ -3,12 +3,13 @@ package noobroutes.features.dungeon.autoroute.nodes
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
-import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
+import noobroutes.features.dungeon.autoroute.AutoRoute.serverSneak
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.AutoP3Utils.startWalk
+import noobroutes.utils.Scheduler
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
@@ -35,6 +36,12 @@ class Walk(
     override fun tick(room: Room) {
         PlayerUtils.forceUnSneak()
         val yaw = room.getRealYaw(yaw)
+        if (serverSneak) {
+            Scheduler.schedulePreTickTask {
+                startWalk(yaw)
+            }
+            return
+        }
         startWalk(yaw)
     }
 

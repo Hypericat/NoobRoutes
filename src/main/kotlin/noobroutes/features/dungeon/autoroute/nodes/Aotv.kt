@@ -14,12 +14,12 @@ import noobroutes.features.move.Zpew
 import noobroutes.utils.*
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
+import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
 import noobroutes.utils.skyblock.dungeon.tiles.Room
-import noobroutes.utils.json.JsonUtils.addProperty
-import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
 
 class Aotv(
@@ -57,9 +57,8 @@ class Aotv(
     }
 
     override fun tick(room: Room) {
+        super.tick(room)
         if (!AutoRoute.silent) RotationUtils.setAngles(room.getRealYaw(yaw), pitch)
-        if (stop) PlayerUtils.stopVelocity()
-        if (center) center()
         val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         stopWalk()
         if (state == SwapManager.SwapState.TOO_FAST) {

@@ -3,16 +3,10 @@ package noobroutes.features.dungeon.autoroute
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import net.minecraft.entity.item.EntityItem
-import net.minecraft.entity.passive.EntityBat
-import net.minecraft.init.Blocks
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C0BPacketEntityAction
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
-import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
-import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -36,13 +30,11 @@ import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.utils.*
 import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.Utils.containsOneOf
-import noobroutes.utils.Utils.getEntitiesOfType
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
-import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
@@ -70,8 +62,12 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     val walkColor by ColorSetting("Walk", default = Color.GREEN, description = "Color of walk nodes").withDependency { renderRoutes && colorSettings }
     val pearlClipColor by ColorSetting("Pearlclip", default = Color.GREEN, description = "Color of pearlclip nodes").withDependency { renderRoutes && colorSettings }
     val aotvColor by ColorSetting("Aotv", default = Color.GREEN, description = "Color of Aotv nodes").withDependency { renderRoutes && colorSettings }
+    val boomColor by ColorSetting("Boom", default = Color.GREEN, description = "Color of Boom nodes").withDependency { renderRoutes && colorSettings }
 
 
+
+    var lastRoute = 0L
+    val routing get() = System.currentTimeMillis() - lastRoute < 150
 
     var editMode by BooleanSetting("Edit Mode", description = "Prevents nodes from triggering")
     val editModeBind by KeybindSetting("Edit Mode Toggle", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress {
@@ -107,7 +103,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     var pearlSoundRegistered = false
     var etherRegistered = false
     var sneakRegistered = false
-    var secretsNeeded = 0
+
 
     var clickRegistered = false
     var itemRegistered = false
@@ -137,17 +133,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     }
 
     @SubscribeEvent
-    fun item(event: PacketEvent.Receive) {
-        if (!itemRegistered || event.packet !is S0DPacketCollectItem) return
-        val item = (mc.theWorld.getEntityByID(event.packet.collectedItemEntityID) as EntityItem).entityItem.displayName.noControlCodes
-        if (!items.contains(item)) return
-        secretsNeeded--
-        if (secretsNeeded > 0) return
-        ether()
-        clear()
-    }
-
-    @SubscribeEvent
     fun onPacketSendReturn(event: PacketReturnEvent.Send) {
         if (event.packet !is C0BPacketEntityAction) return
         serverSneak = when (event.packet.action) {
@@ -156,55 +141,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             else -> serverSneak
         }
     }
-
-
-    @SubscribeEvent
-    fun click(event: PacketReturnEvent.Send) {
-        if (!clickRegistered || event.packet !is C08PacketPlayerBlockPlacement ||
-            event.packet.position == null ||
-            !isBlock(event.packet.position, Blocks.chest, Blocks.trapped_chest, Blocks.lever, Blocks.skull)
-            ) return
-        devMessage("clicked ${getBlockAt(event.packet.position).unlocalizedName}")
-        secretsNeeded--
-        if (secretsNeeded > 0) return
-        Scheduler.schedulePreTickTask(1) {
-            ether()
-            clear()
-        }
-    }
-
-
-    @SubscribeEvent
-    fun batDeath(event: PacketEvent.Receive) {
-        if (
-            !batDeathRegistered ||
-            event.packet !is S29PacketSoundEffect ||
-            event.packet.soundName != "mob.bat.hurt" ||
-            event.packet.positionVector.distanceToPlayerSq > 225
-        ) return
-        secretsNeeded--
-        if (secretsNeeded > 0) return
-        ether()
-        clear()
-    }
-
-    @SubscribeEvent
-    fun onBat(event: ClientTickEvent) {
-        if (event.isEnd) return
-
-        if (!batSpawnRegistered) return
-        val bats = mc.theWorld.getEntitiesOfType<EntityBat>()
-        for (bat in bats) {
-            if (bat.positionVector.distanceToPlayerSq > 225) continue
-            devMessage("Bat Spawned")
-            Scheduler.schedulePreTickTask {
-                PlayerUtils.airClick()
-                rotating = false
-                clear()
-            }
-        }
-    }
-
 
 
     fun clear() {
@@ -303,9 +239,11 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }
 
         nodesToRun.removeFirstOrNull()?.let { node ->
+            lastRoute = System.currentTimeMillis()
             if (node.runStatus == Node.RunStatus.NotExecuted) {
                 rotating = false
-                if (node.awaitSecrets > 0) {
+                SecretUtils.secretCount -= node.awaitSecrets
+                if (SecretUtils.secretCount < 0) {
                     Scheduler.schedulePreMovementUpdateTask {
                         node.awaitMotion((it as MotionUpdateEvent.Pre), room)
                     }

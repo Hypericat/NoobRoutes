@@ -11,10 +11,12 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.events.BossEventDispatcher
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
@@ -22,6 +24,7 @@ import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.features.settings.impl.StringSetting
 import noobroutes.utils.Scheduler
+import noobroutes.utils.Utils.ID
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.getBlockAt
 import noobroutes.utils.getBlockIdAt
@@ -29,6 +32,7 @@ import noobroutes.utils.getBlockStateAt
 import noobroutes.utils.multiply
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.PlayerUtils.getBlockPlayerIsLookingAt
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.toBlockPos
 import kotlin.math.floor
 
@@ -37,7 +41,7 @@ object Zpew : Module(
     category = Category.MOVE,
     description = "Temporary Zpew thing"
 ) {
-
+    private val zpew by BooleanSetting("Zero Ping Etherwarp", description = "Zero ping teleport for right clicking aotv")
     private val zpt by BooleanSetting("Zero Ping Aotv", description = "Zero ping teleport for right clicking aotv")
     private val zph by BooleanSetting("Zero Ping Hyperion", description = "Zero Ping Hyperion wow")
 
@@ -139,12 +143,12 @@ object Zpew : Module(
     }
 
 
-    private fun doZeroPingEtherWarp() {
+    private fun doZeroPingEtherWarp(distance: Float = 57f) {
         val etherBlock = EtherWarpHelper.getEtherPos(
             Vec3(lastX, lastY, lastZ),
             lastYaw,
             lastPitch,
-            57.0
+            distance.toDouble()
         )
 
         if (!etherBlock.succeeded) return
@@ -203,11 +207,7 @@ object Zpew : Module(
 
         val dir = event.packet.placedBlockDirection
         if (dir != 255) return
-
-        if (!LocationUtils.isInSkyblock && !ClickGUIModule.forceHypixel) return
-        if (!isSneaking || mc.thePlayer.heldItem.skyblockID != "ASPECT_OF_THE_VOID" || getBlockPlayerIsLookingAt() in blackListedBlocks) return
-
-
+        val info = getTeleportInfo() ?: return
         if(!checkAllowedFails()) {
             modMessage("§cZero ping etherwarp teleport aborted.")
             modMessage("§c${recentFails.size} fails last ${FAILWATCHPERIOD}s")
@@ -215,7 +215,16 @@ object Zpew : Module(
             return
         }
 
-        doZeroPingEtherWarp()
+        if (!LocationUtils.isInSkyblock && !ClickGUIModule.forceHypixel) return
+        if (info.ether) {
+            doZeroPingEtherWarp(info.distance)
+            return
+        }
+        if (AutoRoute.routing) return
+        devMessage("predicting")
+        val prediction = predictTeleport(info.distance) ?: return
+        devMessage(prediction)
+        doZeroPingAotv(prediction.toBlockPos())
     }
 
     @SubscribeEvent
@@ -250,7 +259,7 @@ object Zpew : Module(
     @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook) return
-        if (inBoss || (!LocationUtils.isInSkyblock && !ClickGUIModule.forceHypixel)) return
+        if (inBoss || (!LocationUtils.isInSkyblock && ClickGUIModule.forceHypixel)) return
         if (recentlySentC06s.isEmpty()) return
 
         val sentC06 = recentlySentC06s[0]
@@ -316,54 +325,80 @@ object Zpew : Module(
 
     val steps = 100
 
-    fun predictTeleport(distance: Float): Vec3? {
-        val cur = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ)
+    private fun predictTeleport(distance: Float): Vec3? {
+        var cur = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ)
         val forward = PlayerUtils.yawPitchVector(lastYaw, lastPitch).multiply(1 / steps)
         var i = 0
-        while (i > distance * steps) {
-            i++
+        while (i < distance * steps) {
             if (i % steps == 0 && !cur.isSpecial && !cur.blockAbove.isSpecial) {
-                cur.add(forward.multiply(-steps))
-                if (i == 0 || !cur.isIgnored || !cur.blockAbove.isIgnored) return null
+                cur = cur.add(forward.multiply(-steps))
+                if (i == 0 || !cur.isIgnored || !cur.blockAbove.isIgnored) {
+                    devMessage("1")
+                    return null}
                 return Vec3(floor(cur.xCoord) + 0.5, floor(cur.yCoord), floor(cur.zCoord) + 0.5)
             }
-            //if (!cur.isIgnored2 && )
-        }
-        return null
-    }
-
-    fun inBB(vec3: Vec3): Boolean {
-        val block = getBlockAt(vec3.toBlockPos())
-        //val bb = block.collisionRayTrace(mc.theWorld, vec3.toBlockPos())
-        return false
-    }
-
-
-    inline val Vec3.isSpecial: Boolean get() = special.contains(getBlockIdAt(this.toBlockPos()))
-    inline val Vec3.isIgnored: Boolean get() = ignored.contains(getBlockIdAt(this.toBlockPos()))
-    inline val Vec3.isIgnored2: Boolean get() = ignored2.contains(getBlockIdAt(this.toBlockPos()))
-
-
-    inline val Vec3.blockAbove get() = Vec3(this.xCoord, this.yCoord + 1, this.zCoord)
-    val special = listOf(65, 106, 111)
-    val ignored = listOf(0, 51, 8, 9, 10, 11, 171, 331, 39, 40, 115, 132, 77, 143, 66, 27, 28, 157)
-    val ignored2 = listOf(44, 182, 126)
-
-
-    fun getTeleportInfo(): Int? {
-        val held = mc.thePlayer.heldItem
-        if (zpt && held.skyblockID.equalsOneOf("ASPECT_OF_THE_VOID", "ASPECT_OF_THE_END")) {
-            val tuners = held.tuners ?: 0
-            if (!isSneaking) {
-                return 8 + tuners
+            if ((!cur.isIgnored2 && cur.inBB) || (!cur.blockAbove.isIgnored2 && cur.blockAbove.inBB)) {
+                cur = cur.add(forward.multiply(-steps))
+                if (i == 0 || (!cur.isIgnored && cur.inBB) || (!cur.blockAbove.isIgnored && cur.blockAbove.inBB)) {
+                    devMessage("2")
+                    return null
+                }
+                break
             }
-            return null
+            cur = cur.add(forward)
+            i++
+        }
+        val pos = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ).add(PlayerUtils.yawPitchVector(lastYaw, lastPitch).multiply(
+            floor((i / steps).toDouble())
+        ))
+        if ((cur.isIgnored && cur.inBB) || (cur.blockAbove.isIgnored && cur.inBB)) return null
+        return Vec3(floor(pos.xCoord) + 0.5, floor(pos.yCoord), floor(pos.zCoord) + 0.5)
+    }
+
+
+    private val Vec3.inBB: Boolean get() {
+        val bb = getBlockStateAt(this.toBlockPos()).block.getSelectedBoundingBox(mc.theWorld, this.toBlockPos())
+        return bb?.isVecInside(this) ?: false
+    }
+
+
+    private inline val Vec3.isSpecial: Boolean get() = special.contains(getBlockIdAt(this.toBlockPos()))
+    private inline val Vec3.isIgnored: Boolean get() = ignored.contains(getBlockIdAt(this.toBlockPos()))
+    private inline val Vec3.isIgnored2: Boolean get() = ignored2.contains(getBlockIdAt(this.toBlockPos()))
+
+
+    private inline val Vec3.blockAbove get() = Vec3(this.xCoord, this.yCoord + 1, this.zCoord)
+    private val special = listOf(65, 106, 111)
+    private val ignored = listOf(0, 51, 8, 9, 10, 11, 171, 331, 39, 40, 115, 132, 77, 143, 66, 27, 28, 157)
+    private val ignored2 = listOf(44, 182, 126)
+
+    class TeleportInfo(val distance: Float, val ether: Boolean)
+    private fun getTeleportInfo(): TeleportInfo? {
+        if (inBoss && DungeonUtils.floorNumber == 7) return null
+        val held = mc.thePlayer.heldItem
+        if (!LocationUtils.isInSkyblock && ClickGUIModule.forceHypixel) {
+            if (held.ID == 277) {
+                return if (isSneaking) {
+                    if (zpew) TeleportInfo(61f, true) else null
+                } else {
+                    if (zpt) TeleportInfo(12f, false) else null
+                }
+            }
+            if (held.ID == 267 && zph) {
+                return TeleportInfo(10f, false)
+            }
+        }
+        if (held.skyblockID.equalsOneOf("ASPECT_OF_THE_VOID", "ASPECT_OF_THE_END")) {
+            val tuners = held.tuners ?: 0
+            return if (isSneaking) {
+                if (zpew) TeleportInfo(56f + tuners, true) else null
+            } else {
+                if (zpt) TeleportInfo(8f + tuners, false) else null
+            }
         }
         if (zph && held.skyblockID.equalsOneOf("NECRON_BLADE", "HYPERION", "VALKYRIE", "ASTRAEA", "SCYLLA")) {
-            return 10
+            return TeleportInfo(10f, false)
         }
         return null
     }
-
-
 }
