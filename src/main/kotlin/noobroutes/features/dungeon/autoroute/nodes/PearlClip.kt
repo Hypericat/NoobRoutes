@@ -76,4 +76,8 @@ class PearlClip(
     override fun nodeAddInfo(obj: JsonObject) {
         obj.addProperty("distance", distance)
     }
+
+    override fun loadNodeInfo(obj: JsonObject) {
+        TODO("Not yet implemented")
+    }
 }

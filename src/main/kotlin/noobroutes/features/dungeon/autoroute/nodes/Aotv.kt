@@ -15,6 +15,8 @@ import noobroutes.utils.*
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
 import noobroutes.utils.json.JsonUtils.addProperty
+import noobroutes.utils.json.JsonUtils.asBlockPos
+import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
@@ -94,7 +96,7 @@ class Aotv(
             Renderer.draw3DLine(
                 listOf(
                     room.getRealCoords(pos).add(yaw.xPart * 0.6, 0.0, yaw.zPart * 0.6),
-                    targetCoords.toVec3(),
+                    targetCoords.toVec3().add(0.5, 0.0, 0.5),
                 ),
                 aotvColor
             )
@@ -102,7 +104,7 @@ class Aotv(
             Renderer.draw3DLine(
                 listOf(
                     room.getRealCoords(pos),
-                    room.getRealCoords(target).toVec3()
+                    room.getRealCoords(target).toVec3().add(0.5, 0.0, 0.5)
                 ),
                 aotvColor
             )
@@ -113,8 +115,9 @@ class Aotv(
         obj.addProperty("target", target)
     }
 
-
-
+    override fun loadNodeInfo(obj: JsonObject) {
+        this.target = obj.get("target")?.asBlockPos ?: BlockPos(0.0, 0.0, 0.0)
+    }
 
 
 }

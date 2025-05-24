@@ -43,6 +43,7 @@ abstract class Node(
     }
     abstract fun render(room: Room)
     abstract fun nodeAddInfo(obj: JsonObject)
+    abstract fun loadNodeInfo(obj: JsonObject)
 
     fun stopWalk(){
         walking = false
@@ -63,6 +64,7 @@ abstract class Node(
         nodeAddInfo(obj)
         return obj
     }
+
 
 
 

@@ -11,6 +11,7 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core.logger
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.PacketEvent
@@ -34,6 +35,7 @@ import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.PlayerUtils.getBlockPlayerIsLookingAt
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.toBlockPos
+import sun.util.logging.resources.logging
 import kotlin.math.floor
 
 object Zpew : Module(
@@ -221,9 +223,7 @@ object Zpew : Module(
             return
         }
         if (AutoRoute.routing) return
-        devMessage("predicting")
         val prediction = predictTeleport(info.distance) ?: return
-        devMessage(prediction)
         doZeroPingAotv(prediction.toBlockPos())
     }
 
@@ -327,31 +327,39 @@ object Zpew : Module(
 
     private fun predictTeleport(distance: Float): Vec3? {
         var cur = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ)
-        val forward = PlayerUtils.yawPitchVector(lastYaw, lastPitch).multiply(1 / steps)
-        var i = 0
-        while (i < distance * steps) {
+        val forward = PlayerUtils.yawPitchVector(lastYaw, lastPitch).multiply(1f / steps)
+        logger.info(forward)
+        var stepsTaken = 0
+        for (i in 0 until (distance * steps).toInt()) {
+            logger.info("i$i")
+            logger.info(cur)
             if (i % steps == 0 && !cur.isSpecial && !cur.blockAbove.isSpecial) {
-                cur = cur.add(forward.multiply(-steps))
-                if (i == 0 || !cur.isIgnored || !cur.blockAbove.isIgnored) {
-                    devMessage("1")
-                    return null}
-                return Vec3(floor(cur.xCoord) + 0.5, floor(cur.yCoord), floor(cur.zCoord) + 0.5)
+                if (!cur.isIgnored || !cur.blockAbove.isIgnored) {
+                    cur = cur.add(forward.multiply(-steps))
+                    if (i == 0 || !cur.isIgnored || !cur.blockAbove.isIgnored) {
+                        return null
+                    }
+                    return Vec3(floor(cur.xCoord) + 0.5, floor(cur.yCoord), floor(cur.zCoord) + 0.5)
+                }
             }
             if ((!cur.isIgnored2 && cur.inBB) || (!cur.blockAbove.isIgnored2 && cur.blockAbove.inBB)) {
                 cur = cur.add(forward.multiply(-steps))
                 if (i == 0 || (!cur.isIgnored && cur.inBB) || (!cur.blockAbove.isIgnored && cur.blockAbove.inBB)) {
-                    devMessage("2")
                     return null
                 }
+                stepsTaken = i
                 break
             }
             cur = cur.add(forward)
-            i++
+            stepsTaken = i
         }
+        val multiplicationFactor = floor(stepsTaken.toFloat() / steps)
         val pos = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ).add(PlayerUtils.yawPitchVector(lastYaw, lastPitch).multiply(
-            floor((i / steps).toDouble())
+            multiplicationFactor
         ))
-        if ((cur.isIgnored && cur.inBB) || (cur.blockAbove.isIgnored && cur.inBB)) return null
+        logger.info(floor((stepsTaken.toFloat() / steps).toDouble()))
+        logger.info("pos: $pos")
+        if ((!cur.isIgnored && cur.inBB) || (!cur.blockAbove.isIgnored && cur.blockAbove.inBB)) return null
         return Vec3(floor(pos.xCoord) + 0.5, floor(pos.yCoord), floor(pos.zCoord) + 0.5)
     }
 
@@ -364,7 +372,7 @@ object Zpew : Module(
 
     private inline val Vec3.isSpecial: Boolean get() = special.contains(getBlockIdAt(this.toBlockPos()))
     private inline val Vec3.isIgnored: Boolean get() = ignored.contains(getBlockIdAt(this.toBlockPos()))
-    private inline val Vec3.isIgnored2: Boolean get() = ignored2.contains(getBlockIdAt(this.toBlockPos()))
+    private inline val Vec3.isIgnored2: Boolean get() = ignored2.contains(getBlockIdAt(this.toBlockPos())) || this.isIgnored
 
 
     private inline val Vec3.blockAbove get() = Vec3(this.xCoord, this.yCoord + 1, this.zCoord)

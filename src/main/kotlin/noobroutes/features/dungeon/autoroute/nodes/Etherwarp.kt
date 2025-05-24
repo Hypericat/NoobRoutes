@@ -121,4 +121,8 @@ class Etherwarp(
     override fun nodeAddInfo(obj: JsonObject) {
         obj.addProperty("target", target)
     }
+
+    override fun loadNodeInfo(obj: JsonObject) {
+        TODO("Not yet implemented")
+    }
 }

@@ -12,6 +12,7 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.bloomNormalize
 import org.lwjgl.input.Keyboard
 import kotlin.math.PI
 import kotlin.math.cos
@@ -25,7 +26,7 @@ object PlayerUtils {
         val f1 = sin(-yaw * 0.017453292 - PI)
         val f2 = -cos(-pitch * 0.017453292)
         val f3 = sin(-pitch * 0.017453292)
-        return Vec3(f1*f2, f3, f*f2).normalize()
+        return Vec3(f1*f2, f3, f*f2).bloomNormalize()
 
     }
 
@@ -35,7 +36,7 @@ object PlayerUtils {
      *
      * @param sound The identifier of the sound to be played.
      * @param volume The volume at which the sound should be played.
-     * @param pitch The pitch at which the sound should be played.
+     * @param pitch The pitch at which the sound should be played.66666
      *
      * @author Aton
      */

@@ -56,5 +56,9 @@ class Walk(
         obj.addProperty("yaw", yaw)
     }
 
+    override fun loadNodeInfo(obj: JsonObject) {
+        TODO("Not yet implemented")
+    }
+
 
 }

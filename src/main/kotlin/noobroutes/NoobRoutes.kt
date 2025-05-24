@@ -13,6 +13,7 @@ import noobroutes.commands.AutoP3Command
 import noobroutes.commands.AutoRouteCommand
 import noobroutes.commands.EtherwarpTestCommand
 import noobroutes.commands.NoobRoutesCommand
+import noobroutes.commands.YawPitchCommand
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
 import noobroutes.features.floor7.autop3.Blink
@@ -49,7 +50,8 @@ class NoobRoutes {
             AutoP3Command(),
             //AuraTestCommand(),
             //EtherwarpTestCommand(),
-            AutoRouteCommand()
+            AutoRouteCommand(),
+            YawPitchCommand()
         ).forEach {
             ClientCommandHandler.instance.registerCommand(it)
         }

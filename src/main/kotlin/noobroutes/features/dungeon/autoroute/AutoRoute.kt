@@ -7,6 +7,7 @@ import net.minecraft.network.play.client.C0BPacketEntityAction
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -19,6 +20,7 @@ import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.dungeon.autoroute.nodes.Aotv
+import noobroutes.features.dungeon.autoroute.nodes.Boom
 import noobroutes.features.dungeon.autoroute.nodes.Etherwarp
 import noobroutes.features.dungeon.autoroute.nodes.PearlClip
 import noobroutes.features.dungeon.autoroute.nodes.Walk
@@ -31,6 +33,7 @@ import noobroutes.utils.*
 import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.Utils.containsOneOf
 import noobroutes.utils.Utils.isEnd
+import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.PlayerUtils
@@ -46,6 +49,7 @@ import org.lwjgl.input.Keyboard
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.floor
+import kotlin.reflect.KClass
 
 
 /**
@@ -64,7 +68,12 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     val aotvColor by ColorSetting("Aotv", default = Color.GREEN, description = "Color of Aotv nodes").withDependency { renderRoutes && colorSettings }
     val boomColor by ColorSetting("Boom", default = Color.GREEN, description = "Color of Boom nodes").withDependency { renderRoutes && colorSettings }
 
-
+    val nodeRegistry = mapOf<String, KClass<out Node>>(
+        Pair("Etherwarp", Etherwarp::class),
+        Pair("Aotv", Aotv::class),
+        Pair("Boom", Boom::class),
+        Pair("Walk", Walk::class)
+    )
 
     var lastRoute = 0L
     val routing get() = System.currentTimeMillis() - lastRoute < 150
@@ -151,6 +160,24 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     }
 
     fun loadFile() {
+        val file = DataManager.loadDataFromFileObject("autoroutes")
+        for ((key, arr) in file) {
+            val nodes = mutableListOf<Node>()
+            arr.forEach {
+                val obj = it.asJsonObject
+                val type = obj.get("type") ?: "Unknown"
+                val node = nodeRegistry[type]
+                val instance = node?.java?.getDeclaredConstructor()?.newInstance() ?: return@forEach
+                instance.loadNodeInfo(obj)
+                instance.pos = obj?.get("position")?.asVec3 ?: Vec3(0.0, 0.0, 0.0)
+                //instance.
+
+
+
+            }
+
+        }
+
 
     }
     fun saveFile(){

@@ -39,4 +39,8 @@ class Boom(
         TODO("Not yet implemented")
     }
 
+    override fun loadNodeInfo(obj: JsonObject) {
+        TODO("Not yet implemented")
+    }
+
 }
