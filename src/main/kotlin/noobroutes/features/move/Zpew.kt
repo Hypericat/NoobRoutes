@@ -331,7 +331,7 @@ object Zpew : Module(
         val forward = PlayerUtils.yawPitchVector(lastYaw, lastPitch).multiply(1f / steps)
         logger.info(forward)
         var stepsTaken = 0
-        for (i in 0 until (distance * steps).toInt()) {
+        for (i in 0 until (distance * steps).toInt() + 1) {
             logger.info("i$i")
             logger.info(cur)
             if (i % steps == 0 && !cur.isSpecial && !cur.blockAbove.isSpecial) {

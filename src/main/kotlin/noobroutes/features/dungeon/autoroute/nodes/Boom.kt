@@ -8,8 +8,8 @@ import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 
 class Boom(
-    pos: Vec3,
-    var target: BlockPos,
+    pos: Vec3 = Vec3(0.0, 0.0, 0.0),
+    var target: BlockPos = BlockPos(0.0, 0.0, 0.0),
     awaitSecret: Int = 0,
     maybeSecret: Boolean = false,
     delay: Long = 0,

@@ -4,7 +4,6 @@ import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C0CPacketInput
-import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S1BPacketEntityAttach
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -16,7 +15,6 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.PacketUtils
-import noobroutes.utils.noControlCodes
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
@@ -42,7 +40,7 @@ object InstaMid: Module (
             sent = true
             PacketUtils.sendPacket(C06PacketPlayerPosLook(54.0, 65.0, 76.0, 0F, 0F, false))
             forceSneakingActive = false
-            PlayerUtils.unSneak()
+            PlayerUtils.resyncSneak()
         }
 
     }

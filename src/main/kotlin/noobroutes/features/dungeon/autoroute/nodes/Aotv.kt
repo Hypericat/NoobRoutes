@@ -25,7 +25,7 @@ import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.modMessage
 
 class Aotv(
-    pos: Vec3,
+    pos: Vec3 = Vec3(0.0, 0.0, 0.0),
     var target: BlockPos = BlockPos(0,0,0),
     var yaw: Float = 0f,
     var pitch: Float = 0f,
@@ -70,22 +70,16 @@ class Aotv(
         val tpTarget = room.getRealCoords(target)
 
         if (mc.thePlayer.isSneaking || serverSneak || state != SwapManager.SwapState.ALREADY_HELD) {
-            AutoRoute.routeUnSneak()
+            PlayerUtils.forceUnSneak()
             AutoRoute.rotatingPitch = pitch
             AutoRoute.rotatingYaw = room.getRealYaw(yaw)
             AutoRoute.rotating = true
             Scheduler.schedulePreTickTask(1) {
-                PlayerUtils.airClick()
-                AutoRoute.rotating = false
-                AutoRoute.rotatingPitch = null
-                AutoRoute.rotatingYaw = null
-                Zpew.doZeroPingAotv(tpTarget)
+                AutoRoute.aotv(tpTarget)
             }
             return
         }
-
-        PlayerUtils.airClick()
-        Zpew.doZeroPingAotv(tpTarget)
+        AutoRoute.aotv(tpTarget)
 
 
     }
@@ -101,7 +95,8 @@ class Aotv(
                     room.getRealCoords(pos).add(yaw.xPart * 0.6, 0.0, yaw.zPart * 0.6),
                     targetCoords.toVec3().add(0.5, 0.0, 0.5),
                 ),
-                aotvColor
+                aotvColor,
+                depth = AutoRoute.depth
             )
         } else {
             Renderer.draw3DLine(
@@ -109,18 +104,21 @@ class Aotv(
                     room.getRealCoords(pos),
                     room.getRealCoords(target).toVec3().add(0.5, 0.0, 0.5)
                 ),
-                aotvColor
+                aotvColor,
+                depth = AutoRoute.depth
             )
         }
     }
 
     override fun nodeAddInfo(obj: JsonObject) {
         obj.addProperty("target", target)
+        obj.addProperty("yaw", yaw)
+        obj.addProperty("pitch", pitch)
     }
 
     override fun loadNodeInfo(obj: JsonObject) {
         this.target = obj.get("target")?.asBlockPos ?: BlockPos(0.0, 0.0, 0.0)
+        this.yaw = obj.get("yaw").asFloat
+        this.pitch = obj.get("pitch").asFloat
     }
-
-
 }

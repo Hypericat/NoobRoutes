@@ -54,7 +54,7 @@ abstract class Node(
         val obj = JsonObject().apply {
             addProperty("name", name)
             addProperty("position", pos)
-            if (awaitSecrets > 0) addProperty("awaitSecret", awaitSecrets)
+            if (awaitSecrets > 0) addProperty("secrets", awaitSecrets)
             if (maybeSecret) addProperty("maybeSecret", true)
             if (delay > 0) addProperty("delay", delay)
             if (center) addProperty("center", true)

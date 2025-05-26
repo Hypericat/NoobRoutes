@@ -17,8 +17,8 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 
 class Walk(
-    pos: Vec3,
-    var yaw: Float,
+    pos: Vec3 = Vec3(0.0, 0.0, 0.0),
+    var yaw: Float = 0f,
     awaitSecret: Int = 0,
     maybeSecret: Boolean = false,
     delay: Long = 0,
@@ -57,7 +57,7 @@ class Walk(
     }
 
     override fun loadNodeInfo(obj: JsonObject) {
-        TODO("Not yet implemented")
+        yaw = obj.get("yaw").asFloat
     }
 
 

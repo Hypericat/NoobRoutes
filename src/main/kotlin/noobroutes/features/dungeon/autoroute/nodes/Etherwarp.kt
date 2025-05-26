@@ -19,6 +19,7 @@ import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
 import noobroutes.utils.add
 import noobroutes.utils.json.JsonUtils.addProperty
+import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
@@ -27,8 +28,8 @@ import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.skyblockID
 
 class Etherwarp(
-    pos: Vec3,
-    var target: Vec3,
+    pos: Vec3 = Vec3(0.0, 0.0, 0.0),
+    var target: Vec3 = Vec3(0.0, 0.0, 0.0),
     awaitSecret: Int = 0,
     maybeSecret: Boolean = false,
     delay: Long = 0,
@@ -65,7 +66,7 @@ class Etherwarp(
         SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (!silent) setAngles(angles.first, angles.second)
         stopWalk()
-        AutoRoute.routeSneak()
+        PlayerUtils.sneak()
     }
 
 
@@ -73,7 +74,7 @@ class Etherwarp(
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         event.yaw = angles.first
         event.pitch = angles.second
-        if (!serverSneak) {
+        if (!mc.thePlayer.isSneaking) {
             AutoRoute.rotatingYaw = angles.first
             AutoRoute.rotatingPitch = angles.second
             AutoRoute.rotating = true
@@ -125,6 +126,6 @@ class Etherwarp(
     }
 
     override fun loadNodeInfo(obj: JsonObject) {
-        TODO("Not yet implemented")
+        target = obj.get("target").asVec3
     }
 }

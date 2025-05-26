@@ -123,7 +123,7 @@ object PlayerUtils {
 
 
 
-    fun unSneak(){
+    fun resyncSneak(){
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.keyCode))
     }
 

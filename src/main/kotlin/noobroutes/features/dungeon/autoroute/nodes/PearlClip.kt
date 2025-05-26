@@ -16,8 +16,8 @@ import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.modMessage
 
 class PearlClip(
-    pos: Vec3,
-    var distance: Int,
+    pos: Vec3 = Vec3(0.0, 0.0, 0.0),
+    var distance: Int = 0,
     awaitSecret: Int = 0,
     maybeSecret: Boolean = false,
     delay: Long = 0,
@@ -78,6 +78,6 @@ class PearlClip(
     }
 
     override fun loadNodeInfo(obj: JsonObject) {
-        TODO("Not yet implemented")
+        distance = obj.get("distance").asInt
     }
 }
