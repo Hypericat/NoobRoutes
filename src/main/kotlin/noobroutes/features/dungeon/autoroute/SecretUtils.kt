@@ -29,6 +29,7 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils
 object SecretUtils {
     var secretCount = 0
     var awaitingNode: Node? = null
+    var canSendC08 = true
 
     @SubscribeEvent
     fun item(event: PacketEvent.Receive) {
@@ -59,10 +60,18 @@ object SecretUtils {
 
     @SubscribeEvent
     fun click(event: PacketReturnEvent.Send) {
-        if (event.packet !is C08PacketPlayerBlockPlacement ||
+        if (event.packet !is C08PacketPlayerBlockPlacement) return
+        canSendC08 = false
+        Scheduler.scheduleLowestPreTickTask {
+            canSendC08 = true
+        }
+
+        if (
             event.packet.position == null ||
             !isBlock(event.packet.position, Blocks.chest, Blocks.trapped_chest, Blocks.lever, Blocks.skull)
         ) return
+
+
         devMessage("clicked ${getBlockAt(event.packet.position).unlocalizedName}")
         Scheduler.schedulePreTickTask(1) {
             secretCount++

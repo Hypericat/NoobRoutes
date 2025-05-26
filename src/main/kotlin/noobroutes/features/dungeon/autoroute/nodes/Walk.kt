@@ -25,7 +25,7 @@ class Walk(
     center: Boolean = false,
     stop: Boolean = false,
     chain: Boolean = false,
-) : Node("Walk", 5,  pos = pos, awaitSecrets = awaitSecret, maybeSecret = maybeSecret, delay = delay, center = center, stop = stop, chain = chain) {
+) : Node("Walk", 4,  pos = pos, awaitSecrets = awaitSecret, maybeSecret = maybeSecret, delay = delay, center = center, stop = stop, chain = chain) {
 
     override fun awaitTick(room: Room) {
         PlayerUtils.forceUnSneak()

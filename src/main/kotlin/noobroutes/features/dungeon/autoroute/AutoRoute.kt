@@ -21,6 +21,7 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.dungeon.autoroute.SecretUtils.secretCount
 import noobroutes.features.dungeon.autoroute.nodes.*
 import noobroutes.features.move.Zpew
 import noobroutes.features.settings.Setting.Companion.withDependency
@@ -331,10 +332,11 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }
         return inNodes
     }
+    var lastBoom = 0L
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: ClientTickEvent) {
-        if (event.isEnd || mc.thePlayer == null) return
+        if (event.isEnd || mc.thePlayer == null || System.currentTimeMillis() - lastBoom < 150) return
         val room = DungeonUtils.currentRoom ?: roomReplacement
 
         if (nodes[room.data.name] == null || editMode || PlayerUtils.movementKeysPressed) {
@@ -347,30 +349,28 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             if (inNodes.firstOrNull()?.name == "Boom") {
                 inNodes.coerceMax(2)
             } else inNodes.coerceMax(1)
-
             nodesToRun = inNodes
+        } else {
+           if (secretCount < 0) secretCount = 0
         }
         nodesToRun.removeFirstOrNull()?.let { node ->
             lastRoute = System.currentTimeMillis()
-            if (node.runStatus == Node.RunStatus.NotExecuted) {
-                rotating = false
-                SecretUtils.secretCount -= node.awaitSecrets
-                if (SecretUtils.secretCount < 0) {
-                    Scheduler.schedulePreMovementUpdateTask {
-                        node.awaitMotion((it as MotionUpdateEvent.Pre), room)
-                    }
-                    node.awaitTick(room)
-                    return
-                }
-                devMessage("runTick: ${System.currentTimeMillis()}")
-                node.tick(room)
+            rotating = false
+            if (secretCount >= 0) secretCount -= node.awaitSecrets else secretCount = -node.awaitSecrets
+            if (secretCount < 0) {
                 Scheduler.schedulePreMovementUpdateTask {
-                    devMessage("motionUpdate: ${System.currentTimeMillis()}")
-                    node.motion((it as MotionUpdateEvent.Pre), room)
+                    node.awaitMotion((it as MotionUpdateEvent.Pre), room)
                 }
-
+                node.awaitTick(room)
+                return
             }
-            if (node.runStatus == Node.RunStatus.Complete) nodesToRun.removeFirst()
+            devMessage("runTick: ${System.currentTimeMillis()}")
+            secretCount = 0
+            node.tick(room)
+            Scheduler.schedulePreMovementUpdateTask {
+                devMessage("motionUpdate: ${System.currentTimeMillis()}")
+                node.motion((it as MotionUpdateEvent.Pre), room)
+            }
         }
 
     }
@@ -439,6 +439,15 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                             room,
                             Etherwarp(playerCoords, target, awaitSecrets, maybeSecret, 0, center, stop, chain)
                         )
+                    }
+                    "boom", "tnt" -> {
+                        val block = mc.objectMouseOver.blockPos
+                        val target = room.getRelativeCoords(block)
+                        if (isAir(block)) {
+                            modMessage("must look at a block")
+                            return
+                        }
+                        addNode(room, Boom(playerCoords, target, awaitSecrets, maybeSecret, 0L, center, stop, chain))
                     }
 
                     "walk" -> {
@@ -539,17 +548,13 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     @SubscribeEvent
     fun onPacket(event: PacketEvent.Receive) {
         if (clipRegistered && event.packet is S08PacketPlayerPosLook) {
-            event.isCanceled = true
-            PacketUtils.sendPacket(
-                C03PacketPlayer.C06PacketPlayerPosLook(
-                    
+            Scheduler.schedulePreTickTask {
+                mc.thePlayer.setPosition(
+                    mc.thePlayer.posX.floor() + 0.5,
+                    mc.thePlayer.posY.floor() - clipDistance,
+                    mc.thePlayer.posZ.floor() + 0.5
                 )
-            )
-            mc.thePlayer.setPosition(
-                mc.thePlayer.posX.floor() + 0.5,
-                mc.thePlayer.posY.floor() - clipDistance,
-                mc.thePlayer.posZ.floor() + 0.5
-            )
+            }
             pearlSoundRegistered = false
             clipRegistered = false
         }

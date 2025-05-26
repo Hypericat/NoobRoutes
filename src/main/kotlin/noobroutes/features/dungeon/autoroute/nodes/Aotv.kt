@@ -37,7 +37,7 @@ class Aotv(
     chain: Boolean = false,
 ) : Node(
     "Aotv",
-    4,
+    5,
     pos,
     awaitSecret,
     maybeSecret,

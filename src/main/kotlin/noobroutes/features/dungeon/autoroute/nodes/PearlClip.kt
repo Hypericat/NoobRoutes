@@ -26,7 +26,7 @@ class PearlClip(
     chain: Boolean = false,
 ) : Node(
     "PearlClip",
-    3,
+    7,
     pos,
     awaitSecret,
     maybeSecret,

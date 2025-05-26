@@ -38,7 +38,7 @@ class Etherwarp(
     chain: Boolean = false,
 ) : Node(
     "Etherwarp",
-    2,
+    8,
     pos,
     awaitSecret,
     maybeSecret,
@@ -49,7 +49,6 @@ class Etherwarp(
 ) {
 
     override fun awaitTick(room: Room) {
-        SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         if (!silent) setAngles(angles.first, angles.second)
     }
