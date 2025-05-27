@@ -78,6 +78,6 @@ class PearlClip(
     }
 
     override fun loadNodeInfo(obj: JsonObject) {
-        distance = obj.get("distance").asInt
+        this.distance = obj.get("distance").asInt
     }
 }

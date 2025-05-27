@@ -329,11 +329,8 @@ object Zpew : Module(
     private fun predictTeleport(distance: Float): Vec3? {
         var cur = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ)
         val forward = PlayerUtils.yawPitchVector(lastYaw, lastPitch).multiply(1f / steps)
-        logger.info(forward)
         var stepsTaken = 0
         for (i in 0 until (distance * steps).toInt() + 1) {
-            logger.info("i$i")
-            logger.info(cur)
             if (i % steps == 0 && !cur.isSpecial && !cur.blockAbove.isSpecial) {
                 if (!cur.isIgnored || !cur.blockAbove.isIgnored) {
                     cur = cur.add(forward.multiply(-steps))
@@ -358,8 +355,6 @@ object Zpew : Module(
         val pos = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ).add(PlayerUtils.yawPitchVector(lastYaw, lastPitch).multiply(
             multiplicationFactor
         ))
-        logger.info(floor((stepsTaken.toFloat() / steps).toDouble()))
-        logger.info("pos: $pos")
         if ((!cur.isIgnored && cur.inBB) || (!cur.blockAbove.isIgnored && cur.blockAbove.inBB)) return null
         return Vec3(floor(pos.xCoord) + 0.5, floor(pos.yCoord), floor(pos.zCoord) + 0.5)
     }

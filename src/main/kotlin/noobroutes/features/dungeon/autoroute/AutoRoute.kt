@@ -397,8 +397,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             "delete", "remove", "begone", "eradicate", "flaccid" -> {
                 val nodeList = nodes[room.data.name]
                 if (args.size > 1) {
-                    val index = args[1].toIntOrNull()?.absoluteValue
-                    if (index == null) return modMessage("Provide a number for index")
+                    val index = args[1].toIntOrNull()?.absoluteValue ?: return modMessage("Provide a number for index")
                     if (nodeList.isNullOrEmpty() || index !in nodeList.indices)
                         return modMessage("No node with index: $index")
                     deletedNodes.add(nodeList[index])
