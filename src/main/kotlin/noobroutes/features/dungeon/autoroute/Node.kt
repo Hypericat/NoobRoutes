@@ -28,6 +28,7 @@ abstract class Node(
 ) {
     enum class RunStatus {
         NotExecuted,
+        Awaiting,
         Unfinished,
         Complete
     }
@@ -69,7 +70,7 @@ abstract class Node(
 
 
 
-    fun calcFloorPos(c: Double, v: Double): Double{
+    private fun calcFloorPos(c: Double, v: Double): Double{
         return if (c < 0) {
             ceil(c) - v / 10
         } else {

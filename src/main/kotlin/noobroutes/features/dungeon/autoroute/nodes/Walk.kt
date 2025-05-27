@@ -39,10 +39,12 @@ class Walk(
         if (serverSneak) {
             Scheduler.schedulePreTickTask {
                 startWalk(yaw)
+                runStatus = RunStatus.Complete
             }
             return
         }
         startWalk(yaw)
+        runStatus = RunStatus.Complete
     }
 
 

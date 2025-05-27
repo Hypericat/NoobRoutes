@@ -57,12 +57,14 @@ class Boom(
                 Scheduler.schedulePreTickTask {
                     if (!isAir(pos)) {
                         AuraManager.auraBlock(pos, true)
+                        Scheduler.schedulePreTickTask { this.runStatus = RunStatus.Complete }
                     }
                 }
             }
             SwapManager.SwapState.ALREADY_HELD -> {
                 if (!isAir(pos)) {
                     AuraManager.auraBlock(pos, true)
+                    Scheduler.schedulePreTickTask { this.runStatus = RunStatus.Complete }
                 }
             }
             else -> return
@@ -71,8 +73,8 @@ class Boom(
     }
     override fun render(room: Room) {
         drawNode(room, AutoRoute.boomColor)
-        val pos = room.getRealCoords(target)
-        if (!isAir(pos)) Renderer.drawBlock(pos, AutoRoute.boomColor)
+        //val pos = room.getRealCoords(target)
+        //if (!isAir(pos)) Renderer.drawBlock(pos, AutoRoute.boomColor, depth = AutoRoute.depth)
     }
 
     override fun nodeAddInfo(obj: JsonObject) {

@@ -59,42 +59,17 @@ import kotlin.math.floor
 object AutoRoute : Module("Autoroute", description = "Ak47 modified", category = Category.DUNGEON) {
     val silent by BooleanSetting("Silent", default = true, description = "Serverside rotations")
     val renderRoutes by BooleanSetting("Render Routes", default = false, description = "Renders nodes")
-    val edgeRoutes by BooleanSetting(
-        "Edging",
-        default = false,
-        description = "Edges nodes :)"
-    ).withDependency { renderRoutes }
-    val depth by BooleanSetting(
-        "Depth",
-        default = true,
-        description = "Render Rings Through Walls"
-    ).withDependency { renderRoutes }
+    val renderIndex by BooleanSetting("Render Index", description = "Render index above node, useful for editing").withDependency { renderRoutes }
+    val edgeRoutes by BooleanSetting("Edging", default = false, description = "Edges nodes :)").withDependency { renderRoutes }
+    val depth by BooleanSetting("Depth", default = true, description = "Render Rings Through Walls").withDependency { renderRoutes }
     private val colorSettings by DropdownSetting("Colors").withDependency { renderRoutes }
-    val etherwarpColor by ColorSetting(
-        "Etherwarp",
-        default = Color.GREEN,
-        description = "Color of etherwarp nodes"
-    ).withDependency { renderRoutes && colorSettings }
-    val walkColor by ColorSetting(
-        "Walk",
-        default = Color.GREEN,
-        description = "Color of walk nodes"
-    ).withDependency { renderRoutes && colorSettings }
-    val pearlClipColor by ColorSetting(
-        "Pearlclip",
-        default = Color.GREEN,
-        description = "Color of pearlclip nodes"
-    ).withDependency { renderRoutes && colorSettings }
-    val aotvColor by ColorSetting(
-        "Aotv",
-        default = Color.GREEN,
-        description = "Color of Aotv nodes"
-    ).withDependency { renderRoutes && colorSettings }
-    val boomColor by ColorSetting(
-        "Boom",
-        default = Color.GREEN,
-        description = "Color of Boom nodes"
-    ).withDependency { renderRoutes && colorSettings }
+    val etherwarpColor by ColorSetting("Etherwarp", default = Color.GREEN, description = "Color of etherwarp nodes").withDependency { renderRoutes && colorSettings }
+    val walkColor by ColorSetting("Walk", default = Color.GREEN, description = "Color of walk nodes").withDependency { renderRoutes && colorSettings }
+    val pearlClipColor by ColorSetting("Pearlclip", default = Color.GREEN, description = "Color of pearlclip nodes").withDependency { renderRoutes && colorSettings }
+    val aotvColor by ColorSetting("Aotv", default = Color.GREEN, description = "Color of Aotv nodes").withDependency { renderRoutes && colorSettings }
+    val boomColor by ColorSetting("Boom", default = Color.GREEN, description = "Color of Boom nodes").withDependency { renderRoutes && colorSettings }
+    var editMode by BooleanSetting("Edit Mode", description = "Prevents nodes from triggering")
+    val editModeBind by KeybindSetting("Edit Mode Toggle", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress { editMode = !editMode }
 
 
     val roomReplacement
@@ -112,16 +87,8 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     )
 
     var lastRoute = 0L
-    val routing get() = System.currentTimeMillis() - lastRoute < 150
+    val routing get() = System.currentTimeMillis() - lastRoute < 200
 
-    var editMode by BooleanSetting("Edit Mode", description = "Prevents nodes from triggering")
-    val editModeBind by KeybindSetting(
-        "Edit Mode Toggle",
-        Keyboard.KEY_NONE,
-        description = "Toggles Edit Mode"
-    ).onPress {
-        editMode = !editMode
-    }
 
     val items = listOf(
         "Health Potion VIII Splash Potion",
@@ -186,8 +153,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         PlayerUtils.airClick()
         aotvTarget?.let { Zpew.doZeroPingAotv(it) }
         resetRotation()
-        PlayerUtils.resyncSneak()
+        nodesToRun.firstOrNull()?.runStatus = Node.RunStatus.Complete
         unsneakRegistered = false
+        PlayerUtils.resyncSneak()
     }
 
     @SubscribeEvent
@@ -197,6 +165,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         if (!serverSneak) return
         PlayerUtils.airClick()
         resetRotation()
+        nodesToRun.firstOrNull()?.runStatus = Node.RunStatus.Complete
         sneakRegistered = false
         PlayerUtils.resyncSneak()
     }
@@ -215,6 +184,10 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                         ) else realCoord.distanceToPlayer <= 0.5
             }
             if (nodes?.isNotEmpty() == true) event.isCanceled = true
+        }
+        if (event.button == 2 && event.buttonstate) {
+            if (secretCount < 0) {secretCount = 0; return}
+            triggerNodes.clear()
         }
     }
 
@@ -245,10 +218,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 val roomNodes = mutableListOf<Node>()
                 arr.forEach {
                     val obj = it.asJsonObject
-                    val type = obj.get("name")?.asString ?: "Unknown"
-                    val node = nodeRegistry[type]
-                    devMessage(type)
-                    val instance = node?.java?.getDeclaredConstructor()?.newInstance() ?: return@forEach
+                    val type = obj.get("name")?.asString ?: return@forEach
+                    val node = nodeRegistry[type] ?: return@forEach
+                    val instance = node.java.getDeclaredConstructor()?.newInstance() ?: return@forEach
                     instance.loadNodeInfo(obj)
                     instance.pos = obj?.get("position")?.asVec3 ?: Vec3(0.0, 0.0, 0.0)
                     instance.center = obj.has("center")
@@ -258,7 +230,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                     instance.awaitSecrets = obj.get("secrets")?.asInt ?: 0
                     instance.delay = obj.get("delay")?.asLong ?: 0L
                     roomNodes.add(instance)
-                    devMessage(instance.name)
                 }
                 nodes[key] = roomNodes
             }
@@ -269,7 +240,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
     }
 
-    fun saveFile() {
+    private fun saveFile() {
         val jsonObj = JsonObject()
         nodes.forEach { route ->
             val nodeArray = JsonArray().apply {
@@ -337,13 +308,15 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: ClientTickEvent) {
-        if (event.isEnd || mc.thePlayer == null || System.currentTimeMillis() - lastBoom < 150) return
+        if (event.isEnd || mc.thePlayer == null) return
         val room = DungeonUtils.currentRoom ?: roomReplacement
 
         if (nodes[room.data.name] == null || editMode || PlayerUtils.movementKeysPressed) {
             rotating = false
+            nodesToRun.clear()
             return
         }
+
         val inNodes = inNodes(room)
         if (inNodes.isNotEmpty()) {
             inNodes.sortWith(compareByDescending { it.priority })
@@ -354,22 +327,28 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         } else {
            if (secretCount < 0) secretCount = 0
         }
-        nodesToRun.removeFirstOrNull()?.let { node ->
+
+       nodesToRun.removeIf { it.runStatus == Node.RunStatus.Complete}
+
+        nodesToRun.firstOrNull()?.let { node ->
             lastRoute = System.currentTimeMillis()
-            rotating = false
+            if (node.runStatus == Node.RunStatus.Unfinished || node.runStatus == Node.RunStatus.Complete) return
             if (secretCount >= 0) secretCount -= node.awaitSecrets else secretCount = -node.awaitSecrets
             if (secretCount < 0) {
+                node.runStatus = Node.RunStatus.Awaiting
                 Scheduler.schedulePreMovementUpdateTask {
                     node.awaitMotion((it as MotionUpdateEvent.Pre), room)
                 }
                 node.awaitTick(room)
                 return
             }
-            devMessage("runTick: ${System.currentTimeMillis()}")
+            rotating = false
+            node.runStatus = Node.RunStatus.Unfinished
+            //devMessage("runTick: ${System.currentTimeMillis()}")
             secretCount = 0
             node.tick(room)
             Scheduler.schedulePreMovementUpdateTask {
-                devMessage("motionUpdate: ${System.currentTimeMillis()}")
+                //devMessage("motionUpdate: ${System.currentTimeMillis()}")
                 node.motion((it as MotionUpdateEvent.Pre), room)
             }
         }
@@ -407,11 +386,10 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                     return
                 }
                 if (nodeList.isNullOrEmpty()) return
-                val playerEyeVec = mc.thePlayer.positionVector.add(Vec3(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0))
-                val deleteList = nodeList.sortedBy { it.pos.squareDistanceTo(playerEyeVec) }
-                if (deleteList[0].pos.squareDistanceTo(playerEyeVec) > 9) return
-                deletedNodes.add(deleteList[0])
-                nodeList.remove(deleteList[0])
+
+                val node = nodeList.maxByOrNull { it.pos.distanceToPlayer * -1 }!!
+                deletedNodes.add(node)
+                nodeList.remove(node)
                 saveFile()
                 modMessage("Removed ${deletedNodes.last().name}")
             }
@@ -555,6 +533,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 mc.thePlayer.posY.floor() - clipDistance,
                 mc.thePlayer.posZ.floor() + 0.5
             )
+            nodesToRun.firstOrNull()?.runStatus = Node.RunStatus.Complete
             pearlSoundRegistered = false
             clipRegistered = false
         }
@@ -566,7 +545,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
     }
 
-    fun addNode(room: Room, node: Node) {
+    private fun addNode(room: Room, node: Node) {
         modMessage("adding node")
         if (nodes[room.data.name] == null) {
             nodes[room.data.name] = mutableListOf()

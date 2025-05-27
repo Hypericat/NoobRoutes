@@ -12,6 +12,7 @@ import noobroutes.features.dungeon.autoroute.AutoRoute.serverSneak
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.RotationUtils
+import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.RotationUtils.setAngles
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
@@ -55,7 +56,7 @@ class Etherwarp(
 
     override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
-        AutoRoute.rotatingYaw = angles.first
+        AutoRoute.rotatingYaw = angles.first + offset
         AutoRoute.rotatingPitch = angles.second
         AutoRoute.rotating = true
     }
@@ -105,7 +106,8 @@ class Etherwarp(
                     room.getRealCoords(pos).add(yaw.xPart * 0.6, 0.0, yaw.zPart * 0.6),
                     targetCoords,
                 ),
-                AutoRoute.etherwarpColor
+                AutoRoute.etherwarpColor,
+                depth = depth
             )
         } else {
             Renderer.draw3DLine(
@@ -113,7 +115,8 @@ class Etherwarp(
                     room.getRealCoords(pos),
                     room.getRealCoords(target)
                 ),
-                AutoRoute.etherwarpColor
+                AutoRoute.etherwarpColor,
+                depth = depth
             )
         }
 
