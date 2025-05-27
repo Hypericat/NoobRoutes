@@ -4,6 +4,7 @@ package noobroutes.features.dungeon.autoroute
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C0BPacketEntityAction
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
@@ -548,13 +549,13 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     @SubscribeEvent
     fun onPacket(event: PacketEvent.Receive) {
         if (clipRegistered && event.packet is S08PacketPlayerPosLook) {
-            Scheduler.schedulePreTickTask {
-                mc.thePlayer.setPosition(
-                    mc.thePlayer.posX.floor() + 0.5,
-                    mc.thePlayer.posY.floor() - clipDistance,
-                    mc.thePlayer.posZ.floor() + 0.5
-                )
-            }
+            event.isCanceled = true
+            PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
+            mc.thePlayer.setPosition(
+                mc.thePlayer.posX.floor() + 0.5,
+                mc.thePlayer.posY.floor() - clipDistance,
+                mc.thePlayer.posZ.floor() + 0.5
+            )
             pearlSoundRegistered = false
             clipRegistered = false
         }
