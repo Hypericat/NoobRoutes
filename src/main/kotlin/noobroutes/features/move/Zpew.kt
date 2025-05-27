@@ -108,7 +108,7 @@ object Zpew : Module(
     }
 
     fun doZeroPingAotv(pos: BlockPos){
-        if (!holdingTeleportItem() || !checkAllowedFails()) return
+        if (!holdingTeleportItem() || !checkAllowedFails() || !enabled) return
         if (isSneaking && mc.thePlayer.heldItem.skyblockID.equalsOneOf("ASPECT_OF_THE_VOID", "ASPECT_OF_THE_END")) return
         var yaw = lastYaw
         var pitch = lastPitch
