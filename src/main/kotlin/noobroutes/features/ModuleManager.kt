@@ -85,7 +85,8 @@ object ModuleManager {
         AutoRoute,
         Penis,
         RotationVisualizer,
-        CrystalAura
+        CrystalAura,
+        BlinkRelic
     )
 
     init {
