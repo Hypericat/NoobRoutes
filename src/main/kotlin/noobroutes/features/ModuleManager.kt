@@ -18,6 +18,7 @@ import noobroutes.features.move.*
 import noobroutes.features.dungeon.puzzle.TicTacToe
 import noobroutes.features.dungeon.puzzle.Weirdos
 import noobroutes.features.render.ClickGUIModule
+import noobroutes.features.render.RotationVisualizer
 import noobroutes.features.render.Trail
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.test.EtherwarpTest
@@ -82,7 +83,8 @@ object ModuleManager {
         Doorless,
         SecretGuideManager,
         AutoRoute,
-        Penis
+        Penis,
+        RotationVisualizer
     )
 
     init {
