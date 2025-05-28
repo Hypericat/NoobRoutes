@@ -51,7 +51,7 @@ object AutoP3: Module (
     val motionValue by NumberSetting(name = "motion value", description = "how much yeet to put into the motion", min = 0f, max = 1000f, default = 509f)
     val silentLook by BooleanSetting("Silent Look", false, description = "when activating a look ring only rotate serverside (may lead to desync)")
     val fuckingLook by BooleanSetting("Loud Look", false, description = "always look for if u want to make ur autop3 seem mroe legit or smth")
-    val simpleRings by BooleanSetting("Simple Rings", false, description = "switches complicated rings with simple circles")
+    val renderStyle by SelectorSetting("ring design", "normal", arrayListOf("normal", "simple", "box"), false, description = "how rings should look")
     val onlyCenter by BooleanSetting("Only Starts", false, description = "only renders rings with the center property(should be only start rings) and blinks")
     private val blinkShit by DropdownSetting(name = "Blink Settings")
     val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink").withDependency { blinkShit }
@@ -141,8 +141,8 @@ object AutoP3: Module (
     fun awaitingOpen(event: TermOpenEvent) {
         if (awaitingTerm.isEmpty()) return
         awaitingTerm.forEach {
-            it.run()
             if (it is BlinkRing) activatedBlinks.add(it)
+            else it.run()
         }
     }
 
@@ -154,8 +154,8 @@ object AutoP3: Module (
         awaitingLeap.addAll(awaitingTerm) //retard protection (no duplicates)
         awaitingLeap.addAll(awaitingLeft)
         awaitingLeap.forEach {
-            it.run()
             if (it is BlinkRing) activatedBlinks.add(it)
+            else it.run()
         }
         awaitingLeap.clear()
         awaitingTerm.clear()
@@ -176,8 +176,8 @@ object AutoP3: Module (
         if (leapedIDs.size == leapPlayers()) {
             modMessage("everyone leaped")
             awaitingLeap.forEach {
-                it.run()
                 if (it is BlinkRing) activatedBlinks.add(it)
+                else it.run()
             }
         }
     }
@@ -418,6 +418,19 @@ object AutoP3: Module (
                 )
                 waypoint.triggered = true
                 blinkStarts.add(waypoint)
+            }
+            "clamp" -> {
+                modMessage("clamp added")
+                actuallyAddRing(ClampRing(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate,
+                    walk
+                ))
             }
             else -> return modMessage("thats not a ring type stoopid")
 
