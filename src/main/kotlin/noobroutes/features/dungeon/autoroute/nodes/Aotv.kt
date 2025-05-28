@@ -58,6 +58,10 @@ class Aotv(
         event.yaw = room.getRealYaw(yaw)
     }
 
+    override fun awaitTick(room: Room) {
+        PlayerUtils.forceUnSneak()
+    }
+
     override fun tick(room: Room) {
         super.tick(room)
         if (!AutoRoute.silent) RotationUtils.setAngles(room.getRealYaw(yaw), pitch)

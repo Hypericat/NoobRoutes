@@ -3,7 +3,6 @@ package noobroutes.features.dungeon.autoroute
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C0BPacketEntityAction
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
@@ -186,8 +185,13 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             if (nodes?.isNotEmpty() == true) event.isCanceled = true
         }
         if (event.button == 2 && event.buttonstate) {
-            if (secretCount < 0) {secretCount = 0; return}
-            triggerNodes.clear()
+            if (secretCount < 0) {
+                secretCount = 0;
+                event.isCanceled = true
+                return
+            }
+
+            triggeredNodes.clear()
         }
     }
 
@@ -254,7 +258,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     }
 
 
-    val triggerNodes = mutableListOf<Node>()
+    val triggeredNodes = mutableListOf<Node>()
 
     @SubscribeEvent
     fun onRenderWorldLast(event: RenderWorldLastEvent) {
@@ -295,11 +299,12 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                             abs(PlayerUtils.posZ - realCoord.zCoord) < 0.001 &&
                             PlayerUtils.posY >= node.pos.yCoord - 0.01 && PlayerUtils.posY <= node.pos.yCoord + 0.5
                     ) else realCoord.distanceToPlayer <= 0.5
-            if (inNode && !triggerNodes.contains(node)) {
-                triggerNodes.add(node)
+            if (inNode && !triggeredNodes.contains(node)) {
+                triggeredNodes.add(node)
                 inNodes.add(node)
-            } else if (!inNode && triggerNodes.contains(node)) {
-                triggerNodes.remove(node)
+            } else if (!inNode && triggeredNodes.contains(node)) {
+                triggeredNodes.remove(node)
+                node.runStatus = Node.RunStatus.NotExecuted
             }
         }
         return inNodes
@@ -308,7 +313,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: ClientTickEvent) {
-        if (event.isEnd || mc.thePlayer == null) return
+        if (event.isEnd || mc.thePlayer == null || System.currentTimeMillis() - lastRoute < 200) return
         val room = DungeonUtils.currentRoom ?: roomReplacement
 
         if (nodes[room.data.name] == null || editMode || PlayerUtils.movementKeysPressed) {
@@ -324,17 +329,30 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 inNodes.coerceMax(2)
             } else inNodes.coerceMax(1)
             nodesToRun = inNodes
-        } else {
-           if (secretCount < 0) secretCount = 0
+        }
+        if (nodesToRun.isEmpty() && secretCount < 0) {
+            secretCount = 0
+            return
         }
 
-       nodesToRun.removeIf { it.runStatus == Node.RunStatus.Complete}
+       nodesToRun.removeIf {
+           val complete = it.runStatus == Node.RunStatus.Complete
+           devMessage(complete)
+           if (complete) it.runStatus = Node.RunStatus.NotExecuted
+           complete
+       }
 
         nodesToRun.firstOrNull()?.let { node ->
             lastRoute = System.currentTimeMillis()
+            devMessage(node.runStatus.name)
             if (node.runStatus == Node.RunStatus.Unfinished || node.runStatus == Node.RunStatus.Complete) return
-            if (secretCount >= 0) secretCount -= node.awaitSecrets else secretCount = -node.awaitSecrets
+            if (node.runStatus == Node.RunStatus.NotExecuted) {
+                devMessage(secretCount)
+                if (secretCount >= 0) secretCount -= node.awaitSecrets else secretCount = -node.awaitSecrets
+                //devMessage(secretCount)
+            }
             if (secretCount < 0) {
+                devMessage(secretCount)
                 node.runStatus = Node.RunStatus.Awaiting
                 Scheduler.schedulePreMovementUpdateTask {
                     node.awaitMotion((it as MotionUpdateEvent.Pre), room)
@@ -342,7 +360,8 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 node.awaitTick(room)
                 return
             }
-            rotating = false
+
+            rotating  = false
             node.runStatus = Node.RunStatus.Unfinished
             //devMessage("runTick: ${System.currentTimeMillis()}")
             secretCount = 0
@@ -351,6 +370,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 //devMessage("motionUpdate: ${System.currentTimeMillis()}")
                 node.motion((it as MotionUpdateEvent.Pre), room)
             }
+            nodesToRun.remove(node)
         }
 
     }

@@ -43,7 +43,10 @@ class Boom(
     override fun tick(room: Room) {
         super.tick(room)
         val pos = room.getRealCoords(target)
-        if (isAir(pos)) return
+        if (isAir(pos)) {
+            runStatus = RunStatus.Complete
+            return
+        }
 
         AutoRoute.lastBoom = System.currentTimeMillis()
         val state = SwapManager.swapFromSBId("INFINITE_SUPERBOOM_TNT", "SUPERBOOM_TNT")
@@ -57,7 +60,9 @@ class Boom(
                 Scheduler.schedulePreTickTask {
                     if (!isAir(pos)) {
                         AuraManager.auraBlock(pos, true)
-                        Scheduler.schedulePreTickTask { this.runStatus = RunStatus.Complete }
+                        Scheduler.schedulePreTickTask { runStatus = RunStatus.Complete }
+                    } else {
+                        runStatus = RunStatus.Complete
                     }
                 }
             }
@@ -65,6 +70,8 @@ class Boom(
                 if (!isAir(pos)) {
                     AuraManager.auraBlock(pos, true)
                     Scheduler.schedulePreTickTask { this.runStatus = RunStatus.Complete }
+                } else {
+                    runStatus = RunStatus.Complete
                 }
             }
             else -> return

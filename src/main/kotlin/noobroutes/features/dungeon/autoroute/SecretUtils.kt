@@ -34,7 +34,9 @@ object SecretUtils {
     @SubscribeEvent
     fun item(event: PacketEvent.Receive) {
         if (event.packet !is S0DPacketCollectItem) return
-        val item = (mc.theWorld.getEntityByID(event.packet.collectedItemEntityID) as EntityItem).entityItem.displayName.noControlCodes
+        val entity = mc.theWorld.getEntityByID(event.packet.collectedItemEntityID)
+        if (entity !is EntityItem) return
+        val item = entity.entityItem.displayName.noControlCodes
         if (!items.contains(item)) return
         secretCount++
     }

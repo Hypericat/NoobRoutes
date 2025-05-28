@@ -21,7 +21,9 @@ import noobroutes.features.Module
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.Setting.Companion.withDependency
+import noobroutes.features.settings.impl.ActionSetting
 import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.features.settings.impl.StringSetting
@@ -65,8 +67,10 @@ object Zpew : Module(
     private val soundSelector by SelectorSetting("Sound", soundOptions[0], soundOptions, description =  "Sound Selection").withDependency { dingdingding }
     private val customSound by StringSetting("Custom Sound", soundOptions[0], description = "Name of a custom sound to play. This is used when Custom is selected in the Sound setting.").withDependency { dingdingding && soundSelector == 6 }
     private val pitch by NumberSetting("Pitch", 1.0, 0.1, 2.0, 0.1, description = "").withDependency { dingdingding }
-
-
+    private val volume by NumberSetting("Volume", 100, 1, 200, 1, description = "").withDependency { dingdingding }
+    private val soundButton by ActionSetting("Play Sound", description = "", default = {
+        PlayerUtils.playLoudSound(getSound(), volume.toFloat(), pitch.toFloat())
+    }).withDependency { dingdingding }
 
     private const val FAILWATCHPERIOD: Int = 20
     private const val MAXFAILSPERFAILPERIOD: Int = 3
@@ -126,7 +130,7 @@ object Zpew : Module(
         lastZ = z
         updatePosition = false
         recentlySentC06s.add(SentC06(yaw, pitch, x, y, z, System.currentTimeMillis()))
-        if (dingdingding) PlayerUtils.playLoudSound(getSound(), 100f, Zpew.pitch.toFloat())
+        if (dingdingding) PlayerUtils.playLoudSound(getSound(), volume.toFloat(), Zpew.pitch.toFloat())
         if (sendTPCommand) Scheduler.schedulePreTickTask(0) { sendChatMessage("/tp $x $y $z")}
         if (sendPacket) Scheduler.scheduleHighPreTickTask {
             mc.netHandler.addToSendQueue(
@@ -176,7 +180,7 @@ object Zpew : Module(
 
         recentlySentC06s.add(SentC06(yaw, pitch, x, y, z, System.currentTimeMillis()))
 
-        if (dingdingding) PlayerUtils.playLoudSound(getSound(), 100f, Zpew.pitch.toFloat())
+        if (dingdingding) PlayerUtils.playLoudSound(getSound(), volume.toFloat(), Zpew.pitch.toFloat())
         if (sendTPCommand) Scheduler.schedulePreTickTask(0) { sendChatMessage("/tp $x $y $z")}
 
         if (sendPacket) Scheduler.scheduleHighPreTickTask {
