@@ -84,7 +84,8 @@ object ModuleManager {
         SecretGuideManager,
         AutoRoute,
         Penis,
-        RotationVisualizer
+        RotationVisualizer,
+        CrystalAura
     )
 
     init {

@@ -20,7 +20,7 @@ object LeverAura: Module(
 ) {
     class Lever (val coords: BlockPos, var lastClick: Long)
     private val range by NumberSetting(name = "range", description = "how much reach the aura should have", min = 5f, max = 6.5f, default = 6f, increment = 0.1f)
-    private val cooldown by NumberSetting(name = "cooldown", description = "how long to wait beetween presses (miliseconds)", min = 50, max = 10000, default = 1000)
+    private val cooldown by NumberSetting(name = "cooldown", description = "how long to wait beetween presses", min = 50, max = 10000, default = 1000, unit = "s", increment = 0.1)
 
 
     private val levers = listOf<Lever>(
@@ -47,7 +47,7 @@ object LeverAura: Module(
         val eyePos = mc.thePlayer.getPositionEyes(0f)
         levers.forEach { lever ->
             if (eyePos.distanceTo(lever.coords.toVec3()) > range) return@forEach
-            if (System.currentTimeMillis() - lever.lastClick < cooldown) return@forEach
+            if (System.currentTimeMillis() - lever.lastClick < cooldown * 1000) return@forEach
             AuraManager.auraBlock(lever.coords)
             lever.lastClick = System.currentTimeMillis()
             return
