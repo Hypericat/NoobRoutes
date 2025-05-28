@@ -85,7 +85,9 @@ object PlayerUtils {
     fun getPositionString() = "x: ${posX.toInt()}, y: ${posY.toInt()}, z: ${posZ.toInt()}"
 
     private var lastGuiClickSent = 0L
-    private var lastC08Sent = 0L
+    var lastC08Sent = 0L
+    inline val canSendC08 get() = System.currentTimeMillis() - lastC08Sent > 50
+
 
     @SubscribeEvent
     fun onPacketSend(event: PacketEvent.Send) {

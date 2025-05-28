@@ -14,6 +14,7 @@ import noobroutes.utils.add
 import noobroutes.utils.isAir
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asBlockPos
+import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Room
@@ -44,7 +45,6 @@ class Boom(
         super.tick(room)
         val pos = room.getRealCoords(target)
         if (isAir(pos)) {
-            runStatus = RunStatus.Complete
             return
         }
 
@@ -60,18 +60,12 @@ class Boom(
                 Scheduler.schedulePreTickTask {
                     if (!isAir(pos)) {
                         AuraManager.auraBlock(pos, true)
-                        Scheduler.schedulePreTickTask { runStatus = RunStatus.Complete }
-                    } else {
-                        runStatus = RunStatus.Complete
                     }
                 }
             }
             SwapManager.SwapState.ALREADY_HELD -> {
                 if (!isAir(pos)) {
                     AuraManager.auraBlock(pos, true)
-                    Scheduler.schedulePreTickTask { this.runStatus = RunStatus.Complete }
-                } else {
-                    runStatus = RunStatus.Complete
                 }
             }
             else -> return
@@ -80,8 +74,11 @@ class Boom(
     }
     override fun render(room: Room) {
         drawNode(room, AutoRoute.boomColor)
-        //val pos = room.getRealCoords(target)
-        //if (!isAir(pos)) Renderer.drawBlock(pos, AutoRoute.boomColor, depth = AutoRoute.depth)
+
+    }
+
+    override fun renderIndexColor(): Color {
+        return AutoRoute.boomColor
     }
 
     override fun nodeAddInfo(obj: JsonObject) {

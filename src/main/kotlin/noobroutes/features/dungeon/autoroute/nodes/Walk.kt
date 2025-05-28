@@ -7,9 +7,11 @@ import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
 import noobroutes.features.dungeon.autoroute.AutoRoute.serverSneak
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
+import noobroutes.features.dungeon.autoroute.AutoRoute.walkColor
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.AutoP3Utils.startWalk
 import noobroutes.utils.Scheduler
+import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
@@ -39,23 +41,25 @@ class Walk(
         if (serverSneak) {
             Scheduler.schedulePreTickTask {
                 startWalk(yaw)
-                runStatus = RunStatus.Complete
             }
             return
         }
         startWalk(yaw)
-        runStatus = RunStatus.Complete
     }
 
 
 
     override fun render(room: Room) {
         Renderer.drawCylinder(room.getRealCoords(pos.add(Vec3(0.0, 0.03, 0.0))), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0,
-            AutoRoute.walkColor, depth = depth)
+            walkColor, depth = depth)
     }
 
     override fun nodeAddInfo(obj: JsonObject) {
         obj.addProperty("yaw", yaw)
+    }
+
+    override fun renderIndexColor(): Color {
+        return  walkColor
     }
 
     override fun loadNodeInfo(obj: JsonObject) {

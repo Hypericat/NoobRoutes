@@ -8,6 +8,7 @@ import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
 import noobroutes.features.dungeon.autoroute.AutoRoute.edgeRoutes
 import noobroutes.features.dungeon.autoroute.AutoRoute.ether
+import noobroutes.features.dungeon.autoroute.AutoRoute.etherwarpColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.serverSneak
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.Node
@@ -21,6 +22,7 @@ import noobroutes.utils.Utils.zPart
 import noobroutes.utils.add
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asVec3
+import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
@@ -97,7 +99,7 @@ class Etherwarp(
     override fun render(room: Room) {
         val nodeCoords = room.getRealCoords(pos)
         Renderer.drawCylinder(nodeCoords.add(0.0, 0.03, 0.0), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0,
-            AutoRoute.etherwarpColor , depth = depth)
+            etherwarpColor , depth = depth)
         if (edgeRoutes) {
             val targetCoords = room.getRealCoords(target)
             val yaw = RotationUtils.getYawAndPitchOrigin(nodeCoords, targetCoords, true).first
@@ -106,7 +108,7 @@ class Etherwarp(
                     room.getRealCoords(pos).add(yaw.xPart * 0.6, 0.0, yaw.zPart * 0.6),
                     targetCoords,
                 ),
-                AutoRoute.etherwarpColor,
+                etherwarpColor,
                 depth = depth
             )
         } else {
@@ -115,12 +117,16 @@ class Etherwarp(
                     room.getRealCoords(pos),
                     room.getRealCoords(target)
                 ),
-                AutoRoute.etherwarpColor,
+                etherwarpColor,
                 depth = depth
             )
         }
 
 
+    }
+
+    override fun renderIndexColor(): Color {
+        return etherwarpColor
     }
 
     override fun nodeAddInfo(obj: JsonObject) {

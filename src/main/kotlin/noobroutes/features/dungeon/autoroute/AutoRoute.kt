@@ -35,6 +35,7 @@ import noobroutes.utils.Utils.containsOneOf
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
+import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
@@ -108,7 +109,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     )
 
 
-    var nodes = mutableMapOf<String, MutableList<Node>>()
+    private var nodes = mutableMapOf<String, MutableList<Node>>()
 
 
     var serverSneak = false
@@ -152,7 +153,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         PlayerUtils.airClick()
         aotvTarget?.let { Zpew.doZeroPingAotv(it) }
         resetRotation()
-        nodesToRun.firstOrNull()?.runStatus = Node.RunStatus.Complete
         unsneakRegistered = false
         PlayerUtils.resyncSneak()
     }
@@ -164,15 +164,13 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         if (!serverSneak) return
         PlayerUtils.airClick()
         resetRotation()
-        nodesToRun.firstOrNull()?.runStatus = Node.RunStatus.Complete
         sneakRegistered = false
         PlayerUtils.resyncSneak()
     }
 
-
     @SubscribeEvent
     fun onKeyInput(event: MouseEvent) {
-        if (event.button == 1 && event.buttonstate) {
+        if (event.button == 1 && event.buttonstate && System.currentTimeMillis() - lastRoute < 150) {
             val room = DungeonUtils.currentRoom ?: roomReplacement
             val nodes = nodes[room.data.name]?.filter { node ->
                 val realCoord = room.getRealCoords(node.pos)
@@ -190,8 +188,8 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 event.isCanceled = true
                 return
             }
-
-            triggeredNodes.clear()
+            val room = DungeonUtils.currentRoom ?: roomReplacement
+            nodes[room.data.name]?.map {it.triggered = false; it.secretTriggered = false}
         }
     }
 
@@ -258,7 +256,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     }
 
 
-    val triggeredNodes = mutableListOf<Node>()
 
     @SubscribeEvent
     fun onRenderWorldLast(event: RenderWorldLastEvent) {
@@ -267,6 +264,11 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         if (!renderRoutes || nodes[room.data.name] == null) return
         nodes[room.data.name]?.forEach {
             it.render(room)
+        }
+        if (renderIndex) {
+            nodes[room.data.name]?.forEachIndexed { index, node ->
+                Renderer.drawStringInWorld(index.toString(), room.getRealCoords(node.pos).add(Vec3(0.0, 0.6, 0.0)), node.renderIndexColor(), depth = depth)
+            }
         }
     }
 
@@ -290,7 +292,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }
     }
 
-    fun inNodes(room: Room): MutableList<Node> {
+    private fun inNodes(room: Room): MutableList<Node> {
         val inNodes = mutableListOf<Node>()
         nodes[room.data.name]?.forEach { node ->
             val realCoord = room.getRealCoords(node.pos)
@@ -299,12 +301,12 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                             abs(PlayerUtils.posZ - realCoord.zCoord) < 0.001 &&
                             PlayerUtils.posY >= node.pos.yCoord - 0.01 && PlayerUtils.posY <= node.pos.yCoord + 0.5
                     ) else realCoord.distanceToPlayer <= 0.5
-            if (inNode && !triggeredNodes.contains(node)) {
-                triggeredNodes.add(node)
+            if (inNode && !node.triggered) {
+                node.triggered = true
                 inNodes.add(node)
-            } else if (!inNode && triggeredNodes.contains(node)) {
-                triggeredNodes.remove(node)
-                node.runStatus = Node.RunStatus.NotExecuted
+            } else if (!inNode && node.triggered) {
+                node.triggered = false
+                node.secretTriggered = false
             }
         }
         return inNodes
@@ -313,11 +315,11 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: ClientTickEvent) {
-        if (event.isEnd || mc.thePlayer == null || System.currentTimeMillis() - lastRoute < 200) return
+        if (event.isEnd || mc.thePlayer == null || System.currentTimeMillis() - lastBoom < 200) return
         val room = DungeonUtils.currentRoom ?: roomReplacement
 
         if (nodes[room.data.name] == null || editMode || PlayerUtils.movementKeysPressed) {
-            rotating = false
+            resetRotation()
             nodesToRun.clear()
             return
         }
@@ -330,30 +332,17 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             } else inNodes.coerceMax(1)
             nodesToRun = inNodes
         }
-        if (nodesToRun.isEmpty() && secretCount < 0) {
-            secretCount = 0
+        if (nodesToRun.isEmpty()) {
+            if (secretCount < 0) secretCount = 0
             return
         }
-
-       nodesToRun.removeIf {
-           val complete = it.runStatus == Node.RunStatus.Complete
-           devMessage(complete)
-           if (complete) it.runStatus = Node.RunStatus.NotExecuted
-           complete
-       }
-
         nodesToRun.firstOrNull()?.let { node ->
             lastRoute = System.currentTimeMillis()
-            devMessage(node.runStatus.name)
-            if (node.runStatus == Node.RunStatus.Unfinished || node.runStatus == Node.RunStatus.Complete) return
-            if (node.runStatus == Node.RunStatus.NotExecuted) {
-                devMessage(secretCount)
+            if (!node.secretTriggered) {
                 if (secretCount >= 0) secretCount -= node.awaitSecrets else secretCount = -node.awaitSecrets
-                //devMessage(secretCount)
+                node.secretTriggered = true
             }
             if (secretCount < 0) {
-                devMessage(secretCount)
-                node.runStatus = Node.RunStatus.Awaiting
                 Scheduler.schedulePreMovementUpdateTask {
                     node.awaitMotion((it as MotionUpdateEvent.Pre), room)
                 }
@@ -361,21 +350,21 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 return
             }
 
-            rotating  = false
-            node.runStatus = Node.RunStatus.Unfinished
-            //devMessage("runTick: ${System.currentTimeMillis()}")
+            node.secretTriggered = false
+            resetRotation()
             secretCount = 0
             node.tick(room)
+            //devMessage("runTick: ${System.currentTimeMillis()}")
             Scheduler.schedulePreMovementUpdateTask {
-                //devMessage("motionUpdate: ${System.currentTimeMillis()}")
                 node.motion((it as MotionUpdateEvent.Pre), room)
+                //devMessage("motionUpdate: ${System.currentTimeMillis()}")
             }
             nodesToRun.remove(node)
         }
 
     }
 
-    var deletedNodes = mutableListOf<Node>()
+    private var deletedNodes = mutableListOf<Node>()
 
     fun handleAutoRouteCommand(args: Array<out String>) {
         val room = DungeonUtils.currentRoom ?: roomReplacement
@@ -407,7 +396,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 }
                 if (nodeList.isNullOrEmpty()) return
 
-                val node = nodeList.maxByOrNull { it.pos.distanceToPlayer * -1 }!!
+                val node = nodeList.maxByOrNull { -it.pos.distanceToPlayer }!!
                 deletedNodes.add(node)
                 nodeList.remove(node)
                 saveFile()
@@ -553,7 +542,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 mc.thePlayer.posY.floor() - clipDistance,
                 mc.thePlayer.posZ.floor() + 0.5
             )
-            nodesToRun.firstOrNull()?.runStatus = Node.RunStatus.Complete
             pearlSoundRegistered = false
             clipRegistered = false
         }

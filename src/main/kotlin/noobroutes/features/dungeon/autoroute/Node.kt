@@ -26,14 +26,9 @@ abstract class Node(
     var stop: Boolean = false,
     var chain: Boolean = false
 ) {
-    enum class RunStatus {
-        NotExecuted,
-        Awaiting,
-        Unfinished,
-        Complete
-    }
 
-    var runStatus = RunStatus.NotExecuted
+    var triggered = false
+    var secretTriggered = false
 
     open fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {}
     open fun motion(event: MotionUpdateEvent.Pre, room: Room) {}
@@ -45,6 +40,9 @@ abstract class Node(
     abstract fun render(room: Room)
     abstract fun nodeAddInfo(obj: JsonObject)
     abstract fun loadNodeInfo(obj: JsonObject)
+    abstract fun renderIndexColor(): Color
+
+
 
     fun stopWalk(){
         walking = false

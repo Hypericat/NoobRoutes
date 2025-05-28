@@ -6,10 +6,12 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
+import noobroutes.features.dungeon.autoroute.AutoRoute.pearlClipColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
+import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.tiles.Room
@@ -69,8 +71,8 @@ class PearlClip(
     }
 
     override fun render(room: Room) {
-        drawNode(room, AutoRoute.pearlClipColor)
-        Renderer.drawStringInWorld("PearlClip: $distance", pos.add(Vec3(0.0, 0.6, 0.0)), AutoRoute.pearlClipColor, depth = depth)
+        drawNode(room, pearlClipColor)
+        Renderer.drawStringInWorld("PearlClip: $distance", pos.add(Vec3(0.0, 0.9, 0.0)), pearlClipColor, depth = depth)
     }
 
     override fun nodeAddInfo(obj: JsonObject) {
@@ -79,5 +81,9 @@ class PearlClip(
 
     override fun loadNodeInfo(obj: JsonObject) {
         this.distance = obj.get("distance").asInt
+    }
+
+    override fun renderIndexColor(): Color {
+        return pearlClipColor
     }
 }

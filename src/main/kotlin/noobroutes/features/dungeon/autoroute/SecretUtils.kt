@@ -12,9 +12,12 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
+import noobroutes.features.dungeon.autoroute.AutoRoute.aotv
+import noobroutes.features.dungeon.autoroute.AutoRoute.aotvTarget
 import noobroutes.features.dungeon.autoroute.AutoRoute.batSpawnRegistered
 import noobroutes.features.dungeon.autoroute.AutoRoute.clear
 import noobroutes.features.dungeon.autoroute.AutoRoute.items
+import noobroutes.features.dungeon.autoroute.AutoRoute.resetRotation
 import noobroutes.features.dungeon.autoroute.AutoRoute.rotating
 import noobroutes.features.dungeon.autoroute.AutoRoute.rotatingPitch
 import noobroutes.features.dungeon.autoroute.AutoRoute.rotatingYaw
@@ -49,9 +52,7 @@ object SecretUtils {
             val room = DungeonUtils.currentRoom ?: return
             awaitingNode?.tick(room)
             Scheduler.schedulePreMovementUpdateTask {
-                rotating = false
-                rotatingYaw = null
-                rotatingPitch = null
+                resetRotation()
                 awaitingNode?.motion((it as MotionUpdateEvent.Pre), room)
                 awaitingNode = null
             }
@@ -100,9 +101,9 @@ object SecretUtils {
             if (bat.positionVector.distanceToPlayerSq > 225) continue
             devMessage("Bat Spawned")
             Scheduler.schedulePreTickTask {
-                PlayerUtils.airClick()
-                rotating = false
-                clear()
+                aotvTarget?.let { it1 -> aotv(it1) }
+                resetRotation()
+                batSpawnRegistered = false
             }
         }
     }
