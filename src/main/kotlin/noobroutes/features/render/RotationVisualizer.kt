@@ -22,6 +22,7 @@ object RotationVisualizer: Module(
     private var lastRot = Pair(0f, 0f)
     private var almostLastRot = Pair(0f, 0f)
     private var resetPitch: Pair<Float, Float>? = null
+    var snappysnap = false
 
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -40,6 +41,10 @@ object RotationVisualizer: Module(
         event.entity.prevRotationPitch = almostLastRot.second
         event.entity.rotationYawHead = lastRot.first
         event.entity.renderYawOffset = lastRot.first
+        if (!snappysnap) return
+        event.entity.prevRotationPitch = lastRot.second
+        event.entity.prevRenderYawOffset = lastRot.first
+        event.entity.prevRotationYawHead = lastRot.first
     }
 
     @SubscribeEvent
