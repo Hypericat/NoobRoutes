@@ -48,11 +48,8 @@ object PlayerUtils {
         }
     }
 
-
-
-    private val canClick get() = System.currentTimeMillis() - lastGuiClickSent > 50
     fun airClick(){
-        if (!canClick) return
+        if (!canSendC08) return
         devMessage("Clicked: ${System.currentTimeMillis()}")
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
     }
@@ -123,7 +120,9 @@ object PlayerUtils {
     inline val BlockPos.distanceToPlayer get() = mc.thePlayer.positionVector.distanceTo(Vec3(this))
     inline val BlockPos.distanceToPlayerSq get() = mc.thePlayer.positionVector.squareDistanceTo(Vec3(this))
 
-
+    fun setSneak(state: Boolean){
+        KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, state)
+    }
 
     fun resyncSneak(){
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.keyCode))

@@ -44,7 +44,7 @@ import kotlin.math.floor
 object Zpew : Module(
     name = "Zpew",
     category = Category.MOVE,
-    description = "Temporary Zpew thing"
+    description = "If you don't know what this is you probably shouldn't be using this mod"
 ) {
     private val zpew by BooleanSetting("Zero Ping Etherwarp", description = "Zero ping teleport for right clicking aotv")
     private val zpt by BooleanSetting("Zero Ping Aotv", description = "Zero ping teleport for right clicking aotv")
@@ -115,14 +115,14 @@ object Zpew : Module(
         if (!holdingTeleportItem() || !checkAllowedFails() || !enabled) return
         if (isSneaking && mc.thePlayer.heldItem.skyblockID.equalsOneOf("ASPECT_OF_THE_VOID", "ASPECT_OF_THE_END")) return
         var yaw = lastYaw
-        var pitch = lastPitch
+        val pitch = lastPitch
 
         yaw %= 360
         if (yaw < 0) yaw += 360
         if (yaw > 360) yaw -= 360
 
         val x = pos.x + 0.5
-        var y = pos.y.toDouble()
+        val y = pos.y.toDouble()
         val z = pos.z + 0.5
 
         lastX = x
@@ -182,7 +182,6 @@ object Zpew : Module(
 
         if (dingdingding) PlayerUtils.playLoudSound(getSound(), volume.toFloat(), Zpew.pitch.toFloat())
         if (sendTPCommand) Scheduler.schedulePreTickTask(0) { sendChatMessage("/tp $x $y $z")}
-
         if (sendPacket) Scheduler.scheduleHighPreTickTask {
             mc.netHandler.addToSendQueue(
                 C03PacketPlayer.C06PacketPlayerPosLook(
@@ -201,7 +200,7 @@ object Zpew : Module(
         updatePosition = true
     }
 
-    fun isWithinTolerance(n1: Float, n2: Float, tolerance: Double = 1e-4): Boolean {
+    private fun isWithinTolerance(n1: Float, n2: Float, tolerance: Double = 1e-4): Boolean {
         return kotlin.math.abs(n1 - n2) < tolerance
     }
 
@@ -216,7 +215,7 @@ object Zpew : Module(
         if (dir != 255) return
         val info = getTeleportInfo() ?: return
         if(!checkAllowedFails()) {
-            modMessage("§cZero ping etherwarp teleport aborted.")
+            modMessage("§cZero ping teleport aborted.")
             modMessage("§c${recentFails.size} fails last ${FAILWATCHPERIOD}s")
             modMessage("§c${recentlySentC06s.size} C06's queued currently")
             return
@@ -291,7 +290,6 @@ object Zpew : Module(
 
         devMessage("receivedS08($newX, $newY, $newZ)")
         devMessage("sentC06(${sentC06.x}, ${sentC06.y}, ${sentC06.z})")
-        devMessage(recentlySentC06s)
         devMessage("Failed")
 
         recentFails.add(System.currentTimeMillis())

@@ -14,8 +14,8 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute.aotv
 import noobroutes.features.dungeon.autoroute.AutoRoute.aotvTarget
-import noobroutes.features.dungeon.autoroute.AutoRoute.items
 import noobroutes.features.dungeon.autoroute.AutoRoute.delay
+import noobroutes.features.dungeon.autoroute.AutoRoute.items
 import noobroutes.features.dungeon.autoroute.AutoRoute.resetRotation
 import noobroutes.utils.*
 import noobroutes.utils.Utils.getEntitiesOfType

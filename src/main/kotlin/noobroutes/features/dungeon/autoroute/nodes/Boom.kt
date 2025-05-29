@@ -6,12 +6,7 @@ import net.minecraft.util.Vec3
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
 import noobroutes.features.dungeon.autoroute.Node
-import noobroutes.utils.AuraManager
-import noobroutes.utils.RotationUtils
-import noobroutes.utils.Scheduler
-import noobroutes.utils.SwapManager
-import noobroutes.utils.add
-import noobroutes.utils.isAir
+import noobroutes.utils.*
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asBlockPos
 import noobroutes.utils.render.Color
@@ -19,7 +14,6 @@ import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.toVec3
 
 class Boom(
     pos: Vec3 = Vec3(0.0, 0.0, 0.0),

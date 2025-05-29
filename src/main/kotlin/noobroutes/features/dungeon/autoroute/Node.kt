@@ -2,7 +2,6 @@ package noobroutes.features.dungeon.autoroute
 
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
-import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
 import noobroutes.utils.AutoP3Utils.walking
@@ -12,8 +11,6 @@ import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Room
-import kotlin.math.ceil
-import kotlin.math.floor
 
 abstract class Node(
     val name: String,
@@ -28,18 +25,20 @@ abstract class Node(
     var reset: Boolean = false
 ) {
 
+    var delete = true
     var delayTriggered = false
     var triggered = false
     var secretTriggered = false
     var centerTriggered = false
     var resetTriggered = false
 
-    fun reset() {
+    open fun reset() {
         delayTriggered = false
         triggered = false
         secretTriggered = false
         centerTriggered = false
         resetTriggered = false
+        delete = true
     }
 
 

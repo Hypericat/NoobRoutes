@@ -720,9 +720,9 @@ object AutoP3: Module (
                 saveRings()
             } else {
                 val file = DataManager.loadDataFromFileObject("rings")
-                file.forEach { route ->
+                for (route in file) {
                     val ringsInJson = mutableListOf<Ring>()
-                    route.value.forEach { it ->
+                    route.value.forEach {
                         val ring = it.asJsonObject
                         val ringType = ring.get("type")?.asString ?: "Unknown"
                         val ringClass = ringRegistry[ringType]
@@ -744,9 +744,5 @@ object AutoP3: Module (
             modMessage("Error Loading Rings, Please Send Log to Wadey")
             logger.info(e)
         }
-    }
-
-    private fun addRing(){
-
     }
 }

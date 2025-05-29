@@ -3,7 +3,6 @@ package noobroutes.features.dungeon.autoroute.nodes
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
-import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
 import noobroutes.features.dungeon.autoroute.AutoRoute.serverSneak
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
