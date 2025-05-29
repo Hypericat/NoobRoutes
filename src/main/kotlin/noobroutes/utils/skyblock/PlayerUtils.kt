@@ -16,7 +16,9 @@ import noobroutes.utils.bloomNormalize
 import org.lwjgl.input.Keyboard
 import kotlin.math.PI
 import kotlin.math.cos
+import kotlin.math.pow
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 object PlayerUtils {
     var shouldBypassVolume = false
@@ -115,6 +117,8 @@ object PlayerUtils {
         return mc.thePlayer.positionVector.distanceTo(Vec3(x.toDouble(), y.toDouble(), z.toDouble()))
     }
 
+    inline val Vec3.distanceToPlayer2D get() = sqrt((mc.thePlayer.positionVector.xCoord - this.xCoord).pow(2) + (mc.thePlayer.positionVector.zCoord - this.zCoord).pow(2))
+    inline val Vec3.distanceToPlayer2DSq get() = (mc.thePlayer.positionVector.xCoord - this.xCoord).pow(2) + (mc.thePlayer.positionVector.zCoord - this.zCoord).pow(2)
     inline val Vec3.distanceToPlayerSq get() = mc.thePlayer.positionVector.squareDistanceTo(this)
     inline val Vec3.distanceToPlayer get() = mc.thePlayer.positionVector.distanceTo(this)
     inline val BlockPos.distanceToPlayer get() = mc.thePlayer.positionVector.distanceTo(Vec3(this))

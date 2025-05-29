@@ -38,6 +38,7 @@ import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
+import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer2D
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
@@ -60,6 +61,7 @@ import kotlin.math.floor
 
 object AutoRoute : Module("Autoroute", description = "Ak47 modified", category = Category.DUNGEON) {
     val silent by BooleanSetting("Silent", default = true, description = "Serverside rotations")
+    val decrease by BooleanSetting("Decrease Pearlclip Distance", default = false, description = "When creating PearlClips it decreases the distance input by 1").withDependency { renderRoutes }
     val renderRoutes by BooleanSetting("Render Routes", default = false, description = "Renders nodes")
     val renderIndex by BooleanSetting("Render Index", description = "Render index above node, useful for editing").withDependency { renderRoutes }
     val edgeRoutes by BooleanSetting("Edging", default = false, description = "Edges nodes :)").withDependency { renderRoutes }
@@ -95,7 +97,8 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         Pair("Walk", Walk::class),
         Pair("Bat", Bat::class),
         Pair("PearlClip", PearlClip::class),
-        Pair("Pearl", Pearl::class)
+        Pair("Pearl", Pearl::class),
+        Pair("UseItem", UseItem::class)
     )
 
     private var lastRoute = 0L
@@ -186,7 +189,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             }
             if (nodes?.isNotEmpty() == true) event.isCanceled = true
         }
-        if (event.button == 2 && event.buttonstate) {
+        if (event.button == 0 && event.buttonstate) {
             if (secretCount < 0) {
                 secretCount = 0;
                 event.isCanceled = true
@@ -194,6 +197,17 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             }
             val room = DungeonUtils.currentRoom ?: roomReplacement
             nodes[room.data.name]?.forEach { it.reset() }
+            if (nodes[room.data.name]?.firstOrNull {node ->
+                val realCoord = room.getRealCoords(node.pos)
+                    (if (node.chain) (
+                            abs(PlayerUtils.posX - realCoord.xCoord) < 0.001 &&
+                                    abs(PlayerUtils.posZ - realCoord.zCoord) < 0.001 &&
+                                    PlayerUtils.posY >= node.pos.yCoord - 0.01 && PlayerUtils.posY <= node.pos.yCoord + 0.5
+                    ) else if (node.name == "Pearl") (
+                            realCoord.distanceToPlayer2D <= 0.5
+                    )
+                    else realCoord.distanceToPlayer <= 0.5)
+                } != null) event.isCanceled = true
         }
     }
 
@@ -299,15 +313,21 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         val inNodes = mutableListOf<Node>()
         nodes[room.data.name]?.forEach { node ->
             val realCoord = room.getRealCoords(node.pos)
-            val inNode = if (node.chain) (
+            val inNode =
+                if (node.chain) (
                     abs(PlayerUtils.posX - realCoord.xCoord) < 0.001 &&
                             abs(PlayerUtils.posZ - realCoord.zCoord) < 0.001 &&
                             PlayerUtils.posY >= node.pos.yCoord - 0.01 && PlayerUtils.posY <= node.pos.yCoord + 0.5
-                    ) else realCoord.distanceToPlayer <= 0.5
+                    )
+                else realCoord.distanceToPlayer <= 0.5
             if (inNode && !node.triggered) {
                 node.triggered = true
                 inNodes.add(node)
             } else if (!inNode && node.triggered) {
+                if (node.name == "Pearl") {
+                    if (realCoord.distanceToPlayer2D <= 0.5) node.reset()
+                    return@forEach
+                }
                 node.reset()
             }
         }
@@ -348,11 +368,12 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 node.resetTriggered = true
             }
             val realCoord = room.getRealCoords(node.pos)
-            if (!if (node.chain) (
+            if ((!if (node.chain) (
                 abs(PlayerUtils.posX - realCoord.xCoord) < 0.001 &&
                         abs(PlayerUtils.posZ - realCoord.zCoord) < 0.001 &&
                         PlayerUtils.posY >= node.pos.yCoord - 0.01 && PlayerUtils.posY <= node.pos.yCoord + 0.5
-                ) else realCoord.distanceToPlayer <= 0.5) {
+                ) else realCoord.distanceToPlayer <= 0.5) && node.name != "Pearl") {
+                devMessage("removing")
                 nodesToRun.remove(node)
                 resetRotation()
                 return
@@ -434,6 +455,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             }
             "restore" -> {
                 addNode(room, deletedNodes.removeFirstOrNull() ?: return modMessage("no node to restore"))
+                saveFile()
             }
 
 
@@ -453,6 +475,11 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 node.delay = delay
                 node.stop = stop
                 node.chain = chain
+                saveFile()
+            }
+            "clear" -> {
+                nodes[room.data.name] = mutableListOf()
+                saveFile()
             }
 
             "add", "create", "erect" -> {
@@ -516,9 +543,40 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                         }
                         addNode(
                             room,
-                            PearlClip(playerCoords, distance, awaitSecrets, maybeSecret, delay, center, stop, chain, reset)
+                            PearlClip(playerCoords, distance - if (decrease) 1 else 0, awaitSecrets, maybeSecret, delay, center, stop, chain, reset)
                         )
                     }
+
+                    "pearl" -> {
+                        if (args.size < 3) {
+                            modMessage("Need Amount")
+                        }
+                        val count = args[2].toIntOrNull()?.absoluteValue
+                        if (count == null) {
+                            modMessage("Provide a Number thanks")
+                            return
+                        }
+                        val yaw = room.getRelativeYaw(mc.thePlayer.rotationYaw)
+                        val pitch = mc.thePlayer.rotationPitch
+                        addNode(
+                            room,
+                            Pearl(playerCoords, count, yaw, pitch, awaitSecrets, maybeSecret, delay, center, stop, chain, reset)
+                        )
+                    }
+                    "useitem" -> {
+                        if (args.size < 3) {
+                            modMessage("Need Item Name")
+                        }
+                        val name = args[2].toString()
+                        val yaw = room.getRelativeYaw(mc.thePlayer.rotationYaw)
+                        val pitch = mc.thePlayer.rotationPitch
+                        addNode(
+                            room,
+                            UseItem(playerCoords, name, yaw, pitch, awaitSecrets, maybeSecret, delay, center, stop, chain, reset)
+                        )
+
+                    }
+
 
                     "aotv", "teleport", "hype", "bat" -> {
                         modMessage("recording Aotv do not move!")

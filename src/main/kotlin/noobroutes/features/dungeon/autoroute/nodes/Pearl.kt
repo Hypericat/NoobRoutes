@@ -48,8 +48,13 @@ class Pearl(
     private var pearlsThrown = 0
 
     override fun reset() {
-        super.reset()
+        delayTriggered = false
+        secretTriggered = false
+        centerTriggered = false
+        resetTriggered = false
+        delete = true
         pearlsThrown = 0
+        triggered = false
     }
 
     override fun awaitTick(room: Room) {

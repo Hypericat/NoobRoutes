@@ -19,7 +19,6 @@ class UseItem(
     var itemName: String = "",
     var yaw: Float = 0f,
     var pitch: Float = 0f,
-    var sneak: Boolean = false,
     awaitSecret: Int = 0,
     maybeSecret: Boolean = false,
     delay: Long = 0,
@@ -28,7 +27,7 @@ class UseItem(
     chain: Boolean = false,
     reset: Boolean = false,
 ) : Node(
-    "Aotv",
+    "UseItem",
     5,
     pos,
     awaitSecret,
@@ -57,7 +56,7 @@ class UseItem(
 
     override fun tick(room: Room) {
         if (!AutoRoute.silent) RotationUtils.setAngles(room.getRealYaw(yaw), pitch)
-        val state = SwapManager.swapFromSBId(itemName)
+        val state = SwapManager.swapFromName(itemName)
         stopWalk()
         if (state == SwapManager.SwapState.UNKNOWN) return
         if (state == SwapManager.SwapState.TOO_FAST) {
@@ -65,17 +64,19 @@ class UseItem(
             return
         }
 
-        if (mc.thePlayer.isSneaking != sneak || state != SwapManager.SwapState.ALREADY_HELD) {
-            PlayerUtils.setSneak(sneak)
+        if (state != SwapManager.SwapState.ALREADY_HELD) {
             AutoRoute.rotatingPitch = pitch
             AutoRoute.rotatingYaw = room.getRealYaw(yaw)
             AutoRoute.rotating = true
-            Scheduler.scheduleLowestPreTickTask {
+            Scheduler.scheduleLowestPreTickTask(1) {
                 PlayerUtils.airClick()
             }
             return
         }
-        PlayerUtils.airClick()
+        Scheduler.scheduleLowestPreTickTask {
+            PlayerUtils.airClick()
+        }
+
     }
 
 
@@ -87,7 +88,6 @@ class UseItem(
     override fun nodeAddInfo(obj: JsonObject) {
         obj.addProperty("yaw", yaw)
         obj.addProperty("pitch", pitch)
-        obj.addProperty("sneak", sneak)
         obj.addProperty("itemName", itemName)
     }
 
@@ -95,7 +95,6 @@ class UseItem(
         this.yaw = obj.get("yaw").asFloat
         this.pitch = obj.get("pitch").asFloat
         this.itemName = obj.get("itemName").asString
-        this.sneak = obj.get("sneak").asBoolean
     }
 
     override fun renderIndexColor(): Color {

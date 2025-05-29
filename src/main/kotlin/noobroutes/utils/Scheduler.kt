@@ -29,6 +29,7 @@ object Scheduler {
     private val scheduledSoundTasks = Tasks()
 
     private val scheduledPreMovementUpdateTasks = Tasks()
+    private val scheduledLowPreMovementUpdateTasks = Tasks()
 
 
     @Throws(IndexOutOfBoundsException::class)
@@ -41,6 +42,11 @@ object Scheduler {
     fun schedulePreMovementUpdateTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledPreMovementUpdateTasks.add(Task({ p -> callback(p) }, ticks, priority))
+    }
+    @Throws(IndexOutOfBoundsException::class)
+    fun scheduleLowPreMovementUpdateTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+        if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
+        scheduledLowPreMovementUpdateTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
@@ -183,6 +189,10 @@ object Scheduler {
     @SubscribeEvent
     fun motionUpdateEvent(event: MotionUpdateEvent.Pre){
         if (scheduledPreMovementUpdateTasks.doTasks(event)) event.isCanceled = true
+    }
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun lowMotionUpdateEvent(event: MotionUpdateEvent.Pre){
+        if (scheduledLowPreMovementUpdateTasks.doTasks(event)) event.isCanceled = true
     }
 
 
