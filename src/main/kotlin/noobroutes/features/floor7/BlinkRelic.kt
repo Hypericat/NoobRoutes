@@ -132,7 +132,7 @@ object BlinkRelic: Module(
     private fun drawRings() {
         if (!inBoss) return
         RenderUtils.drawOutlinedAABB(Vec3(89.85, 6.0, 54.85).toAABB(), if (onOrangeSpot) Color.GREEN else Color.RED, thickness = 3, depth = true)
-        RenderUtils.drawOutlinedAABB(Vec3(22.15, 6.0, 57.85).toAABB(), if (onOrangeSpot) Color.GREEN else Color.RED, thickness = 3, depth = true)
+        RenderUtils.drawOutlinedAABB(Vec3(22.15, 6.0, 57.85).toAABB(), if (onRedSpot) Color.GREEN else Color.RED, thickness = 3, depth = true)
     }
 
     private fun grabRelic(entity: Entity) {
