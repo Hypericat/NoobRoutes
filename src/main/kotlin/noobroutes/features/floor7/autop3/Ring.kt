@@ -16,6 +16,7 @@ import noobroutes.utils.json.syncdata.SyncInt
 import noobroutes.utils.json.syncdata.SyncLong
 import noobroutes.utils.json.syncdata.SyncString
 import noobroutes.utils.json.syncdata.SyncVec3
+import java.lang.System
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
@@ -104,7 +105,7 @@ abstract class Ring(
         if (fuckingLook) {
             mc.thePlayer.rotationYaw = yaw
         }
-        if (center && mc.thePlayer.onGround) {
+        if (center && (mc.thePlayer.onGround || System.currentTimeMillis() - Blink.lastBlink < 100)) {
             mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord)
             Blink.rotSkip = true
         }

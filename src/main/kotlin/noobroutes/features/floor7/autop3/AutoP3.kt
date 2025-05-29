@@ -7,6 +7,7 @@ import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -106,15 +107,15 @@ object AutoP3: Module (
                 }
                 if (ring.leap) {
                     awaitingLeap.add(ring)
-                    return
+                    return@forEach
                 }
                 if (ring.term) {
                     awaitingTerm.add(ring)
-                    return
+                    return@forEach
                 }
                 if (ring.left) {
                     awaitingLeft.add(ring)
-                    return
+                    return@forEach
                 }
                 ring.run()
             }
@@ -445,9 +446,9 @@ object AutoP3: Module (
         saveRings()
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun doTriggeredBlink(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.END || activatedBlinks.isEmpty()) return
+        if (event.phase != TickEvent.Phase.START || activatedBlinks.isEmpty()) return
         for (ring in activatedBlinks) {
             if (AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)) {
                 ring.run()
