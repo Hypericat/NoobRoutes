@@ -26,6 +26,7 @@ class PearlClip(
     center: Boolean = false,
     stop: Boolean = false,
     chain: Boolean = false,
+    reset: Boolean = false,
 ) : Node(
     "PearlClip",
     7,
@@ -35,7 +36,8 @@ class PearlClip(
     delay,
     center,
     stop,
-    chain
+    chain,
+    reset
 ) {
     override fun awaitTick(room: Room) {
         if (!silent) mc.thePlayer.rotationPitch = 90f
@@ -53,7 +55,12 @@ class PearlClip(
 
     override fun tick(room: Room) {
         if (distance > 70) return modMessage("Invalid Clip Distance")
-        SwapManager.swapFromName("ender pearl")
+        val state = SwapManager.swapFromName("ender pearl")
+        if (state == SwapManager.SwapState.UNKNOWN) return
+        if (state == SwapManager.SwapState.TOO_FAST) {
+            modMessage("Tried to 0 tick swap gg")
+            return
+        }
         AutoRoute.pearlSoundRegistered = true
         AutoRoute.clipDistance = distance
         if (!silent) mc.thePlayer.rotationPitch = 90f
@@ -72,7 +79,7 @@ class PearlClip(
 
     override fun render(room: Room) {
         drawNode(room, pearlClipColor)
-        Renderer.drawStringInWorld("PearlClip: $distance", pos.add(Vec3(0.0, 0.9, 0.0)), pearlClipColor, depth = depth)
+        if (AutoRoute.drawPearlClipText) Renderer.drawStringInWorld("PearlClip: $distance", pos.add(Vec3(0.0, 0.9, 0.0)), pearlClipColor, depth = depth)
     }
 
     override fun nodeAddInfo(obj: JsonObject) {

@@ -9,7 +9,6 @@ import noobroutes.features.dungeon.autoroute.AutoRoute.depth
 import noobroutes.features.dungeon.autoroute.AutoRoute.edgeRoutes
 import noobroutes.features.dungeon.autoroute.AutoRoute.ether
 import noobroutes.features.dungeon.autoroute.AutoRoute.etherwarpColor
-import noobroutes.features.dungeon.autoroute.AutoRoute.serverSneak
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.RotationUtils
@@ -25,10 +24,11 @@ import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.skyblockID
+import kotlin.math.absoluteValue
 
 class Etherwarp(
     pos: Vec3 = Vec3(0.0, 0.0, 0.0),
@@ -39,6 +39,7 @@ class Etherwarp(
     center: Boolean = false,
     stop: Boolean = false,
     chain: Boolean = false,
+    reset: Boolean = false,
 ) : Node(
     "Etherwarp",
     8,
@@ -48,7 +49,8 @@ class Etherwarp(
     delay,
     center,
     stop,
-    chain
+    chain,
+    reset
 ) {
 
     override fun awaitTick(room: Room) {
@@ -65,7 +67,12 @@ class Etherwarp(
 
     override fun tick(room: Room) {
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
-        SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+        val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+        if (state == SwapManager.SwapState.UNKNOWN) return
+        if (state == SwapManager.SwapState.TOO_FAST) {
+            modMessage("Tried to 0 tick swap gg")
+            return
+        }
         if (!silent) setAngles(angles.first, angles.second)
         stopWalk()
         PlayerUtils.sneak()
@@ -97,15 +104,15 @@ class Etherwarp(
 
 
     override fun render(room: Room) {
+        drawNode(room, etherwarpColor)
+        if (!AutoRoute.drawEtherLines) return
         val nodeCoords = room.getRealCoords(pos)
-        Renderer.drawCylinder(nodeCoords.add(0.0, 0.03, 0.0), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0,
-            etherwarpColor , depth = depth)
-        if (edgeRoutes) {
-            val targetCoords = room.getRealCoords(target)
-            val yaw = RotationUtils.getYawAndPitchOrigin(nodeCoords, targetCoords, true).first
+        val targetCoords = room.getRealCoords(target)
+        val lookVec = RotationUtils.getYawAndPitchOrigin(nodeCoords, targetCoords, true)
+        if (edgeRoutes && lookVec.second.absoluteValue != 90f) {
             Renderer.draw3DLine(
                 listOf(
-                    room.getRealCoords(pos).add(yaw.xPart * 0.6, 0.0, yaw.zPart * 0.6),
+                    nodeCoords.add(lookVec.first.xPart * 0.6, 0.0, lookVec.first.zPart * 0.6),
                     targetCoords,
                 ),
                 etherwarpColor,
@@ -114,8 +121,8 @@ class Etherwarp(
         } else {
             Renderer.draw3DLine(
                 listOf(
-                    room.getRealCoords(pos),
-                    room.getRealCoords(target)
+                    nodeCoords,
+                    targetCoords
                 ),
                 etherwarpColor,
                 depth = depth

@@ -14,6 +14,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import noobroutes.Core
 import noobroutes.Core.logger
 import noobroutes.config.DataManager
 import noobroutes.events.impl.MotionUpdateEvent
@@ -35,9 +36,9 @@ import noobroutes.utils.Utils.containsOneOf
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
-import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
+import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
@@ -49,6 +50,7 @@ import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import org.lwjgl.input.Keyboard
 import kotlin.math.abs
 import kotlin.math.absoluteValue
+import kotlin.math.ceil
 import kotlin.math.floor
 
 
@@ -62,12 +64,16 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     val renderIndex by BooleanSetting("Render Index", description = "Render index above node, useful for editing").withDependency { renderRoutes }
     val edgeRoutes by BooleanSetting("Edging", default = false, description = "Edges nodes :)").withDependency { renderRoutes }
     val depth by BooleanSetting("Depth", default = true, description = "Render Rings Through Walls").withDependency { renderRoutes }
+    val drawEtherLines by BooleanSetting("Draw Ether Lines", default = true, description = "Draws a line to the ether target").withDependency { renderRoutes }
+    val drawAotvLines by BooleanSetting("Draw Aotv Lines", default = true, description = "Draws a line to the Aotv target").withDependency { renderRoutes }
+    val drawPearlClipText by BooleanSetting("Draw Pearlclip Distance", default = true, description = "Renders the distance of the Pearlclip above the node").withDependency { renderRoutes }
     private val colorSettings by DropdownSetting("Colors").withDependency { renderRoutes }
-    val etherwarpColor by ColorSetting("Etherwarp", default = Color.GREEN, description = "Color of etherwarp nodes").withDependency { renderRoutes && colorSettings }
-    val walkColor by ColorSetting("Walk", default = Color.GREEN, description = "Color of walk nodes").withDependency { renderRoutes && colorSettings }
-    val pearlClipColor by ColorSetting("Pearlclip", default = Color.GREEN, description = "Color of pearlclip nodes").withDependency { renderRoutes && colorSettings }
+    val etherwarpColor by ColorSetting("Etherwarp", default = Color.GREEN, description = "Color of Etherwarp nodes").withDependency { renderRoutes && colorSettings }
+    val walkColor by ColorSetting("Walk", default = Color.GREEN, description = "Color of Walk nodes").withDependency { renderRoutes && colorSettings }
+    val pearlClipColor by ColorSetting("Pearlclip", default = Color.GREEN, description = "Color of Pearlclip nodes").withDependency { renderRoutes && colorSettings }
     val aotvColor by ColorSetting("Aotv", default = Color.GREEN, description = "Color of Aotv nodes").withDependency { renderRoutes && colorSettings }
     val boomColor by ColorSetting("Boom", default = Color.GREEN, description = "Color of Boom nodes").withDependency { renderRoutes && colorSettings }
+    val batColor by ColorSetting("Bat", default = Color.GREEN, description = "Color of Bat nodes").withDependency { renderRoutes && colorSettings }
     var editMode by BooleanSetting("Edit Mode", description = "Prevents nodes from triggering")
     val editModeBind by KeybindSetting("Edit Mode Toggle", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress { editMode = !editMode }
 
@@ -83,7 +89,10 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         Pair("Etherwarp", Etherwarp::class),
         Pair("Aotv", Aotv::class),
         Pair("Boom", Boom::class),
-        Pair("Walk", Walk::class)
+        Pair("Walk", Walk::class),
+        Pair("Bat", Bat::class),
+        Pair("PearlClip", PearlClip::class
+        )
     )
 
     var lastRoute = 0L
@@ -113,17 +122,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
 
     var serverSneak = false
-    var lastEtherwarp = 0L
 
     var pearlSoundRegistered = false
-    var etherRegistered = false
     var sneakRegistered = false
-
-
-    var clickRegistered = false
-    var itemRegistered = false
-    var batSpawnRegistered = false
-    var batDeathRegistered = false
     var unsneakRegistered = false
 
     fun ether() {
@@ -189,7 +190,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 return
             }
             val room = DungeonUtils.currentRoom ?: roomReplacement
-            nodes[room.data.name]?.map {it.triggered = false; it.secretTriggered = false}
+            nodes[room.data.name]?.forEach { it.reset() }
         }
     }
 
@@ -204,12 +205,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     }
 
 
-    fun clear() {
-        batDeathRegistered = false
-        clickRegistered = false
-        itemRegistered = false
-        batSpawnRegistered = false
-    }
+
 
     fun loadFile() {
         nodes.clear()
@@ -227,6 +223,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                     instance.pos = obj?.get("position")?.asVec3 ?: Vec3(0.0, 0.0, 0.0)
                     instance.center = obj.has("center")
                     instance.chain = obj.has("chain")
+                    instance.chain = obj.has("reset")
                     instance.maybeSecret = obj.has("maybeSecret")
                     instance.stop = obj.has("stop")
                     instance.awaitSecrets = obj.get("secrets")?.asInt ?: 0
@@ -267,7 +264,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }
         if (renderIndex) {
             nodes[room.data.name]?.forEachIndexed { index, node ->
-                Renderer.drawStringInWorld(index.toString(), room.getRealCoords(node.pos).add(Vec3(0.0, 0.6, 0.0)), node.renderIndexColor(), depth = depth)
+                node.drawIndex(index, room)
             }
         }
     }
@@ -281,6 +278,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     fun motion(event: MotionUpdateEvent.Pre) {
         if (PlayerUtils.movementKeysPressed) {
             resetRotation()
+            nodesToRun.clear()
+            val room = DungeonUtils.currentRoom ?: roomReplacement
+            nodes[room.data.name]?.forEach { it.reset() }
         }
         if (rotating) {
             rotatingYaw?.let {
@@ -305,17 +305,18 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 node.triggered = true
                 inNodes.add(node)
             } else if (!inNode && node.triggered) {
-                node.triggered = false
-                node.secretTriggered = false
+                node.reset()
             }
         }
         return inNodes
     }
-    var lastBoom = 0L
+    var delay = 0L
+
+    val canRoute get() = System.currentTimeMillis() - delay >= 0
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: ClientTickEvent) {
-        if (event.isEnd || mc.thePlayer == null || System.currentTimeMillis() - lastBoom < 200) return
+        if (event.isEnd || mc.thePlayer == null || !canRoute) return
         val room = DungeonUtils.currentRoom ?: roomReplacement
 
         if (nodes[room.data.name] == null || editMode || PlayerUtils.movementKeysPressed) {
@@ -337,7 +338,23 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             return
         }
         nodesToRun.firstOrNull()?.let { node ->
+
             lastRoute = System.currentTimeMillis()
+            if (node.reset && !node.resetTriggered) {
+                secretCount = 0
+                node.resetTriggered = true
+            }
+            val realCoord = room.getRealCoords(node.pos)
+            if (!if (node.chain) (
+                abs(PlayerUtils.posX - realCoord.xCoord) < 0.001 &&
+                        abs(PlayerUtils.posZ - realCoord.zCoord) < 0.001 &&
+                        PlayerUtils.posY >= node.pos.yCoord - 0.01 && PlayerUtils.posY <= node.pos.yCoord + 0.5
+                ) else realCoord.distanceToPlayer <= 0.5) {
+                nodesToRun.remove(node)
+                resetRotation()
+                return
+            }
+
             if (!node.secretTriggered) {
                 if (secretCount >= 0) secretCount -= node.awaitSecrets else secretCount = -node.awaitSecrets
                 node.secretTriggered = true
@@ -349,7 +366,18 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 node.awaitTick(room)
                 return
             }
+            if (node.delay != 0L && !node.delayTriggered) {
+                delay = System.currentTimeMillis() + node.delay
+                node.delayTriggered = true
+                return
+            }
 
+            if (node.stop) PlayerUtils.stopVelocity()
+            if (node.center && !node.centerTriggered) {
+                center()
+                node.centerTriggered = true
+                return //makes it wait a tick before executing the rest
+            }
             node.secretTriggered = false
             resetRotation()
             secretCount = 0
@@ -364,11 +392,28 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
     }
 
+    fun center(){
+        if (Core.mc.thePlayer.posZ < 0 || Core.mc.thePlayer.posZ > 0) Core.mc.thePlayer.setPosition(
+            calcFloorPos(Core.mc.thePlayer.posX, 5.0),
+            Core.mc.thePlayer.posY,
+            calcFloorPos(Core.mc.thePlayer.posZ, 5.0)
+        )
+    }
+
+    private fun calcFloorPos(c: Double, v: Double): Double{
+        return if (c < 0) {
+            ceil(c) - v / 10
+        } else {
+            return floor(c) + v / 10
+        }
+    }
+
+
     private var deletedNodes = mutableListOf<Node>()
 
     fun handleAutoRouteCommand(args: Array<out String>) {
         val room = DungeonUtils.currentRoom ?: roomReplacement
-
+        val reset = args.containsOneOf("reset", ignoreCase = true)
         val center = args.containsOneOf("center", "align", ignoreCase = true)
         val chain = args.containsOneOf("chain", ignoreCase = true)
         val maybeSecret = args.containsOneOf("maybe", "maybesecret", ignoreCase = true)
@@ -376,11 +421,18 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         val awaitSecrets =
             args.firstOrNull { it.startsWith("await:", ignoreCase = true) }?.substringAfter("await:")?.toIntOrNull()
                 ?: 0
+        val delay =
+            args.firstOrNull { it.startsWith("delay:", ignoreCase = true) }?.substringAfter("delay:")?.toLongOrNull()
+                ?: 0L
 
         when (args[0].lowercase()) {
             "load" -> {
                 loadFile()
             }
+            "restore" -> {
+                addNode(room, deletedNodes.removeFirstOrNull() ?: return modMessage("no node to restore"))
+            }
+
 
             "delete", "remove", "begone", "eradicate", "flaccid" -> {
                 val nodeList = nodes[room.data.name]
@@ -396,7 +448,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 }
                 if (nodeList.isNullOrEmpty()) return
 
-                val node = nodeList.maxByOrNull { -it.pos.distanceToPlayer }!!
+                val node = nodeList.minByOrNull {
+                    room.getRealCoords(it.pos).distanceToPlayerSq
+                }!!
                 deletedNodes.add(node)
                 nodeList.remove(node)
                 saveFile()
@@ -424,7 +478,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                         val target = room.getRelativeCoords(raytrace)
                         addNode(
                             room,
-                            Etherwarp(playerCoords, target, awaitSecrets, maybeSecret, 0, center, stop, chain)
+                            Etherwarp(playerCoords, target, awaitSecrets, maybeSecret, delay, center, stop, chain, reset)
                         )
                     }
                     "boom", "tnt" -> {
@@ -434,7 +488,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                             modMessage("must look at a block")
                             return
                         }
-                        addNode(room, Boom(playerCoords, target, awaitSecrets, maybeSecret, 0L, center, stop, chain))
+                        addNode(room, Boom(playerCoords, target, awaitSecrets, maybeSecret, delay, center, stop, chain, reset))
                     }
 
                     "walk" -> {
@@ -445,10 +499,11 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                                 room.getRelativeYaw(mc.thePlayer.rotationYaw.round(14).toFloat()),
                                 awaitSecrets,
                                 maybeSecret,
-                                0,
+                                delay,
                                 center,
                                 stop,
-                                chain
+                                chain,
+                                reset
                             )
                         )
                     }
@@ -464,7 +519,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                         }
                         addNode(
                             room,
-                            PearlClip(playerCoords, distance, awaitSecrets, maybeSecret, 0, center, stop, chain)
+                            PearlClip(playerCoords, distance, awaitSecrets, maybeSecret, delay, center, stop, chain, reset)
                         )
                     }
 
@@ -504,13 +559,33 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                                             pitch,
                                             awaitSecrets,
                                             maybeSecret,
-                                            0,
+                                            delay,
                                             center,
                                             stop,
-                                            chain
+                                            chain,
+                                            reset
                                         )
                                     )
                                 }
+                                else if (args[1].lowercase().equalsOneOf("bat", "hype")) {
+                                    addNode(
+                                        room,
+                                        Bat(
+                                            playerCoords,
+                                            target,
+                                            yaw,
+                                            pitch,
+                                            awaitSecrets,
+                                            maybeSecret,
+                                            delay,
+                                            center,
+                                            stop,
+                                            chain,
+                                            reset
+                                        )
+                                    )
+                                }
+
                             }
 
 

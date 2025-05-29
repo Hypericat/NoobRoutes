@@ -14,17 +14,12 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute.aotv
 import noobroutes.features.dungeon.autoroute.AutoRoute.aotvTarget
-import noobroutes.features.dungeon.autoroute.AutoRoute.batSpawnRegistered
-import noobroutes.features.dungeon.autoroute.AutoRoute.clear
 import noobroutes.features.dungeon.autoroute.AutoRoute.items
+import noobroutes.features.dungeon.autoroute.AutoRoute.delay
 import noobroutes.features.dungeon.autoroute.AutoRoute.resetRotation
-import noobroutes.features.dungeon.autoroute.AutoRoute.rotating
-import noobroutes.features.dungeon.autoroute.AutoRoute.rotatingPitch
-import noobroutes.features.dungeon.autoroute.AutoRoute.rotatingYaw
 import noobroutes.utils.*
 import noobroutes.utils.Utils.getEntitiesOfType
 import noobroutes.utils.Utils.isEnd
-import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
@@ -33,7 +28,7 @@ object SecretUtils {
     var secretCount = 0
     var awaitingNode: Node? = null
     var canSendC08 = true
-
+    var batSpawnRegistered = false
     @SubscribeEvent
     fun item(event: PacketEvent.Receive) {
         if (event.packet !is S0DPacketCollectItem) return
@@ -94,17 +89,15 @@ object SecretUtils {
 
     @SubscribeEvent
     fun onBat(event: ClientTickEvent) {
-        if (event.isEnd) return
+        if (event.isEnd || System.currentTimeMillis() - delay < 200) return
         if (!batSpawnRegistered) return
         val bats = mc.theWorld.getEntitiesOfType<EntityBat>()
         for (bat in bats) {
             if (bat.positionVector.distanceToPlayerSq > 225) continue
             devMessage("Bat Spawned")
-            Scheduler.schedulePreTickTask {
-                aotvTarget?.let { it1 -> aotv(it1) }
-                resetRotation()
-                batSpawnRegistered = false
-            }
+            aotvTarget?.let { it1 -> aotv(it1) }
+            resetRotation()
+            batSpawnRegistered = false
         }
     }
 

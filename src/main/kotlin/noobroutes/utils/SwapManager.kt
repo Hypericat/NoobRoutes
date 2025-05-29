@@ -108,7 +108,7 @@ object SwapManager {
                 }
             }
         }
-        modMessage("$skyblockID not found.")
+        modMessage("${skyblockID.first()} not found.")
         return SwapState.UNKNOWN
     }
 
