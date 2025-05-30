@@ -64,6 +64,24 @@ object AutoP3: Module (
     var customBlinkLengthToggle by BooleanSetting("blink length", default = true, description = "allows for changing the blink length of waypoints").withDependency { blinkShit }
     val customBlinkLength by NumberSetting(name = "length", description = "well how long for the blink to be", min = 1, max = 40, default = 24).withDependency { blinkShit && customBlinkLengthToggle }
     val timerSpeed by NumberSetting(name = "sped ring speed", description = "how much faster it goes (100 means 100x speed) also need tick check for high speeds", min = 2f, max = 100f, default = 10f).withDependency { blinkShit }
+    private val testShit by DropdownSetting(name = "test ring")
+    val tick0 by NumberSetting(name = "0", description = "tick 0 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick1 by NumberSetting(name = "1", description = "tick 1 speed", min = 1.0, max = 7.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick2 by NumberSetting(name = "2", description = "tick 2 speed", min = 1.0, max = 7.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick3 by NumberSetting(name = "3", description = "tick 3 speed", min = 1.0, max = 4.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick4 by NumberSetting(name = "4", description = "tick 4 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick5 by NumberSetting(name = "5", description = "tick 5 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick6 by NumberSetting(name = "6", description = "tick 6 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick7 by NumberSetting(name = "7", description = "tick 7 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick8 by NumberSetting(name = "8", description = "tick 8 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick9 by NumberSetting(name = "9", description = "tick 9 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick10 by NumberSetting(name = "10", description = "tick 10 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick11 by NumberSetting(name = "11", description = "tick 11 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick12 by NumberSetting(name = "12", description = "tick 12 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick13 by NumberSetting(name = "13", description = "tick 13 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick14 by NumberSetting(name = "14", description = "tick 14 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick15 by NumberSetting(name = "15", description = "tick 15 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     private var leapedIDs = mutableSetOf<Int>()
@@ -432,6 +450,19 @@ object AutoP3: Module (
                     rotate,
                     walk
                 ))
+            }
+            "test" -> {
+                modMessage("test added")
+                actuallyAddRing(TestRing(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate
+                )
+                )
             }
             else -> return modMessage("thats not a ring type stoopid")
 

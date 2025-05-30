@@ -50,6 +50,19 @@ object AutoP3Utils {
         mc.gameSettings.keyBindBack
     )
 
+    val tickSpeeds = mapOf(
+        0 to 0.1,
+        1 to 3.08,
+        2 to 1.99,
+        3 to 1.77,
+        4 to 1.64,
+        5 to 1.45,
+        6 to 1.33,
+        7 to 1.24,
+        8 to 1.15,
+        9 to 1.07
+    )
+
     private var xSpeed = 0.0
     private var zSpeed = 0.0
     private var air = 0
@@ -62,7 +75,8 @@ object AutoP3Utils {
         keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
         if (!stop) return
         walking = false
-        yeeting = false
+        motioning = false
+        testing = false
     }
 
     fun rePressKeys() {
@@ -71,8 +85,10 @@ object AutoP3Utils {
 
     var walking = false
     var direction = 0F
-    var yeeting = false
-    var yeetTicks = 0
+    var motioning = false
+    var motionTicks = 0
+    var testing = false
+    var testTicks = 0
 
     fun startWalk(dir: Float) {
         direction = dir
@@ -100,42 +116,51 @@ object AutoP3Utils {
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook) return
         walking = false
-        yeeting = false
+        motioning = false
+        testing = false
     }
 
     @SubscribeEvent
-    fun yeet(event: ClientTickEvent) {
-        if (!yeeting || event.phase != TickEvent.Phase.START) return
-        when (yeetTicks) {
-            0 -> {
-                val speed = mc.thePlayer.capabilities.walkSpeed * 0.1 / 0.91
-                mc.thePlayer.motionX = -Utils.xPart(direction) * speed
-                mc.thePlayer.motionZ = -Utils.zPart(direction) * speed
-            }
+    fun motion(event: ClientTickEvent) {
+        if (!motioning || event.phase != TickEvent.Phase.START) return
+        if (motionTicks == 1 && mc.thePlayer.onGround) mc.thePlayer.jump()
+        setSpeed(tickSpeeds.getOrElse(motionTicks) { 1.0 })
+        if (motionTicks > 1 && mc.thePlayer.onGround) {setSpeed(1.403)} //it's fine, since it doesn't account for walk speed anyway
+        motionTicks++
+    }
+
+    @SubscribeEvent
+    fun doTest(event: ClientTickEvent) {
+        if (!testing || event.phase != TickEvent.Phase.START) return
+        when (testTicks) {
+            0 -> { setSpeed(AutoP3.tick0) }
             1 -> {
                 if (mc.thePlayer.onGround) mc.thePlayer.jump()
-                val speed = mc.thePlayer.capabilities.walkSpeed * 5.5 / 0.91
-                mc.thePlayer.motionX = Utils.xPart(direction) * speed
-                mc.thePlayer.motionZ = Utils.zPart(direction) * speed
+                setSpeed(AutoP3.tick1)
             }
-            2 -> {
-                mc.thePlayer.motionX *= 0.7 / 0.91
-                mc.thePlayer.motionZ *= 0.7 / 0.91
-            }
+            2 -> { setSpeed(AutoP3.tick2) }
+            3 -> { setSpeed(AutoP3.tick3) }
+            4 -> { setSpeed(AutoP3.tick4) }
+            5 -> { setSpeed(AutoP3.tick5) }
+            6 -> { setSpeed(AutoP3.tick6) }
+            7 -> { setSpeed(AutoP3.tick7) }
+            8 -> { setSpeed(AutoP3.tick8) }
+            9 -> { setSpeed(AutoP3.tick9) }
+            10 -> { setSpeed(AutoP3.tick10) }
+            11 -> { setSpeed(AutoP3.tick11) }
+            12 -> { setSpeed(AutoP3.tick12) }
+            13 -> { setSpeed(AutoP3.tick13) }
+            14 -> { setSpeed(AutoP3.tick14) }
+            15 -> { setSpeed(AutoP3.tick15) }
+            else -> testing = false
         }
-        if (yeetTicks > 1) {
-            if (mc.thePlayer.onGround) {
-                val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
-                mc.thePlayer.motionX = Utils.xPart(direction) * speed
-                mc.thePlayer.motionZ = Utils.zPart(direction) * speed
-            }
-            else {
-                mc.thePlayer.motionX += mc.thePlayer.capabilities.walkSpeed * motionValue/10000 * Utils.xPart(direction)
-                mc.thePlayer.motionZ += mc.thePlayer.capabilities.walkSpeed * motionValue/10000 * Utils.zPart(direction)
-            }
-        }
-        yeetTicks++
+        testTicks++
 
+    }
+
+    private fun setSpeed(speed: Double) {
+        mc.thePlayer.motionX = Utils.xPart(direction) * speed
+        mc.thePlayer.motionZ = Utils.zPart(direction) * speed
     }
 
     @SubscribeEvent
@@ -171,12 +196,12 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun onKeyInput(event: InputEvent.KeyInputEvent) {
-        if (!walking && !yeeting) return
+        if (!walking && !motioning) return
         val keyCode = Keyboard.getEventKey()
         if (keyCode != Keyboard.KEY_W && keyCode != Keyboard.KEY_A && keyCode != Keyboard.KEY_S && keyCode != Keyboard.KEY_D ) return
         if (!Keyboard.getEventKeyState()) return
         walking = false
-        yeeting = false
+        motioning = false
     }
 
     fun renderRing(ring: Ring) {

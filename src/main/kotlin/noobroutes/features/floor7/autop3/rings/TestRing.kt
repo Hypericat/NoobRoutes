@@ -5,8 +5,8 @@ import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
 
-@RingType("Motion")
-class MotionRing(
+@RingType("Test")
+class TestRing(
     coords: Vec3 = Vec3(0.0, 0.0, 0.0),
     yaw: Float = 0f,
     term: Boolean = false,
@@ -19,7 +19,7 @@ class MotionRing(
         AutoP3Utils.unPressKeys()
         super.doRing()
         AutoP3Utils.direction = yaw
-        AutoP3Utils.motionTicks = 0
-        AutoP3Utils.motioning = true
+        AutoP3Utils.testTicks = 0
+        AutoP3Utils.testing = true
     }
 }

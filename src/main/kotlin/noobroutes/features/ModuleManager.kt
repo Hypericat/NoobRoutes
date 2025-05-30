@@ -11,6 +11,7 @@ import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute
+import noobroutes.features.dungeon.puzzle.IceFill
 import noobroutes.features.floor7.*
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.misc.*
@@ -86,7 +87,8 @@ object ModuleManager {
         Penis,
         RotationVisualizer,
         CrystalAura,
-        BlinkRelic
+        BlinkRelic,
+        IceFill
     )
 
     init {
