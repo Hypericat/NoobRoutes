@@ -59,7 +59,7 @@ object PlayerUtils {
     fun stopVelocity(){
         mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
     }
-    inline val movementKeysPressed: Boolean get() = playerControlsKeycodes.any { Keyboard.isKeyDown(it) }
+    inline val movementKeysPressed: Boolean get() = playerControlsKeycodes.any { Keyboard.isKeyDown(it) } && mc.currentScreen == null
 
 
 

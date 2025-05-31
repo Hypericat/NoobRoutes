@@ -8,7 +8,8 @@ import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.aotvColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.edgeRoutes
-import noobroutes.features.dungeon.autoroute.AutoRoute.serverSneak
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.serverSneak
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.*
 import noobroutes.utils.Utils.xPart
@@ -50,9 +51,7 @@ class Aotv(
 ) {
 
     override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
-        AutoRoute.rotatingPitch = pitch
-        AutoRoute.rotatingYaw = room.getRealYaw(yaw)
-        AutoRoute.rotating = true
+        AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
     }
 
     override fun motion(event: MotionUpdateEvent.Pre, room: Room) {
@@ -77,15 +76,13 @@ class Aotv(
 
         if (mc.thePlayer.isSneaking || serverSneak || state != SwapManager.SwapState.ALREADY_HELD) {
             PlayerUtils.forceUnSneak()
-            AutoRoute.rotatingPitch = pitch
-            AutoRoute.rotatingYaw = room.getRealYaw(yaw)
-            AutoRoute.rotating = true
+            AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
             Scheduler.schedulePreTickTask(1) {
-                AutoRoute.aotv(tpTarget)
+                AutoRouteUtils.aotv(tpTarget)
             }
             return
         }
-        AutoRoute.aotv(tpTarget)
+        AutoRouteUtils.aotv(tpTarget)
 
 
     }

@@ -2,18 +2,16 @@ package noobroutes.features.dungeon.autoroute.nodes
 
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
-import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
-import noobroutes.features.dungeon.autoroute.AutoRoute.pearlClipColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.pearlColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
-import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
@@ -59,20 +57,20 @@ class Pearl(
 
     override fun awaitTick(room: Room) {
         if (!silent) RotationUtils.setAngles(room.getRealYaw(yaw), pitch)
+        PlayerUtils.forceUnSneak()
     }
 
     override fun awaitMotion(
         event: MotionUpdateEvent.Pre,
         room: Room
     ) {
-        AutoRoute.rotatingYaw = room.getRealYaw(yaw)
-        AutoRoute.rotatingPitch = pitch
-        AutoRoute.rotating = true
+        AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
     }
 
 
     override fun tick(room: Room) {
         if (count < 1) return modMessage("Invalid Clip Distance")
+        PlayerUtils.forceUnSneak()
         delete = false
         val state = SwapManager.swapFromName("ender pearl")
         if (state == SwapManager.SwapState.UNKNOWN) return

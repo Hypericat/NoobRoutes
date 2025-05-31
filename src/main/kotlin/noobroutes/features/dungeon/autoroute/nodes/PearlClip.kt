@@ -8,6 +8,9 @@ import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
 import noobroutes.features.dungeon.autoroute.AutoRoute.pearlClipColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.clipDistance
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.pearlSoundRegistered
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
@@ -47,9 +50,7 @@ class PearlClip(
         event: MotionUpdateEvent.Pre,
         room: Room
     ) {
-        AutoRoute.rotatingYaw = null
-        AutoRoute.rotatingPitch = 90f
-        AutoRoute.rotating = true
+        AutoRouteUtils.setRotation(null, 90f)
     }
 
 
@@ -61,8 +62,8 @@ class PearlClip(
             modMessage("Tried to 0 tick swap gg")
             return
         }
-        AutoRoute.pearlSoundRegistered = true
-        AutoRoute.clipDistance = distance
+        pearlSoundRegistered = true
+        clipDistance = distance
         if (!silent) mc.thePlayer.rotationPitch = 90f
         //PlayerUtils.forceUnSneak()
         Scheduler.schedulePreTickTask {
@@ -74,9 +75,7 @@ class PearlClip(
         event: MotionUpdateEvent.Pre,
         room: Room
     ) {
-        AutoRoute.rotatingYaw = null
-        AutoRoute.rotatingPitch = 90f
-        AutoRoute.rotating = true
+        AutoRouteUtils.setRotation(null, 90f)
     }
 
     override fun render(room: Room) {

@@ -2,12 +2,14 @@ package noobroutes.features.dungeon.autoroute.nodes
 
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
-import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.useItemColor
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.Node
-import noobroutes.utils.*
+import noobroutes.utils.RotationUtils
+import noobroutes.utils.Scheduler
+import noobroutes.utils.SwapManager
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
@@ -40,9 +42,7 @@ class UseItem(
 ) {
 
     override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
-        AutoRoute.rotatingPitch = pitch
-        AutoRoute.rotatingYaw = room.getRealYaw(yaw)
-        AutoRoute.rotating = true
+        AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
     }
 
     override fun motion(event: MotionUpdateEvent.Pre, room: Room) {
@@ -65,9 +65,7 @@ class UseItem(
         }
 
         if (state != SwapManager.SwapState.ALREADY_HELD) {
-            AutoRoute.rotatingPitch = pitch
-            AutoRoute.rotatingYaw = room.getRealYaw(yaw)
-            AutoRoute.rotating = true
+            AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
             Scheduler.scheduleLowestPreTickTask(1) {
                 PlayerUtils.airClick()
             }

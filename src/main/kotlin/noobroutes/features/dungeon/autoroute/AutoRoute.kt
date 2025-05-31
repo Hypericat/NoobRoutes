@@ -3,10 +3,7 @@ package noobroutes.features.dungeon.autoroute
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
-import net.minecraft.network.play.client.C0BPacketEntityAction
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
-import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.MouseEvent
@@ -19,19 +16,17 @@ import noobroutes.Core.logger
 import noobroutes.config.DataManager
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
-import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.features.dungeon.autoroute.SecretUtils.secretCount
 import noobroutes.features.dungeon.autoroute.nodes.*
-import noobroutes.features.move.Zpew
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.features.settings.impl.DropdownSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.utils.*
-import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.Utils.containsOneOf
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.json.JsonUtils.asVec3
@@ -61,15 +56,16 @@ import kotlin.math.floor
 
 object AutoRoute : Module("Autoroute", description = "Ak47 modified", category = Category.DUNGEON) {
     val silent by BooleanSetting("Silent", default = true, description = "Serverside rotations")
-    val decrease by BooleanSetting("Decrease Pearlclip Distance", default = false, description = "When creating PearlClips it decreases the distance input by 1").withDependency { renderRoutes }
+    val decrease by BooleanSetting("Reduce Pearlclip", default = false, description = "When creating PearlClips it decreases the distance input by 1")
     val renderRoutes by BooleanSetting("Render Routes", default = false, description = "Renders nodes")
     val renderIndex by BooleanSetting("Render Index", description = "Render index above node, useful for editing").withDependency { renderRoutes }
     val edgeRoutes by BooleanSetting("Edging", default = false, description = "Edges nodes :)").withDependency { renderRoutes }
     val depth by BooleanSetting("Depth", default = true, description = "Render Rings Through Walls").withDependency { renderRoutes }
-    val drawEtherLines by BooleanSetting("Draw Ether Lines", default = true, description = "Draws a line to the ether target").withDependency { renderRoutes }
-    val drawAotvLines by BooleanSetting("Draw Aotv Lines", default = true, description = "Draws a line to the Aotv target").withDependency { renderRoutes }
-    val drawPearlClipText by BooleanSetting("Draw Pearlclip Distance", default = true, description = "Renders the distance of the Pearlclip above the node").withDependency { renderRoutes }
-    val drawPearlCountText by BooleanSetting("Draw Pearl Count", default = true, description = "Renders the pearl count above the Pearl node").withDependency { renderRoutes }
+    private val drawSettings by DropdownSetting("Draw").withDependency { renderRoutes }
+    val drawEtherLines by BooleanSetting("Draw Ether Lines", default = true, description = "Draws a line to the ether target").withDependency { renderRoutes && drawSettings }
+    val drawAotvLines by BooleanSetting("Draw Aotv Lines", default = true, description = "Draws a line to the Aotv target").withDependency { renderRoutes && drawSettings }
+    val drawPearlClipText by BooleanSetting("Draw Pearlclip Distance", default = true, description = "Renders the distance of the Pearlclip above the node").withDependency { renderRoutes && drawSettings }
+    val drawPearlCountText by BooleanSetting("Draw Pearl Count", default = true, description = "Renders the pearl count above the Pearl node").withDependency { renderRoutes && drawSettings }
     private val colorSettings by DropdownSetting("Colors").withDependency { renderRoutes }
     val etherwarpColor by ColorSetting("Etherwarp", default = Color.GREEN, description = "Color of Etherwarp nodes").withDependency { renderRoutes && colorSettings }
     val walkColor by ColorSetting("Walk", default = Color.GREEN, description = "Color of Walk nodes").withDependency { renderRoutes && colorSettings }
@@ -104,76 +100,14 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     private var lastRoute = 0L
     val routing get() = System.currentTimeMillis() - lastRoute < 200
 
-
-    val items = listOf(
-        "Health Potion VIII Splash Potion",
-        "Healing Potion 8 Splash Potion",
-        "Healing Potion VIII Splash Potion",
-        "Healing VIII Splash Potion",
-        "Healing 8 Splash Potion",
-        "Decoy",
-        "Inflatable Jerry",
-        "Spirit Leap",
-        "Trap",
-        "Training Weights",
-        "Defuse Kit",
-        "Dungeon Chest Key",
-        "Treasure Talisman",
-        "Revive Stone",
-        "Architect's First Draft"
-    )
-
-
     private var nodes = mutableMapOf<String, MutableList<Node>>()
 
 
-    var serverSneak = false
-
-    var pearlSoundRegistered = false
-    private var sneakRegistered = false
-    private var unsneakRegistered = false
-
-    fun ether() {
-        sneakRegistered = true
-        PlayerUtils.sneak()
-    }
-
-    var aotvTarget: BlockPos? = null
-    fun aotv(pos: BlockPos) {
-        aotvTarget = pos
-        unsneakRegistered = true
-        PlayerUtils.forceUnSneak()
-    }
-
-    fun resetRotation() {
-        rotating = false
-        rotatingPitch = null
-        rotatingYaw = null
-    }
 
 
-    @SubscribeEvent
-    fun unsneak(event: RenderWorldLastEvent) {
-        if (!unsneakRegistered) return
-        if (mc.thePlayer.isSneaking) PlayerUtils.forceUnSneak()
-        if (serverSneak) return
-        PlayerUtils.airClick()
-        aotvTarget?.let { Zpew.doZeroPingAotv(it) }
-        resetRotation()
-        unsneakRegistered = false
-        PlayerUtils.resyncSneak()
-    }
 
-    @SubscribeEvent
-    fun sneak(event: RenderWorldLastEvent) {
-        if (!sneakRegistered) return
-        if (!mc.thePlayer.isSneaking) PlayerUtils.sneak()
-        if (!serverSneak) return
-        PlayerUtils.airClick()
-        resetRotation()
-        sneakRegistered = false
-        PlayerUtils.resyncSneak()
-    }
+
+
 
     @SubscribeEvent
     fun onKeyInput(event: MouseEvent) {
@@ -211,15 +145,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }
     }
 
-    @SubscribeEvent
-    fun onPacketSendReturn(event: PacketReturnEvent.Send) {
-        if (event.packet !is C0BPacketEntityAction) return
-        serverSneak = when (event.packet.action) {
-            C0BPacketEntityAction.Action.START_SNEAKING -> true
-            C0BPacketEntityAction.Action.STOP_SNEAKING -> false
-            else -> serverSneak
-        }
-    }
+
 
 
 
@@ -286,28 +212,10 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }
     }
 
-    var rotating = false
-    var rotatingYaw: Float? = null
-    var rotatingPitch: Float? = null
+
     private var nodesToRun = mutableListOf<Node>()
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun motion(event: MotionUpdateEvent.Pre) {
-        if (PlayerUtils.movementKeysPressed) {
-            resetRotation()
-            nodesToRun.clear()
-            val room = DungeonUtils.currentRoom ?: roomReplacement
-            nodes[room.data.name]?.forEach { it.reset() }
-        }
-        if (rotating) {
-            rotatingYaw?.let {
-                event.yaw = it + offset
-            }
-            rotatingPitch?.let {
-                event.pitch = it + offset
-            }
-        }
-    }
+
 
     private fun inNodes(room: Room): MutableList<Node> {
         val inNodes = mutableListOf<Node>()
@@ -339,14 +247,14 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: ClientTickEvent) {
-        if (event.isEnd || mc.thePlayer == null || !canRoute) return
+        if (event.isEnd || mc.thePlayer == null) return
         val room = DungeonUtils.currentRoom ?: roomReplacement
-
         if (nodes[room.data.name] == null || editMode || PlayerUtils.movementKeysPressed) {
             resetRotation()
             nodesToRun.clear()
             return
         }
+        if (!canRoute) return
 
         val inNodes = inNodes(room)
         if (inNodes.isNotEmpty()) {
@@ -361,7 +269,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             return
         }
         nodesToRun.firstOrNull()?.let { node ->
-
             lastRoute = System.currentTimeMillis()
             if (node.reset && !node.resetTriggered) {
                 secretCount = 0
@@ -373,7 +280,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                         abs(PlayerUtils.posZ - realCoord.zCoord) < 0.001 &&
                         PlayerUtils.posY >= node.pos.yCoord - 0.01 && PlayerUtils.posY <= node.pos.yCoord + 0.5
                 ) else realCoord.distanceToPlayer <= 0.5) && node.name != "Pearl") {
-                devMessage("removing")
                 nodesToRun.remove(node)
                 resetRotation()
                 return
@@ -680,27 +586,8 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         return node
     }
 
-    var clipDistance = 0
-    private var clipRegistered = false
 
-    @SubscribeEvent
-    fun onPacket(event: PacketEvent.Receive) {
-        if (clipRegistered && event.packet is S08PacketPlayerPosLook) {
-            event.isCanceled = true
-            PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
-            mc.thePlayer.setPosition(
-                mc.thePlayer.posX.floor() + 0.5,
-                mc.thePlayer.posY.floor() - clipDistance,
-                mc.thePlayer.posZ.floor() + 0.5
-            )
-            pearlSoundRegistered = false
-            clipRegistered = false
-        }
 
-        if (!pearlSoundRegistered || event.packet !is S29PacketSoundEffect) return
-        if (event.packet.soundName != "random.bow" || event.packet.volume != 0.5f) return
-        clipRegistered = true
-    }
 
     private fun addNode(room: Room, node: Node) {
         modMessage("adding node")

@@ -216,8 +216,11 @@ object AutoP3: Module (
             "roomname" -> {
                 modMessage(DungeonUtils.currentRoomName)
             }
-            "relativepos" -> {
+            "relativepos" , "relpos", "rel" -> {
                 modMessage(DungeonUtils.currentRoom?.getRelativeCoords(mc.objectMouseOver.blockPos))
+            }
+            "relativeplayerpos", "relppos", "relplayer", "playerrel" -> {
+                modMessage(DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector))
             }
             /*"speed" -> {
                 if (args.size < 3) return

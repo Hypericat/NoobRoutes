@@ -14,13 +14,13 @@ import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.render.RenderUtils.outlineBounds
 import kotlin.math.*
 
-data class Vec2(val x: Int, val z: Int)
+data class Vec2(val x: Double, val z: Double)
 
 data class LookVec(val yaw: Float, val pitch: Float)
 
 data class PositionLook(val pos: Vec3, val yaw: Float, val pitch: Float)
 
-fun BlockPos.add(vec: Vec2): BlockPos = this.add(vec.x, 0, vec.z)
+fun BlockPos.add(vec: Vec2): BlockPos = this.add(vec.x, 0.0, vec.z)
 
 operator fun Vec3.component1(): Double = xCoord
 

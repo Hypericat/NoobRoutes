@@ -12,11 +12,10 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
-import noobroutes.features.dungeon.autoroute.AutoRoute.aotv
-import noobroutes.features.dungeon.autoroute.AutoRoute.aotvTarget
 import noobroutes.features.dungeon.autoroute.AutoRoute.delay
-import noobroutes.features.dungeon.autoroute.AutoRoute.items
-import noobroutes.features.dungeon.autoroute.AutoRoute.resetRotation
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.aotv
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.aotvTarget
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.utils.*
 import noobroutes.utils.Utils.getEntitiesOfType
 import noobroutes.utils.Utils.isEnd
@@ -25,6 +24,27 @@ import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 
 object SecretUtils {
+
+
+    val items = listOf(
+        "Health Potion VIII Splash Potion",
+        "Healing Potion 8 Splash Potion",
+        "Healing Potion VIII Splash Potion",
+        "Healing VIII Splash Potion",
+        "Healing 8 Splash Potion",
+        "Decoy",
+        "Inflatable Jerry",
+        "Spirit Leap",
+        "Trap",
+        "Training Weights",
+        "Defuse Kit",
+        "Dungeon Chest Key",
+        "Treasure Talisman",
+        "Revive Stone",
+        "Architect's First Draft"
+    )
+
+
     var secretCount = 0
     var awaitingNode: Node? = null
     var canSendC08 = true

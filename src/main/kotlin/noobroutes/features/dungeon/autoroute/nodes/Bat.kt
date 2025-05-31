@@ -6,10 +6,11 @@ import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute
-import noobroutes.features.dungeon.autoroute.AutoRoute.aotvTarget
 import noobroutes.features.dungeon.autoroute.AutoRoute.batColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.edgeRoutes
-import noobroutes.features.dungeon.autoroute.AutoRoute.serverSneak
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.aotvTarget
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.serverSneak
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.features.dungeon.autoroute.SecretUtils
 import noobroutes.utils.*
@@ -52,9 +53,7 @@ class Bat(
 ) {
 
     override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
-        AutoRoute.rotatingPitch = pitch
-        AutoRoute.rotatingYaw = room.getRealYaw(yaw)
-        AutoRoute.rotating = true
+        AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
     }
 
     override fun motion(event: MotionUpdateEvent.Pre, room: Room) {
@@ -82,9 +81,7 @@ class Bat(
 
         if (mc.thePlayer.isSneaking || serverSneak || state != SwapManager.SwapState.ALREADY_HELD) {
             PlayerUtils.forceUnSneak()
-            AutoRoute.rotatingPitch = pitch
-            AutoRoute.rotatingYaw = room.getRealYaw(yaw)
-            AutoRoute.rotating = true
+            AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
             Scheduler.schedulePreTickTask(1) {
                 SecretUtils.batSpawnRegistered = true
                 aotvTarget = tpTarget

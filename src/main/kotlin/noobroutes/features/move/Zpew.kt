@@ -308,7 +308,7 @@ object Zpew : Module(
      * Returns the sound from the selector setting, or the custom sound when the last element is selected
      */
     private fun getSound(): String {
-        return if (soundSelector < soundSelector - 1)
+        return if (soundSelector < soundOptions.size - 1)
             soundOptions[soundSelector]
         else
             customSound

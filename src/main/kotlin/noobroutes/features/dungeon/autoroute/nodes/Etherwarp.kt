@@ -7,9 +7,10 @@ import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
 import noobroutes.features.dungeon.autoroute.AutoRoute.edgeRoutes
-import noobroutes.features.dungeon.autoroute.AutoRoute.ether
 import noobroutes.features.dungeon.autoroute.AutoRoute.etherwarpColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.ether
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.RotationUtils.offset
@@ -60,9 +61,7 @@ class Etherwarp(
 
     override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
-        AutoRoute.rotatingYaw = angles.first + offset
-        AutoRoute.rotatingPitch = angles.second
-        AutoRoute.rotating = true
+        AutoRouteUtils.setRotation(angles.first + offset,angles.second)
     }
 
     override fun tick(room: Room) {
@@ -83,23 +82,14 @@ class Etherwarp(
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         event.yaw = angles.first
         event.pitch = angles.second
-        if (!mc.thePlayer.isSneaking) {
-            AutoRoute.rotatingYaw = angles.first
-            AutoRoute.rotatingPitch = angles.second
-            AutoRoute.rotating = true
+        if (!mc.thePlayer.isSneaking || mc.thePlayer.heldItem.skyblockID != "ASPECT_OF_THE_VOID") {
+            AutoRouteUtils.setRotation(angles.first + offset, angles.second)
             Scheduler.schedulePreTickTask {
                 ether()
             }
             return
         }
-        if (mc.thePlayer.heldItem.skyblockID != "ASPECT_OF_THE_VOID") {
-            AutoRoute.rotatingYaw = angles.first
-            AutoRoute.rotatingPitch = angles.second
-            AutoRoute.rotating = true
-            Scheduler.schedulePreTickTask {
-                ether()
-            }
-        } else ether()
+        ether()
     }
 
 

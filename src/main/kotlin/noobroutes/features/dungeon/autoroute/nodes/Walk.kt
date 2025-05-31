@@ -4,9 +4,9 @@ import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
-import noobroutes.features.dungeon.autoroute.AutoRoute.serverSneak
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.AutoRoute.walkColor
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.serverSneak
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.AutoP3Utils.startWalk
 import noobroutes.utils.Scheduler
