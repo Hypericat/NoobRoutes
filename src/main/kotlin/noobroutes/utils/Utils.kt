@@ -40,6 +40,19 @@ object Utils {
         return -sin(yaw * Math.PI /180)
     }
 
+    fun Array<out String>.containsOneOf(vararg inputs: String, ignoreCase: Boolean = false): Boolean {
+        if (!ignoreCase) return inputs.any {
+            this.contains(it)
+        }
+        else {
+            val lowercaseArray = this.map { it.lowercase() }
+            return inputs.map { it.lowercase() }.any {
+                lowercaseArray.contains(it)
+            }
+        }
+
+    }
+
     fun zPart(yaw: Float): Double {
         return cos(yaw * Math.PI /180)
     }

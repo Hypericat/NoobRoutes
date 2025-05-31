@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.config.Config
+import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.ClickGUI
@@ -43,6 +44,7 @@ object Core {
             }.join()
         }
         AutoP3.loadRings()
+        AutoRoute.loadFile()
         ClickGUI.init()
         RoundedRect.initShaders()
 

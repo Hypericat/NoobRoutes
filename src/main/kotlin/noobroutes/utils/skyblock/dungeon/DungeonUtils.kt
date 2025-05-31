@@ -233,8 +233,83 @@ object DungeonUtils {
         }
     }
 
-    fun Room.getRelativeCoords(pos: Vec3) = pos.subtractVec(x = clayPos.x, z = clayPos.z).rotateToNorth(rotation)
-    fun Room.getRealCoords(pos: Vec3) = pos.rotateAroundNorth(rotation).addVec(x = clayPos.x, z = clayPos.z)
+    fun Room.getRelativeCoords(pos: Vec3): Vec3 {
+        val center = this.getCenter()
+        val x = pos.xCoord - center.x
+        val z = pos.zCoord - center.z
+        return when ( this.rotation) {
+            Rotations.NORTH -> {
+                Vec3(x, pos.yCoord, z)
+            }
+            Rotations.WEST -> {
+                Vec3(-z, pos.yCoord, x)
+            }
+            Rotations.SOUTH -> {
+                Vec3(-x, pos.yCoord, -z)
+            }
+            Rotations.EAST -> {
+                Vec3(z, pos.yCoord, -x)
+            }
+            Rotations.NONE -> {
+                devMessage("no rotation??????")
+                Vec3(x, pos.yCoord, z)
+            }
+        }
+    }
+
+
+
+
+
+    const val MAX_SAFE_INTEGER: Long = 9007199254740991L
+    const val MIN_SAFE_INTEGER = -9007199254740991L
+
+    fun Room.getCenter(): Vec2 {
+        var minX = MAX_SAFE_INTEGER.toDouble()
+        var maxX = MIN_SAFE_INTEGER.toDouble()
+        var minZ = MAX_SAFE_INTEGER.toDouble()
+        var maxZ = MIN_SAFE_INTEGER.toDouble()
+        for (component in this.roomComponents) {
+            val x = component.x + 0.5
+            val z = component.z + 0.5
+            minX = if (x < minX) x else minX
+            maxX = if (x > maxX) x else maxX
+            minZ = if (z < minZ) z else minZ
+            maxZ = if (z > maxZ) z else maxZ
+        }
+        return Vec2((minX + maxX) * 0.5, (minZ + maxZ) * 0.5)
+    }
+
+
+    fun Room.getRealCoords(pos: Vec3): Vec3 {
+        val center = this.getCenter()
+        val rotatedPos = when (this.rotation) {
+            Rotations.NORTH -> {
+                Vec2(pos.xCoord, pos.zCoord)
+            }
+            Rotations.WEST -> {
+                Vec2(pos.zCoord, -pos.xCoord)
+            }
+            Rotations.SOUTH -> {
+                Vec2(-pos.xCoord, -pos.zCoord)
+            }
+            Rotations.EAST -> {
+                Vec2(-pos.zCoord, pos.xCoord)
+            }
+            Rotations.NONE -> {
+                devMessage("no rotation??????")
+                Vec2(pos.xCoord, pos.zCoord)
+            }
+        }
+        return Vec3(rotatedPos.x + center.x, pos.yCoord, rotatedPos.z + center.z)
+
+    }
+
+
+
+
+
+
     fun Room.getRelativeCoords(x: Double, y: Double, z: Double) = getRelativeCoords(Vec3(x, y, z))
 
     fun Room.getRealYaw(yaw: Float): Float {

@@ -9,19 +9,36 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
+import noobroutes.events.impl.PacketEvent
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.bloomNormalize
 import org.lwjgl.input.Keyboard
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 object PlayerUtils {
     var shouldBypassVolume = false
+
+    fun yawPitchVector(yaw: Float, pitch: Float): Vec3 {
+        val f = cos(-yaw * 0.017453292 - PI)
+        val f1 = sin(-yaw * 0.017453292 - PI)
+        val f2 = -cos(-pitch * 0.017453292)
+        val f3 = sin(-pitch * 0.017453292)
+        return Vec3(f1*f2, f3, f*f2).bloomNormalize()
+
+    }
+
 
     /**
      * Plays a sound at a specified volume and pitch, bypassing the default volume setting.
      *
      * @param sound The identifier of the sound to be played.
      * @param volume The volume at which the sound should be played.
-     * @param pitch The pitch at which the sound should be played.
+     * @param pitch The pitch at which the sound should be played.66666
      *
      * @author Aton
      */
@@ -34,14 +51,15 @@ object PlayerUtils {
     }
 
     fun airClick(){
-        devMessage("Clicked")
+        if (!canSendC08) return
+        devMessage("Clicked: ${System.currentTimeMillis()}")
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
     }
 
     fun stopVelocity(){
         mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
     }
-    inline val movementKeysPressed: Boolean get() = playerControlsKeycodes.any { Keyboard.isKeyDown(it) }
+    inline val movementKeysPressed: Boolean get() = playerControlsKeycodes.any { Keyboard.isKeyDown(it) } && mc.currentScreen == null
 
 
 
@@ -65,16 +83,21 @@ object PlayerUtils {
 
     fun getPositionString() = "x: ${posX.toInt()}, y: ${posY.toInt()}, z: ${posZ.toInt()}"
 
-    private var lastClickSent = 0L
+    private var lastGuiClickSent = 0L
+    var lastC08Sent = 0L
+    inline val canSendC08 get() = System.currentTimeMillis() - lastC08Sent > 50
+
 
     @SubscribeEvent
-    fun onPacketSend(event: noobroutes.events.impl.PacketEvent.Send) {
-        if (event.packet !is C0EPacketClickWindow) return
-        lastClickSent = System.currentTimeMillis()
+    fun onPacketSend(event: PacketEvent.Send) {
+        when (event.packet) {
+            is C0EPacketClickWindow -> lastGuiClickSent = System.currentTimeMillis()
+            is C08PacketPlayerBlockPlacement -> lastC08Sent = System.currentTimeMillis()
+        }
     }
 
     fun windowClick(slotId: Int, button: Int, mode: Int) {
-        if (lastClickSent + 45 > System.currentTimeMillis())
+        if (lastGuiClickSent + 45 > System.currentTimeMillis())
         mc.thePlayer?.openContainer?.let {
             if (it !is ContainerChest || slotId !in 0 until it.inventorySlots.size) return
             mc.netHandler?.networkManager?.sendPacket(C0EPacketClickWindow(it.windowId, slotId, button, mode, it.inventory[slotId], it.getNextTransactionID(mc.thePlayer?.inventory)))
@@ -93,14 +116,19 @@ object PlayerUtils {
     fun distanceToPlayer(x: Int, y: Int, z: Int): Double {
         return mc.thePlayer.positionVector.distanceTo(Vec3(x.toDouble(), y.toDouble(), z.toDouble()))
     }
+
+    inline val Vec3.distanceToPlayer2D get() = sqrt((mc.thePlayer.positionVector.xCoord - this.xCoord).pow(2) + (mc.thePlayer.positionVector.zCoord - this.zCoord).pow(2))
+    inline val Vec3.distanceToPlayer2DSq get() = (mc.thePlayer.positionVector.xCoord - this.xCoord).pow(2) + (mc.thePlayer.positionVector.zCoord - this.zCoord).pow(2)
     inline val Vec3.distanceToPlayerSq get() = mc.thePlayer.positionVector.squareDistanceTo(this)
     inline val Vec3.distanceToPlayer get() = mc.thePlayer.positionVector.distanceTo(this)
     inline val BlockPos.distanceToPlayer get() = mc.thePlayer.positionVector.distanceTo(Vec3(this))
     inline val BlockPos.distanceToPlayerSq get() = mc.thePlayer.positionVector.squareDistanceTo(Vec3(this))
 
+    fun setSneak(state: Boolean){
+        KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, state)
+    }
 
-
-    fun unSneak(){
+    fun resyncSneak(){
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.keyCode))
     }
 

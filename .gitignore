@@ -9,3 +9,4 @@ build/
 .github/workflows/gradle-wrapper-validation.yml
 gradle/wrapper/gradle-wrapper.jar
 gradle/wrapper/gradle-wrapper.properties
+*.salive

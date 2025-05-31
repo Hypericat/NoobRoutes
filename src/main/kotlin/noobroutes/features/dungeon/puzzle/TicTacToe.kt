@@ -15,6 +15,7 @@ import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.AuraManager
 import noobroutes.utils.Scheduler
@@ -35,6 +36,7 @@ object TicTacToe : Module(
     category = Category.DUNGEON,
     description = "Automatically completes the Tic Tac Toe Puzzle"
 ){
+    private val clip by BooleanSetting("Board Clip", description = "Clips you through the tic tac toe board similar to coreclip")
     private val reach by NumberSetting("Reach", 4.5, 1, 6, 0.1, description = "The distance you can aura buttons from")
     private var topLeft: BlockPos? = null
     private var roomFacing: EnumFacing? = null
@@ -57,7 +59,6 @@ object TicTacToe : Module(
         }
         execute(50) {
             if (currentRoomName != "Tic Tac Toe") destroyExecutor()
-            devMessage("Attempting solve")
             solveBoard()
 
         }
@@ -88,6 +89,7 @@ object TicTacToe : Module(
 
     @SubscribeEvent
     fun onMotion(event: MotionUpdateEvent.Pre) {
+        if (!clip) return
         val room = DungeonUtils.currentRoom
         if (room == null || event.y != 69.0) return
         val relativePlayerVec: Vec3 = room.getRelativeCoords(Vec3(event.x, event.y, event.z))

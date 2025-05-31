@@ -44,6 +44,9 @@ val ItemStack?.lore: List<String>
 val ItemStack?.skyblockID: String
     get() = this?.extraAttributes?.getString("id") ?: ""
 
+val ItemStack?.tuners: Int?
+    get() = this?.extraAttributes?.getInteger("tuned_transmission")
+
 /**
  * Returns uuid for an Item
  */

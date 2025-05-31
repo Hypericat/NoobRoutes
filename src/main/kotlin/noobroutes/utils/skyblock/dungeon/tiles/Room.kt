@@ -4,6 +4,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import net.minecraft.util.BlockPos
+import noobroutes.utils.Vec2
 import java.lang.reflect.Type
 
 data class Room(
@@ -13,9 +14,9 @@ data class Room(
     val roomComponents: MutableSet<RoomComponent>,
 )
 
-data class RoomComponent(val x: Int, val z: Int, val core: Int = 0) {
-    val vec2 = _root_ide_package_.noobroutes.utils.Vec2(x, z)
-    val blockPos = BlockPos(x, 70, z)
+data class RoomComponent(val x: Double, val z: Double, val core: Int = 0) {
+    val vec2 = Vec2(x, z)
+    val blockPos = BlockPos(x, 70.0, z)
 }
 
 data class RoomData(

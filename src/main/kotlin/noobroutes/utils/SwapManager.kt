@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.utils.Utils.ID
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.skyblockID
 import noobroutes.utils.skyblock.unformattedName
@@ -87,6 +88,7 @@ object SwapManager {
      * - [SwapState.UNKNOWN]: No item with a matching Skyblock ID was found in the player's inventory.
      */
     fun swapFromSBId(vararg skyblockID: String): SwapState {
+        devMessage("swapped: ${System.currentTimeMillis()}")
         for (i in 0..8) {
             val stack: ItemStack? = mc.thePlayer.inventory.getStackInSlot(i)
             val itemName = stack?.skyblockID
@@ -106,7 +108,7 @@ object SwapManager {
                 }
             }
         }
-        modMessage("$skyblockID not found.")
+        modMessage("${skyblockID.first()} not found.")
         return SwapState.UNKNOWN
     }
 
