@@ -84,11 +84,11 @@ object IceFill: Module(
 
     private fun transform(x: Int, z: Int, rotation: Rotations): Vec2 {
         return when (rotation) {
-            Rotations.NORTH -> Vec2(z, -x) // east
-            Rotations.WEST -> Vec2(-x, -z) // north
-            Rotations.SOUTH -> Vec2(-z, x) // west
-            Rotations.EAST -> Vec2(x, z) // south
-            else -> Vec2(x, z)
+            Rotations.NORTH -> Vec2(z.toDouble(), -x.toDouble()) // east
+            Rotations.WEST -> Vec2(-x.toDouble(), -z.toDouble()) // north
+            Rotations.SOUTH -> Vec2(-z.toDouble(), x.toDouble()) // west
+            Rotations.EAST -> Vec2(x.toDouble(), z.toDouble()) // south
+            else -> Vec2(x.toDouble(), z.toDouble())
         }
     }
 
@@ -100,5 +100,5 @@ object IceFill: Module(
         currentPatterns.clear()
     }
 
-    fun BlockPos.add(vec: Vec2): BlockPos = this.add(vec.x, 0, vec.z)
+    fun BlockPos.add(vec: Vec2): BlockPos = this.add(vec.x.toDouble(), 0.0, vec.z.toDouble())
 }

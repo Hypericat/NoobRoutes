@@ -20,6 +20,7 @@ import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.AuraManager
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isClose
+import noobroutes.utils.add
 import noobroutes.utils.isAir
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
@@ -93,20 +94,21 @@ object TicTacToe : Module(
         val room = DungeonUtils.currentRoom
         if (room == null || event.y != 69.0) return
         val relativePlayerVec: Vec3 = room.getRelativeCoords(Vec3(event.x, event.y, event.z))
+        if (relativePlayerVec.zCoord !in -2.3..0.3) return
         if (currentRoomName != "Tic Tac Toe") return
 
-        if (isClose(relativePlayerVec.xCoord, 7.3)) {
+        if (isClose(relativePlayerVec.xCoord, 7.2)) {
             event.motionZ = 0.0
-            val clip1Pos = room.getRealCoords(relativePlayerVec.subtract(0.0624, 0.0, 0.0))
-            val clip2Pos = room.getRealCoords(relativePlayerVec.subtract(1.601, 0.0, 0.0))
+            val clip1Pos = room.getRealCoords(relativePlayerVec.add(0.0624, 0.0, 0.0))
+            val clip2Pos = room.getRealCoords(relativePlayerVec.add(1.601, 0.0, 0.0))
             event.x = clip1Pos.xCoord
             event.z = clip1Pos.zCoord
             Scheduler.scheduleC03Task { mc.thePlayer.setPosition(clip2Pos.xCoord, clip2Pos.yCoord, clip2Pos.zCoord) }
         }
-        else if (isClose(relativePlayerVec.xCoord, 5.7)) {
+        else if (isClose(relativePlayerVec.xCoord, 8.8)) {
             event.motionZ = 0.0
-            val clip1Pos = room.getRealCoords(relativePlayerVec.add(Vec3(0.0624, 0.0, 0.0)))
-            val clip2Pos = room.getRealCoords(relativePlayerVec.add(Vec3(1.601, 0.0, 0.0)))
+            val clip1Pos = room.getRealCoords(relativePlayerVec.subtract(0.0624, 0.0, 0.0))
+            val clip2Pos = room.getRealCoords(relativePlayerVec.subtract(1.601, 0.0, 0.0))
             event.x = clip1Pos.xCoord
             event.z = clip1Pos.zCoord
             Scheduler.scheduleC03Task { mc.thePlayer.setPosition(clip2Pos.xCoord, clip2Pos.yCoord, clip2Pos.zCoord) }
