@@ -67,12 +67,12 @@ object IceFill: Module(
 
             for (patternIndex in floorHeight.indices) {
                 if (
-                    isAir(BlockPos(startPosition).add(transform(floorHeight[patternIndex][0], floorHeight[patternIndex][1], rotation))) &&
-                    !isAir(BlockPos(startPosition).add(transform(floorHeight[patternIndex][2], floorHeight[patternIndex][3], rotation)))
+                    isAir(BlockPos(startPosition).add(transform(floorHeight[patternIndex][0].toDouble(), floorHeight[patternIndex][1].toDouble(), rotation))) &&
+                    !isAir(BlockPos(startPosition).add(transform(floorHeight[patternIndex][2].toDouble(), floorHeight[patternIndex][3].toDouble(), rotation)))
                 ) {
                     modMessage("Section $floorIndex scan took ${(System.nanoTime() - startTime) / 1000000.0}ms pattern: $patternIndex")
 
-                    (if (false) IceFillFloors.advanced[floorIndex][patternIndex] else IceFillFloors.IceFillFloors[floorIndex][patternIndex]).toMutableList().let {
+                    (IceFillFloors.IceFillFloors[floorIndex][patternIndex]).toMutableList().let {
                         currentPatterns.addAll(it.map { startPosition.addVec(x = 0.5, y = 0.1, z = 0.5).add(transformTo(it, rotation)) })
                     }
                     return@forEachIndexed
@@ -82,7 +82,7 @@ object IceFill: Module(
         }
     }
 
-    private fun transform(x: Int, z: Int, rotation: Rotations): Vec2 {
+    private fun transform(x: Double, z: Double, rotation: Rotations): Vec2 {
         return when (rotation) {
             Rotations.NORTH -> Vec2(z, -x) // east
             Rotations.WEST -> Vec2(-x, -z) // north
@@ -92,13 +92,13 @@ object IceFill: Module(
         }
     }
 
-    private fun transformTo(vec: Vec3i, rotation: Rotations): Vec3 = with(transform(vec.x, vec.z, rotation)) {
-        Vec3(x.toDouble(), vec.y.toDouble(), z.toDouble())
+    private fun transformTo(vec: Vec3i, rotation: Rotations): Vec3 = with(transform(vec.x.toDouble(), vec.z.toDouble(), rotation)) {
+        Vec3(x, vec.y.toDouble(), z)
     }
 
     fun reset() {
         currentPatterns.clear()
     }
 
-    fun BlockPos.add(vec: Vec2): BlockPos = this.add(vec.x, 0, vec.z)
+    fun BlockPos.add(vec: Vec2): BlockPos = this.add(vec.x, 0.0, vec.z)
 }
