@@ -5,6 +5,7 @@ import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.Vec3
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -98,6 +99,13 @@ object AutoP3Utils {
     }
 
     @SubscribeEvent
+    fun onUnload(event: WorldEvent.Unload) {
+        walking = false
+        motioning = false
+        testing = false
+    }
+
+    @SubscribeEvent
     fun awaitTick(event: PacketEvent) {
         if(!awaitingTick || event.packet !is C03PacketPlayer) return
         awaitingTick = false
@@ -124,6 +132,13 @@ object AutoP3Utils {
     fun motion(event: ClientTickEvent) {
         if (!motioning || event.phase != TickEvent.Phase.START) return
         if (motionTicks == 1 && mc.thePlayer.onGround) mc.thePlayer.jump()
+        if (motionTicks == 1) {
+            if (mc.thePlayer.onGround) mc.thePlayer.jump()
+            else {
+                motioning = false
+                return
+            }
+        }
         setSpeed(tickSpeeds.getOrElse(motionTicks) { 1.0 })
         if (motionTicks > 1 && mc.thePlayer.onGround) {setSpeed(1.403)} //it's fine, since it doesn't account for walk speed anyway
         motionTicks++

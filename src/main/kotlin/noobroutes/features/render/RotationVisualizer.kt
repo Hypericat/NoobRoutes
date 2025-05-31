@@ -10,6 +10,7 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.utils.Scheduler
+import noobroutes.utils.skyblock.devMessage
 
 import org.lwjgl.input.Keyboard
 
