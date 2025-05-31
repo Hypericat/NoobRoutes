@@ -88,13 +88,13 @@ object EtherWarpHelper {
     fun rayTraceBlock(
         maxDistance: Int = 50,
         partialTicks: Float = 1f,
-        forceSneak: Boolean = false,
         yaw: Float = mc.thePlayer.rotationYaw,
         pitch: Float = mc.thePlayer.rotationPitch,
         playerX: Double? = null, playerY: Double? = null, playerZ: Double? = null
     ): Vec3? {
         val eyeX = playerX ?: (mc.thePlayer.lastTickPosX + (mc.thePlayer.posX - mc.thePlayer.lastTickPosX) * partialTicks)
-        val eyeHeight = mc.thePlayer.eyeHeight - if (!mc.thePlayer.isSneaking && forceSneak) 0.0800000429153443 else 0.0
+        val eyeHeight = 1.539999957084656
+        devMessage("eye:${mc.thePlayer.eyeHeight} edited:$eyeHeight")
         val eyeY = playerY
             ?: ((mc.thePlayer.lastTickPosY + (mc.thePlayer.posY - mc.thePlayer.lastTickPosY) * partialTicks) + eyeHeight)
         val eyeZ = playerZ ?: (mc.thePlayer.lastTickPosZ + (mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ) * partialTicks)
