@@ -91,7 +91,7 @@ object SecretUtils {
 
 
         devMessage("clicked ${getBlockAt(event.packet.position).unlocalizedName}")
-        Scheduler.schedulePreTickTask(1) {
+        Scheduler.schedulePreTickTask(3) {
             secretCount++
         }
     }

@@ -37,7 +37,7 @@ object AutoRouteUtils {
     }
 
     var clipDistance = 0
-    private var clipRegistered = false
+    var clipRegistered = false
 
 
     var serverSneak = false

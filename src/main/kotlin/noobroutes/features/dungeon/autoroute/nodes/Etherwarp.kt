@@ -25,6 +25,7 @@ import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.modMessage
@@ -61,6 +62,7 @@ class Etherwarp(
 
     override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target), true)
+        devMessage("yaw: ${angles.first}, pitch: ${angles.second}")
         AutoRouteUtils.setRotation(angles.first + offset,angles.second)
     }
 

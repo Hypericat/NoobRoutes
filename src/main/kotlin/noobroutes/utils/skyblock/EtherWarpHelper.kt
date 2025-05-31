@@ -73,7 +73,7 @@ object EtherWarpHelper {
 
         return EtherPos.NONE
     }
-
+    const val EYE_HEIGHT = 1.539999957084656
     val degToRad = Math.PI / 180;
     /**
      * taken from MeowClient
@@ -93,10 +93,9 @@ object EtherWarpHelper {
         playerX: Double? = null, playerY: Double? = null, playerZ: Double? = null
     ): Vec3? {
         val eyeX = playerX ?: (mc.thePlayer.lastTickPosX + (mc.thePlayer.posX - mc.thePlayer.lastTickPosX) * partialTicks)
-        val eyeHeight = 1.539999957084656
-        devMessage("eye:${mc.thePlayer.eyeHeight} edited:$eyeHeight")
+
         val eyeY = playerY
-            ?: ((mc.thePlayer.lastTickPosY + (mc.thePlayer.posY - mc.thePlayer.lastTickPosY) * partialTicks) + eyeHeight)
+            ?: ((mc.thePlayer.lastTickPosY + (mc.thePlayer.posY - mc.thePlayer.lastTickPosY) * partialTicks) + EYE_HEIGHT)
         val eyeZ = playerZ ?: (mc.thePlayer.lastTickPosZ + (mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ) * partialTicks)
         val roundedYaw = (yaw.round(14) * degToRad).toDouble()
         val roundedPitch = (pitch.round(14) * degToRad).toDouble()

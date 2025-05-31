@@ -10,15 +10,18 @@ import noobroutes.features.dungeon.autoroute.AutoRoute.pearlClipColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.clipDistance
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.clipRegistered
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.pearlSoundRegistered
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.skyblock.sendChatMessage
 
 class PearlClip(
     pos: Vec3 = Vec3(0.0, 0.0, 0.0),
@@ -62,8 +65,12 @@ class PearlClip(
             modMessage("Tried to 0 tick swap gg")
             return
         }
-        pearlSoundRegistered = true
         clipDistance = distance
+        if (LocationUtils.isSinglePlayer) {
+            Scheduler.schedulePreTickTask(1) { sendChatMessage("/tp ~ ~-$distance ~") }
+        }
+        pearlSoundRegistered = true
+
         if (!silent) mc.thePlayer.rotationPitch = 90f
         //PlayerUtils.forceUnSneak()
         Scheduler.schedulePreTickTask {

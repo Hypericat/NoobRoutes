@@ -131,7 +131,7 @@ object Zpew : Module(
         updatePosition = false
         recentlySentC06s.add(SentC06(yaw, pitch, x, y, z, System.currentTimeMillis()))
         if (dingdingding) PlayerUtils.playLoudSound(getSound(), volume.toFloat(), Zpew.pitch.toFloat())
-        if (sendTPCommand) Scheduler.schedulePreTickTask(0) { sendChatMessage("/tp $x $y $z")}
+        if (sendTPCommand && LocationUtils.isSinglePlayer) { sendChatMessage("/tp $x $y $z")}
         if (sendPacket) Scheduler.scheduleHighPreTickTask {
             mc.netHandler.addToSendQueue(
                 C03PacketPlayer.C06PacketPlayerPosLook(
@@ -181,7 +181,7 @@ object Zpew : Module(
         recentlySentC06s.add(SentC06(yaw, pitch, x, y, z, System.currentTimeMillis()))
 
         if (dingdingding) PlayerUtils.playLoudSound(getSound(), volume.toFloat(), Zpew.pitch.toFloat())
-        if (sendTPCommand) Scheduler.schedulePreTickTask(0) { sendChatMessage("/tp $x $y $z")}
+        if (sendTPCommand && LocationUtils.isSinglePlayer) { sendChatMessage("/tp $x $y $z")}
         if (sendPacket) Scheduler.scheduleHighPreTickTask {
             mc.netHandler.addToSendQueue(
                 C03PacketPlayer.C06PacketPlayerPosLook(
