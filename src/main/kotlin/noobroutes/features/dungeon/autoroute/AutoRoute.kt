@@ -16,6 +16,7 @@ import noobroutes.Core.logger
 import noobroutes.config.DataManager
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
@@ -158,6 +159,10 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         nodes.clear()
         val file = DataManager.loadDataFromFileObject("autoroutes")
         try {
+            if (file.containsKey("Routes")) {
+                nodes = AutoRouteUtils.meowConverter(file)
+                return
+            }
             for ((key, arr) in file) {
                 devMessage(key)
                 val roomNodes = mutableListOf<Node>()
@@ -186,7 +191,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
     }
 
-    private fun saveFile() {
+    fun saveFile() {
         val jsonObj = JsonObject()
         nodes.forEach { route ->
             val nodeArray = JsonArray().apply {
@@ -600,6 +605,15 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }
         nodes[room.data.name]?.add(node)
         //devMessage(nodes[room.data.name])
+        saveFile()
+    }
+
+    @SubscribeEvent
+    fun meowTranslator(event: RoomEnterEvent){
+        event.room ?: return
+        nodes[event.room.data.name]?.filter { it.name == "Bat" || it.name == "Aotv"}?.forEach {
+            it.meowConvert(event.room)
+        }
         saveFile()
     }
 

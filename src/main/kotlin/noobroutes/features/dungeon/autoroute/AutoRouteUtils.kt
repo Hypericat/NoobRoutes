@@ -1,10 +1,12 @@
 package noobroutes.features.dungeon.autoroute
 
+import com.google.gson.JsonArray
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C0BPacketEntityAction
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -12,11 +14,20 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
+import noobroutes.features.dungeon.autoroute.nodes.Aotv
+import noobroutes.features.dungeon.autoroute.nodes.Bat
+import noobroutes.features.dungeon.autoroute.nodes.Etherwarp
+import noobroutes.features.dungeon.autoroute.nodes.Pearl
+import noobroutes.features.dungeon.autoroute.nodes.PearlClip
+import noobroutes.features.dungeon.autoroute.nodes.UseItem
+import noobroutes.features.dungeon.autoroute.nodes.Walk
 import noobroutes.features.move.Zpew
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.floor
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
+import kotlin.collections.mutableMapOf
 
 object AutoRouteUtils {
 
@@ -120,4 +131,158 @@ object AutoRouteUtils {
         }
     }
 
+    fun meowConverter(file: Map<String, JsonArray>): MutableMap<String, MutableList<Node>> {
+        devMessage("meowing")
+        val routeMap = mutableMapOf<String, MutableList<Node>>()
+        val routes = file["Routes"] ?: return mutableMapOf()
+        routes.forEach {
+            val route = it.asJsonObject
+            val room = route.get("room").asString
+            val meowType = route.get("type").asString
+            val coords = Vec3(route.get("x").asDouble, route.get("y").asDouble, route.get("z").asDouble)
+            val args = route.get("args").asJsonObject
+            val data = route.get("data").asJsonObject
+            val await = if (args.has("await_secret")) 1 else 0
+            val delay = args.get("delay")?.asInt?.toLong() ?: 0L
+            if (routeMap[room] == null) routeMap[room] = mutableListOf()
+            when (meowType) {
+                "etherwarp_target" -> {
+                    val target = Vec3(data.get("x").asDouble, data.get("y").asDouble, data.get("z").asDouble)
+                    routeMap[room]?.add(
+                        Etherwarp(
+                            coords,
+                            target,
+                            await,
+                            false,
+                            delay,
+                            false,
+                            false,
+                            false,
+                            false
+                        )
+                    )
+                }
+                "aotv" -> {
+                    val yaw = data.get("yaw").asFloat
+                    val pitch = data.get("pitch").asFloat
+                    val target = BlockPos(data.get("x").asInt, data.get("y").asInt, data.get("z").asInt)
+                    val aotv = Aotv(
+                        coords,
+                        target,
+                        yaw,
+                        pitch,
+                        await,
+                        false,
+                        delay,
+                        false,
+                        false,
+                        false,
+                        false
+                    )
+                    aotv.meow = true
+                    routeMap[room]?.add(
+                        aotv
+                    )
+                }
+                "bat" -> {
+                    val yaw = data.get("yaw").asFloat
+                    val pitch = data.get("pitch").asFloat
+                    val x = data["x"]?.asInt
+                    val y = data["y"]?.asInt
+                    val z = data["z"]?.asInt
+                    if (x == null || y == null || z == null) {
+                        return@forEach
+                    }
+                    val target = BlockPos(x, y, z)
+                    routeMap.getOrPut(room) {mutableListOf()} .add(
+                        Bat(
+                            coords,
+                            target,
+                            yaw,
+                            pitch,
+                            await,
+                            false,
+                            delay,
+                            false,
+                            false,
+                            false,
+                            false
+                        )
+                    )
+                }
+                "pearl_clip" -> {
+                    val distance = data.get("distance").asInt
+                    routeMap[room]?.add(
+                        PearlClip(
+                            coords,
+                            distance - 1,
+                            await,
+                            false,
+                            delay,
+                            false,
+                            false,
+                            false,
+                            false
+                        )
+                    )
+                }
+                "use_item" -> {
+                    val name = data.get("item_name").asString
+                    val yaw = data.get("yaw").asFloat
+                    val pitch = data.get("pitch").asFloat
+                    if (name == "pearl") {
+                        routeMap[room]?.add(
+                            Pearl(coords,
+                                1,
+                                yaw,
+                                pitch,
+                                await,
+                                false,
+                                delay,
+                                false,
+                                false,
+                                false,
+                                false
+                            )
+                        )
+
+                    } else {
+                        routeMap[room]?.add(
+                            UseItem(
+                                coords,
+                                name,
+                                yaw,
+                                pitch,
+                                await,
+                                false,
+                                delay,
+                                false,
+                                false,
+                                false,
+                                false
+                            )
+                        )
+                    }
+                }
+                "walk" -> {
+                    val yaw = data.get("yaw").asFloat
+                    routeMap[room]?.add(
+                        Walk(
+                        coords,
+                        yaw,
+                        await,
+                        false,
+                        delay,
+                        false,
+                        false,
+                        false,
+                        false
+                        )
+                    )
+                }
+                else -> {}
+            }
+        }
+        return routeMap
+    }
 }

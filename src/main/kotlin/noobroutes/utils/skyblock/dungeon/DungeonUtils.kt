@@ -334,6 +334,15 @@ object DungeonUtils {
     }
 
 
+
+    fun Room.getRelativeCoordsOdin(pos: Vec3) = pos.subtractVec(x = clayPos.x, z = clayPos.z).rotateToNorth(rotation)
+    fun Room.getRealCoordsOdin(pos: Vec3) = pos.rotateAroundNorth(rotation).addVec(x = clayPos.x, z = clayPos.z)
+    fun Room.getRelativeCoordsOdin(pos: BlockPos) = getRelativeCoordsOdin(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
+    fun Room.getRealCoordsOdin(pos: BlockPos) = getRealCoordsOdin(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
+    fun Room.getRelativeCoordsOdin(x: Int, y: Int, z: Int) = getRelativeCoordsOdin(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
+    fun Room.getRealCoordsOdin(x: Int, y: Int, z: Int) = getRealCoordsOdin(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
+
+
     fun Room.getRelativeCoords(pos: BlockPos) = getRelativeCoords(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
     fun Room.getRealCoords(pos: BlockPos) = getRealCoords(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
     fun Room.getRelativeCoords(x: Int, y: Int, z: Int) = getRelativeCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
