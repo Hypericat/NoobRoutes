@@ -66,22 +66,22 @@ object AutoP3: Module (
     val customBlinkLength by NumberSetting(name = "length", description = "well how long for the blink to be", min = 1, max = 40, default = 24).withDependency { blinkShit && customBlinkLengthToggle }
     val timerSpeed by NumberSetting(name = "sped ring speed", description = "how much faster it goes (100 means 100x speed) also need tick check for high speeds", min = 2f, max = 100f, default = 10f).withDependency { blinkShit }
     private val testShit by DropdownSetting(name = "test ring")
-    val tick0 by NumberSetting(name = "0", description = "tick 0 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick1 by NumberSetting(name = "1", description = "tick 1 speed", min = 1.0, max = 7.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick2 by NumberSetting(name = "2", description = "tick 2 speed", min = 1.0, max = 7.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick3 by NumberSetting(name = "3", description = "tick 3 speed", min = 1.0, max = 4.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick4 by NumberSetting(name = "4", description = "tick 4 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick5 by NumberSetting(name = "5", description = "tick 5 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick6 by NumberSetting(name = "6", description = "tick 6 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick7 by NumberSetting(name = "7", description = "tick 7 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick8 by NumberSetting(name = "8", description = "tick 8 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick9 by NumberSetting(name = "9", description = "tick 9 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick10 by NumberSetting(name = "10", description = "tick 10 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick11 by NumberSetting(name = "11", description = "tick 11 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick12 by NumberSetting(name = "12", description = "tick 12 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick13 by NumberSetting(name = "13", description = "tick 13 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick14 by NumberSetting(name = "14", description = "tick 14 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick15 by NumberSetting(name = "15", description = "tick 15 speed", min = 0.0, max = 3.0, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick0 by NumberSetting(name = "0", description = "tick 0 speed", min = 1.4, max = 1.5, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick1 by NumberSetting(name = "1", description = "tick 1 speed", min = 3.0, max = 3.1, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick2 by NumberSetting(name = "2", description = "tick 2 speed", min = 1.95, max = 2.1, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick3 by NumberSetting(name = "3", description = "tick 3 speed", min = 1.8, max = 1.9, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick4 by NumberSetting(name = "4", description = "tick 4 speed", min = 1.65, max = 1.75, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick5 by NumberSetting(name = "5", description = "tick 5 speed", min = 1.55, max = 1.65, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick6 by NumberSetting(name = "6", description = "tick 6 speed", min = 1.4, max = 1.55, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick7 by NumberSetting(name = "7", description = "tick 7 speed", min = 1.3, max = 1.45, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick8 by NumberSetting(name = "8", description = "tick 8 speed", min = 1.2, max = 1.35, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick9 by NumberSetting(name = "9", description = "tick 9 speed", min = 1.15, max = 1.3, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick10 by NumberSetting(name = "10", description = "tick 10 speed", min = 1.05, max = 1.15, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick11 by NumberSetting(name = "11", description = "tick 11 speed", min = 1.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick12 by NumberSetting(name = "12", description = "tick 12 speed", min = 1.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick13 by NumberSetting(name = "13", description = "tick 13 speed", min = 0.95, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick14 by NumberSetting(name = "14", description = "tick 14 speed", min = 0.95, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick15 by NumberSetting(name = "15", description = "tick 15 speed", min = 0.95, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
 
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()

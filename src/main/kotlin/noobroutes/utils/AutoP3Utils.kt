@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.logger
 import noobroutes.Core.mc
+import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3.depth
@@ -56,13 +57,15 @@ object AutoP3Utils {
         0 to 0.1,
         1 to 3.08,
         2 to 1.99,
-        3 to 1.77,
-        4 to 1.64,
-        5 to 1.45,
-        6 to 1.33,
-        7 to 1.24,
-        8 to 1.15,
-        9 to 1.07
+        3 to 1.84,
+        4 to 1.7,
+        5 to 1.58,
+        6 to 1.47,
+        7 to 1.37,
+        8 to 1.28,
+        9 to 1.2,
+        10 to 1.12,
+        11 to 1.05
     )
 
     private var xSpeed = 0.0
@@ -141,8 +144,24 @@ object AutoP3Utils {
             }
         }
         setSpeed(tickSpeeds.getOrElse(motionTicks) { 1.0 })
-        if (motionTicks > 1 && mc.thePlayer.onGround) {setSpeed(1.403)} //it's fine, since it doesn't account for walk speed anyway
+        if (motionTicks > 1 && mc.thePlayer.onGround) {
+            startWalk(direction)
+            motioning = false
+        }
         motionTicks++
+    }
+
+    private var lastLook = Pair(0f,0f)
+
+    @SubscribeEvent
+    fun noTurn(event: MotionUpdateEvent.Pre) {
+        if (!motioning) {
+            lastLook = Pair(event.yaw, event.pitch)
+        }
+        else {
+            event.yaw = lastLook.first
+            event.pitch = lastLook.second
+        }
     }
 
     @SubscribeEvent
