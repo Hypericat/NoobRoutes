@@ -340,6 +340,15 @@ object AutoP3: Module (
                 )
             }
             "motion" -> {
+                if (args.size < 3) {
+                    modMessage("need a scale arg (0-1)")
+                    return
+                }
+                val scale = args[2].toFloatOrNull()
+                if (scale == null) {
+                    modMessage("need a scale arg (0-1)")
+                    return
+                }
                 modMessage("motion added")
                 actuallyAddRing(MotionRing(
                     coords,
@@ -349,7 +358,8 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate,
-                    far = walk
+                    far = walk,
+                    scale = scale
                 )
                 )
             }

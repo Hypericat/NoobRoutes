@@ -15,11 +15,13 @@ class MotionRing(
     left: Boolean = false,
     center: Boolean = false,
     rotate: Boolean = false,
-    var far: Boolean = false
+    var far: Boolean = false,
+    var scale: Float = 1f
 ) : Ring(coords, yaw, term, leap, left, center, rotate) {
 
     init {
         addBoolean("far", {far}, {far = it})
+        addFloat("scale", {scale}, {scale = it})
     }
 
     override fun doRing() {
@@ -27,6 +29,7 @@ class MotionRing(
         super.doRing()
         AutoP3Utils.direction = yaw
         AutoP3Utils.motionTicks = if (AutoP3.fasterMotion && !center && !far) 1 else 0
+        AutoP3Utils.scale = scale
         AutoP3Utils.motioning = true
     }
 }

@@ -69,7 +69,7 @@ object AutoP3Utils {
         10 to 1.12,
         11 to 1.05,
         12 to 1.0,
-        13 to 0.97,
+        13 to 0.95,
     )
 
     private var xSpeed = 0.0
@@ -136,6 +136,7 @@ object AutoP3Utils {
     }
 
     private var lastSpeed = 0.0
+    var scale = 1f
 
     var drag = 0.906339756
     var push = 0.03689255977
@@ -152,15 +153,15 @@ object AutoP3Utils {
                 return
             }
         }
-        if (motionTicks == 1) setSpeed(AutoP3.tick1)
+        if (motionTicks == 1) setSpeed(AutoP3.tick1 * scale)
         else if (motionTicks == 2) {
-            setSpeed(AutoP3.tick2)
+            setSpeed(AutoP3.tick2 * scale)
             lastSpeed = AutoP3.tick2
         }
         else {
             lastSpeed *= drag
             lastSpeed += push
-            setSpeed(lastSpeed)
+            setSpeed(lastSpeed * scale)
         }
         if (motionTicks > 1 && mc.thePlayer.onGround) {
             startWalk(direction)
