@@ -51,6 +51,11 @@ object AutoP3: Module (
     val frame by BooleanSetting("Check per Frame", false, description = "check each frame if the player is in a ring. Routes are easier to setup with per frame but possibly less consistent on low fps. Per tick is harder to setup but 100% consistent. Everything done on frame can also be done on tick")
     val motionValue by NumberSetting(name = "motion value", description = "how much yeet to put into the motion", min = 0f, max = 1000f, default = 509f)
     val fasterMotion by BooleanSetting("faster motion", false, description = "doesnt stop before the jump for motion")
+    var noRotate by BooleanSetting("no rotate", false, description = "forces the player to be unable to change where they look in boss. Pretty much only way to gurantee working motion rings")
+    private val noRotateKey by KeybindSetting("toggle no rotate", Keyboard.KEY_NONE, "toggles no rotate setting").onPress {
+        noRotate = !noRotate
+        modMessage("can rotate: " + !noRotate)
+    }
     val silentLook by BooleanSetting("Silent Look", false, description = "when activating a look ring only rotate serverside (may lead to desync)")
     val fuckingLook by BooleanSetting("Loud Look", false, description = "always look for if u want to make ur autop3 seem mroe legit or smth")
     val renderStyle by SelectorSetting("ring design", "normal", arrayListOf("normal", "simple", "box"), false, description = "how rings should look")
@@ -77,11 +82,11 @@ object AutoP3: Module (
     val tick8 by NumberSetting(name = "8", description = "tick 8 speed", min = 1.2, max = 1.35, default = 1.0, increment = 0.01).withDependency { testShit }
     val tick9 by NumberSetting(name = "9", description = "tick 9 speed", min = 1.15, max = 1.3, default = 1.0, increment = 0.01).withDependency { testShit }
     val tick10 by NumberSetting(name = "10", description = "tick 10 speed", min = 1.05, max = 1.15, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick11 by NumberSetting(name = "11", description = "tick 11 speed", min = 1.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick12 by NumberSetting(name = "12", description = "tick 12 speed", min = 1.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick13 by NumberSetting(name = "13", description = "tick 13 speed", min = 0.95, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick14 by NumberSetting(name = "14", description = "tick 14 speed", min = 0.95, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick15 by NumberSetting(name = "15", description = "tick 15 speed", min = 0.95, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick11 by NumberSetting(name = "11", description = "tick 11 speed", min = 0.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick12 by NumberSetting(name = "12", description = "tick 12 speed", min = 0.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick13 by NumberSetting(name = "13", description = "tick 13 speed", min = 0.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick14 by NumberSetting(name = "14", description = "tick 14 speed", min = 0.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
+    val tick15 by NumberSetting(name = "15", description = "tick 15 speed", min = 0.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
 
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
@@ -253,6 +258,14 @@ object AutoP3: Module (
                 val pitch = args[3].toFloatOrNull() ?: return
                 RotationUtils.rotate(yaw, pitch, false)
             }
+            "motion" -> {
+                if (args.size < 4) return
+                val drag = args[2].toDoubleOrNull() ?: return
+                val push = args[3].toDoubleOrNull() ?: return
+                AutoP3Utils.drag = drag
+                AutoP3Utils.push = push
+                modMessage("drag: $drag push: $push")
+            }
             else -> {
                 modMessage("All tests passed")
             }
@@ -335,7 +348,8 @@ object AutoP3: Module (
                     leap,
                     left,
                     center,
-                    rotate
+                    rotate,
+                    far = walk
                 )
                 )
             }

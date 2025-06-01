@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.logger
 import noobroutes.Core.mc
+import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.AutoP3
@@ -28,6 +29,7 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import java.io.IOException
 import java.net.MalformedURLException
@@ -54,7 +56,7 @@ object AutoP3Utils {
     )
 
     val tickSpeeds = mapOf(
-        0 to 0.1,
+        0 to 1.403,
         1 to 3.08,
         2 to 1.99,
         3 to 1.84,
@@ -65,12 +67,13 @@ object AutoP3Utils {
         8 to 1.28,
         9 to 1.2,
         10 to 1.12,
-        11 to 1.05
+        11 to 1.05,
+        12 to 1.0,
+        13 to 0.97,
     )
 
     private var xSpeed = 0.0
     private var zSpeed = 0.0
-    private var air = 0
 
     var walkAfter = false
     var awaitingTick = false
@@ -132,18 +135,33 @@ object AutoP3Utils {
         testing = false
     }
 
+    private var lastSpeed = 0.0
+
+    var drag = 0.906339756
+    var push = 0.03689255977
+
     @SubscribeEvent
     fun motion(event: ClientTickEvent) {
         if (!motioning || event.phase != TickEvent.Phase.START) return
-        if (motionTicks == 1 && mc.thePlayer.onGround) mc.thePlayer.jump()
+        if (motionTicks == 0) setSpeed(1.4)
         if (motionTicks == 1) {
             if (mc.thePlayer.onGround) mc.thePlayer.jump()
             else {
                 motioning = false
+                modMessage("help im midair")
                 return
             }
         }
-        setSpeed(tickSpeeds.getOrElse(motionTicks) { 1.0 })
+        if (motionTicks == 1) setSpeed(AutoP3.tick1)
+        else if (motionTicks == 2) {
+            setSpeed(AutoP3.tick2)
+            lastSpeed = AutoP3.tick2
+        }
+        else {
+            lastSpeed *= drag
+            lastSpeed += push
+            setSpeed(lastSpeed)
+        }
         if (motionTicks > 1 && mc.thePlayer.onGround) {
             startWalk(direction)
             motioning = false
@@ -155,7 +173,7 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun noTurn(event: MotionUpdateEvent.Pre) {
-        if (!motioning) {
+        if (!AutoP3.noRotate || !inBoss) {
             lastLook = Pair(event.yaw, event.pitch)
         }
         else {
@@ -201,12 +219,10 @@ object AutoP3Utils {
     @SubscribeEvent
     fun movement(event: ClientTickEvent) {
         if (mc.thePlayer == null || event.phase != TickEvent.Phase.START) return
-        if (mc.thePlayer.onGround) air = 0
-        else air++
 
         if (!walking) return
 
-        if (air <= 1)  {
+        if (mc.thePlayer.onGround)  {
             val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
             xSpeed = speed * Utils.xPart(direction)
             zSpeed = speed * Utils.zPart(direction)
