@@ -80,8 +80,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     val editModeBind by KeybindSetting("Edit Mode Toggle", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress { editMode = !editMode }
     val placewarp by KeybindSetting("warp", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress {
         handleAutoRouteCommand(arrayOf("add", "ew"))
-
-
     }
 
     private val roomReplacement
