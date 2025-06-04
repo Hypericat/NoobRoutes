@@ -21,8 +21,11 @@ import noobroutes.utils.json.JsonUtils.asBlockPos
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoordsOdin
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.absoluteValue
@@ -51,6 +54,16 @@ class Bat(
     chain,
     reset
 ) {
+    var meow = false
+    override fun meowConvert(room: Room) {
+        if (meow) {
+            val odinReal = room.getRealCoordsOdin(target)
+            devMessage(odinReal)
+            target = room.getRelativeCoords(odinReal)
+            meow = false
+            AutoRoute.saveFile()
+        }
+    }
 
     override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
         AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
@@ -126,12 +139,14 @@ class Bat(
         obj.addProperty("target", target)
         obj.addProperty("yaw", yaw)
         obj.addProperty("pitch", pitch)
+        if (meow) obj.addProperty("meow", true)
     }
 
     override fun loadNodeInfo(obj: JsonObject) {
         this.target = obj.get("target")?.asBlockPos ?: BlockPos(0.0, 0.0, 0.0)
         this.yaw = obj.get("yaw").asFloat
         this.pitch = obj.get("pitch").asFloat
+        this.meow = obj.has("meow")
     }
 
     override fun renderIndexColor(): Color {

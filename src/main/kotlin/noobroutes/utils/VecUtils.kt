@@ -151,10 +151,10 @@ operator fun Vec3.get(index: Int): Double =
  */
 fun Vec3.rotateAroundNorth(rotation: Rotations): Vec3 =
     when (rotation) {
-        Rotations.NORTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
-        Rotations.WEST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
-        Rotations.SOUTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
-        Rotations.EAST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
+        Rotations.NORTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
+        Rotations.WEST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
+        Rotations.SOUTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
+        Rotations.EAST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
         else -> this
     }
 
@@ -165,10 +165,10 @@ fun Vec3.rotateAroundNorth(rotation: Rotations): Vec3 =
  */
 fun Vec3.rotateToNorth(rotation: Rotations): Vec3 =
     when (rotation) {
-        Rotations.NORTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
-        Rotations.WEST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
-        Rotations.SOUTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
-        Rotations.EAST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
+        Rotations.NORTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
+        Rotations.WEST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
+        Rotations.SOUTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
+        Rotations.EAST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
         else -> this
     }
 

@@ -41,6 +41,9 @@ abstract class Node(
         delete = true
     }
 
+    open fun meowConvert(room: Room) {
+
+    }
 
     open fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {}
     open fun motion(event: MotionUpdateEvent.Pre, room: Room) {}
