@@ -64,8 +64,8 @@ object HClip: Module(
         AutoP3Utils.unPressKeys()
         Scheduler.scheduleC03Task {
             val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
-            mc.thePlayer.motionX = speed * Utils.xPart(mc.thePlayer.rotationYaw + yawChange())
-            mc.thePlayer.motionZ = speed * Utils.zPart(mc.thePlayer.rotationYaw + yawChange())
+            mc.thePlayer.motionX = speed * Utils.xPart(mc.thePlayer.prevRotationYaw + yawChange())
+            mc.thePlayer.motionZ = speed * Utils.zPart(mc.thePlayer.prevRotationYaw + yawChange())
             AutoP3Utils.rePressKeys()
         }
         if (!shouldSpam) toggle()

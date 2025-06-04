@@ -26,6 +26,9 @@ class JumpRing (
         AutoP3Utils.unPressKeys()
         super.doRing()
         if (mc.thePlayer.onGround) mc.thePlayer.jump()
-        if (walk) AutoP3Utils.startWalk(yaw)
+        if (walk) {
+            AutoP3Utils.startWalk(yaw)
+            AutoP3Utils.jumping = true
+        }
     }
 }

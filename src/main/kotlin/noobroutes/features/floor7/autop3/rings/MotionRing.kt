@@ -5,6 +5,7 @@ import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
+import noobroutes.Core.mc
 
 @RingType("Motion")
 class MotionRing(
@@ -28,6 +29,8 @@ class MotionRing(
         AutoP3Utils.unPressKeys()
         super.doRing()
         AutoP3Utils.direction = yaw
+        mc.thePlayer.motionX = 0.0
+        mc.thePlayer.motionZ = 0.0
         AutoP3Utils.motionTicks = if (AutoP3.fasterMotion && !center && !far) 1 else 0
         AutoP3Utils.scale = scale
         AutoP3Utils.motioning = true

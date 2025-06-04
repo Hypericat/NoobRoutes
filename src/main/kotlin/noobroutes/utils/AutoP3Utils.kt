@@ -138,22 +138,27 @@ object AutoP3Utils {
     private var lastSpeed = 0.0
     var scale = 1f
 
-    var drag = 0.906339756
-    var push = 0.03689255977
+    var drag = 0.9063338661881611
+    var push = 0.036901383361851
 
     @SubscribeEvent
     fun motion(event: ClientTickEvent) {
         if (!motioning || event.phase != TickEvent.Phase.START) return
-        if (motionTicks == 0) setSpeed(1.4)
+        if (motionTicks == 0) {
+            setSpeed(1.4)
+            modMessage("walk")
+        }
         if (motionTicks == 1) {
-            if (mc.thePlayer.onGround) mc.thePlayer.jump()
+            if (mc.thePlayer.onGround) {
+                mc.thePlayer.jump()
+                setSpeed(AutoP3.tick1 * scale)
+            }
             else {
                 motioning = false
                 modMessage("help im midair")
                 return
             }
         }
-        if (motionTicks == 1) setSpeed(AutoP3.tick1 * scale)
         else if (motionTicks == 2) {
             setSpeed(AutoP3.tick2 * scale)
             lastSpeed = AutoP3.tick2
@@ -183,7 +188,7 @@ object AutoP3Utils {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun doTest(event: ClientTickEvent) {
         if (!testing || event.phase != TickEvent.Phase.START) return
         when (testTicks) {
@@ -217,25 +222,47 @@ object AutoP3Utils {
         mc.thePlayer.motionZ = Utils.zPart(direction) * speed
     }
 
+    private var airTicks = 0
+    var jumping = false
+
     @SubscribeEvent
     fun movement(event: ClientTickEvent) {
-        if (mc.thePlayer == null || event.phase != TickEvent.Phase.START) return
+        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || walking == false) return
 
-        if (!walking) return
+        if (mc.thePlayer.onGround) {
+            airTicks = 0
+        } else {
+            ++airTicks
+        }
 
-        if (mc.thePlayer.onGround)  {
-            val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
-            xSpeed = speed * Utils.xPart(direction)
-            zSpeed = speed * Utils.zPart(direction)
-            mc.thePlayer.motionX = speed * Utils.xPart(direction)
-            mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+        if (mc.thePlayer.isInWater || mc.thePlayer.isInLava) return
+
+        val sprintMultiplier = 1.3
+        var speed = mc.thePlayer.aiMoveSpeed.toDouble()
+        if (mc.thePlayer.isSprinting) {
+            speed /= sprintMultiplier
         }
-        else {
-            xSpeed = xSpeed * 0.91 + motionValue/10000 * mc.thePlayer.capabilities.walkSpeed * Utils.xPart(direction)
-            zSpeed = zSpeed * 0.91 + motionValue/10000 * mc.thePlayer.capabilities.walkSpeed * Utils.zPart(direction)
-            mc.thePlayer.motionX = xSpeed
-            mc.thePlayer.motionZ = zSpeed
+
+        if (airTicks < 1) {
+            var speedMultiplier = 2.806
+            /*if (jumping) {
+                jumping = false
+                speedMultiplier += 2
+                speedMultiplier *= 1.25
+            }*/
+            mc.thePlayer.motionX = Utils.xPart(direction) * speed * speedMultiplier
+            mc.thePlayer.motionZ = Utils.zPart(direction) * speed * speedMultiplier
+            return
         }
+
+        val movementFactor = if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0)) {
+            speed * sprintMultiplier
+        } else {
+            motionValue/10000 * sprintMultiplier
+        }
+
+        mc.thePlayer.motionX += movementFactor * Utils.xPart(direction)
+        mc.thePlayer.motionZ += movementFactor * Utils.zPart(direction)
     }
 
     fun distanceToRingSq(coords: Vec3): Double {
