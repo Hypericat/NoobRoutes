@@ -1,6 +1,7 @@
 package noobroutes.utils
 
 import net.minecraft.entity.Entity
+import net.minecraft.util.Vec3
 
 class EntityPosition(
     var x: Double,
@@ -89,5 +90,18 @@ class EntityPosition(
         prevYaw = yaw
     }
 
+    fun add(vec3: Vec3) {
+        add(vec3.xCoord, vec3.yCoord, vec3.zCoord)
+    }
+
+    fun add(entityPosition: EntityPosition) {
+        add(entityPosition.x, entityPosition.y, entityPosition.z)
+    }
+
+    fun add(x: Double, y: Double, z: Double){
+        this.x += x
+        this.y += y
+        this.z += z
+    }
 
 }

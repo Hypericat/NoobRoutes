@@ -1,4 +1,4 @@
-package noobroutes.mixin;
+package noobroutes.mixin.player;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -16,7 +16,7 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 
 
 @Mixin(value = {EntityPlayerSP.class})
-public abstract class MixinEntityPlayerSP extends EntityPlayer {
+public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
     private double oldPosX;
     private double oldPosY;
     private double oldPosZ;
@@ -27,7 +27,7 @@ public abstract class MixinEntityPlayerSP extends EntityPlayer {
     private boolean oldOnGround;
 
 
-    public MixinEntityPlayerSP(World worldIn, GameProfile gameProfileIn) {
+    public MixinEntityPlayerSP_EntityPlayer(World worldIn, GameProfile gameProfileIn) {
         super(worldIn, gameProfileIn);
     }
 

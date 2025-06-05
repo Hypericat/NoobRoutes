@@ -1,8 +1,9 @@
-package noobroutes.mixin;
+package noobroutes.mixin.render;
 
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import noobroutes.events.impl.RenderOverlayNoCaching;
+import noobroutes.features.render.FreeCam;
 import noobroutes.features.misc.NoDebuff;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,8 +21,17 @@ abstract public class MixinEntityRenderer implements IResourceManagerReloadListe
 
     @Inject(method = "hurtCameraEffect", at = @At("HEAD"), cancellable = true)
     private void onHurtCam(float partialTicks, CallbackInfo ci) {
-
         if (NoDebuff.INSTANCE.getNoHurtCam()) ci.cancel();
+    }
+
+    @Inject(method = "renderWorld", at = @At("HEAD"))
+    private void beforeRenderWorld(float partialTicks, long finishTimeNano, CallbackInfo ci){
+        FreeCam.INSTANCE.onBeforeRenderWorld();
+    }
+
+    @Inject(method = "renderWorld", at = @At("TAIL"))
+    private void afterRenderWorld(float partialTicks, long finishTimeNano, CallbackInfo ci){
+        FreeCam.INSTANCE.onAfterRenderWorld();
     }
 
 }

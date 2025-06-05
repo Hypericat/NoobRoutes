@@ -24,6 +24,7 @@ import noobroutes.features.render.RotationVisualizer
 import noobroutes.features.render.Trail
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.move.Zpew
+import noobroutes.features.render.FreeCam
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.capitalizeFirst
@@ -89,7 +90,8 @@ object ModuleManager {
         CrystalAura,
         BlinkRelic,
         IceFill,
-        MapLobotomizer
+        MapLobotomizer,
+        FreeCam
     )
 
     init {

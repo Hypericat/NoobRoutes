@@ -27,17 +27,11 @@ import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.features.settings.impl.StringSetting
-import noobroutes.utils.Scheduler
+import noobroutes.utils.*
 import noobroutes.utils.Utils.ID
-import noobroutes.utils.equalsOneOf
-import noobroutes.utils.getBlockAt
-import noobroutes.utils.getBlockIdAt
-import noobroutes.utils.getBlockStateAt
-import noobroutes.utils.multiply
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.PlayerUtils.getBlockPlayerIsLookingAt
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.toBlockPos
 import sun.util.logging.resources.logging
 import kotlin.math.floor
 
@@ -330,7 +324,7 @@ object Zpew : Module(
 
     private fun predictTeleport(distance: Float): Vec3? {
         var cur = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ)
-        val forward = PlayerUtils.yawPitchVector(lastYaw, lastPitch).multiply(1f / steps)
+        val forward = RotationUtils.yawAndPitchVector(lastYaw, lastPitch).multiply(1f / steps)
         var stepsTaken = 0
         for (i in 0 until (distance * steps).toInt() + 1) {
             if (i % steps == 0 && !cur.isSpecial && !cur.blockAbove.isSpecial) {
@@ -354,7 +348,7 @@ object Zpew : Module(
             stepsTaken = i
         }
         val multiplicationFactor = floor(stepsTaken.toFloat() / steps)
-        val pos = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ).add(PlayerUtils.yawPitchVector(lastYaw, lastPitch).multiply(
+        val pos = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ).add(RotationUtils.yawAndPitchVector(lastYaw, lastPitch).multiply(
             multiplicationFactor
         ))
         if ((!cur.isIgnored && cur.inBB) || (!cur.blockAbove.isIgnored && cur.blockAbove.inBB)) return null
