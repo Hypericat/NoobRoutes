@@ -104,4 +104,10 @@ class EntityPosition(
         this.z += z
     }
 
+    fun add(mutableVec3: MutableVec3) {
+        this.x += mutableVec3.x
+        this.y += mutableVec3.y
+        this.z += mutableVec3.z
+    }
+
 }

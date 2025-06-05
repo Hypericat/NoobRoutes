@@ -14,13 +14,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.utils.EntityPosition
-import noobroutes.utils.RotationUtils
+import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.add
-import noobroutes.utils.length
 import noobroutes.utils.multiply
+import noobroutes.utils.skyblock.devMessage
 import kotlin.math.pow
 import kotlin.math.sign
 
@@ -28,14 +27,14 @@ import kotlin.math.sign
  * Credit to FME
  */
 object FreeCam : Module("Free Cam", description = "FME free cam", category = Category.RENDER) {
-    val freeCamSpectatorMovement by BooleanSetting("Spectator Movement", description = "Moving forward and backward in free cam mode changes y level.")
+    private val freeCamSpectatorMovement by BooleanSetting("Spectator Movement", description = "Moving forward and backward in free cam mode changes y level.")
     var looking: MovingObjectPosition? = null
     private var forwardVelocity: Double = 0.0
     private var leftVelocity: Double = 0.0
     private var upVelocity: Double = 0.0
     private var lastTime = System.nanoTime()
     private var oldNoClip = false
-    private var lookVec: Vec3 = Vec3(0.0, 0.0, 0.0)
+    private var lookVec: MutableVec3 = MutableVec3(0.0, 0.0, 0.0)
     private var oldCameraType: Int = 0
     private var shouldOverride = false
     private var oldInput: MovementInput = MovementInput()
@@ -50,10 +49,10 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         mc.gameSettings.thirdPersonView = 0
         val viewEntity = mc.renderViewEntity
         val pos = viewEntity.getPositionEyes(1f)
-        lookVec = RotationUtils.yawAndPitchVector(viewEntity.rotationYaw, viewEntity.rotationPitch)
-        freeCamPosition.x = pos.xCoord + lookVec.xCoord * -1.5
-        freeCamPosition.y = pos.yCoord + lookVec.yCoord * -1.5
-        freeCamPosition.z = pos.zCoord + lookVec.zCoord * -1.5
+        lookVec = RotationUtils.yawAndPitchVector(viewEntity.rotationYaw, viewEntity.rotationPitch).toMutableVec3()
+        freeCamPosition.x = pos.xCoord + lookVec.x * -1.5
+        freeCamPosition.y = pos.yCoord + lookVec.y * -1.5
+        freeCamPosition.z = pos.zCoord + lookVec.z * -1.5
         freeCamPosition.pitch = viewEntity.rotationPitch
         freeCamPosition.yaw = viewEntity.rotationYaw
         lastTime = System.nanoTime()
@@ -86,24 +85,24 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         leftVelocity = calculateVelocity(leftVelocity, leftImpulse.toDouble(), frameTime.toDouble())
         upVelocity = calculateVelocity(upVelocity, upImpulse.toDouble(), frameTime.toDouble())
         val forward =
-            if (freeCamSpectatorMovement) lookVec else (Vec3(
-                lookVec.xCoord,
+            if (freeCamSpectatorMovement) lookVec else MutableVec3(
+                lookVec.x,
                 0.0,
-                lookVec.zCoord
-            )).normalize()
-        val left = (Vec3(lookVec.zCoord, 0.0, -lookVec.xCoord)).normalize()
+                lookVec.z
+            ).normalize()
+        val left = MutableVec3(lookVec.z, 0.0, -lookVec.x).normalize()
 
-        var moveDelta: Vec3 = forward.multiply(forwardVelocity)
-            .add(left.multiply(leftVelocity))
+        val moveDelta: MutableVec3 = forward.scale(forwardVelocity)
+            .add(left.scale(leftVelocity))
             .add(0.0, upVelocity, 0.0)
-            .multiply(frameTime)
+            .scale(frameTime)
         val speed: Double = moveDelta.length / frameTime
         if (speed > 35.0) {
             val factor = 35.0 / speed
             forwardVelocity *= factor
             leftVelocity *= factor
             upVelocity *= factor
-            moveDelta = moveDelta.multiply(factor)
+            moveDelta.scale(factor)
         }
        freeCamPosition.add(moveDelta)
     }
@@ -140,7 +139,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     fun onAfterRenderWorld(){
         if (shouldOverride) {
             looking = mc.objectMouseOver
-            val cameraEntity = mc.renderViewEntity
+            val cameraEntity = mc.renderViewEntity ?: return
             playerPosition.copyToEntity(cameraEntity, true)
             shouldOverride = false
             cameraEntity.noClip = oldNoClip
@@ -149,7 +148,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
 
     fun onBeforeRenderEntity(entity: Entity){
         if (mc.renderViewEntity == entity && shouldOverride) {
-            freeCamPosition.copyToEntity(entity, true)
+            playerPosition.copyToEntity(entity, true)
         }
     }
 
@@ -177,12 +176,9 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     }
 
     fun setAngles(yaw: Float, pitch: Float) {
-        var p = pitch
-        var y = yaw
-        p -= pitch * 0.15f
-        y += yaw * 0.15f
-        p = MathHelper.clamp_float(p, -90f, 90f)
-        lookVec = RotationUtils.yawAndPitchVector(y, p)
+        freeCamPosition.yaw += yaw * 0.15f
+        freeCamPosition.pitch = MathHelper.clamp_float((freeCamPosition.pitch - pitch * 0.15f), -90f, 90f)
+        lookVec = RotationUtils.yawAndPitchVector(freeCamPosition.yaw, freeCamPosition.pitch).toMutableVec3()
     }
 
 

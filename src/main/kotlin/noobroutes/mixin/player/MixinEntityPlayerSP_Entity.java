@@ -18,6 +18,5 @@ public abstract class MixinEntityPlayerSP_Entity extends Entity {
         } else {
             super.setAngles(yaw, pitch);
         }
-
     }
 }

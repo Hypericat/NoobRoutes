@@ -344,6 +344,15 @@ fun DoubleArray.toVec3(): Vec3 =
     Vec3(this[0], this[1], this[2])
 
 /**
+ * Turns a BlockPos into a MutableVec3
+ */
+fun BlockPos.toMutableVec3(): MutableVec3 =
+    MutableVec3(x.toDouble(), y.toDouble(), z.toDouble())
+
+fun Vec3.toMutableVec3(): MutableVec3 =
+    MutableVec3(xCoord, yCoord, zCoord)
+
+/**
  * Solves the equation for diana burrow estimate.
  * @see noobroutes.utils.skyblock.DianaBurrowEstimate.guessPosition
  * @author Soopy
