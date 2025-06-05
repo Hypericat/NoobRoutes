@@ -81,8 +81,7 @@ class NoobRoutes {
             Etherwarper,
             BossEventDispatcher,
             SecretUtils,
-            AutoRouteUtils,
-            FreeCam
+            AutoRouteUtils
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }

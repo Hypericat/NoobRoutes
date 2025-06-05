@@ -5,7 +5,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.util.MathHelper
 import net.minecraft.util.MovementInput
 import net.minecraft.util.MovingObjectPosition
-import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -17,9 +16,10 @@ import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
-import noobroutes.utils.add
-import noobroutes.utils.multiply
-import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.Utils.xPart
+import noobroutes.utils.Utils.zPart
+import org.lwjgl.input.Keyboard
+import kotlin.math.atan2
 import kotlin.math.pow
 import kotlin.math.sign
 
@@ -29,9 +29,9 @@ import kotlin.math.sign
 object FreeCam : Module("Free Cam", description = "FME free cam", category = Category.RENDER) {
     private val freeCamSpectatorMovement by BooleanSetting("Spectator Movement", description = "Moving forward and backward in free cam mode changes y level.")
     var looking: MovingObjectPosition? = null
-    private var forwardVelocity: Double = 0.0
-    private var leftVelocity: Double = 0.0
-    private var upVelocity: Double = 0.0
+    private var xVelocity: Double = 0.0
+    private var zVelocity: Double = 0.0
+    private var yVelocity: Double = 0.0
     private var lastTime = System.nanoTime()
     private var oldNoClip = false
     private var lookVec: MutableVec3 = MutableVec3(0.0, 0.0, 0.0)
@@ -60,14 +60,14 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     }
 
     override fun onDisable() {
-        super.onDisable()
         mc.gameSettings.thirdPersonView = oldCameraType
         mc.thePlayer.movementInput = oldInput
         shouldOverride = false
-        forwardVelocity = 0.0
-        leftVelocity = 0.0
-        upVelocity = 0.0
+        xVelocity = 0.0
+        zVelocity = 0.0
+        yVelocity = 0.0
         mc.renderGlobal.loadRenderers()
+        super.onDisable()
     }
 
 
@@ -78,30 +78,25 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         val frameTime = ((currTime - lastTime).toFloat() / 1.0E9f)
         lastTime = currTime
         val input = oldInput
-        val forwardImpulse = input.moveForward
-        val leftImpulse = input.moveStrafe
-        val upImpulse = if (input.jump) 1 else 0 + if (input.sneak) -1 else 0
-        forwardVelocity = calculateVelocity(forwardVelocity, forwardImpulse.toDouble(), frameTime.toDouble())
-        leftVelocity = calculateVelocity(leftVelocity, leftImpulse.toDouble(), frameTime.toDouble())
-        upVelocity = calculateVelocity(upVelocity, upImpulse.toDouble(), frameTime.toDouble())
-        val forward =
-            if (freeCamSpectatorMovement) lookVec else MutableVec3(
-                lookVec.x,
-                0.0,
-                lookVec.z
-            ).normalize()
-        val left = MutableVec3(lookVec.z, 0.0, -lookVec.x).normalize()
+        val yImpulse = if (input.jump) 1 else 0 + if (input.sneak) -1 else 0
+        val xImpulse = freeCamPosition.yaw.xPart * input.moveForward + if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe).xPart
+        val zImpulse = freeCamPosition.yaw.zPart * input.moveForward + if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe).zPart
+        xVelocity = calculateVelocity(xVelocity, xImpulse, frameTime.toDouble())
+        zVelocity = calculateVelocity(zVelocity, zImpulse, frameTime.toDouble())
+        yVelocity = calculateVelocity(yVelocity, yImpulse.toDouble(), frameTime.toDouble())
 
-        val moveDelta: MutableVec3 = forward.scale(forwardVelocity)
-            .add(left.scale(leftVelocity))
-            .add(0.0, upVelocity, 0.0)
-            .scale(frameTime)
+        val moveDelta = MutableVec3(
+            xVelocity,
+            yVelocity,
+            zVelocity
+        ).scale(frameTime)
+
         val speed: Double = moveDelta.length / frameTime
         if (speed > 35.0) {
             val factor = 35.0 / speed
-            forwardVelocity *= factor
-            leftVelocity *= factor
-            upVelocity *= factor
+            xVelocity *= factor
+            zVelocity *= factor
+            yVelocity *= factor
             moveDelta.scale(factor)
         }
        freeCamPosition.add(moveDelta)
@@ -176,7 +171,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     }
 
     fun setAngles(yaw: Float, pitch: Float) {
-        freeCamPosition.yaw += yaw * 0.15f
+        freeCamPosition.yaw = MathHelper.wrapAngleTo180_float(((yaw * 0.15f) + freeCamPosition.yaw))
         freeCamPosition.pitch = MathHelper.clamp_float((freeCamPosition.pitch - pitch * 0.15f), -90f, 90f)
         lookVec = RotationUtils.yawAndPitchVector(freeCamPosition.yaw, freeCamPosition.pitch).toMutableVec3()
     }
