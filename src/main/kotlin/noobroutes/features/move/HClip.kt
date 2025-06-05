@@ -65,8 +65,8 @@ object HClip: Module(
         Scheduler.scheduleC03Task {
             val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
             val renderEntity = mc.renderViewEntity
-            mc.thePlayer.motionX = speed * Utils.xPart(renderEntity.rotationYaw + yawChange())
-            mc.thePlayer.motionZ = speed * Utils.zPart(renderEntity.rotationPitch + yawChange())
+            mc.thePlayer.motionX = speed * Utils.xPart(renderEntity.rotationYawHead + yawChange())
+            mc.thePlayer.motionZ = speed * Utils.zPart(renderEntity.rotationYawHead + yawChange())
             AutoP3Utils.rePressKeys()
         }
         if (!shouldSpam) toggle()

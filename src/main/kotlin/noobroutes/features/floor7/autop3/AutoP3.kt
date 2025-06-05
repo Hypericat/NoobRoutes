@@ -260,11 +260,11 @@ object AutoP3: Module (
             }
             "motion" -> {
                 if (args.size < 4) return
-                val drag = args[2].toDoubleOrNull() ?: return
-                val push = args[3].toDoubleOrNull() ?: return
-                AutoP3Utils.drag = drag
-                AutoP3Utils.push = push
-                modMessage("drag: $drag push: $push")
+                val add = args[2].toIntOrNull() ?: return
+                val mult = args[3].toDoubleOrNull() ?: return
+                AutoP3Utils.jump1 = add
+                AutoP3Utils.jump2 = mult
+                modMessage("1 $add 2 $mult")
             }
             else -> {
                 modMessage("All tests passed")

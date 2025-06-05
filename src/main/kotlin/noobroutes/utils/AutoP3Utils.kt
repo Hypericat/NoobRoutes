@@ -112,21 +112,6 @@ object AutoP3Utils {
         testing = false
     }
 
-    @SubscribeEvent
-    fun awaitTick(event: PacketEvent) {
-        if(!awaitingTick || event.packet !is C03PacketPlayer) return
-        awaitingTick = false
-        val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
-        mc.thePlayer.motionX = speed * Utils.xPart(direction)
-        mc.thePlayer.motionZ = speed * Utils.zPart(direction)
-        xSpeed = speed * Utils.xPart(direction)
-        zSpeed = speed * Utils.zPart(direction)
-        if (walkAfter) {
-            walkAfter = false
-            Scheduler.schedulePreTickTask { walking = true }
-        }
-    }
-
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook) return
@@ -225,6 +210,9 @@ object AutoP3Utils {
     private var airTicks = 0
     var jumping = false
 
+    var jump1 = 2
+    var jump2 = 1.25
+
     @SubscribeEvent
     fun movement(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || walking == false) return
@@ -245,11 +233,11 @@ object AutoP3Utils {
 
         if (airTicks < 1) {
             var speedMultiplier = 2.806
-            /*if (jumping) {
+            if (jumping) {
                 jumping = false
-                speedMultiplier += 2
-                speedMultiplier *= 1.25
-            }*/
+                speedMultiplier += jump1
+                speedMultiplier *= jump2
+            }
             mc.thePlayer.motionX = Utils.xPart(direction) * speed * speedMultiplier
             mc.thePlayer.motionZ = Utils.zPart(direction) * speed * speedMultiplier
             return

@@ -2,10 +2,17 @@ package noobroutes.features.floor7.autop3.rings
 
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.AutoP3Utils.awaitingTick
+import noobroutes.utils.AutoP3Utils.direction
+import noobroutes.utils.AutoP3Utils.walkAfter
+import noobroutes.utils.AutoP3Utils.walking
+import noobroutes.utils.Scheduler
+import noobroutes.utils.Utils
 import noobroutes.utils.skyblock.modMessage
 @RingType("HClip")
 class HClipRing(
@@ -32,8 +39,12 @@ class HClipRing(
         super.doRing()
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
-        AutoP3Utils.awaitingTick = true
         AutoP3Utils.direction = yaw
-        if (walk) AutoP3Utils.walkAfter = true
+        Scheduler.schedulePreTickTask(1) {
+            val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
+            mc.thePlayer.motionX = speed * Utils.xPart(direction)
+            mc.thePlayer.motionZ = speed * Utils.zPart(direction)
+        }
+        if (walk) Scheduler.schedulePreTickTask(1) { walking = true }
     }
 }

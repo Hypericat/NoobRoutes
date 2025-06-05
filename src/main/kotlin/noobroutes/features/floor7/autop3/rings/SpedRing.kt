@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3.rings
 
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
+import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3.spedFor
 import noobroutes.features.floor7.autop3.AutoP3.timerSpeed
 import noobroutes.features.floor7.autop3.Blink
@@ -28,12 +29,13 @@ class SpedRing(
 
     override fun doRing() {
         super.doRing()
-        if (length > Blink.cancelled || spedFor > 0) return
+        if (length > Blink.cancelled || spedFor > 0 || Blink.blinksInstance + length > AutoP3.maxBlinks) return
         if (length < 1.0) {
             modMessage("Broken Speed Ring, cancelling execution")
             return
 
         }
+        Blink.blinksInstance += length
 
         modMessage("speeding (solid trip)")
         AutoP3Utils.setGameSpeed(timerSpeed)
