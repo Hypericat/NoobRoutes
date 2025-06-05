@@ -23,14 +23,7 @@ import kotlin.math.sqrt
 object PlayerUtils {
     var shouldBypassVolume = false
 
-    fun yawPitchVector(yaw: Float, pitch: Float): Vec3 {
-        val f = cos(-yaw * 0.017453292 - PI)
-        val f1 = sin(-yaw * 0.017453292 - PI)
-        val f2 = -cos(-pitch * 0.017453292)
-        val f3 = sin(-pitch * 0.017453292)
-        return Vec3(f1*f2, f3, f*f2).bloomNormalize()
 
-    }
 
 
     /**

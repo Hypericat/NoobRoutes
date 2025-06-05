@@ -1,10 +1,12 @@
 package noobroutes.features.dungeon.autoroute.nodes
 
 import com.google.gson.JsonObject
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
+import noobroutes.events.impl.PacketEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.batColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.edgeRoutes
@@ -32,7 +34,7 @@ import kotlin.math.absoluteValue
 
 class Bat(
     pos: Vec3 = Vec3(0.0, 0.0, 0.0),
-    var target: BlockPos = BlockPos(0,0,0),
+    var target: BlockPos? = null,
     var yaw: Float = 0f,
     var pitch: Float = 0f,
     awaitSecret: Int = 0,
@@ -54,16 +56,7 @@ class Bat(
     chain,
     reset
 ) {
-    var meow = false
-    override fun meowConvert(room: Room) {
-        if (meow) {
-            val odinReal = room.getRealCoordsOdin(target)
-            devMessage(odinReal)
-            target = room.getRelativeCoords(odinReal)
-            meow = false
-            AutoRoute.saveFile()
-        }
-    }
+
 
     override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
         AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
@@ -90,28 +83,54 @@ class Bat(
             return
         }
 
-        val tpTarget = room.getRealCoords(target)
+        val tpTarget = target?.let { room.getRealCoords(it) }
 
         if (mc.thePlayer.isSneaking || serverSneak || state != SwapManager.SwapState.ALREADY_HELD) {
             PlayerUtils.forceUnSneak()
             AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
             Scheduler.schedulePreTickTask(1) {
                 SecretUtils.batSpawnRegistered = true
+                tpSetter(tpTarget, room)
                 aotvTarget = tpTarget
             }
             return
         }
         SecretUtils.batSpawnRegistered = true
+        tpSetter(tpTarget, room)
         aotvTarget = tpTarget
+    }
 
-
+    fun tpSetter(tpTarget: BlockPos?, room: Room){
+        if (tpTarget == null) {
+            val timeClicked = System.currentTimeMillis()
+            Scheduler.scheduleLowS08Task {
+                if (timeClicked + 5000 < System.currentTimeMillis()) {
+                    modMessage("recording timed out")
+                    return@scheduleLowS08Task
+                }
+                val event = (it as? PacketEvent.Receive) ?: return@scheduleLowS08Task
+                val s08 = event.packet as S08PacketPlayerPosLook
+                val flag = s08.func_179834_f()
+                if (
+                    flag.contains(S08PacketPlayerPosLook.EnumFlags.X) ||
+                    flag.contains(S08PacketPlayerPosLook.EnumFlags.Y) ||
+                    flag.contains(S08PacketPlayerPosLook.EnumFlags.Z) ||
+                    event.isCanceled ||
+                    s08.y - s08.y.floor() != 0.0
+                ) {
+                    modMessage("Invalid Packet")
+                    return@scheduleLowS08Task
+                }
+                target = room.getRelativeCoords(BlockPos(s08.x, s08.y, s08.z))
+            }
+        }
     }
 
 
     override fun render(room: Room) {
         drawNode(room, batColor)
         if (!AutoRoute.drawAotvLines) return
-        val targetCoords = room.getRealCoords(target)
+        val targetCoords = target?.let { room.getRealCoords(it) } ?: return
         val nodePosition = room.getRealCoords(pos)
         val yaw = room.getRealYaw(yaw)
         if (edgeRoutes && pitch.absoluteValue != 90f) {
@@ -136,17 +155,15 @@ class Bat(
     }
 
     override fun nodeAddInfo(obj: JsonObject) {
-        obj.addProperty("target", target)
+        target?.let { obj.addProperty("target", it) }
         obj.addProperty("yaw", yaw)
         obj.addProperty("pitch", pitch)
-        if (meow) obj.addProperty("meow", true)
     }
 
     override fun loadNodeInfo(obj: JsonObject) {
         this.target = obj.get("target")?.asBlockPos ?: BlockPos(0.0, 0.0, 0.0)
         this.yaw = obj.get("yaw").asFloat
         this.pitch = obj.get("pitch").asFloat
-        this.meow = obj.has("meow")
     }
 
     override fun renderIndexColor(): Color {

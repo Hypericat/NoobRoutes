@@ -609,7 +609,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     @SubscribeEvent
     fun meowTranslator(event: RoomEnterEvent){
         event.room ?: return
-        nodes[event.room.data.name]?.filter { it.name == "Bat" || it.name == "Aotv"}?.forEach {
+        nodes[event.room.data.name]?.filter {it.name == "Aotv"}?.forEach {
             it.meowConvert(event.room)
         }
         saveFile()

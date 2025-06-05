@@ -19,6 +19,7 @@ import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.ModuleManager
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.SecretUtils
+import noobroutes.features.dungeon.maplobotomizer.FreeCam
 import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.*
@@ -80,7 +81,8 @@ class NoobRoutes {
             Etherwarper,
             BossEventDispatcher,
             SecretUtils,
-            AutoRouteUtils
+            AutoRouteUtils,
+            FreeCam
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }

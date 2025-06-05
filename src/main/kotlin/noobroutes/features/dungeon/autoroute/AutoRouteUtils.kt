@@ -41,7 +41,7 @@ object AutoRouteUtils {
     }
 
     var aotvTarget: BlockPos? = null
-    fun aotv(pos: BlockPos) {
+    fun aotv(pos: BlockPos?) {
         aotvTarget = pos
         unsneakRegistered = true
         PlayerUtils.forceUnSneak()
@@ -144,6 +144,7 @@ object AutoRouteUtils {
             val data = route.get("data").asJsonObject
             val await = if (args.has("await_secret")) 1 else 0
             val delay = args.get("delay")?.asInt?.toLong() ?: 0L
+
             if (routeMap[room] == null) routeMap[room] = mutableListOf()
             when (meowType) {
                 "etherwarp_target" -> {
@@ -187,17 +188,10 @@ object AutoRouteUtils {
                 "bat" -> {
                     val yaw = data.get("yaw").asFloat
                     val pitch = data.get("pitch").asFloat
-                    val x = data["x"]?.asInt
-                    val y = data["y"]?.asInt
-                    val z = data["z"]?.asInt
-                    if (x == null || y == null || z == null) {
-                        return@forEach
-                    }
-                    val target = BlockPos(x, y, z)
                     routeMap.getOrPut(room) {mutableListOf()} .add(
                         Bat(
                             coords,
-                            target,
+                            null,
                             yaw,
                             pitch,
                             await,

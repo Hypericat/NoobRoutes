@@ -16,7 +16,10 @@ import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
+import kotlin.math.PI
 import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.math.sqrt
 
 object RotationUtils {
@@ -30,6 +33,14 @@ object RotationUtils {
     enum class Action{
         LeftClick,
         RightClick
+    }
+
+    fun yawAndPitchVector(yaw: Float, pitch: Float): Vec3 {
+        val f = cos(-yaw * 0.017453292519943295 - PI)
+        val f1 = sin(-yaw * 0.017453292519943295 - PI)
+        val f2 = -cos(-pitch * 0.017453292519943295)
+        val f3 = sin(-pitch * 0.017453292519943295)
+        return Vec3(f1*f2, f3, f*f2).bloomNormalize()
     }
 
     /**

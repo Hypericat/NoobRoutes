@@ -47,7 +47,7 @@ fun Vec3.add(x: Double, y: Double, z: Double): Vec3 {
     return this.add(Vec3(x, y, z))
 }
 
-val Vec3.length get() = sqrt(this.xCoord.pow(2) + this.yCoord.pow(2) + this.zCoord.pow(2))
+val Vec3.length get() = sqrt(this.xCoord * this.xCoord + this.yCoord * this.yCoord + this.zCoord * this.zCoord)
 
 
 fun Vec3.bloomNormalize(): Vec3 {
