@@ -9,13 +9,14 @@ import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.shader.RoundedRect
 import noobroutes.utils.*
+import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import org.lwjgl.opengl.Display
 import org.lwjgl.opengl.GL11
 
 val matrix = UMatrixStack.Compat
 val scaleFactor get() = ScaledResolution(mc).scaleFactor.toFloat()
 private val arrowIcon = DynamicTexture(
-    _root_ide_package_.noobroutes.utils.render.RenderUtils.loadBufferedImage(
+    loadBufferedImage(
         "/assets/defnotstolen/clickgui/arrow.png"
     )
 )

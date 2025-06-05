@@ -8,6 +8,7 @@ import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
+import noobroutes.utils.clock.Executor
 import noobroutes.utils.clock.Executor.Companion.register
 
 object ServerUtils {
@@ -36,7 +37,7 @@ object ServerUtils {
     }
 
     init {
-        _root_ide_package_.noobroutes.utils.clock.Executor(2000, "ClientUtils") {
+        Executor(2000, "ClientUtils") {
             sendPing()
         }.register()
     }

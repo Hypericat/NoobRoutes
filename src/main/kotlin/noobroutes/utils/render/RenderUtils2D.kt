@@ -123,22 +123,22 @@ object RenderUtils2D {
         GL11.glLineWidth(lineWidth)
         color.bind()
 
-        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION)
+        RenderUtils.worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION)
 
         // Draw the four lines of the box
-        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.x, box.y, 0.0).endVertex()  // Top-left to top-right
-        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.w, box.y, 0.0).endVertex()
+        RenderUtils.worldRenderer.pos(box.x, box.y, 0.0).endVertex()  // Top-left to top-right
+        RenderUtils.worldRenderer.pos(box.w, box.y, 0.0).endVertex()
 
-        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.w, box.y, 0.0).endVertex()  // Top-right to bottom-right
-        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.w, box.h, 0.0).endVertex()
+        RenderUtils.worldRenderer.pos(box.w, box.y, 0.0).endVertex()  // Top-right to bottom-right
+        RenderUtils.worldRenderer.pos(box.w, box.h, 0.0).endVertex()
 
-        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.w, box.h, 0.0).endVertex()  // Bottom-right to bottom-left
-        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.x, box.h, 0.0).endVertex()
+        RenderUtils.worldRenderer.pos(box.w, box.h, 0.0).endVertex()  // Bottom-right to bottom-left
+        RenderUtils.worldRenderer.pos(box.x, box.h, 0.0).endVertex()
 
-        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.x, box.h, 0.0).endVertex()  // Bottom-left to top-left
-        _root_ide_package_.noobroutes.utils.render.RenderUtils.worldRenderer.pos(box.x, box.y, 0.0).endVertex()
+        RenderUtils.worldRenderer.pos(box.x, box.h, 0.0).endVertex()  // Bottom-left to top-left
+        RenderUtils.worldRenderer.pos(box.x, box.y, 0.0).endVertex()
 
-        _root_ide_package_.noobroutes.utils.render.RenderUtils.tessellator.draw()
+        RenderUtils.tessellator.draw()
 
         Color.WHITE.bind()
         GL11.glLineWidth(1f)

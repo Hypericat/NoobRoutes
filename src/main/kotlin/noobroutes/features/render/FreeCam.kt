@@ -116,6 +116,8 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         onDisable()
     }
 
+
+
     @SubscribeEvent
     fun onClick(event: MouseEvent) {
         event.isCanceled = true
@@ -175,8 +177,6 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         freeCamPosition.pitch = MathHelper.clamp_float((freeCamPosition.pitch - pitch * 0.15f), -90f, 90f)
         lookVec = RotationUtils.yawAndPitchVector(freeCamPosition.yaw, freeCamPosition.pitch).toMutableVec3()
     }
-
-
 
     private fun calculateVelocity(velocity: Double, impulse: Double, frameTime: Double): Double {
         if (impulse == 0.0) return velocity * 0.05.pow(frameTime)

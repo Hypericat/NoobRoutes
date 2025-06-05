@@ -37,7 +37,7 @@ object EditHUDGui : Screen() {
 
     /** Code is horrible ngl but it looks nice */
     override fun draw() {
-        mc.mcProfiler.startSection("Odin Example Hud")
+        mc.mcProfiler.startSection("Noobroutes Example Hud")
         dragging?.let {
             it.x = MouseUtils.mouseX - startX
             it.y = MouseUtils.mouseY - startY

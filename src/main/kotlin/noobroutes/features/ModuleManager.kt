@@ -186,7 +186,7 @@ object ModuleManager {
     fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if ((Core.mc.currentScreen != null ) || event.type != RenderGameOverlayEvent.ElementType.ALL || Core.mc.currentScreen == EditHUDGui) return
 
-        profile("Odin Hud") {
+        profile("Noobroutes Hud") {
             for (i in 0 until huds.size) {
                 huds[i].draw(false)
             }

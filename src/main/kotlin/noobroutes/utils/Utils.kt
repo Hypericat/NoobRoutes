@@ -24,6 +24,8 @@ import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.features.ModuleManager
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.skyblock.sendCommand
 import noobroutes.utils.skyblock.skyblockID
 import org.lwjgl.opengl.GL11
 import org.lwjgl.util.glu.GLU
@@ -246,8 +248,8 @@ fun Event.postAndCatch(): Boolean {
         val style = ChatStyle()
         style.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/od copy ```${it.stackTraceToString().lineSequence().take(10).joinToString("\n")}```")
         style.chatHoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§6Click to copy the error to your clipboard."))
-        _root_ide_package_.noobroutes.utils.skyblock.modMessage(
-            "${Core.VERSION} Caught an ${it::class.simpleName ?: "error"} at ${this::class.simpleName}. §cPlease click this message to copy and send it in the Odin discord!",
+        modMessage(
+            "${Core.VERSION} Caught an ${it::class.simpleName ?: "error"} at ${this::class.simpleName}. §cPlease click this message to copy and send it in the Noobroutes discord!",
             chatStyle = style
         )
     }.getOrDefault(isCanceled)
@@ -280,10 +282,10 @@ inline fun profile(name: String, func: () -> Unit) {
 }
 
 /**
- * Starts a minecraft profiler section with the specified name + "Odin: ".
+ * Starts a minecraft profiler section with the specified name + "Noobroutes: ".
  * */
 fun startProfile(name: String) {
-    mc.mcProfiler.startSection("Odin: $name")
+    mc.mcProfiler.startSection("Noobroutes: $name")
 }
 
 /**
@@ -358,7 +360,7 @@ fun checkGLError(message: String) {
  */
 fun writeToClipboard(text: String, successMessage: String = "§aCopied to clipboard.") {
     GuiScreen.setClipboardString(text)
-    if (successMessage.isNotEmpty()) _root_ide_package_.noobroutes.utils.skyblock.modMessage(
+    if (successMessage.isNotEmpty()) modMessage(
         successMessage
     )
 }
@@ -380,7 +382,7 @@ fun romanToInt(s: String): Int {
 
 fun fillItemFromSack(amount: Int, itemId: String, sackName: String, sendMessage: Boolean) {
     val needed = mc.thePlayer?.inventory?.mainInventory?.find { it?.skyblockID == itemId }?.stackSize ?: 0
-    if (needed != amount) _root_ide_package_.noobroutes.utils.skyblock.sendCommand("gfs $sackName ${amount - needed}") else if (sendMessage) _root_ide_package_.noobroutes.utils.skyblock.modMessage(
+    if (needed != amount) sendCommand("gfs $sackName ${amount - needed}") else if (sendMessage) modMessage(
         "§cAlready at max stack size."
     )
 }
