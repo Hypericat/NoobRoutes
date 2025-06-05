@@ -1,9 +1,12 @@
 package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.Vec3
+import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.Scheduler
+
 @RingType("Walk")
 class WalkRing(
     coords: Vec3 = Vec3(0.0, 0.0, 0.0),
@@ -18,6 +21,11 @@ class WalkRing(
     override fun doRing() {
         AutoP3Utils.unPressKeys()
         super.doRing()
-        AutoP3Utils.startWalk(yaw)
+        if (!center) AutoP3Utils.startWalk(yaw)
+        else {
+            mc.thePlayer.motionX = 0.0
+            mc.thePlayer.motionZ = 0.0
+            Scheduler.schedulePreTickTask { AutoP3Utils.startWalk(yaw) }
+        }
     }
 }

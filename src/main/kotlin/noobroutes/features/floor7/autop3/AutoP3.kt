@@ -114,9 +114,9 @@ object AutoP3: Module (
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun tickRing(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.END || frame) return
+        if (event.phase != TickEvent.Phase.START || frame) return
         if(!inBoss || mc.thePlayer.isSneaking) return
         rings[route]?.forEach {ring ->
             if (editMode) return@forEach

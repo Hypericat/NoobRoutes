@@ -227,9 +227,6 @@ object AutoP3Utils {
 
         val sprintMultiplier = 1.3
         var speed = mc.thePlayer.aiMoveSpeed.toDouble()
-        if (mc.thePlayer.isSprinting) {
-            speed /= sprintMultiplier
-        }
 
         if (airTicks < 1) {
             var speedMultiplier = 2.806
@@ -246,7 +243,7 @@ object AutoP3Utils {
         val movementFactor = if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0)) {
             speed * sprintMultiplier
         } else {
-            motionValue/10000 * sprintMultiplier
+            0.02 * sprintMultiplier
         }
 
         mc.thePlayer.motionX += movementFactor * Utils.xPart(direction)
