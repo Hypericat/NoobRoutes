@@ -10,9 +10,9 @@ import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import noobroutes.events.impl.PacketEvent
-import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils

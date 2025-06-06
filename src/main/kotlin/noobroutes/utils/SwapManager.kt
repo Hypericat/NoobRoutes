@@ -3,7 +3,6 @@ package noobroutes.utils
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.utils.Utils.ID

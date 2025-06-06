@@ -14,20 +14,13 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
-import noobroutes.features.dungeon.autoroute.nodes.Aotv
-import noobroutes.features.dungeon.autoroute.nodes.Bat
-import noobroutes.features.dungeon.autoroute.nodes.Etherwarp
-import noobroutes.features.dungeon.autoroute.nodes.Pearl
-import noobroutes.features.dungeon.autoroute.nodes.PearlClip
-import noobroutes.features.dungeon.autoroute.nodes.UseItem
-import noobroutes.features.dungeon.autoroute.nodes.Walk
+import noobroutes.features.dungeon.autoroute.nodes.*
 import noobroutes.features.move.Zpew
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.floor
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
-import kotlin.collections.mutableMapOf
 
 object AutoRouteUtils {
 

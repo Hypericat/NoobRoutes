@@ -12,8 +12,6 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import noobroutes.Core.logger
-import noobroutes.events.BossEventDispatcher
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
@@ -21,18 +19,11 @@ import noobroutes.features.Module
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.Setting.Companion.withDependency
-import noobroutes.features.settings.impl.ActionSetting
-import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.features.settings.impl.KeybindSetting
-import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.features.settings.impl.SelectorSetting
-import noobroutes.features.settings.impl.StringSetting
+import noobroutes.features.settings.impl.*
 import noobroutes.utils.*
 import noobroutes.utils.Utils.ID
 import noobroutes.utils.skyblock.*
-import noobroutes.utils.skyblock.PlayerUtils.getBlockPlayerIsLookingAt
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import sun.util.logging.resources.logging
 import kotlin.math.floor
 
 object Zpew : Module(

@@ -2,7 +2,6 @@ package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.Vec3
 import noobroutes.features.floor7.autop3.Ring
-import noobroutes.features.floor7.autop3.RingType
 
 //@RingType("Name")
 class RingPreset(

@@ -1,9 +1,7 @@
 package noobroutes.utils
 
 import net.minecraft.client.settings.KeyBinding
-import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
-import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.Vec3
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -18,13 +16,11 @@ import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3.depth
-import noobroutes.features.floor7.autop3.AutoP3.motionValue
 import noobroutes.features.floor7.autop3.AutoP3.renderStyle
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.mixin.accessors.TimerFieldAccessor
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
@@ -40,11 +36,9 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
-import kotlin.math.log
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.reflect.KClass
-import kotlin.text.replace
 
 object AutoP3Utils {
 

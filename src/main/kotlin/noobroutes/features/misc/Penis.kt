@@ -8,7 +8,6 @@ import noobroutes.utils.PacketUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.isAir
 import noobroutes.utils.toBlockPos
-import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 
 object Penis: Module(

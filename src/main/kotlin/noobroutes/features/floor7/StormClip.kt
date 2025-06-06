@@ -9,7 +9,6 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.PacketUtils
-import noobroutes.utils.Scheduler
 import org.lwjgl.input.Keyboard
 
 object StormClip: Module(

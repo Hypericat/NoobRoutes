@@ -1,6 +1,5 @@
 package noobroutes
 
-import noobroutes.utils.skyblock.dungeon.ScanUtils
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
@@ -15,11 +14,10 @@ import noobroutes.commands.NoobRoutesCommand
 import noobroutes.commands.YawPitchCommand
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
-import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.ModuleManager
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.SecretUtils
-import noobroutes.features.render.FreeCam
+import noobroutes.features.floor7.autop3.Blink
 import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.*
@@ -28,6 +26,7 @@ import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.RenderUtils2D
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.LocationUtils
+import noobroutes.utils.skyblock.dungeon.ScanUtils
 import java.io.File
 
 

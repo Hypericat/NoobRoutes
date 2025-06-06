@@ -1,6 +1,5 @@
 package noobroutes.features.render
 
-import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -9,10 +8,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.utils.Scheduler
-import noobroutes.utils.skyblock.devMessage
-
 import org.lwjgl.input.Keyboard
 
 object RotationVisualizer: Module(

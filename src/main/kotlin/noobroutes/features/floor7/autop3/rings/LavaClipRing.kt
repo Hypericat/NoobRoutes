@@ -1,13 +1,12 @@
 package noobroutes.features.floor7.autop3.rings
 
-import codes.som.anthony.koffee.types.double
-import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.features.move.LavaClip
 import noobroutes.utils.AutoP3Utils
+
 @RingType("LavaClip")
 class LavaClipRing(
     coords: Vec3 = Vec3(0.0, 0.0, 0.0),

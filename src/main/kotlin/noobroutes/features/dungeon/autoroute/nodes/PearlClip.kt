@@ -10,7 +10,6 @@ import noobroutes.features.dungeon.autoroute.AutoRoute.pearlClipColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.clipDistance
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils.clipRegistered
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.pearlSoundRegistered
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.Scheduler

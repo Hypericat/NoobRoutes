@@ -12,7 +12,10 @@ import noobroutes.ui.clickgui.util.ColorUtil.darker
 import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
 import noobroutes.ui.util.MouseUtils
-import noobroutes.utils.render.*
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.TextAlign
+import noobroutes.utils.render.roundedRectangle
+import noobroutes.utils.render.text
 
 /**
  * Renders all the modules.

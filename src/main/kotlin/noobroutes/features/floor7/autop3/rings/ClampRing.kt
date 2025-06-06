@@ -5,11 +5,8 @@ import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
-import noobroutes.utils.Utils
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
-import kotlin.math.cos
-import kotlin.math.sin
 
 @RingType("Clamp")
 class ClampRing(

@@ -16,11 +16,7 @@ import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
+import kotlin.math.*
 
 object RotationUtils {
     private const val SNEAKHEIGHT = 0.0800000429153443

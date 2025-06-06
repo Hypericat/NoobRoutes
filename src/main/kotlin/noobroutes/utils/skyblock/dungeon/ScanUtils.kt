@@ -21,13 +21,11 @@ import noobroutes.utils.Vec2
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.getBlockIdAt
 import noobroutes.utils.postAndCatch
-import noobroutes.utils.skyblock.LocationUtils
-import noobroutes.utils.skyblock.dungeon.tiles.*
 import noobroutes.utils.skyblock.Island
+import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.tiles.Room
-import noobroutes.utils.skyblock.dungeon.tiles.Rotations
+import noobroutes.utils.skyblock.dungeon.tiles.*
 import java.io.FileNotFoundException
 
 object ScanUtils {

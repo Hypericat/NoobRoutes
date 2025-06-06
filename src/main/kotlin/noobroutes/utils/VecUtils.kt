@@ -10,8 +10,8 @@ import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.*
 import noobroutes.Core.mc
 import noobroutes.Core.scope
-import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.render.RenderUtils.outlineBounds
+import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import kotlin.math.*
 
 data class Vec2(val x: Double, val z: Double)

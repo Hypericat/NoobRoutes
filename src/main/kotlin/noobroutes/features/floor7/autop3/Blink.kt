@@ -21,7 +21,6 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.text
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.sin
 

@@ -4,7 +4,6 @@ import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import noobroutes.Core.mc
 import noobroutes.features.render.ClickGUIModule.devMode
-import noobroutes.features.test.AuraTest.blockAuraList
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 

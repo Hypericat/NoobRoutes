@@ -14,15 +14,11 @@ import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.floor7.autop3.Blink
-import noobroutes.utils.AuraManager
-import noobroutes.utils.PacketUtils
-import noobroutes.utils.Scheduler
-import noobroutes.utils.SwapManager
+import noobroutes.utils.*
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.skyblockID
-import noobroutes.utils.toAABB
 import org.lwjgl.input.Keyboard
 
 object BlinkRelic: Module(

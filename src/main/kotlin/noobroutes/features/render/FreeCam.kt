@@ -14,17 +14,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.NotPersistent
-import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
-import noobroutes.utils.skyblock.modMessage
-import org.lwjgl.input.Keyboard
-import kotlin.math.atan2
-import kotlin.math.pow
-import kotlin.math.sign
 
 /**
  * Credit to FME

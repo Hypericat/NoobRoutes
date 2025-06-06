@@ -12,12 +12,8 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
-import noobroutes.utils.bloomNormalize
 import org.lwjgl.input.Keyboard
-import kotlin.math.PI
-import kotlin.math.cos
 import kotlin.math.pow
-import kotlin.math.sin
 import kotlin.math.sqrt
 
 object PlayerUtils {

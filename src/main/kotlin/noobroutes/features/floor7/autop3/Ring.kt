@@ -8,15 +8,7 @@ import noobroutes.features.floor7.autop3.AutoP3.fuckingLook
 import noobroutes.features.floor7.autop3.AutoP3.silentLook
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.SyncData
-import noobroutes.utils.json.syncdata.SyncBlockPos
-import noobroutes.utils.json.syncdata.SyncBoolean
-import noobroutes.utils.json.syncdata.SyncDouble
-import noobroutes.utils.json.syncdata.SyncFloat
-import noobroutes.utils.json.syncdata.SyncInt
-import noobroutes.utils.json.syncdata.SyncLong
-import noobroutes.utils.json.syncdata.SyncString
-import noobroutes.utils.json.syncdata.SyncVec3
-import java.lang.System
+import noobroutes.utils.json.syncdata.*
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)

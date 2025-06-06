@@ -6,11 +6,13 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import noobroutes.Core.mc
+import noobroutes.events.impl.LocationChangeEvent
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.utils.cleanLine
 import noobroutes.utils.cleanSB
 import noobroutes.utils.clock.Executor
 import noobroutes.utils.clock.Executor.Companion.register
+import noobroutes.utils.postAndCatch
 import noobroutes.utils.sidebarLines
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
@@ -28,6 +30,7 @@ object LocationUtils {
         private set
     var currentArea: Island = Island.Unknown
     var kuudraTier: Int = 0
+    private var lastArea: Island = Island.Unknown
 
     init {
         Executor(500, "LocationUtils") {
@@ -40,7 +43,9 @@ object LocationUtils {
                     kuudraTier = it.substringBefore(")").lastOrNull()?.digitToIntOrNull() ?: 0
                 }
 
+            lastArea = currentArea
             if (currentArea.isArea(Island.Unknown)) currentArea = getArea()
+            if (lastArea != currentArea) LocationChangeEvent(currentArea).postAndCatch()
 
             if ((DungeonUtils.inDungeons || currentArea.isArea(
                     Island.SinglePlayer

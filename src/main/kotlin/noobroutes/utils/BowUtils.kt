@@ -12,7 +12,6 @@ import noobroutes.Core.mc
 import noobroutes.features.render.ClickGUIModule.devMode
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
-import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
