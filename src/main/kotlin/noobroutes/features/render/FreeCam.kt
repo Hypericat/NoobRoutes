@@ -33,9 +33,9 @@ import kotlin.math.sign
 object FreeCam : Module("Free Cam", description = "FME free cam", category = Category.RENDER) {
 
     var looking: MovingObjectPosition? = null
-    private var speedVector = MutableVec3(0.0,0.0,0.0)
-    private var oldPos = MutableVec3(0.0,0.0,0.0)
-    private var pos = MutableVec3(0.0,0.0,0.0)
+    private var speedVector = Vec3(0.0,0.0,0.0)
+    private var oldPos = Vec3(0.0,0.0,0.0)
+    private var pos = Vec3(0.0,0.0,0.0)
     private var lastTick = System.currentTimeMillis()
     private var oldNoClip = false
     private var lookVec: MutableVec3 = MutableVec3(0.0, 0.0, 0.0)
@@ -54,15 +54,15 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         val viewEntity = mc.renderViewEntity
         val eyePos = viewEntity.getPositionEyes(1f)
         lookVec = RotationUtils.yawAndPitchVector(viewEntity.rotationYaw, viewEntity.rotationPitch).toMutableVec3()
-        val camPos = eyePos.subtract(Vec3(lookVec.x, lookVec.y, lookVec.z).multiply(1.5)).toMutableVec3()
+        val camPos = eyePos.subtract(Vec3(lookVec.x, lookVec.y, lookVec.z).multiply(1.5))
         pos = camPos
         oldPos = camPos
-        freeCamPosition.x = camPos.x
-        freeCamPosition.y = camPos.y
-        freeCamPosition.z = camPos.z
+        freeCamPosition.x = camPos.xCoord
+        freeCamPosition.y = camPos.yCoord
+        freeCamPosition.z = camPos.zCoord
         freeCamPosition.pitch = viewEntity.rotationPitch
         freeCamPosition.yaw = viewEntity.rotationYaw
-        speedVector = MutableVec3(0.0, 0.0, 0.0)
+        speedVector = Vec3(0.0, 0.0, 0.0)
         super.onEnable()
     }
 
@@ -70,7 +70,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         mc.gameSettings.thirdPersonView = oldCameraType
         mc.thePlayer.movementInput = oldInput
         shouldOverride = false
-        speedVector = MutableVec3(0.0,0.0,0.0)
+        speedVector = Vec3(0.0,0.0,0.0)
         mc.renderGlobal.loadRenderers()
         super.onDisable()
     }
@@ -80,11 +80,11 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     fun onRenderTick(event: RenderTickEvent){
         if (!event.isStart) return
         val partialTicks = event.renderTickTime
-        val interpPos = oldPos.add(pos.subtract(oldPos, false).scale(partialTicks, false), false)
+        val interpPos = oldPos.add(pos.subtract(oldPos).multiply(partialTicks))
 
-        freeCamPosition.x = interpPos.x
-        freeCamPosition.y = interpPos.y
-        freeCamPosition.z = interpPos.z
+        freeCamPosition.x = interpPos.xCoord
+        freeCamPosition.y = interpPos.yCoord
+        freeCamPosition.z = interpPos.zCoord
 
     }
 
@@ -95,8 +95,10 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         val yImpulse = if (input.jump) 1 else 0 + if (input.sneak) -1 else 0
         val xImpulse = freeCamPosition.yaw.xPart * input.moveForward + if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe).xPart
         val zImpulse = freeCamPosition.yaw.zPart * input.moveForward + if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe).zPart
-        speedVector.scale(0.91)
-        speedVector.add(xImpulse * 0.1, yImpulse * 0.1, zImpulse * 0.1)
+        val xSpeed = speedVector.xCoord * 0.91 + xImpulse * 0.1 //adjust values as needed
+        val ySpeed = speedVector.yCoord * 0.91 + yImpulse * 0.1
+        val zSpeed = speedVector.zCoord * 0.91 + zImpulse * 0.1
+        speedVector = Vec3(xSpeed, ySpeed, zSpeed)
         oldPos = pos
         pos = pos.add(speedVector)
     }

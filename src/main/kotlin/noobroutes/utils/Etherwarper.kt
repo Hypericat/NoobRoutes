@@ -41,12 +41,12 @@ object Etherwarper {
         when (state) {
             SwapManager.SwapState.ALREADY_HELD -> {
                 prevEWLocation = mc.thePlayer.positionVector
-                RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick)
+                //RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick)
             }
             SwapManager.SwapState.SWAPPED -> {
                 prevEWLocation = mc.thePlayer.positionVector
                 Scheduler.schedulePreTickTask {
-                    RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick)
+                    //RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick)
                 }
             }
             else -> return
@@ -80,12 +80,12 @@ object Etherwarper {
         when (state) {
             SwapManager.SwapState.ALREADY_HELD -> {
                 prevEWLocation = mc.thePlayer.positionVector
-                RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick, continuous = RotationUtils.CompletionRequirement.PreRotate)
+                //RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick, continuous = RotationUtils.CompletionRequirement.PreRotate)
             }
             SwapManager.SwapState.SWAPPED -> {
                 prevEWLocation = mc.thePlayer.positionVector
                 Scheduler.schedulePreTickTask {
-                    RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick, continuous = RotationUtils.CompletionRequirement.PreRotate)
+                    //RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick, continuous = RotationUtils.CompletionRequirement.PreRotate)
                 }
             }
             else -> return
@@ -104,9 +104,9 @@ object Etherwarper {
         val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.ALREADY_HELD || state == SwapManager.SwapState.SWAPPED) {
             prevEWLocation = mc.thePlayer.positionVector
-            RotationUtils.rotate(yaw, pitch, silent)
+            //RotationUtils.rotate(yaw, pitch, silent)
             Scheduler.schedulePreTickTask(1) {
-                RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick)
+                //RotationUtils.rotate(yaw, pitch, silent, RotationUtils.Action.RightClick)
             }
         }
     }
