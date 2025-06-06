@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.settings.NotPersistent
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
@@ -26,7 +27,9 @@ import kotlin.math.sign
 /**
  * Credit to FME
  */
+@NotPersistent
 object FreeCam : Module("Free Cam", description = "FME free cam", category = Category.RENDER) {
+
     private val freeCamSpectatorMovement by BooleanSetting("Spectator Movement", description = "Moving forward and backward in free cam mode changes y level.")
     var looking: MovingObjectPosition? = null
     private var xVelocity: Double = 0.0
@@ -181,7 +184,11 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     private fun calculateVelocity(velocity: Double, impulse: Double, frameTime: Double): Double {
         if (impulse == 0.0) return velocity * 0.05.pow(frameTime)
         var newVelocity = 20 * impulse * frameTime
-        if (sign(impulse) == sign(velocity)) newVelocity += velocity
+        newVelocity += if (velocity.sign != newVelocity.sign) {
+            velocity * 0.90
+        } else {
+            velocity
+        }
         return newVelocity
     }
 

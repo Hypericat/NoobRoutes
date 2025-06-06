@@ -59,7 +59,7 @@ object Config {
                 for (module in ModuleManager.modules) {
                     add(JsonObject().apply {
                         add("name", JsonPrimitive(module.name))
-                        add("enabled", JsonPrimitive(module.enabled))
+                        add("enabled", JsonPrimitive(if (module.notPersistent) false else module.enabled))
                         add("settings", JsonArray().apply {
                             for (setting in module.settings) {
                                 if (setting is Saving) {

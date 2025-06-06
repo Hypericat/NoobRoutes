@@ -99,10 +99,10 @@ object DungeonUtils {
     inline val mimicKilled: Boolean
         get() = LocationUtils.currentDungeon?.dungeonStats?.mimicKilled == true
 
-    inline val currentRoom: noobroutes.utils.skyblock.dungeon.tiles.Room?
+    inline val currentRoom: Room?
         get() = LocationUtils.currentDungeon?.currentRoom
 
-    inline val passedRooms: Set<noobroutes.utils.skyblock.dungeon.tiles.Room>
+    inline val passedRooms: Set<Room>
         get() = LocationUtils.currentDungeon?.passedRooms.orEmpty()
 
     inline val isPaul: Boolean

@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.settings.NotPersistent
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.Scheduler
 import noobroutes.utils.render.Color
@@ -17,6 +18,7 @@ import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.text
 import org.lwjgl.input.Keyboard
 
+@NotPersistent
 object LavaClip: Module(
     name = "Lava Clip",
     Keyboard.KEY_NONE,

@@ -6,6 +6,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.render.FreeCam
+import noobroutes.features.settings.NotPersistent
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
@@ -16,6 +18,7 @@ import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import kotlin.math.atan2
 
+@NotPersistent
 object HClip: Module(
     name = "HClip",
     Keyboard.KEY_NONE,
@@ -29,7 +32,7 @@ object HClip: Module(
     private var since = 0
 
     override fun onKeybind() {
-        toggle()
+        if (!FreeCam.enabled) toggle()
     }
 
     @SubscribeEvent

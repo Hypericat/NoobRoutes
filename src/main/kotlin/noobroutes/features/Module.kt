@@ -5,6 +5,7 @@ import net.minecraftforge.common.MinecraftForge
 import noobroutes.Core
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.AlwaysActive
+import noobroutes.features.settings.NotPersistent
 import noobroutes.features.settings.Setting
 import noobroutes.features.settings.impl.HudSetting
 import noobroutes.features.settings.impl.Keybinding
@@ -49,6 +50,9 @@ abstract class Module(
      */
     @Transient
     val alwaysActive = this::class.hasAnnotation<AlwaysActive>()
+
+    @Transient
+    val notPersistent = this::class.hasAnnotation<NotPersistent>()
 
     init {
         if (alwaysActive) {
