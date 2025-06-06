@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.util.MathHelper
 import net.minecraft.util.MovementInput
 import net.minecraft.util.MovingObjectPosition
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -19,6 +20,7 @@ import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
+import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import kotlin.math.atan2
 import kotlin.math.pow
@@ -30,18 +32,17 @@ import kotlin.math.sign
 @NotPersistent
 object FreeCam : Module("Free Cam", description = "FME free cam", category = Category.RENDER) {
 
-    private val freeCamSpectatorMovement by BooleanSetting("Spectator Movement", description = "Moving forward and backward in free cam mode changes y level.")
     var looking: MovingObjectPosition? = null
-    private var xVelocity: Double = 0.0
-    private var zVelocity: Double = 0.0
-    private var yVelocity: Double = 0.0
-    private var lastTime = System.nanoTime()
+    private var speedVector = Vec3(0.0,0.0,0.0)
+    private var oldPos = Vec3(0.0,0.0,0.0)
+    private var pos = Vec3(0.0,0.0,0.0)
+    private var lastTick = System.currentTimeMillis()
     private var oldNoClip = false
     private var lookVec: MutableVec3 = MutableVec3(0.0, 0.0, 0.0)
     private var oldCameraType: Int = 0
     private var shouldOverride = false
     private var oldInput: MovementInput = MovementInput()
-    private val freeCamPosition: EntityPosition = EntityPosition(0.0, 0.0, 0.0, 0f, 0f)
+    private var freeCamPosition: EntityPosition = EntityPosition(0.0, 0.0, 0.0, 0f, 0f)
     private val playerPosition: EntityPosition = EntityPosition(0.0, 0.0, 0.0, 0f, 0f)
     private var renderingEntities = false
 
@@ -51,14 +52,17 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         mc.thePlayer.movementInput = MovementInput()
         mc.gameSettings.thirdPersonView = 0
         val viewEntity = mc.renderViewEntity
-        val pos = viewEntity.getPositionEyes(1f)
+        val eyePos = viewEntity.getPositionEyes(1f)
         lookVec = RotationUtils.yawAndPitchVector(viewEntity.rotationYaw, viewEntity.rotationPitch).toMutableVec3()
-        freeCamPosition.x = pos.xCoord + lookVec.x * -1.5
-        freeCamPosition.y = pos.yCoord + lookVec.y * -1.5
-        freeCamPosition.z = pos.zCoord + lookVec.z * -1.5
+        val camPos = eyePos.subtract(Vec3(lookVec.x, lookVec.y, lookVec.z).multiply(1.5))
+        pos = camPos
+        oldPos = camPos
+        freeCamPosition.x = camPos.xCoord
+        freeCamPosition.y = camPos.yCoord
+        freeCamPosition.z = camPos.zCoord
         freeCamPosition.pitch = viewEntity.rotationPitch
         freeCamPosition.yaw = viewEntity.rotationYaw
-        lastTime = System.nanoTime()
+        speedVector = Vec3(0.0, 0.0, 0.0)
         super.onEnable()
     }
 
@@ -66,9 +70,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         mc.gameSettings.thirdPersonView = oldCameraType
         mc.thePlayer.movementInput = oldInput
         shouldOverride = false
-        xVelocity = 0.0
-        zVelocity = 0.0
-        yVelocity = 0.0
+        speedVector = Vec3(0.0,0.0,0.0)
         mc.renderGlobal.loadRenderers()
         super.onDisable()
     }
@@ -76,33 +78,29 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
 
     @SubscribeEvent
     fun onRenderTick(event: RenderTickEvent){
+        if (!event.isStart) return
+        val partialTicks = event.renderTickTime
+        val interpPos = oldPos.add(pos.subtract(oldPos).multiply(partialTicks))
+
+        freeCamPosition.x = interpPos.xCoord
+        freeCamPosition.y = interpPos.yCoord
+        freeCamPosition.z = interpPos.zCoord
+
+    }
+
+    @SubscribeEvent
+    fun onTick(event: ClientTickEvent) {
         if (event.isEnd) return
-        val currTime = System.nanoTime()
-        val frameTime = ((currTime - lastTime).toFloat() / 1.0E9f)
-        lastTime = currTime
         val input = oldInput
         val yImpulse = if (input.jump) 1 else 0 + if (input.sneak) -1 else 0
         val xImpulse = freeCamPosition.yaw.xPart * input.moveForward + if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe).xPart
         val zImpulse = freeCamPosition.yaw.zPart * input.moveForward + if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe).zPart
-        xVelocity = calculateVelocity(xVelocity, xImpulse, frameTime.toDouble())
-        zVelocity = calculateVelocity(zVelocity, zImpulse, frameTime.toDouble())
-        yVelocity = calculateVelocity(yVelocity, yImpulse.toDouble(), frameTime.toDouble())
-
-        val moveDelta = MutableVec3(
-            xVelocity,
-            yVelocity,
-            zVelocity
-        ).scale(frameTime)
-
-        val speed: Double = moveDelta.length / frameTime
-        if (speed > 35.0) {
-            val factor = 35.0 / speed
-            xVelocity *= factor
-            zVelocity *= factor
-            yVelocity *= factor
-            moveDelta.scale(factor)
-        }
-       freeCamPosition.add(moveDelta)
+        val xSpeed = speedVector.xCoord * 0.91 + xImpulse * 0.1 //adjust values as needed
+        val ySpeed = speedVector.yCoord * 0.91 + yImpulse * 0.1
+        val zSpeed = speedVector.zCoord * 0.91 + zImpulse * 0.1
+        speedVector = Vec3(xSpeed, ySpeed, zSpeed)
+        oldPos = pos
+        pos = pos.add(speedVector)
     }
 
     @SubscribeEvent
@@ -180,18 +178,4 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         freeCamPosition.pitch = MathHelper.clamp_float((freeCamPosition.pitch - pitch * 0.15f), -90f, 90f)
         lookVec = RotationUtils.yawAndPitchVector(freeCamPosition.yaw, freeCamPosition.pitch).toMutableVec3()
     }
-
-    private fun calculateVelocity(velocity: Double, impulse: Double, frameTime: Double): Double {
-        if (impulse == 0.0) return velocity * 0.05.pow(frameTime)
-        var newVelocity = 20 * impulse * frameTime
-        newVelocity += if (velocity.sign != newVelocity.sign) {
-            velocity * 0.90
-        } else {
-            velocity
-        }
-        return newVelocity
-    }
-
-
-
 }
