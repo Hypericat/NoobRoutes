@@ -147,7 +147,6 @@ fun rotate(degrees: Float, xPos: Float, yPos: Float, zPos: Float, xAxis: Float, 
 fun scale(x: Number, y: Number, z: Number = 1f) = GlStateManager.scale(x.toDouble(), y.toDouble(), z.toDouble())
 
 fun dropShadow(x: Number, y: Number, w: Number, h: Number, shadowColor: Color, shadowSoftness: Number, topL: Number, topR: Number, botL: Number, botR: Number) {
-    return //removed for now
     translate(0f, 0f, -100f)
 
     matrix.runLegacyMethod(matrix.get()) {

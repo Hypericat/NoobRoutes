@@ -1,6 +1,7 @@
 package noobroutes.mixin;
 
 
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.Vec3;
@@ -17,13 +18,19 @@ public abstract class MixinEntityLivingBase extends Entity {
         super(worldIn);
     }
 
+
+    /**
+     * This makes it so that the block overlay doesn't have a brain aneurysm
+     * while using FreeCam or Rotation Visualizer.
+     * I don't know why it fixes it, it just does.
+     */
     @Inject(method = "getLook", at = @At("HEAD"), cancellable = true)
-    private void mouseDelayFix(float partialTicks, CallbackInfoReturnable<Vec3> cir) {
-        if ((EntityLivingBase)(Object)this instanceof net.minecraft.client.entity.EntityPlayerSP)
-            cir.setReturnValue(getLook1(partialTicks));
+    private void blockOverlayFix(float partialTicks, CallbackInfoReturnable<Vec3> cir) {
+        if ((EntityLivingBase)(Object)this instanceof EntityPlayerSP)
+            cir.setReturnValue(noobRoutes$getLook(partialTicks));
     }
     @Unique
-    private Vec3 getLook1(float partialTicks){
+    private Vec3 noobRoutes$getLook(float partialTicks){
         if (partialTicks == 1.0F) {
             return this.getVectorForRotation(this.rotationPitch, this.rotationYaw);
         } else {

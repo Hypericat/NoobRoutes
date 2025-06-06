@@ -76,7 +76,6 @@ class Panel(
         scrollOffset = scrollAnimation.get(scrollOffset, scrollTarget).round(0).toFloat()
         var startY = scrollOffset + HEIGHT
         scale(1f / scaleFactor, 1f / scaleFactor, 1f)
-        dropShadow(x, y, WIDTH, if (extended) (length + 5f).coerceAtLeast(HEIGHT) else 50f, ColorUtil.moduleButtonColor, 5f, 3f, 3f, 3f, 3f)
 
         roundedRectangle(x, y, WIDTH, HEIGHT, titlePanelColor, titlePanelColor, titlePanelColor, 0f, 10f, 10f, 0f, 0f, 0f)
         var additionalOffset = 0.0

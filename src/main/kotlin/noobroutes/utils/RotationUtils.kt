@@ -84,8 +84,6 @@ object RotationUtils {
         return getYawAndPitchOrigin(origin.xCoord, origin.yCoord, origin.zCoord, target.xCoord, target.yCoord, target.zCoord, sneaking)
     }
 
-
-
     /**
      * Gets the angle to aim at a Vec3.
      *
@@ -106,9 +104,9 @@ object RotationUtils {
     fun setAngleToVec3(vec3: Vec3, sneaking: Boolean = false) {
         val angles = getYawAndPitch(vec3.xCoord, vec3.yCoord, vec3.zCoord, sneaking)
         setAngles(angles.first, angles.second)
-
     }
 
+    @Deprecated(message = "Don't use this, will be removed later, just use a MovementUpdateEvent.Pre")
     fun rotate(yaw: Float, pitch: Float, silent: Boolean = false , action: Action? = null, continuous: CompletionRequirement? = null) {
         currentRotation = Rotation(yaw, pitch, silent,action, continuous)
     }

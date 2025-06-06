@@ -48,7 +48,6 @@ class ElementKeyBind(parent: ModuleButton, setting: KeybindSetting) :
             hover.handle(x + w - 20 - width, y + 4, width + 12f, 22f)
 
         roundedRectangle(x + w - 20 - width, y + 4, width + 12f, 22f, buttonColor, 5f)
-        dropShadow(x + w - 20 - width, y + 4, width + 12f, 22f, 10f, 0.75f)
 
         if (listening || colorAnim.isAnimating()) {
             val color = colorAnim.get(clickGUIColor, buttonColor, listening)

@@ -98,27 +98,6 @@ object BowUtils {
 
 
 
-    /**
-     * Adapted from cga
-     * @param x X position to aim at.
-     * @param y Y position to aim at.
-     * @param z Z position to aim at.
-     * @
-     */
-    fun getYawAndPitchOrigin(origin: Vec3, pos: Vec3): Pair<Float, Float> {
-        val dx = pos.xCoord - origin.xCoord
-        val dy = pos.yCoord - origin.yCoord
-        val dz = pos.zCoord - origin.zCoord
-
-        val horizontalDistance = sqrt(dx * dx + dz * dz )
-
-        val yaw = Math.toDegrees(atan2(-dx, dz))
-        val pitch = -Math.toDegrees(atan2(dy, horizontalDistance))
-
-        val normalizedYaw = if (yaw < -180) yaw + 360 else yaw
-        return Pair(normalizedYaw.toFloat(), pitch.toFloat())
-    }
-
     @SubscribeEvent
     fun onWorld(event: WorldEvent.Unload){
         linesList.clear()

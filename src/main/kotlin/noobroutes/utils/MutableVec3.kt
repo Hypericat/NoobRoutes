@@ -23,40 +23,67 @@ class MutableVec3(var x: Double, var y: Double, var z: Double) {
         return if (d0 < 1.0E-4) MutableVec3(0.0, 0.0, 0.0) else MutableVec3(this.x / d0, this.y / d0, this.z / d0)
     }
 
+    fun toVec3(): Vec3 {
+        return Vec3(this.x, this.y, this.z)
+    }
+
     fun toBlockPos(): BlockPos {
         return BlockPos(this.x, this.y, this.z)
     }
-    fun add(mutableVec3: MutableVec3): MutableVec3 {
-        return add(mutableVec3.x, mutableVec3.y, mutableVec3.z)
+    fun add(mutableVec3: MutableVec3, mutate: Boolean = true): MutableVec3 {
+        return add(mutableVec3.x, mutableVec3.y, mutableVec3.z, mutate)
     }
 
-    fun add(vec3i: Vec3i): MutableVec3 {
-        return add(vec3i.x, vec3i.y, vec3i.z)
+    fun add(vec3i: Vec3i, mutate: Boolean = true): MutableVec3 {
+        return add(vec3i.x, vec3i.y, vec3i.z, mutate)
     }
-    fun add(blockPos: BlockPos): MutableVec3 {
-        return add(blockPos.x, blockPos.y, blockPos.z)
+    fun add(blockPos: BlockPos, mutate: Boolean = true): MutableVec3 {
+        return add(blockPos.x, blockPos.y, blockPos.z, mutate)
     }
-    fun add(vec3: Vec3): MutableVec3 {
-        return add(vec3.xCoord, vec3.yCoord, vec3.zCoord)
+    fun add(vec3: Vec3, mutate: Boolean = true): MutableVec3 {
+        return add(vec3.xCoord, vec3.yCoord, vec3.zCoord, mutate)
     }
-    fun add(x: Number, y: Number, z: Number): MutableVec3 {
+    fun add(x: Number, y: Number, z: Number, mutate: Boolean = true): MutableVec3 {
+        if (!mutate) {
+            return MutableVec3(this.x + x.toDouble(), this.y + y.toDouble(), this.z + z.toDouble())
+        }
         this.x += x.toDouble()
         this.y += y.toDouble()
         this.z += z.toDouble()
         return this
     }
 
-    fun scale(scale: Number): MutableVec3 {
-        return scale(scale, scale, scale)
+    fun scale(scale: Number, mutate: Boolean = true): MutableVec3 {
+        return scale(scale, scale, scale, mutate)
     }
 
-    fun scale(x: Number, y: Number, z: Number): MutableVec3 {
+    fun scale(x: Number, y: Number, z: Number, mutate: Boolean = true): MutableVec3 {
+        if (!mutate) {
+            return MutableVec3(this.x * x.toDouble(), this.y * y.toDouble(), this.z * z.toDouble())
+        }
         this.x *= x.toDouble()
         this.y *= y.toDouble()
         this.z *= z.toDouble()
         return this
     }
 
+    fun subtract(x: Number, y: Number, z: Number, mutate: Boolean = true): MutableVec3 {
+        if (!mutate) {
+            return MutableVec3(this.x - x.toDouble(), this.y - y.toDouble(), this.z - z.toDouble())
+        }
+        this.x -= x.toDouble()
+        this.y -= y.toDouble()
+        this.z -= z.toDouble()
+        return this
+    }
+
+    fun subtract(mutableVec3: MutableVec3, mutate: Boolean = true): MutableVec3 {
+        return subtract(mutableVec3.x, mutableVec3.y, mutableVec3.z, mutate)
+    }
+
+    fun subtract(vec3: Vec3, mutate: Boolean = true): MutableVec3 {
+        return subtract(vec3.xCoord, vec3.yCoord, vec3.zCoord, mutate)
+    }
 
 
 

@@ -186,7 +186,7 @@ object Blaze : Module(
             .asSequence()
             .map { loc ->
                 val origin = loc.add(0.5, 2.56, 0.5)
-                val (yaw, pitch) = BowUtils.getYawAndPitchOrigin(origin, target.positionVector.add(0.0, -0.9, 0.0))
+                val (yaw, pitch) = RotationUtils.getYawAndPitchOrigin(origin, target.positionVector.add(0.0, -0.9, 0.0))
                 BowUtils.findHitEntity(origin, yaw.toDouble(), pitch.toDouble())
                     ?.firstOrNull()
                     ?.takeIf {
