@@ -86,6 +86,9 @@ object Zpew : Module(
     fun holdingTeleportItem(): Boolean {
         val held = mc.thePlayer.heldItem
         if (held.skyblockID.equalsOneOf("ASPECT_OF_THE_VOID", "ASPECT_OF_THE_END")) return true
+        if (LocationUtils.isSinglePlayer && (held.ID == 277 || held.ID == 267)) {
+            return true
+        }
         val scrolls = held.extraAttributes?.getTag("ability_scroll") ?: return false
         if (scrolls !is NBTTagList) return false
 
@@ -206,7 +209,7 @@ object Zpew : Module(
             return
         }
 
-        if (!LocationUtils.isInSkyblock && !ClickGUIModule.forceHypixel) return
+        if (!LocationUtils.isSinglePlayer) return
         if (info.ether) {
             doZeroPingEtherWarp(info.distance)
             return
@@ -367,7 +370,7 @@ object Zpew : Module(
     private fun getTeleportInfo(): TeleportInfo? {
         if (inBoss && DungeonUtils.floorNumber == 7) return null
         val held = mc.thePlayer.heldItem
-        if (!LocationUtils.isInSkyblock && ClickGUIModule.forceHypixel) {
+        if (LocationUtils.isSinglePlayer) {
             if (held.ID == 277) {
                 return if (isSneaking) {
                     if (zpew) TeleportInfo(61f, true) else null
