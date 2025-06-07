@@ -33,6 +33,9 @@ import noobroutes.utils.skyblock.skyblockID
 
 object AutoRouteUtils {
 
+
+
+
     /**
      * Call inside a ClientTickEvent (start)
      */
@@ -91,7 +94,12 @@ object AutoRouteUtils {
     var clipDistance = 0
     var clipRegistered = false
 
+    fun testFunction(){
+        devMessage(sneak)
+        devMessage(serverSneak)
+    }
 
+    var sneak = false
     var serverSneak = false
     @SubscribeEvent
     fun onPacketSendReturn(event: PacketReturnEvent.Send) {

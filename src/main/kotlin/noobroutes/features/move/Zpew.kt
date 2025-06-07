@@ -209,7 +209,7 @@ object Zpew : Module(
             return
         }
 
-        if (!LocationUtils.isSinglePlayer) return
+        if (!LocationUtils.isInSkyblock && !ClickGUIModule.forceHypixel) return
         if (info.ether) {
             doZeroPingEtherWarp(info.distance)
             return

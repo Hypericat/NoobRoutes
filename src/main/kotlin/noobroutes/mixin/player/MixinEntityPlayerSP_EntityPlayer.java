@@ -5,12 +5,14 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import noobroutes.events.impl.MotionUpdateEvent;
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils;
 import noobroutes.features.misc.NoDebuff;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static noobroutes.utils.UtilsKt.postAndCatch;
 
@@ -25,10 +27,18 @@ public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
     private float oldPitch;
 
     private boolean oldOnGround;
-
-
     public MixinEntityPlayerSP_EntityPlayer(World worldIn, GameProfile gameProfileIn) {
         super(worldIn, gameProfileIn);
+    }
+
+
+
+
+
+    //@Inject(method = "isSneaking", at = @At("HEAD"), cancellable = true)
+    public void setSneak(CallbackInfoReturnable<Boolean> cir) {
+        AutoRouteUtils.INSTANCE.testFunction();
+        if (AutoRouteUtils.INSTANCE.getSneak()) cir.setReturnValue(!this.isPlayerSleeping());
     }
 
     @Inject(method = "onUpdate",
