@@ -19,6 +19,8 @@ import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
+import org.lwjgl.input.Keyboard
+import kotlin.math.atan2
 
 /**
  * Credit to FME
@@ -87,14 +89,28 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         if (event.isEnd) return
         val input = oldInput
         val yImpulse = if (input.jump) 1 else 0 + if (input.sneak) -1 else 0
-        val xImpulse = freeCamPosition.yaw.xPart * input.moveForward + if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe).xPart
-        val zImpulse = freeCamPosition.yaw.zPart * input.moveForward + if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe).zPart
+        var xImpulse = 0.0
+        var zImpulse = 0.0
+        val yawChange = yawChange()
+        if (yawChange != null) {
+            xImpulse = Utils.xPart(freeCamPosition.yaw + yawChange)
+            zImpulse = Utils.zPart(freeCamPosition.yaw + yawChange)
+        }
         val xSpeed = speedVector.xCoord * 0.91 + xImpulse * 0.1 //adjust values as needed
         val ySpeed = speedVector.yCoord * 0.91 + yImpulse * 0.1
         val zSpeed = speedVector.zCoord * 0.91 + zImpulse * 0.1
         speedVector = Vec3(xSpeed, ySpeed, zSpeed)
         oldPos = pos
         pos = pos.add(speedVector)
+    }
+
+    private fun yawChange(): Int? {
+        val deltaX = (if (Keyboard.isKeyDown(mc.gameSettings.keyBindRight.keyCode)) 1 else 0) + (if (Keyboard.isKeyDown(mc.gameSettings.keyBindLeft.keyCode)) -1 else 0)
+        val deltaZ = (if (Keyboard.isKeyDown(mc.gameSettings.keyBindForward.keyCode)) 1 else 0) + (if (Keyboard.isKeyDown(mc.gameSettings.keyBindBack.keyCode)) -1 else 0)
+
+        if (deltaX == 0 && deltaZ == 0) return null
+
+        return Math.toDegrees(atan2(deltaX.toDouble(), deltaZ.toDouble())).toInt()
     }
 
     @SubscribeEvent
