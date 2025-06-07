@@ -64,7 +64,7 @@ class Aotv(
     }
 
     override fun awaitTick(room: Room) {
-        PlayerUtils.forceUnSneak()
+        PlayerUtils.unSneak()
     }
 
     override fun tick(room: Room) {
@@ -79,7 +79,7 @@ class Aotv(
         val tpTarget = room.getRealCoords(target)
 
         if (mc.thePlayer.isSneaking || serverSneak || state != SwapManager.SwapState.ALREADY_HELD) {
-            PlayerUtils.forceUnSneak()
+            PlayerUtils.unSneak()
             AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
             Scheduler.schedulePreTickTask(1) {
                 AutoRouteUtils.aotv(tpTarget)

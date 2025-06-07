@@ -66,7 +66,7 @@ class Bat(
     }
 
     override fun awaitTick(room: Room) {
-        PlayerUtils.forceUnSneak()
+        PlayerUtils.unSneak()
     }
 
     override fun tick(room: Room) {
@@ -84,7 +84,7 @@ class Bat(
         val tpTarget = target?.let { room.getRealCoords(it) }
 
         if (mc.thePlayer.isSneaking || serverSneak || state != SwapManager.SwapState.ALREADY_HELD) {
-            PlayerUtils.forceUnSneak()
+            PlayerUtils.unSneak()
             AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
             Scheduler.schedulePreTickTask(1) {
                 SecretUtils.batSpawnRegistered = true

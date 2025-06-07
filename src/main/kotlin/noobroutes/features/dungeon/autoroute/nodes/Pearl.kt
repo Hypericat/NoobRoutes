@@ -15,6 +15,7 @@ import noobroutes.utils.SwapManager
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.modMessage
@@ -57,7 +58,7 @@ class Pearl(
 
     override fun awaitTick(room: Room) {
         if (!silent) RotationUtils.setAngles(room.getRealYaw(yaw), pitch)
-        PlayerUtils.forceUnSneak()
+        PlayerUtils.unSneak()
     }
 
     override fun awaitMotion(
@@ -70,7 +71,7 @@ class Pearl(
 
     override fun tick(room: Room) {
         if (count < 1) return modMessage("Invalid Clip Distance")
-        PlayerUtils.forceUnSneak()
+        PlayerUtils.unSneak()
         delete = false
         val state = SwapManager.swapFromName("ender pearl")
         if (state == SwapManager.SwapState.UNKNOWN) return
@@ -98,7 +99,7 @@ class Pearl(
 
     override fun render(room: Room) {
         drawNode(room, pearlColor)
-        if (AutoRoute.drawPearlCountText) Renderer.drawStringInWorld("Pearls: $count", pos.add(Vec3(0.0, 0.9, 0.0)), pearlColor, depth = depth)
+        if (AutoRoute.drawPearlCountText) Renderer.drawStringInWorld("Pearls: $count", room.getRealCoords(pos).add(Vec3(0.0, 0.9, 0.0)), pearlColor, depth = depth)
     }
 
     override fun nodeAddInfo(obj: JsonObject) {

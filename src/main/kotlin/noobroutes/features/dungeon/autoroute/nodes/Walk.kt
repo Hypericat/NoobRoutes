@@ -30,13 +30,13 @@ class Walk(
 ) : Node("Walk", 4,  pos = pos, awaitSecrets = awaitSecret, maybeSecret = maybeSecret, delay = delay, center = center, stop = stop, chain = chain, reset) {
 
     override fun awaitTick(room: Room) {
-        PlayerUtils.forceUnSneak()
+        PlayerUtils.unSneak()
         val yaw = room.getRealYaw(yaw)
         if (!silent) mc.thePlayer.rotationYaw = yaw
     }
 
     override fun tick(room: Room) {
-        PlayerUtils.forceUnSneak()
+        PlayerUtils.unSneak()
         val yaw = room.getRealYaw(yaw)
         if (serverSneak) {
             Scheduler.schedulePreTickTask {

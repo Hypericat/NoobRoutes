@@ -178,7 +178,7 @@ object Zpew : Module(
                     mc.thePlayer.onGround
                 )
             )
-            if (zpewOffset) y -= 0.05
+            if (zpewOffset) y -= (0.05 - (if (y == 32.05) 0.00001 else 0.0))
             mc.thePlayer.setPosition(x, y, z)
             mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
         }

@@ -121,7 +121,7 @@ object PlayerUtils {
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.keyCode))
     }
 
-    fun forceUnSneak(){
+    fun unSneak(){
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, false)
     }
 

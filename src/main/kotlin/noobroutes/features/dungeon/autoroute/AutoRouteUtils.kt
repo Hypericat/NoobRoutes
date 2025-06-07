@@ -16,13 +16,59 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.dungeon.autoroute.nodes.*
 import noobroutes.features.move.Zpew
+import noobroutes.utils.AutoP3Utils.walking
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.RotationUtils
 import noobroutes.utils.RotationUtils.offset
+import noobroutes.utils.Scheduler
+import noobroutes.utils.SwapManager
 import noobroutes.utils.floor
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.skyblock.skyblockID
 
 object AutoRouteUtils {
+
+    /**
+     * Call inside a ClientTickEvent (start)
+     */
+    fun etherwarpToRelativeVec3(vec3: Vec3, room: Room, silent: Boolean = false){
+        val target = room.getRealCoords(vec3)
+        etherwarpToVec3(target, silent)
+    }
+
+    /**
+     * Call inside a ClientTickEvent (start)
+     */
+    fun etherwarpToVec3(vec3: Vec3, silent: Boolean = false){
+        val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+        if (state == SwapManager.SwapState.UNKNOWN) return
+        if (state == SwapManager.SwapState.TOO_FAST) {
+            modMessage("Tried to 0 tick swap gg")
+            return
+        }
+        val rot = RotationUtils.getYawAndPitch(vec3)
+
+        if (!silent) RotationUtils.setAngles(rot.first, rot.second)
+        walking = false
+        PlayerUtils.sneak()
+        Scheduler.schedulePreMovementUpdateTask {
+            val event = it as MotionUpdateEvent.Pre
+            event.yaw = rot.first
+            event.pitch = rot.second
+            if (!mc.thePlayer.isSneaking || state == SwapManager.SwapState.SWAPPED) {
+                setRotation(rot.first + offset, rot.second)
+                Scheduler.schedulePreTickTask {
+                    ether()
+                }
+                return@schedulePreMovementUpdateTask
+            }
+            ether()
+        }
+    }
 
     var pearlSoundRegistered = false
     var sneakRegistered = false
@@ -37,7 +83,7 @@ object AutoRouteUtils {
     fun aotv(pos: BlockPos?) {
         aotvTarget = pos
         unsneakRegistered = true
-        PlayerUtils.forceUnSneak()
+        PlayerUtils.unSneak()
     }
 
     var clipDistance = 0
@@ -77,7 +123,7 @@ object AutoRouteUtils {
     @SubscribeEvent
     fun unsneak(event: RenderWorldLastEvent) {
         if (!unsneakRegistered) return
-        if (mc.thePlayer.isSneaking) PlayerUtils.forceUnSneak()
+        if (mc.thePlayer.isSneaking) PlayerUtils.unSneak()
         if (serverSneak) return
         PlayerUtils.airClick()
         aotvTarget?.let { Zpew.doZeroPingAotv(it) }

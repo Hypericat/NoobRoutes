@@ -18,6 +18,7 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.sendChatMessage
@@ -58,6 +59,7 @@ class PearlClip(
 
     override fun tick(room: Room) {
         if (distance > 70) return modMessage("Invalid Clip Distance")
+        stopWalk()
         val state = SwapManager.swapFromName("ender pearl")
         if (state == SwapManager.SwapState.UNKNOWN) return
         if (state == SwapManager.SwapState.TOO_FAST) {
@@ -86,7 +88,7 @@ class PearlClip(
 
     override fun render(room: Room) {
         drawNode(room, pearlClipColor)
-        if (AutoRoute.drawPearlClipText) Renderer.drawStringInWorld("PearlClip: $distance", pos.add(Vec3(0.0, 0.9, 0.0)), pearlClipColor, depth = depth)
+        if (AutoRoute.drawPearlClipText) Renderer.drawStringInWorld("PearlClip: $distance", room.getRealCoords(pos).add(Vec3(0.0, 0.9, 0.0)), pearlClipColor, depth = depth)
     }
 
     override fun nodeAddInfo(obj: JsonObject) {

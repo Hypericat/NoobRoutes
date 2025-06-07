@@ -51,7 +51,7 @@ class UseItem(
     }
 
     override fun awaitTick(room: Room) {
-        PlayerUtils.forceUnSneak()
+        PlayerUtils.unSneak()
     }
 
     override fun tick(room: Room) {
