@@ -45,6 +45,7 @@ object AutoRouteUtils {
      * Call inside a ClientTickEvent (start)
      */
     fun etherwarpToVec3(vec3: Vec3, silent: Boolean = false){
+        PlayerUtils.stopVelocity()
         val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.UNKNOWN) return
         if (state == SwapManager.SwapState.TOO_FAST) {

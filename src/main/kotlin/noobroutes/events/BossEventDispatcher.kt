@@ -21,6 +21,7 @@ object BossEventDispatcher {
     var currentBossPhase: Phase = Phase.Unknown
     private var lastInBoss = false
     var inBoss = false
+    var inF7Boss = false
 
     private inline val inBossCheck: Boolean
         get() = LocationUtils.currentDungeon?.inBoss == true
@@ -28,6 +29,7 @@ object BossEventDispatcher {
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
         inBoss = false
+        inF7Boss = false
         lastInBoss = false
         currentBossPhase = Phase.Unknown
         currentTerminalPhase = TerminalPhase.Unknown
@@ -41,9 +43,11 @@ object BossEventDispatcher {
             devMessage("something")
             if (iB) {
                 inBoss = true
+                if (DungeonUtils.floorNumber == 7) inF7Boss = true
                 BossEvent.BossStart(DungeonUtils.floor).postAndCatch()
             } else {
                 inBoss = false
+                inF7Boss = false
                 BossEvent.BossFinish(DungeonUtils.floor).postAndCatch()
             }
         }
@@ -83,6 +87,7 @@ object BossEventDispatcher {
             currentTerminalPhase = TerminalPhase.Unknown
             BossEvent.BossFinish(DungeonUtils.floor).postAndCatch()
             inBoss = false
+            inF7Boss = false
         }
     }
 
@@ -128,10 +133,4 @@ object BossEventDispatcher {
     fun onTermPhaseChange(event: BossEvent.TerminalPhaseChange) {
         devMessage("Term phase change phase! ${event.phase.name}")
     }
-
-
-
-
-
-
 }

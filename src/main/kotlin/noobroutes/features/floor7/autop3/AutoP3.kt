@@ -15,7 +15,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.logger
 import noobroutes.config.DataManager
-import noobroutes.events.BossEventDispatcher.inBoss
+import noobroutes.events.BossEventDispatcher.inF7Boss
+import noobroutes.events.BossEventDispatcher.inF7Boss
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.TermOpenEvent
 import noobroutes.features.Category
@@ -103,7 +104,7 @@ object AutoP3: Module (
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
-        if (!inBoss) return
+        if (!inF7Boss && DungeonUtils.floorNumber == 7) return
         rings[route]?.forEachIndexed { i, ring ->
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
             AutoP3Utils.renderRing(ring)
@@ -117,7 +118,7 @@ object AutoP3: Module (
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun tickRing(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || frame) return
-        if(!inBoss || mc.thePlayer.isSneaking) return
+        if(!inF7Boss || mc.thePlayer.isSneaking) return
         rings[route]?.forEach {ring ->
             if (editMode) return@forEach
             val inRing = AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)
@@ -219,7 +220,7 @@ object AutoP3: Module (
             "add","create" -> addNormalRing(args)
             "delete","remove" -> deleteNormalRing(args)
             "blink" -> Blink.blinkCommand(args)
-            "start" -> inBoss = true
+            "start" -> inF7Boss = true
             "rat" -> Utils.rat.forEach{ modMessage(it) }
             "pickup" -> SexAura.pickupLineByName(args)
             "restore" -> restoreRing()
