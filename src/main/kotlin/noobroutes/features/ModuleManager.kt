@@ -1,5 +1,6 @@
 package noobroutes.features
 
+import me.odinmain.features.impl.dungeon.puzzlesolvers.WaterBoard
 import net.minecraft.network.Packet
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -72,7 +73,7 @@ object ModuleManager {
         InstaMid,
         Auto4,
         LeverAura,
-        //WaterBoard,
+        WaterBoard,
         TicTacToe,
         //AuraTest,
         Weirdos,
