@@ -9,4 +9,16 @@ abstract class ClickEvent : Event() {
 
     @Cancelable
     class Right : ClickEvent()
+
+    @Cancelable
+    class Middle: ClickEvent()
+
+    @Cancelable
+    class All(val type: ClickType) : ClickEvent()
+
+    enum class ClickType{
+        Left,
+        Middle,
+        Right
+    }
 }

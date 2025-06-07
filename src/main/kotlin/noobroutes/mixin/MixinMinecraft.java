@@ -14,7 +14,7 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 
 
 @Mixin(value = {Minecraft.class}, priority = 800)
-public class MixinMinecraft{
+public class MixinMinecraft {
     @Inject(method = {"runTick"}, at = {@At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;dispatchKeypresses()V")})
     public void keyPresses(CallbackInfo ci) {
         if (Keyboard.getEventKeyState()) postAndCatch(new InputEvent.Keyboard((Keyboard.getEventKey() == 0) ? (Keyboard.getEventCharacter() + 256) : Keyboard.getEventKey()));
@@ -27,13 +27,18 @@ public class MixinMinecraft{
 
     @Inject(method = "rightClickMouse", at = @At("HEAD"), cancellable = true)
     private void rightClickMouse(CallbackInfo ci) {
-        if (postAndCatch(new ClickEvent.Right())) ci.cancel();
+        if (postAndCatch(new ClickEvent.Right()) || postAndCatch(new ClickEvent.All(ClickEvent.ClickType.Right))) ci.cancel();
 
+    }
+
+    @Inject(method = "middleClickMouse", at = @At("HEAD"), cancellable = true)
+    private void middleClickMouse(CallbackInfo ci) {
+        if (postAndCatch(new ClickEvent.Middle()) || postAndCatch(new ClickEvent.All(ClickEvent.ClickType.Middle))) ci.cancel();
     }
 
     @Inject(method = "clickMouse", at = @At("HEAD"), cancellable = true)
     private void clickMouse(CallbackInfo ci) {
-        if (postAndCatch(new ClickEvent.Left())) ci.cancel();
+        if (postAndCatch(new ClickEvent.Left()) || postAndCatch(new ClickEvent.All(ClickEvent.ClickType.Left))) ci.cancel();
     }
 
 }

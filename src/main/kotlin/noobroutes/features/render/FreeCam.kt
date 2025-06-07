@@ -11,6 +11,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
+import noobroutes.events.impl.ClickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.NotPersistent
@@ -19,6 +20,8 @@ import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
+import noobroutes.utils.skyblock.devMessage
+import kotlin.math.sign
 
 /**
  * Credit to FME
@@ -86,9 +89,11 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     fun onTick(event: ClientTickEvent) {
         if (event.isEnd) return
         val input = oldInput
-        val yImpulse = if (input.jump) 1 else 0 + if (input.sneak) -1 else 0
-        val xImpulse = freeCamPosition.yaw.xPart * input.moveForward + if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe).xPart
-        val zImpulse = freeCamPosition.yaw.zPart * input.moveForward + if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe).zPart
+        val yImpulse = (if (input.jump) 1 else 0) + (if (input.sneak) -1 else 0)
+
+
+        val xImpulse = ((freeCamPosition.yaw.xPart * input.moveForward.sign) + (if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe.sign).xPart)) * (if (input.sneak) 0.3 else 1.0)
+        val zImpulse = ((freeCamPosition.yaw.zPart * input.moveForward.sign) + (if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe.sign).zPart)) * (if (input.sneak) 0.3 else 1.0)
         val xSpeed = speedVector.xCoord * 0.91 + xImpulse * 0.1 //adjust values as needed
         val ySpeed = speedVector.yCoord * 0.91 + yImpulse * 0.1
         val zSpeed = speedVector.zCoord * 0.91 + zImpulse * 0.1
@@ -114,7 +119,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
 
 
     @SubscribeEvent
-    fun onClick(event: MouseEvent) {
+    fun onClick(event: ClickEvent.All) {
         event.isCanceled = true
     }
 
