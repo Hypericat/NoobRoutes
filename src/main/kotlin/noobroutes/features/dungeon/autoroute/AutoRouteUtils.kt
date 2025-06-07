@@ -23,6 +23,7 @@ import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
 import noobroutes.utils.floor
+import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
@@ -44,7 +45,7 @@ object AutoRouteUtils {
      * Call inside a ClientTickEvent (start)
      */
     fun etherwarpToVec3(vec3: Vec3, silent: Boolean = false){
-        val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+        val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.UNKNOWN) return
         if (state == SwapManager.SwapState.TOO_FAST) {
             modMessage("Tried to 0 tick swap gg")
