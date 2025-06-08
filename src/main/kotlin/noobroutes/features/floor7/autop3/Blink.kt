@@ -1,6 +1,8 @@
 package noobroutes.features.floor7.autop3
 
 import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.Vec3
@@ -337,11 +339,7 @@ object Blink{
             if (cancelled > 0) cancelled--
             return
         }
-        if (mc.thePlayer.posX != mc.thePlayer.lastTickPosX ||
-            mc.thePlayer.posY != mc.thePlayer.lastTickPosY ||
-            mc.thePlayer.posZ != mc.thePlayer.lastTickPosZ ||
-            !mc.thePlayer.onGround || mc.thePlayer.motionX != 0.0 ||
-            mc.thePlayer.motionZ != 0.0 ||
+        if (event.packet.isMoving ||
             movementPackets.isNotEmpty() ||
             (mc.thePlayer.getDistanceSq(63.5, 127.0, 35.5) < 1.25 && event.packet is C03PacketPlayer.C05PacketPlayerLook) ||
             System.currentTimeMillis() - lastBlink < 100 //listen if it works it works

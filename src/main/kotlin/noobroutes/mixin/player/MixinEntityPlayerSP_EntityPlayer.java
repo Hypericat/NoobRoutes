@@ -4,10 +4,13 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import noobroutes.events.BossEventDispatcher;
 import noobroutes.events.impl.MotionUpdateEvent;
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils;
 import noobroutes.features.misc.NoDebuff;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -19,6 +22,7 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 
 @Mixin(value = {EntityPlayerSP.class})
 public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
+    @Shadow private int positionUpdateTicks;
     private double oldPosX;
     private double oldPosY;
     private double oldPosZ;
@@ -109,5 +113,20 @@ public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
     @Redirect(method = {"pushOutOfBlocks"}, at = @At(value = "FIELD", target = "Lnet/minecraft/client/entity/EntityPlayerSP;noClip:Z"))
     public boolean shouldPrevent(EntityPlayerSP instance) {
         return NoDebuff.INSTANCE.getNoPush();
+    }
+
+    @Redirect(
+            method = "onUpdateWalkingPlayer",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/entity/EntityPlayerSP;positionUpdateTicks:I",
+                    opcode = Opcodes.GETFIELD
+            )
+    )
+    private int alwaysZeroPositionUpdateTicks(EntityPlayerSP self) {
+        if (BossEventDispatcher.INSTANCE.getInF7Boss()) {
+            return 0;
+        }
+        return this.positionUpdateTicks;
     }
 }
