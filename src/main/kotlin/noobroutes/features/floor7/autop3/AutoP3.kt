@@ -62,6 +62,7 @@ object AutoP3: Module (
     val renderStyle by SelectorSetting("ring design", "normal", arrayListOf("normal", "simple", "box"), false, description = "how rings should look")
     val onlyCenter by BooleanSetting("Only Starts", false, description = "only renders rings with the center property(should be only start rings) and blinks")
     private val blinkShit by DropdownSetting(name = "Blink Settings")
+    val speedRings by BooleanSetting(name = "Speed Rings", description = "Toggles the use of tickshift rings").withDependency { blinkShit }
     val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink").withDependency { blinkShit }
     val mode by DualSetting(name = "movement mode", description = "how movement should look", default = false, left = "Motion", right = "Packet").withDependency { blinkShit }
     val maxBlinks by NumberSetting(name = "max blinks per instance", description = "too much blink on an instance bans apparently", min = 100, max = 300, default = 120).withDependency { blinkShit }
@@ -104,7 +105,7 @@ object AutoP3: Module (
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
-        if (!inF7Boss && DungeonUtils.floorNumber == 7) return
+        if (!inF7Boss) return
         rings[route]?.forEachIndexed { i, ring ->
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
             AutoP3Utils.renderRing(ring)

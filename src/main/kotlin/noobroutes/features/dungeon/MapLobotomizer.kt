@@ -2,12 +2,11 @@ package noobroutes.features.dungeon
 
 
 import net.minecraft.block.state.IBlockState
+import net.minecraft.network.play.server.S21PacketChunkData
 import net.minecraft.network.play.server.S22PacketMultiBlockChange
 import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
-import net.minecraftforge.client.event.MouseEvent
-import net.minecraftforge.event.world.ChunkEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.ClickEvent
@@ -21,6 +20,7 @@ import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.IBlockStateUtils
+import noobroutes.utils.Scheduler
 import noobroutes.utils.getBlockStateAt
 import noobroutes.utils.removeFirstOrNull
 import noobroutes.utils.setBlock
@@ -38,6 +38,7 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
     val placeCooldown by NumberSetting("Place Cooldown", min = 0, max = 1000, default = 150,  description = "Cooldown between placing blocks in edit mode", unit = "ms")
     class Block(val pos: BlockPos, val state: IBlockState)
 
+    var blocksToSet = mutableSetOf<Block>()
     var blocks:  MutableMap<String, MutableSet<Block>> = mutableMapOf()
     var selectedBlockState: IBlockState = IBlockStateUtils.airIBlockState
 
@@ -66,7 +67,7 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
             return
         }
         if (event.type == ClickEvent.ClickType.Right) {
-            if (System.currentTimeMillis() - lastPlace < placeCooldown) return
+            if (System.currentTimeMillis() - lastPlace < placeCooldown || selectedBlockState == IBlockStateUtils.airIBlockState) return
             lastPlace = System.currentTimeMillis()
             val facing = mouseOver.sideHit
             val offset = target.offset(facing)
@@ -92,23 +93,9 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
         }
     }
 
-    @SubscribeEvent
-    fun onChunkLoad(event: ChunkEvent.Load){
-        if (DungeonUtils.currentRoom != null) return
-        val minX = event.chunk.xPosition * 16
-        val minZ = event.chunk.zPosition * 16
-        val maxX = minX + 15
-        val maxZ = minZ + 15
-        blocks[getLocation()]?.filter {
-            it.pos.x in minX..maxX && it.pos.z in minZ..maxZ
-        }?.forEach {
-            setBlock(it.pos, it.state)
-        }
-    }
-
 
     @SubscribeEvent
-    fun onBlockChangePacket(event: PacketEvent){
+    fun onPacket(event: PacketEvent){
         val room = DungeonUtils.currentRoom
         if (event.packet is S23PacketBlockChange) {
             val position = room?.getRelativeCoords(event.packet.blockPosition) ?: event.packet.blockPosition
@@ -119,6 +106,7 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
             event.isCanceled = true
         }
         if (event.packet is S22PacketMultiBlockChange) {
+            devMessage(blocksToSet.size)
             val blockList = blocks[room?.data?.name ?: getLocation()] ?: return
             event.packet.changedBlocks.forEach { changedBlock ->
                 val block = blockList.firstOrNull{ it.pos == (room?.getRelativeCoords(changedBlock.pos) ?: changedBlock.pos) }
@@ -130,6 +118,20 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
             }
             event.isCanceled = true
         }
+        if (room != null) return
+        if (event.packet is S21PacketChunkData) {
+            event.packet.chunkZ
+            val minX = event.packet.chunkX * 16
+            val minZ = event.packet.chunkZ * 16
+            val maxX = minX + 15
+            val maxZ = minZ + 15
+            blocksToSet.addAll(
+                blocks[getLocation()]?.filter {
+                    it.pos.x in minX..maxX && it.pos.z in minZ..maxZ
+                } ?: return
+            )
+        }
+
     }
 
     private fun MovingObjectPosition.hitBlock(): BlockPos? {

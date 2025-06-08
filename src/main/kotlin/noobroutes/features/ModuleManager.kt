@@ -1,6 +1,6 @@
 package noobroutes.features
 
-import me.odinmain.features.impl.dungeon.puzzlesolvers.WaterBoard
+import noobroutes.features.dungeon.puzzle.WaterBoard
 import net.minecraft.network.Packet
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.world.WorldEvent

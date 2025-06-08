@@ -296,14 +296,12 @@ object AutoP3Utils {
         foundRings = mutableMapOf()
         val path = packageName.replace('.', '/')
         val classURL = this.javaClass.protectionDomain.codeSource.location
-        logger.info(classURL)
         val file = try {
             Paths.get(getBaseUrlForClassUrl(classURL).toURI())
         } catch (e: URISyntaxException) {
             logger.error("URI ERROR IN AUTO P3 UTILS: $e")
             return emptyMap()
         }
-        logger.info("Base directory: $file")
         if (Files.isDirectory(file)) {
             walkDir(file, path)
         } else {
@@ -314,14 +312,11 @@ object AutoP3Utils {
     }
 
     private fun walkDir(classRoot: Path, directory: String) {
-        logger.info("Trying to find rings from directory")
-        logger.info(classRoot.resolve(directory))
         val editedDir = directory.replace("/", ".")
         try {
             Files.walk(classRoot.resolve(directory)).use { classes ->
                 classes.map<String?> { it: Path? -> classRoot.relativize(it).toString() }
                     .forEach { className: String? ->
-                        logger.info("Found class: $className")
                         tryAddRingClass(className, editedDir)
                     }
             }
@@ -340,14 +335,10 @@ object AutoP3Utils {
         ) else className)
             .replace("\\", "/")
             .replace("/", ".")
-        logger.info("Found class: $norm, directory: $directory, ${norm.startsWith("$directory.")}")
-
         if (norm.startsWith("$directory.") && !norm.endsWith(".")) {
-            logger.info("something happening")
             val clazz = Class.forName(norm)
             val annotation = clazz.getAnnotation(RingType::class.java)
             if (annotation == null) return
-            logger.info("Found annotation: $annotation")
             @Suppress("UNCHECKED_CAST")
             foundRings[annotation.name] = clazz.kotlin as KClass<out Ring>
 
@@ -391,7 +382,7 @@ object AutoP3Utils {
                         zis.closeEntry()
                         continue
                     }
-                    tryAddRingClass(next!!.getName(), editedDir)
+                    tryAddRingClass(next.getName(), editedDir)
                     zis.closeEntry()
                 }
             }
