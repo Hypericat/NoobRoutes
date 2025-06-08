@@ -86,7 +86,7 @@ object Blink{
         blinksInstance = 0
         cancelled = 0
         SecretGuideIntegration.setSecretGuideAura(true)
-        BossEventDispatcher.inBoss = false
+        BossEventDispatcher.inF7Boss = false
         AutoP3.customBlinkLengthToggle = false
     }
 
@@ -95,14 +95,14 @@ object Blink{
         blinksInstance = 0
         cancelled = 0
         SecretGuideIntegration.setSecretGuideAura(true)
-        BossEventDispatcher.inBoss = false
+        BossEventDispatcher.inF7Boss = false
         AutoP3.customBlinkLengthToggle = false
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
-        if(!BossEventDispatcher.inBoss) return
+        if(!BossEventDispatcher.inF7Boss) return
         //val resolution = ScaledResolution(mc)
         //text(cancelled.toString(), resolution.scaledWidth / 2, resolution.scaledHeight / 2.3, Color.WHITE, 13, align = TextAlign.Middle)
         text(
@@ -117,7 +117,7 @@ object Blink{
     private var lastMovementedC03: C03PacketPlayer.C04PacketPlayerPosition? = null
     @SubscribeEvent
     fun renderMovement(event: RenderWorldLastEvent) {
-        if(!BossEventDispatcher.inBoss) return
+        if(!BossEventDispatcher.inF7Boss) return
         if (movementPackets.isEmpty() || lastMovementedC03 == null) return
         if (!AutoP3.mode) return
         val firstPacket = movementPackets.first()
@@ -148,7 +148,7 @@ object Blink{
 
     @SubscribeEvent
     fun blinkWaypoints(event: RenderWorldLastEvent) {
-        if(!BossEventDispatcher.inBoss) return
+        if(!BossEventDispatcher.inF7Boss) return
         blinkStarts.forEach {
             Renderer.drawCylinder(it.coords.add(
                 Vec3(
@@ -285,7 +285,7 @@ object Blink{
 
     @SubscribeEvent
     fun s08(event: PacketEvent.Receive) {
-        if (!BossEventDispatcher.inBoss) return
+        if (!BossEventDispatcher.inF7Boss) return
         if (event.packet is S08PacketPlayerPosLook) c03AfterS08 = 2
     }
 
@@ -294,7 +294,7 @@ object Blink{
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun canceller(event: PacketEvent.Send) {
 
-        if(!BossEventDispatcher.inBoss) return
+        if(!BossEventDispatcher.inF7Boss) return
 
         if (event.packet !is C03PacketPlayer) return
 
