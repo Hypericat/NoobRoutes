@@ -49,8 +49,6 @@ object AutoP3: Module (
     val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
     val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
     val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
-    val frame by BooleanSetting("Check per Frame", false, description = "check each frame if the player is in a ring. Routes are easier to setup with per frame but possibly less consistent on low fps. Per tick is harder to setup but 100% consistent. Everything done on frame can also be done on tick")
-    val motionValue by NumberSetting(name = "motion value", description = "how much yeet to put into the motion", min = 0f, max = 1000f, default = 509f)
     val fasterMotion by BooleanSetting("faster motion", false, description = "doesnt stop before the jump for motion")
     var noRotate by BooleanSetting("no rotate", false, description = "forces the player to be unable to change where they look in boss. Pretty much only way to gurantee working motion rings")
     private val noRotateKey by KeybindSetting("toggle no rotate", Keyboard.KEY_NONE, "toggles no rotate setting").onPress {
@@ -118,7 +116,7 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun tickRing(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || frame) return
+        if (event.phase != TickEvent.Phase.END) return
         if(!inF7Boss || mc.thePlayer.isSneaking) return
         rings[route]?.forEach {ring ->
             if (editMode) return@forEach

@@ -70,8 +70,6 @@ object AutoP3Utils {
     private var xSpeed = 0.0
     private var zSpeed = 0.0
 
-    var walkAfter = false
-    var awaitingTick = false
 
     fun unPressKeys(stop: Boolean = true) {
         Keyboard.enableRepeatEvents(false)
@@ -208,9 +206,9 @@ object AutoP3Utils {
     var jump1 = 2
     var jump2 = 1.25
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun movement(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || walking == false) return
+        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
 
         if (mc.thePlayer.onGround) {
             airTicks = 0
@@ -218,7 +216,7 @@ object AutoP3Utils {
             ++airTicks
         }
 
-        if (mc.thePlayer.isInWater || mc.thePlayer.isInLava) return
+        if (mc.thePlayer.isInWater || mc.thePlayer.isInLava || walking == false) return
 
         val sprintMultiplier = 1.3
         var speed = mc.thePlayer.aiMoveSpeed.toDouble()
@@ -240,7 +238,7 @@ object AutoP3Utils {
         } else {
             0.02 * sprintMultiplier
         }
-
+        modMessage("air")
         mc.thePlayer.motionX += movementFactor * Utils.xPart(direction)
         mc.thePlayer.motionZ += movementFactor * Utils.zPart(direction)
     }

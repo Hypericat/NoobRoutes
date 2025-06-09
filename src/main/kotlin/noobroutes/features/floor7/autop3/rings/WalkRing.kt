@@ -25,7 +25,9 @@ class WalkRing(
         else {
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
-            Scheduler.schedulePreTickTask { AutoP3Utils.startWalk(yaw) }
+            Scheduler.schedulePostTickTask { AutoP3Utils.unPressKeys() }
+            Scheduler.schedulePostTickTask(1) { AutoP3Utils.unPressKeys() }
+            Scheduler.schedulePostTickTask(2) { AutoP3Utils.startWalk(yaw) }
         }
     }
 }
