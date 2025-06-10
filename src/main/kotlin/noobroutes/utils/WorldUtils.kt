@@ -9,6 +9,7 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.util.*
 import noobroutes.Core.mc
+import noobroutes.utils.skyblock.devMessage
 
 
 /**
@@ -23,6 +24,7 @@ fun getBlockIdAt(blockPos: BlockPos): Int? {
 
 fun setBlock(blockPos: BlockPos, blockState: IBlockState){
     val world = mc.theWorld
+    devMessage(blockPos)
     world.setBlockState(blockPos, blockState)
     world.markBlockForUpdate(blockPos)
 }

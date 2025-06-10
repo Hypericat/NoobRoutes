@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.logger
 import noobroutes.Core.mc
-import noobroutes.events.BossEventDispatcher.inBoss
+import noobroutes.events.BossEventDispatcher.inF7Boss
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.AutoP3
@@ -157,7 +157,7 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun noTurn(event: MotionUpdateEvent.Pre) {
-        if (!AutoP3.noRotate || !inBoss) {
+        if (!AutoP3.noRotate || !inF7Boss) {
             lastLook = Pair(event.yaw, event.pitch)
         }
         else {

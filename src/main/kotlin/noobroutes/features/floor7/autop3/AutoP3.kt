@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.logger
 import noobroutes.config.DataManager
 import noobroutes.events.BossEventDispatcher.inF7Boss
-import noobroutes.events.BossEventDispatcher.inF7Boss
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.TermOpenEvent
 import noobroutes.features.Category
