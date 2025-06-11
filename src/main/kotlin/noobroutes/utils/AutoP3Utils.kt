@@ -216,7 +216,7 @@ object AutoP3Utils {
             ++airTicks
         }
 
-        if (mc.thePlayer.isInWater || mc.thePlayer.isInLava || walking == false) return
+        if (mc.thePlayer.isInWater || mc.thePlayer.isInLava || !walking) return
 
         val sprintMultiplier = 1.3
         var speed = mc.thePlayer.aiMoveSpeed.toDouble()

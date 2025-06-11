@@ -66,7 +66,7 @@ object SecretUtils {
         if (awaitingNode != null && secretCount >= 0) {
             val room = DungeonUtils.currentRoom ?: return
             awaitingNode?.tick(room)
-            Scheduler.schedulePreMovementUpdateTask {
+            Scheduler.schedulePreMotionUpdateTask {
                 resetRotation()
                 awaitingNode?.motion((it as MotionUpdateEvent.Pre), room)
                 awaitingNode = null

@@ -11,6 +11,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraft.util.Vec3i
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
@@ -19,6 +20,7 @@ import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.*
 import noobroutes.utils.Utils.isClose
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.sendChatMessage
 import org.lwjgl.input.Keyboard
@@ -34,6 +36,8 @@ object Doorless: Module(
     private val allowChiseled by BooleanSetting("Chiseled Toggle", default = false, description = "Include chiseled stone bricks as door blocks")
     private val second by BooleanSetting("hclip", default = false, description = "hclips on second tick")
     private val clip2Distance by NumberSetting(name = "hclip distance", description = "how far u hclip", min = 0.0, max = 5.0, default = 4.0, increment = 0.1).withDependency { second }
+    private val setSpeed by BooleanSetting(name = "Set Speed", description = "set the player to make speed first tick after clipping")
+
 
     private var doingShit = false
     private var clipped = false
@@ -87,7 +91,7 @@ object Doorless: Module(
         if (!faster) prevRot = Pair(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
 
         if (mc.isSingleplayer) {
-            Scheduler.schedulePreTickTask(5) { sendChatMessage("/tp $expectedX ${blockPosPlayer.y + 2.0} $expectedZ") }
+            Scheduler.schedulePreTickTask(2) { sendChatMessage("/tp $expectedX ${blockPosPlayer.y + 2.0} $expectedZ") }
         }
     }
 
@@ -127,7 +131,24 @@ object Doorless: Module(
             Scheduler.schedulePreTickTask { clip() }
             return
         }
-        Scheduler.schedulePreTickTask(1) { clip2() }
+        Scheduler.schedulePreTickTask(1) {
+            val (dx, dz) = when (dir) {
+                0 -> -1 to 0
+                1 -> 1 to 0
+                2 -> 0 to -1
+                3 -> 0 to 1
+                else -> return@schedulePreTickTask
+            }
+            clip2(dx, dz)
+            if (!setSpeed) return@schedulePreTickTask
+            val speed = Core.mc.thePlayer.aiMoveSpeed.toDouble()
+            PlayerUtils.setMotion(
+                dx * 2.806 * speed,
+                dz * 2.806 * speed
+            )
+            PlayerUtils.unPressKeys()
+            Scheduler.schedulePreTickTask { PlayerUtils.rePressKeys() }
+        }
         event.isCanceled = true
         PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
         devMessage("sent packet")
@@ -163,20 +184,15 @@ object Doorless: Module(
         }
     }
 
-    private fun clip2() {
+    private fun clip2(dx: Int, dz: Int) {
         if (!second) return
-        val (dx, dz) = when (dir) {
-            0 -> -1 to 0
-            1 -> 1 to 0
-            2 -> 0 to -1
-            3 -> 0 to 1
-            else -> return
-        }
+
         mc.thePlayer.setPosition(
             s08Pos.first + dx * (clip2Distance + clipDistance),
             69.0,
             s08Pos.second + dz * (clip2Distance + clipDistance)
         )
+
     }
 
     private fun isDoorBlock(blockPosition: BlockPos): Boolean {

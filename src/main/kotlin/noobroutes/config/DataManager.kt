@@ -7,7 +7,7 @@ import java.io.File
 import java.io.IOException
 
 object DataManager {
-    private val gson = GsonBuilder().setPrettyPrinting().create()
+    private val gson = GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create()
 
     fun saveDataToFile(fileName: String, dataList: JsonArray) {
         val path = File(mc.mcDataDir, "config/noobroutes/$fileName.json")
@@ -34,7 +34,6 @@ object DataManager {
             if (!path.exists()) {
                 path.createNewFile()
             }
-            val gson = GsonBuilder().setPrettyPrinting().create()
             path.bufferedWriter().use {
                 it.write(gson.toJson(dataList))
             }
@@ -49,7 +48,6 @@ object DataManager {
         return try {
             path.bufferedReader().use { reader ->
                 val jsonContent = reader.readText()
-                val gson: Gson = GsonBuilder().setPrettyPrinting().create()
                 val jsonObject = gson.fromJson(jsonContent, JsonObject::class.java)
                 val jsonArrays = mutableMapOf<String, JsonArray>()
                 for ((key, value) in jsonObject.entrySet()) {

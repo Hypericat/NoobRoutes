@@ -33,6 +33,7 @@ import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoordsOdin
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
@@ -245,6 +246,9 @@ object AutoP3: Module (
             }
             "relativeplayerpos", "relppos", "relplayer", "playerrel" -> {
                 modMessage(DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector))
+            }
+            "odinrelative" -> {
+                modMessage(DungeonUtils.currentRoom?.getRelativeCoordsOdin(mc.objectMouseOver.blockPos))
             }
             /*"speed" -> {
                 if (args.size < 3) return

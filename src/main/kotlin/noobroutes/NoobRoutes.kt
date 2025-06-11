@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import noobroutes.Core.mc
+import noobroutes.commands.AutoBloodRushCommand
 import noobroutes.commands.AutoP3Command
 import noobroutes.commands.AutoRouteCommand
 import noobroutes.commands.NoobRoutesCommand
@@ -50,7 +51,8 @@ class NoobRoutes {
             //AuraTestCommand(),
             //EtherwarpTestCommand(),
             AutoRouteCommand(),
-            YawPitchCommand()
+            YawPitchCommand(),
+            AutoBloodRushCommand()
         ).forEach {
             ClientCommandHandler.instance.registerCommand(it)
         }

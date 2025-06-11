@@ -29,7 +29,6 @@ import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.skyblock.skyblockID
 
 object AutoRouteUtils {
 
@@ -60,7 +59,7 @@ object AutoRouteUtils {
         if (!silent) RotationUtils.setAngles(rot.first, rot.second)
         walking = false
         PlayerUtils.sneak()
-        Scheduler.schedulePreMovementUpdateTask {
+        Scheduler.schedulePreMotionUpdateTask {
             val event = it as MotionUpdateEvent.Pre
             event.yaw = rot.first
             event.pitch = rot.second
@@ -69,7 +68,7 @@ object AutoRouteUtils {
                 Scheduler.schedulePreTickTask {
                     ether()
                 }
-                return@schedulePreMovementUpdateTask
+                return@schedulePreMotionUpdateTask
             }
             ether()
         }

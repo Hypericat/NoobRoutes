@@ -11,6 +11,7 @@ import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
+import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
 import noobroutes.features.dungeon.MapLobotomizer
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.puzzle.IceFill
@@ -91,7 +92,8 @@ object ModuleManager {
         BlinkRelic,
         IceFill,
         MapLobotomizer,
-        FreeCam
+        FreeCam,
+        AutoBloodRush
     )
 
     init {

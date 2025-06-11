@@ -297,7 +297,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 node.secretTriggered = true
             }
             if (secretCount < 0) {
-                Scheduler.schedulePreMovementUpdateTask {
+                Scheduler.schedulePreMotionUpdateTask {
                     node.awaitMotion((it as MotionUpdateEvent.Pre), room)
                 }
                 node.awaitTick(room)
@@ -320,7 +320,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             secretCount = 0
             node.tick(room)
             //devMessage("runTick: ${System.currentTimeMillis()}")
-            Scheduler.schedulePreMovementUpdateTask {
+            Scheduler.schedulePreMotionUpdateTask {
                 node.motion((it as MotionUpdateEvent.Pre), room)
                 //devMessage("motionUpdate: ${System.currentTimeMillis()}")
             }
