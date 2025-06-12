@@ -238,7 +238,6 @@ object AutoP3Utils {
         } else {
             0.02 * sprintMultiplier
         }
-        modMessage("air")
         mc.thePlayer.motionX += movementFactor * Utils.xPart(direction)
         mc.thePlayer.motionZ += movementFactor * Utils.zPart(direction)
     }
