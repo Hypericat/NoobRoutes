@@ -2,8 +2,11 @@ package noobroutes.features.dungeon.autobloodrush
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import jdk.nashorn.internal.objects.Global.Infinity
 import net.minecraft.init.Blocks
+import net.minecraft.init.Items
 import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
@@ -48,6 +51,8 @@ import noobroutes.utils.skyblock.dungeon.ScanUtils
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.skyblock.sendChatMessage
+import noobroutes.utils.toBlockPos
 import noobroutes.utils.toVec3
 import kotlin.math.floor
 
@@ -461,6 +466,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     var expectedX = 0.0
     var expectedZ = 0.0
     var s08Pos = Pair(0.0, 0.0)
+    var thrown = 0L
     @SubscribeEvent
     fun cancelC03(event: PacketEvent.Send) {
         if (!doingShit) {
@@ -487,6 +493,72 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
         devMessage("sent packet")
         clip()
+    }
+
+    data class ExpectedS08(val x: Double, val z: Double, val dir: Int)
+    lateinit var clipS08: ExpectedS08
+
+    @SubscribeEvent
+    fun onC03(event: PacketEvent) {
+        if ((event.packet !is C04PacketPlayerPosition && event.packet !is C06PacketPlayerPosLook) || System.currentTimeMillis() - thrown < 10000 || !event.packet.isOnGround) return
+        if (Core.mc.thePlayer.heldItem?.item != Items.ender_pearl) return
+        val x = event.packet.positionX
+        val y = event.packet.positionY
+        val z = event.packet.positionZ
+        if (y != 69.0 || x > 0 || z > 0 || x < -200 || z < -200) return
+        val xDec = (x + 200) % 1
+        val zDec = (z + 200) % 1
+        if (xDec != 0.5 || zDec != 0.5) return
+        val dir = getDir()
+        event.isCanceled = true
+        val yaw = when (dir) {
+            0 -> -90f
+            1 -> 90f
+            2 -> 0f
+            3 -> 180f
+            else -> return
+        }
+        event.isCanceled = true
+        thrown = System.currentTimeMillis()
+        PacketUtils.sendPacket(C06PacketPlayerPosLook(x, y, z, yaw, 69.420f, event.packet.isOnGround))
+        PlayerUtils.airClick()
+        val expectedX = x + if (dir == 0) 1 else if (dir == 1) -1 else 0
+        val expectedZ = z + if (dir == 2) 1 else if (dir == 3) -1 else 0
+        clipS08 = ExpectedS08(expectedX, expectedZ, dir)
+        if (mc.isSingleplayer) {
+            Scheduler.schedulePreTickTask(5) { sendChatMessage("/tp $expectedX 70 $expectedZ") }
+        }
+    }
+
+    @SubscribeEvent
+    fun clipForwardish(event: PacketEvent) {
+        if (event.packet !is S08PacketPlayerPosLook || System.currentTimeMillis() - thrown > 1000) return
+        if (event.packet.x != clipS08.x || event.packet.z != clipS08.z) return
+        event.isCanceled = true
+        PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
+        val dx = if (clipS08.dir == 0) 1 else if (clipS08.dir == 1) -1 else 0
+        val dz = if (clipS08.dir == 2) 1 else if (clipS08.dir == 3) -1 else 0
+        if (mc.theWorld.getBlockState(BlockPos(event.packet.x, event.packet.y - 1, event.packet.z)).block == Blocks.cobblestone_wall) {
+            Scheduler.scheduleC03Task(0, true) { PacketUtils.sendPacket(C04PacketPlayerPosition(clipS08.x + 1.4 * dx, 70.0, clipS08.z + 1.4 * dz, true)) }
+            Scheduler.scheduleC03Task(1, true) {
+                PacketUtils.sendPacket(C04PacketPlayerPosition(clipS08.x + 2.8 * dx, 70.0, clipS08.z + 2.8 * dz, true))
+                mc.thePlayer.setPosition(clipS08.x + 3.8 * dx + 0.8 * dz, 70.0, clipS08.z + 3.8 * dz - 0.8 * dx)
+                thrown = 0
+            }
+            return
+        }
+        mc.thePlayer.setPosition(clipS08.x + 3.8 * dx + 0.8 * dz, 70.0, clipS08.z + 3.8 * dz - 0.8 * dx)
+        thrown = 0
+    }
+
+    private fun getDir(): Int {
+        return when {
+            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(1,1,0)) != null -> 0
+            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(-1,1,0)) != null -> 1
+            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(0,1,1)) != null -> 2
+            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(0,1,-1)) != null -> 3
+            else -> 69420
+        }
     }
 
     private fun clip() {
