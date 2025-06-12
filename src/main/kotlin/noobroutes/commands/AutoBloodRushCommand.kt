@@ -15,7 +15,7 @@ class AutoBloodRushCommand: CommandBase() {
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Load, Set, LoadFile, Clear, ClearActive")
+        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Set, Clear, Load")
         AutoBloodRush.handleBloodRushCommand(args)
     }
 

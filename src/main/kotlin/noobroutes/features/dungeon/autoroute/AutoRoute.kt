@@ -56,7 +56,7 @@ import kotlin.math.floor
  */
 
 object AutoRoute : Module("Autoroute", description = "Ak47 modified", category = Category.DUNGEON) {
-    val silent by BooleanSetting("Silent", default = true, description = "Serverside rotations")
+    val silent by BooleanSetting("Silent", default = true, description = "Server side rotations")
     val decrease by BooleanSetting("Reduce Pearlclip", default = false, description = "When creating PearlClips it decreases the distance input by 1")
     val renderRoutes by BooleanSetting("Render Routes", default = false, description = "Renders nodes")
     val renderIndex by BooleanSetting("Render Index", description = "Render index above node, useful for editing").withDependency { renderRoutes }
