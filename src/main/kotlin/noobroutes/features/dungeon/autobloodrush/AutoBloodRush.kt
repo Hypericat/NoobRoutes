@@ -2,9 +2,7 @@ package noobroutes.features.dungeon.autobloodrush
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import jdk.nashorn.internal.objects.Global.Infinity
 import net.minecraft.init.Blocks
-import net.minecraft.init.Items
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
@@ -24,18 +22,15 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.dungeon.autobloodrush.routes.DoorRoute
 import noobroutes.features.dungeon.autobloodrush.routes.Etherwarp
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.serverSneak
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.utils.AutoP3Utils
-import noobroutes.utils.PacketUtils
-import noobroutes.utils.Scheduler
+import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
-import noobroutes.utils.Vec2i
-import noobroutes.utils.add
-import noobroutes.utils.isAir
-import noobroutes.utils.isBlock
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.EtherWarpHelper
@@ -51,9 +46,6 @@ import noobroutes.utils.skyblock.dungeon.ScanUtils
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.skyblock.sendChatMessage
-import noobroutes.utils.toBlockPos
-import noobroutes.utils.toVec3
 import kotlin.math.floor
 
 object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for bloodrushing", category = Category.DUNGEON) {
@@ -498,41 +490,10 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     data class ExpectedS08(val x: Double, val z: Double, val dir: Int)
     lateinit var clipS08: ExpectedS08
 
-    @SubscribeEvent
-    fun onC03(event: PacketEvent) {
-        if ((event.packet !is C04PacketPlayerPosition && event.packet !is C06PacketPlayerPosLook) || System.currentTimeMillis() - thrown < 10000 || !event.packet.isOnGround) return
-        if (Core.mc.thePlayer.heldItem?.item != Items.ender_pearl) return
-        val x = event.packet.positionX
-        val y = event.packet.positionY
-        val z = event.packet.positionZ
-        if (y != 69.0 || x > 0 || z > 0 || x < -200 || z < -200) return
-        val xDec = (x + 200) % 1
-        val zDec = (z + 200) % 1
-        if (xDec != 0.5 || zDec != 0.5) return
-        val dir = getDir()
-        event.isCanceled = true
-        val yaw = when (dir) {
-            0 -> 10f
-            1 -> -170f
-            2 -> 100f
-            3 -> -80f
-            else -> return
-        }
-        event.isCanceled = true
-        thrown = System.currentTimeMillis()
-        PacketUtils.sendPacket(C06PacketPlayerPosLook(x, y, z, yaw, 68f, event.packet.isOnGround))
-        devMessage(yaw)
-        PlayerUtils.airClick()
-        val expectedX = x + if (dir == 3) 1 else if (dir == 2) -1 else 0
-        val expectedZ = z + if (dir == 0) 1 else if (dir == 1) -1 else 0
-        clipS08 = ExpectedS08(expectedX, expectedZ, dir)
-        if (mc.isSingleplayer) {
-            Scheduler.schedulePreTickTask(5) { sendChatMessage("/tp $expectedX 70 $expectedZ") }
-        }
-    }
+
 
     @SubscribeEvent
-    fun clipForwardish(event: PacketEvent) {
+    fun clipForwardish(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook || System.currentTimeMillis() - thrown > 1000) return
         if (event.packet.x != clipS08.x || event.packet.z != clipS08.z) return
         event.isCanceled = true
@@ -544,15 +505,21 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             Scheduler.scheduleC03Task(1, true) {
                 PacketUtils.sendPacket(C04PacketPlayerPosition(clipS08.x + 2.8 * dx, 70.0, clipS08.z + 2.8 * dz, true))
                 mc.thePlayer.setPosition(clipS08.x + 3.8 * dx + 0.8 * dz, 70.0, clipS08.z + 3.8 * dz - 0.8 * dx)
+                Scheduler.schedulePreTickTask {
+                    AutoRouteUtils.etherwarp(event.packet.yaw, 90f, silent)
+                }
                 thrown = 0
             }
             return
         }
         mc.thePlayer.setPosition(clipS08.x + 3.8 * dx + 0.8 * dz, 70.0, clipS08.z + 3.8 * dz - 0.8 * dx)
+        Scheduler.schedulePreTickTask {
+            AutoRouteUtils.etherwarp(event.packet.yaw, 90f, silent)
+        }
         thrown = 0
     }
 
-    private fun getDir(): Int {
+    fun getDir(): Int {
         return when {
             mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(0,1,1)) != null -> 0
             mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(0,1,-1)) != null -> 1
@@ -602,5 +569,17 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             Blocks.stained_hardened_clay.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
             Blocks.monster_egg.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
         }
+    }
+
+
+    var autoBrUnsneakRegistered = false
+    @SubscribeEvent
+    fun unsneak(event: RenderWorldLastEvent) {
+        if (!autoBrUnsneakRegistered) return
+        if (Core.mc.thePlayer.isSneaking) PlayerUtils.unSneak()
+        if (serverSneak) return
+        PlayerUtils.airClick()
+        resetRotation()
+        autoBrUnsneakRegistered = false
     }
 }
