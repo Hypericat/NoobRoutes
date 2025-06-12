@@ -512,18 +512,19 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         val dir = getDir()
         event.isCanceled = true
         val yaw = when (dir) {
-            0 -> -90f
-            1 -> 90f
-            2 -> 0f
-            3 -> 180f
+            0 -> 10f
+            1 -> -170f
+            2 -> 100f
+            3 -> -80f
             else -> return
         }
         event.isCanceled = true
         thrown = System.currentTimeMillis()
-        PacketUtils.sendPacket(C06PacketPlayerPosLook(x, y, z, yaw, 69.420f, event.packet.isOnGround))
+        PacketUtils.sendPacket(C06PacketPlayerPosLook(x, y, z, yaw, 68f, event.packet.isOnGround))
+        devMessage(yaw)
         PlayerUtils.airClick()
-        val expectedX = x + if (dir == 0) 1 else if (dir == 1) -1 else 0
-        val expectedZ = z + if (dir == 2) 1 else if (dir == 3) -1 else 0
+        val expectedX = x + if (dir == 3) 1 else if (dir == 2) -1 else 0
+        val expectedZ = z + if (dir == 0) 1 else if (dir == 1) -1 else 0
         clipS08 = ExpectedS08(expectedX, expectedZ, dir)
         if (mc.isSingleplayer) {
             Scheduler.schedulePreTickTask(5) { sendChatMessage("/tp $expectedX 70 $expectedZ") }
@@ -553,10 +554,10 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
     private fun getDir(): Int {
         return when {
-            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(1,1,0)) != null -> 0
-            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(-1,1,0)) != null -> 1
-            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(0,1,1)) != null -> 2
-            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(0,1,-1)) != null -> 3
+            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(0,1,1)) != null -> 0
+            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(0,1,-1)) != null -> 1
+            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(-1,1,0)) != null -> 2
+            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(1,1,0)) != null -> 3
             else -> 69420
         }
     }
