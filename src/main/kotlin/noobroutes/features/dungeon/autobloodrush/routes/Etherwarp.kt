@@ -4,8 +4,8 @@ import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
+import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.silent
 import noobroutes.features.dungeon.autobloodrush.BloodRushRoute
-import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.ether
 import noobroutes.utils.RotationUtils
@@ -22,9 +22,13 @@ import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.skyblockID
 
 class Etherwarp(pos: Vec3, var target: Vec3) : BloodRushRoute(name = "Etherwarp", pos) {
-    override fun convertToReal(room: Room) {
-        pos = room.getRealCoords(pos)
-        target = room.getRealCoords(pos)
+    companion object {
+        fun loadFromJsonObject(jsonObject: JsonObject): Etherwarp {
+            return Etherwarp(
+                jsonObject.get("pos").asVec3,
+                jsonObject.get("target").asVec3
+            )
+        }
     }
 
 
@@ -57,13 +61,9 @@ class Etherwarp(pos: Vec3, var target: Vec3) : BloodRushRoute(name = "Etherwarp"
 
     override fun getAsJsonObject(): JsonObject {
         val obj = JsonObject()
+        obj.addProperty("name", name)
         obj.addProperty("pos", pos)
         obj.addProperty("target", target)
         return obj
-    }
-
-    override fun loadFromJsonObject(jsonObject: JsonObject) {
-        jsonObject.get("pos").asVec3
-        jsonObject.get("target").asVec3
     }
 }

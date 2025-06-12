@@ -42,7 +42,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
     private val colorAnim = ColorAnimation(150)
 
     val color: Color
-        get() = colorAnim.get(clickGUIColor, Color.WHITE, module.enabled).darkerIf(isButtonHovered && !isExtendButtonHovered, 0.7f)
+        get() = colorAnim.get(clickGUIColor, Color.WHITE, module.enabled).darkerIf(isButtonHovered, 0.7f)
 
     val width = Panel.WIDTH
     val height = 32f
@@ -120,11 +120,8 @@ class ModuleButton(val module: Module, val panel: Panel) {
         }
 
         if (!extendAnim.isAnimating() && !extended || menuElements.isEmpty()) {
-            drawArrow(x + width * 0.9f, y + height * 0.5f, rotation = 0f, scale = 0.9f)
             return offs
         }
-        val extendedAnimPercent = extendAnim.get(0f, 1f, !extended)
-        drawArrow(x + width * 0.9f, y + height * 0.5f, scale = 0.9f, rotation = extendedAnimPercent * 90f)
         var drawY = offs
         offs = height + floor(extendAnim.get(0f, getSettingHeight(), !extended))
 
@@ -142,15 +139,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
     }
 
     fun mouseClicked(mouseButton: Int): Boolean {
-        if (isExtendButtonHovered) {
-            if (extendAnim.start()) extended = !extended
-            if (!extended) {
-                menuElements.forEach {
-                    it.listening = false
-                }
-            }
-        }
-        if (isButtonHovered && !isExtendButtonHovered) {
+        if (isButtonHovered) {
             if (mouseButton == 0) {
                 if (colorAnim.start()) module.toggle()
                 return true
@@ -208,8 +197,6 @@ class ModuleButton(val module: Module, val panel: Panel) {
     private val isButtonHovered: Boolean
         get() = isAreaHovered(x, y, width, height - 1)
 
-    private val isExtendButtonHovered: Boolean
-        get() = isAreaHovered(x + width * 0.9f - 5,  y, width * 0.1f, height - 1)
 
     private val isMouseUnderButton: Boolean
         get() = extended && isAreaHovered(x, y + height, width)

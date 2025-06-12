@@ -79,7 +79,7 @@ object PlayerUtils {
 
     private var lastGuiClickSent = 0L
     var lastC08Sent = 0L
-    inline val canSendC08 get() = System.currentTimeMillis() - lastC08Sent > 50
+    inline val canSendC08 get() = System.currentTimeMillis() - lastC08Sent > 49
 
 
     @SubscribeEvent

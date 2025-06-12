@@ -15,6 +15,7 @@ import noobroutes.Core
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
@@ -85,7 +86,7 @@ object Doorless: Module(
         event.isCanceled = true
         skip = true
         PacketUtils.sendPacket(C06PacketPlayerPosLook(x, y, z, getYaw(), getPitch(blockPosPlayer), event.packet.isOnGround))
-        PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+        PlayerUtils.airClick()
         expectedX = blockPosPlayer.x + 0.5
         expectedZ = blockPosPlayer.z + 0.5
         if (!faster) prevRot = Pair(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
@@ -125,6 +126,7 @@ object Doorless: Module(
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook || !doingShit || clipped) return
         s08Pos = Pair(event.packet.x, event.packet.z)
+        devMessage(s08Pos)
         clipped = true
         AutoP3Utils.unPressKeys()
         if (!faster) {

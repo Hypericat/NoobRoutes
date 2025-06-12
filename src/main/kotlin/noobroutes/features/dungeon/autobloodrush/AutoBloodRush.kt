@@ -3,7 +3,11 @@ package noobroutes.features.dungeon.autobloodrush
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -11,13 +15,18 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.config.DataManager
 import noobroutes.events.impl.MotionUpdateEvent
+import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.dungeon.autobloodrush.routes.DoorRoute
 import noobroutes.features.dungeon.autobloodrush.routes.Etherwarp
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
+import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.PacketUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Vec2i
@@ -28,6 +37,8 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
+import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
@@ -42,15 +53,26 @@ import kotlin.math.floor
 
 object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for bloodrushing", category = Category.DUNGEON) {
 
-    private val renderDoorNumbers by BooleanSetting(
-        "Render Door Numbers",
-        description = "Renders wither door numbers, essential for creating routes. Do not use while in normal gameplay, because this is somewhat performance intensive."
+
+    private val clipDistance by NumberSetting(name = "Clip Distance", description = "how far u clip", min = 0.0, max = 2, default = 0.5, increment = 0.1)
+    val silent by BooleanSetting("Silent", default = true, description = "Server side rotations")
+    val editMode by BooleanSetting(
+        "Edit Mode",
+        description = "Allows you to edit routes"
     )
     private val doorNumberColor by ColorSetting(
         "Door Number Color",
         description = "I wonder what this could possibly mean",
         default = Color.Companion.GREEN
-    ).withDependency { renderDoorNumbers }
+    ).withDependency { editMode }
+    val nodeColor by ColorSetting(
+        "Node",
+        description = "Color of Route Nodes",
+        default = Color.Companion.GREEN
+    ).withDependency { editMode }
+
+
+
 
     var routes = mutableMapOf<String, MutableMap<String, MutableList<BloodRushRoute>>>()
     data class Door(val pos: BlockPos, val rotation: Rotations)
@@ -58,8 +80,8 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     val oneByOneDoors = listOf(
         BlockPos(-1, 69, 15),
         BlockPos(15, 69, -1),
-        BlockPos(15, 69, 31),
-        BlockPos(31, 69, 14)
+        BlockPos(31, 69, 14),
+        BlockPos(15, 69, 31)
     )
     val twoByOneDoors =  listOf(
         BlockPos(-1, 69, 15),
@@ -69,6 +91,19 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         BlockPos(47, 69, -1),
         BlockPos(15, 69, -1)
     )
+    val threeByOneDoors = listOf(
+        BlockPos(95, 69, 15),
+        BlockPos(79, 69, 31),
+        BlockPos(47, 69, 31),
+        BlockPos(15, 69, 31),
+        BlockPos(-1, 69, 15),
+        BlockPos(15, 69, -1),
+        BlockPos(47, 69, -1),
+        BlockPos(79, 69, -1)
+    )
+
+
+
     val fourByOneDoors = listOf(
         BlockPos(-1, 69, 15),
         BlockPos(15, 69, -1),
@@ -105,7 +140,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
 
 
-    var activeRoutes: MutableList<BloodRushRoute> = mutableListOf()
+    var activeRoutes: MutableMap<String, String> = mutableMapOf()
     var currentDoor: Door? = null
     val doors = mutableListOf<Door>()
     var fairyRoom: Room? = null
@@ -171,11 +206,23 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         "Mossy"
     )
 
+    val room1x3Names = hashSetOf(
+        "Slime",
+        "Red Blue",
+        "Diagonal",
+        "Gravel",
+        "Deathmite",
+        "Catwalk",
+        "Wizard"
+    )
+
     fun getRoomDoors(room: Room): List<BlockPos> {
         return when (room.data.cores.size) {
             1 -> oneByOneDoors
             2 -> twoByOneDoors
-            3 -> lShapedDoors
+            3 -> {
+                if (room1x3Names.contains(room.data.name)) threeByOneDoors else lShapedDoors
+            }
             4 -> {
                 if (room1x4Names.contains(room.data.name)) fourByOneDoors else twoByTwoDoors
             }
@@ -190,11 +237,8 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         }
         val doorPos = doors.firstOrNull {it != currentDoor?.pos} ?: return null
         val roomRouteName = "${possibleDoors.indexOf(currentDoor?.pos)}>${possibleDoors.indexOf(doorPos)}"
-
-        val routes = routes.getOrPut(room.data.name) {mutableMapOf()}.getOrPut(roomRouteName) {mutableListOf()}.toList()
-        routes.forEach { it.convertToReal(room) }
-        activeRoutes.addAll(routes)
-        devMessage(roomRouteName)
+        activeRoutes[room.data.name] = roomRouteName
+        devMessage(Pair(room.data.name, roomRouteName))
         val closestComponent = room.roomComponents.minByOrNull { it.blockPos.distanceSq(doorPos) }!!
         val rotation = when {
             doorPos.x < closestComponent.x -> Rotations.EAST
@@ -224,23 +268,39 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             scanForDoors()
             if (currentDoor == null) devMessage(doors)
         }
-        if (event.isEnd || activeRoutes.isEmpty() || !PlayerUtils.canSendC08) return
-        val node = activeRoutes.firstOrNull { it.inNode() } ?: return
-        node.runTick()
+        if (event.isEnd || (activeRoutes.isEmpty() && !editMode) || !PlayerUtils.canSendC08) return
+        val room = DungeonUtils.currentRoom ?: return
+        if (!activeRoutes.any { it.key == room.data.name } && !editMode) return
+        val key = if (editMode) routeName else activeRoutes[room.data.name]!!
+
+        val node = routes.getOrPut(room.data.name) {mutableMapOf()}.getOrPut(key) {mutableListOf()}.firstOrNull { it.inNode(room) } ?: return
+        node.runTick(room)
         Scheduler.schedulePreMotionUpdateTask {
-            node.runMotion(it as MotionUpdateEvent.Pre)
+            node.runMotion(room, it as MotionUpdateEvent.Pre)
         }
     }
 
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent){
-        if (!renderDoorNumbers) return
         val room = DungeonUtils.currentRoom ?: return
-
-        val doorPositions = if (room.data.name == "Entrance") oneByOneDoors.map { room.getRealCoordsOdin(it) } else getRoomDoors(room).map { room.getRealCoordsOdin(it) }
-        doorPositions.forEachIndexed { index, pos ->
-            Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), doorNumberColor, scale = 0.1f)
+        if (editMode) {
+            val doorPositions = if (room.data.name == "Entrance") oneByOneDoors.map { room.getRealCoordsOdin(it) } else getRoomDoors(room).map { room.getRealCoordsOdin(it) }
+            doorPositions.forEachIndexed { index, pos ->
+                Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), doorNumberColor, scale = 0.1f)
+            }
+        }
+        if (routeName == "" && editMode) return
+        val key = if (editMode) routeName else activeRoutes[room.data.name] ?: return
+        val nodeList = routes.getOrPut(room.data.name) {mutableMapOf()}.getOrPut(key) {mutableListOf()}
+        if (editMode) nodeList.forEachIndexed {
+            index, node ->
+            node.renderIndex(room, index)
+            node.render(room)
+        } else {
+            nodeList.forEach { node ->
+                node.render(room)
+            }
         }
     }
 
@@ -255,8 +315,37 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         scanForDoors()
     }
 
-    //var routes = mutableMapOf<String, MutableMap<String, MutableList<BloodRushRoute>>>()
-    fun saveToFile(){
+    fun loadFile() {
+        val file = DataManager.loadDataFromFileObject("autobloodroutes")
+        routes.clear()
+
+        for ((roomName, routeList) in file) {
+            val roomRoutes = mutableMapOf<String, MutableList<BloodRushRoute>>()
+
+            for (entryElement in routeList) {
+                val entryObj = entryElement.asJsonObject
+
+                for ((routeName, routeArray) in entryObj.entrySet()) {
+                    val routeItems = mutableListOf<BloodRushRoute>()
+                    if (routeArray.isJsonArray) {
+                        for (routeElement in routeArray.asJsonArray) {
+                            val routeObj = routeElement.asJsonObject
+                            if (routeObj.get("name").asString == "Etherwarp") {
+                                routeItems.add(Etherwarp.loadFromJsonObject(routeObj))
+                            } else {
+                                routeItems.add(DoorRoute.loadFromJsonObject(routeObj))
+                            }
+                        }
+                    }
+                    roomRoutes[routeName] = routeItems
+                }
+            }
+
+            routes[roomName] = roomRoutes
+        }
+    }
+
+    fun saveFile(){
         val jsonObj = JsonObject()
         routes.forEach { (roomName, roomRoutes) ->
             val arr = JsonArray()
@@ -279,7 +368,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     val routeRegex = Regex("\\d+>\\d+")
     var routeName = ""
     fun handleBloodRushCommand(args: Array<out String>) {
-        saveToFile()
+
         when (args[0].lowercase()) {
             "set" -> {
                 val currentRoom = DungeonUtils.currentRoom ?: return modMessage("not in room")
@@ -296,10 +385,8 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 modMessage("set to ${doorNumbers[0]}>${doorNumbers[1]}")
                 routeName = "${doorNumbers[0]}>${doorNumbers[1]}"
             }
-            "clearactive" -> {
-                activeRoutes.clear()
-            }
             "add" -> {
+                if (!editMode) return modMessage("Edit Mode Required")
                 val currentRoom = DungeonUtils.currentRoom ?: return modMessage("not in room")
                 if (routeName == "") return modMessage("no route set")
                 if (args.size < 2) {
@@ -321,14 +408,126 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                     routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.add(
                         Etherwarp(playerCoords, target)
                     )
+                    saveFile()
+                    return
+                }
+                if (args[1].lowercase() == "door") {
+                    routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.add(
+                        DoorRoute(playerCoords)
+                    )
+                    saveFile()
+                    return
+                }
+            }
+            "clear" -> {
+                if (!editMode) return modMessage("Edit Mode Required")
+                val currentRoom = DungeonUtils.currentRoom ?: return modMessage("Not in room")
+                if (routeName == "") return modMessage("No route set")
+                routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.clear()
+                saveFile()
+            }
+
+            "delete" -> {
+                if (!editMode) return modMessage("Edit Mode Required")
+                val currentRoom = DungeonUtils.currentRoom ?: return modMessage("Not in room")
+                if (routeName == "") return modMessage("No route set")
+                val nodeList = routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}
+                if (nodeList.isEmpty()) return modMessage("No Nodes")
+                if (args.size > 1) {
+                    val index = args[1].toIntOrNull() ?: return modMessage("Invalid Index")
+                    if (nodeList.size - 1 < index) return modMessage("Invalid Index")
+                    nodeList.removeAt(index)
+                    saveFile()
                     return
                 }
 
-
+                val node = nodeList.minByOrNull {
+                    currentRoom.getRealCoords(it.pos).distanceToPlayerSq
+                }!!
+                nodeList.remove(node)
+                saveFile()
+            }
+            "load" -> {
+                loadFile()
             }
         }
     }
 
+    var lastAttempt: Vec3? = null
+    var direction: Rotations = Rotations.NONE
+    inline val doingShit get() = (lastAttempt?.distanceToPlayer ?: 5.0) < 3
+    var clipped = false
+    var skip = false
+    var expectedX = 0.0
+    var expectedZ = 0.0
+    var s08Pos = Pair(0.0, 0.0)
+    @SubscribeEvent
+    fun cancelC03(event: PacketEvent.Send) {
+        if (!doingShit) {
+            clipped = false
+            lastAttempt = null
+        }
+        if (!doingShit || event.packet !is C03PacketPlayer || clipped) return
+        if (skip) {
+            skip = false
+            return
+        }
+        devMessage("cancelled packet")
+        event.isCanceled = true
+    }
 
+    @SubscribeEvent
+    fun onS08(event: PacketEvent.Receive) {
+        if (event.packet !is S08PacketPlayerPosLook || !doingShit || clipped) return
+        s08Pos = Pair(event.packet.x, event.packet.z)
+        devMessage(s08Pos)
+        clipped = true
+        AutoP3Utils.unPressKeys()
+        event.isCanceled = true
+        PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
+        devMessage("sent packet")
+        clip()
+    }
 
+    private fun clip() {
+        val (dx, dz) = when (direction) {
+            Rotations.EAST -> -1 to 0
+            Rotations.WEST -> 1 to 0
+            Rotations.SOUTH -> 0 to -1
+            Rotations.NORTH -> 0 to 1
+            else -> return
+        }
+        mc.thePlayer.setPosition(
+            s08Pos.first + dx * clipDistance,
+            69.0,
+            s08Pos.second + dz * clipDistance
+        )
+        val speed = Core.mc.thePlayer.aiMoveSpeed.toDouble()
+        PlayerUtils.setMotion(
+            dx * 2.806 * speed,
+            dz * 2.806 * speed
+        )
+
+        Blocks.coal_block.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
+        Blocks.stained_hardened_clay.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
+        Blocks.monster_egg.setBlockBounds(-1f, -1f, -1f, -1f, -1f, -1f)
+        Scheduler.schedulePreTickTask {
+            PlayerUtils.setMotion(
+                dx * 2.806 * speed,
+                dz * 2.806 * speed
+            )
+        }
+        Scheduler.schedulePreTickTask(1) {
+            PlayerUtils.setMotion(
+                dx * 2.806 * speed,
+                dz * 2.806 * speed
+            )
+        }
+
+        Scheduler.schedulePreTickTask(4) {
+            Blocks.coal_block.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
+            Blocks.stained_hardened_clay.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
+            Blocks.monster_egg.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
+        }
+    }
 }
