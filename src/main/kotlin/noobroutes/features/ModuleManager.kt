@@ -1,6 +1,5 @@
 package noobroutes.features
 
-import noobroutes.features.dungeon.puzzle.WaterBoard
 import net.minecraft.network.Packet
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -11,11 +10,12 @@ import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
 import noobroutes.features.dungeon.MapLobotomizer
+import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.puzzle.IceFill
 import noobroutes.features.dungeon.puzzle.TicTacToe
+import noobroutes.features.dungeon.puzzle.WaterBoard
 import noobroutes.features.dungeon.puzzle.Weirdos
 import noobroutes.features.floor7.*
 import noobroutes.features.floor7.autop3.AutoP3

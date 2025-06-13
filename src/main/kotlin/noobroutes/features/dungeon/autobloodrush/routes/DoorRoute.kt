@@ -1,8 +1,6 @@
 package noobroutes.features.dungeon.autobloodrush.routes
 
 import com.google.gson.JsonObject
-import net.minecraft.init.Blocks
-import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
@@ -19,15 +17,11 @@ import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Room
-import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.sendChatMessage
 
 class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
-
-
     companion object {
         fun loadFromJsonObject(jsonObject: JsonObject): DoorRoute {
             return DoorRoute(jsonObject.get("pos").asVec3)

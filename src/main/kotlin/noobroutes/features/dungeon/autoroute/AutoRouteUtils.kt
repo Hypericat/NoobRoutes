@@ -16,13 +16,9 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.dungeon.autoroute.nodes.*
 import noobroutes.features.move.Zpew
+import noobroutes.utils.*
 import noobroutes.utils.AutoP3Utils.walking
-import noobroutes.utils.PacketUtils
-import noobroutes.utils.RotationUtils
 import noobroutes.utils.RotationUtils.offset
-import noobroutes.utils.Scheduler
-import noobroutes.utils.SwapManager
-import noobroutes.utils.floor
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage

@@ -1,11 +1,9 @@
 package noobroutes.utils
 
-import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.inventory.Container
@@ -22,14 +20,9 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.Core.logger
 import noobroutes.Core.mc
-import noobroutes.features.ModuleManager
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.skyblock.sendCommand
-import noobroutes.utils.skyblock.skyblockID
-import org.lwjgl.opengl.GL11
-import org.lwjgl.util.glu.GLU
 import java.util.*
 import kotlin.math.*
 

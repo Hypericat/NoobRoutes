@@ -25,11 +25,6 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.currentRoomName
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
-import kotlin.collections.filter
-import kotlin.collections.indices
-import kotlin.collections.set
 import kotlin.experimental.and
 
 object TicTacToe : Module(

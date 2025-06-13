@@ -6,7 +6,6 @@ import net.minecraft.util.MathHelper
 import net.minecraft.util.MovementInput
 import net.minecraft.util.MovingObjectPosition
 import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
@@ -20,7 +19,6 @@ import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
-import noobroutes.utils.skyblock.devMessage
 import kotlin.math.sign
 
 /**

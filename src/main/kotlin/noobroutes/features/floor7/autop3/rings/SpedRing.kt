@@ -5,7 +5,6 @@ import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3.spedFor
 import noobroutes.features.floor7.autop3.AutoP3.speedRings
 import noobroutes.features.floor7.autop3.AutoP3.timerSpeed
-import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.floor7.autop3.Blink.blinksInstance
 import noobroutes.features.floor7.autop3.Blink.cancelled
 import noobroutes.features.floor7.autop3.Ring

@@ -3,7 +3,6 @@ package noobroutes.features.floor7
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.BossEventDispatcher.inF7Boss
 import noobroutes.features.Category
 import noobroutes.features.Module

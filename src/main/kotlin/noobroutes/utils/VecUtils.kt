@@ -1,18 +1,19 @@
 package noobroutes.utils
 
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.channels.ticker
-import kotlinx.coroutines.launch
 import net.minecraft.entity.Entity
-import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraft.util.*
+import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.BlockPos
+import net.minecraft.util.Vec3
+import net.minecraft.util.Vec3i
 import noobroutes.Core.mc
-import noobroutes.Core.scope
 import noobroutes.utils.render.RenderUtils.outlineBounds
 import noobroutes.utils.skyblock.dungeon.tiles.Rotations
-import kotlin.math.*
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 data class Vec2(val x: Double, val z: Double)
 

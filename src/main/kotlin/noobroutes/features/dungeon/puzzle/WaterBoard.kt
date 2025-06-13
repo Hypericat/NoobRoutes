@@ -13,21 +13,14 @@ import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
-import noobroutes.utils.AuraManager
-import noobroutes.utils.Scheduler
-import noobroutes.utils.getBlockAt
-import noobroutes.utils.isAir
+import noobroutes.utils.*
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoordsOdin
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.toBlockPos
 import org.lwjgl.input.Keyboard
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 
 object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, description = "Automatic Waterboard Solver") {
     private var waterSolutions: JsonObject

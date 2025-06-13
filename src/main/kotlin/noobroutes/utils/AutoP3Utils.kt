@@ -1,7 +1,6 @@
 package noobroutes.utils
 
 import net.minecraft.client.settings.KeyBinding
-import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.Vec3
 import net.minecraftforge.event.world.WorldEvent

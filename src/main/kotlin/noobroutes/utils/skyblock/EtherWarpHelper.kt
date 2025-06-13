@@ -16,6 +16,47 @@ object EtherWarpHelper {
     }
     var etherPos: EtherPos = EtherPos.NONE
 
+
+    /*
+    /**
+ * Gets a valid Yaw/Pitch combination that you can etherwarp to in order to land at a specific block. Has terrible performance.
+ * @param {Array} blockCoords
+ * @returns Object with yaw and pitch or null if fail
+ */
+export function getEtherYawPitch(blockCoords) {
+    const runStart = System.nanoTime()
+    const playerCoords = [Player.getX(), Player.getY(), Player.getZ()]
+
+    const centeredCoords = centerCoords(blockCoords)
+    const rotation = calcYawPitch(centeredCoords[0], centeredCoords[1] + 0.5, centeredCoords[2], true)
+    // Return if you can aim at center of the block
+    if (rayTraceEtherBlock(playerCoords, rotation.yaw, rotation.pitch)?.every((coord, index) => coord === blockCoords[index])) return rotation
+    let runs = 0
+    for (let i = 0; i <= 10; i++) { // Exponentially less distance between steps...
+        let lowerLimit = { yaw: rotation.yaw - 2, pitch: rotation.pitch - 4 }
+        let upperLimit = { yaw: rotation.yaw + 2, pitch: rotation.pitch + 4 }
+
+        let yawStepSize = (1 / (1 + i * (2 / 3)))
+        let pitchStepSize = (0.5 / (1 + (i * 0.5)))
+        for (let yaw = lowerLimit.yaw; yaw < upperLimit.yaw; yaw += yawStepSize) {
+            for (let pitch = lowerLimit.pitch; pitch < upperLimit.pitch; pitch += pitchStepSize) {
+                runs++
+                let prediction = rayTraceEtherBlock(playerCoords, yaw, pitch)
+                if (!prediction) continue
+                if (prediction.every((coord, index) => coord === blockCoords[index])) {
+                    debugMessage(`Found Yaw/Pitch combination in ${runs} attempts! Took ${(System.nanoTime() - runStart) / 1000000}ms. Shoutout to CT performance btw`, false)
+                    return { yaw, pitch }
+                }
+            }
+        }
+    }
+    debugMessage(`Failed to find Yaw/Pitch combination. ${runs} attempts. Took ${(System.nanoTime() - runStart) / 1000000}ms. Shoutout to CT performance btw`, false)
+    return null
+}
+     */
+
+
+
     /**
      * Gets the position of an entity in the "ether" based on the player's view direction.
      *
