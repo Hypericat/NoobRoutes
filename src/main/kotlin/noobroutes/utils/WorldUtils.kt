@@ -48,9 +48,6 @@ fun getSkull(pos: BlockPos): TileEntitySkull? {
 fun isAir(blockPos: BlockPos): Boolean =
     getBlockAt(blockPos) == Blocks.air
 
-fun getLookingBlock(){
-
-}
 
 
 fun isBlock(blockPos: BlockPos, vararg blocks: Block): Boolean {
@@ -194,37 +191,4 @@ object BlockUtils {
             else -> null
         }
     }
-/*
-    fun clickLever(lever: BlockPos) {
-        val orientation = mc.theWorld.getBlockState(lever).properties[BlockLever.FACING] as EnumOrientation
-        val aabb = when(orientation) {
-            EnumOrientation.EAST -> AxisAlignedBB(0.0, 0.2, 0.315, 0.375, 0.8, 0.6875)
-            EnumOrientation.WEST -> AxisAlignedBB(0.625, 0.2, 0.315, 1.0, 0.8, 0.6875)
-            EnumOrientation.SOUTH -> AxisAlignedBB(0.3125, 0.2, 0.0, 0.6875, 0.8, 0.375)
-            EnumOrientation.NORTH -> AxisAlignedBB(0.3125, 0.2, 0.625, 0.6875, 0.8, 1.0)
-            EnumOrientation.UP_Z, EnumOrientation.UP_X -> AxisAlignedBB(0.25, 0.0, 0.25, 0.75, 0.6, 0.75)
-            EnumOrientation.DOWN_X, EnumOrientation.DOWN_Z -> AxisAlignedBB(0.25, 0.4, 0.25, 0.75, 1.0, 0.75)
-            else -> return
-        }
-
-        val centerPos = Vec3(lever).addVector(
-            (aabb.minX + aabb.maxX) / 2,
-            (aabb.minY + aabb.maxY) / 2,
-            (aabb.minZ + aabb.maxZ) / 2
-        )
-
-        val movingObjectPosition: MovingObjectPosition = collisionRayTrace(lever, aabb, mc.thePlayer.getPositionEyes(0f), centerPos) ?: return
-        PacketUtils.sendPacket(
-            C08PacketPlayerBlockPlacement(
-                lever,
-                movingObjectPosition.sideHit.index,
-                mc.thePlayer.heldItem,
-                movingObjectPosition.hitVec.xCoord.toFloat(),
-                movingObjectPosition.hitVec.yCoord.toFloat(),
-                movingObjectPosition.hitVec.zCoord.toFloat()
-            )
-        )
-    }
-
- */
 }

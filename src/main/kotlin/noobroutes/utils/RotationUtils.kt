@@ -1,14 +1,19 @@
 package noobroutes.utils
 
 
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.channels.ticker
+import kotlinx.coroutines.launch
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.logger
 import noobroutes.Core.mc
+import noobroutes.Core.scope
 import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
@@ -20,16 +25,6 @@ import kotlin.math.*
 
 object RotationUtils {
     private const val SNEAKHEIGHT = 0.0800000429153443
-    class Rotation(val yaw: Float, val pitch: Float, val silent: Boolean = false, val action: Action?, var continuous: CompletionRequirement? = null)
-    enum class CompletionRequirement{
-        NonDirectionalC08,
-        PreRotate
-    }
-
-    enum class Action{
-        LeftClick,
-        RightClick
-    }
 
     fun yawAndPitchVector(yaw: Float, pitch: Float): Vec3 {
         val f = cos(-yaw * 0.017453292519943295 - PI)
@@ -102,139 +97,41 @@ object RotationUtils {
         setAngles(angles.first, angles.second)
     }
 
-    @Deprecated(message = "Don't use this, will be removed later, just use a MovementUpdateEvent.Pre")
-    fun rotate(yaw: Float, pitch: Float, silent: Boolean = false , action: Action? = null, continuous: CompletionRequirement? = null) {
-        currentRotation = Rotation(yaw, pitch, silent,action, continuous)
-    }
+    /**
+     * Smoothly rotates the players head to the given yaw and pitch.
+     *
+     * @param yaw The yaw to rotate to
+     * @param pitch The pitch to rotate to
+     * @param rotTime how long the rotation should take. In milliseconds.
+     */
+    @OptIn(ObsoleteCoroutinesApi::class)
+    fun smoothRotateTo(yaw: Float, pitch: Float, rotTime: Number, functionToRunWhenDone: () -> Unit = {}) {
+        scope.launch {
+            val initialYaw = MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw)
+            val initialPitch = MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationPitch)
+            val targetYaw = wrapAngle(yaw)
+            val targetPitch = wrapAngle(pitch)
+            val startTime = System.currentTimeMillis()
+            val duration = rotTime.toInt().coerceIn(10, 10000)
 
-    var currentRotation: Rotation? = null
-    var lastSentC08 = 0L
-    var shouldRightClick = false
-    var shouldLeftClick = false
-    inline val canSendC08 get() = Scheduler.runTime - lastSentC08 > 2
-    inline val offset get() = ((Scheduler.runTime % 2 * 2 - 1) * 1e-6).toFloat()
-    var targetYaw: Float? = null
-    var targetPitch: Float? = null
-    var ticksRotated: Long = 0L
+            val tickerChannel = ticker(delayMillis = 1, initialDelayMillis = 0)
+            for (event in tickerChannel) {
+                val currentTime = System.currentTimeMillis()
+                val progress = ((currentTime - startTime).toFloat() / duration).coerceIn(0f, 1f)
+                val amount = bezier(progress, 0f, 1f, 1f, 1f)
 
-    //@SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTick(event: TickEvent.ClientTickEvent){
-        if (event.isEnd || mc.thePlayer == null) return
-        val rot = currentRotation ?: return
-        //if (rot.silent) SilentRotator.doSilentRotation()
-        setAngles(rot.yaw + offset, rot.pitch)
-        targetYaw = rot.yaw + offset
-        targetPitch = rot.pitch
-        if (rot.continuous == null) {
-            when (rot.action) {
-                Action.RightClick -> {
-                    shouldRightClick = true
-                }
-                Action.LeftClick -> {
-                    shouldLeftClick = true
-                }
-                null -> {}
-            }
-            currentRotation = null
-            ticksRotated = 0L
-            return
-        }
-        ticksRotated++
-    }
+                mc.thePlayer?.rotationYaw = initialYaw + (targetYaw - initialYaw) * amount
+                mc.thePlayer?.rotationPitch = initialPitch + (targetPitch - initialPitch) * amount
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onMotion(event: MotionUpdateEvent.Pre){
-        if (mc.thePlayer == null) return
-        val rot = currentRotation ?: return
-        //if (rot.silent) SilentRotator.doSilentRotation()
-        //setAngles(rot.yaw + offset, rot.pitch)
-        event.yaw = rot.yaw + offset
-        event.pitch = rot.pitch
-        targetYaw = rot.yaw + offset
-        targetPitch = rot.pitch
-        if (rot.continuous == null) {
-            when (rot.action) {
-                Action.RightClick -> {
-                    shouldRightClick = true
-                }
-                Action.LeftClick -> {
-                    shouldLeftClick = true
-                }
-                null -> {}
-            }
-            currentRotation = null
-            ticksRotated = 0L
-            return
-        }
-        ticksRotated++
-    }
-
-    @SubscribeEvent
-    fun onPacket(event: PacketEvent.Send){
-        if (event.packet is C08PacketPlayerBlockPlacement && event.packet.placedBlockDirection == 255) {
-            lastSentC08 = 0L
-            currentRotation?.let {
-                if (it.continuous == CompletionRequirement.NonDirectionalC08) {
-                    it.continuous = null
+                if (progress >= 1f) {
+                    tickerChannel.cancel()
+                    break
                 }
             }
+
+            mc.thePlayer?.rotationYaw = yaw
+            mc.thePlayer?.rotationPitch = pitch
+            functionToRunWhenDone.invoke()
         }
     }
-
-    @SubscribeEvent
-    fun onKeyInput(event: InputEvent.Keyboard) {
-        if (PlayerUtils.playerControlsKeycodes.contains(event.keycode) && currentRotation != null) {
-            devMessage("cancelling prerotate")
-             try {
-                 if (currentRotation!!.continuous == CompletionRequirement.PreRotate) {
-                     currentRotation = null
-                     ticksRotated = 0L
-                     targetPitch = null
-                     targetYaw = null
-                 }
-             } catch (e: Exception) {
-                 logger.error(e)
-             }
-        }
-    }
-
-
-    @SubscribeEvent
-    fun onPacketReturn(event: PacketReturnEvent.Send){
-        if (event.packet !is C03PacketPlayer || SwapManager.recentlySwapped || !canSendC08) return
-        if (shouldRightClick) {
-            shouldRightClick = false
-            PlayerUtils.airClick()
-        }
-    }
-
-    fun completePrerotateTask(){
-        devMessage("complete prerotate")
-        try {
-            if (currentRotation != null && currentRotation!!.continuous == CompletionRequirement.PreRotate) {
-                currentRotation!!.continuous = null
-            }
-        } catch (e: Exception) {
-            devMessage("Error Occurred Completing Task")
-            logger.error(e)
-        }
-
-    }
-
-    fun forceCompleteTask(){
-        try {
-            if (currentRotation != null) {
-                currentRotation!!.continuous = null
-            }
-        } catch (e: Exception) {
-            devMessage("Error Occurred Completing Task")
-            logger.error(e)
-        }
-    }
-
-
-
-
-
-
 }

@@ -39,6 +39,7 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
 
+@Suppress("Unused")
 object AutoP3: Module (
     name = "AutoP3",
     Keyboard.KEY_NONE,
@@ -255,12 +256,6 @@ object AutoP3: Module (
                 val speed = args[2].toFloatOrNull() ?: return
                 AutoP3Utils.setGameSpeed(speed)
             }*/
-            "rotate" -> {
-                if (args.size < 4) return
-                val yaw = args[2].toFloatOrNull() ?: return
-                val pitch = args[3].toFloatOrNull() ?: return
-                RotationUtils.rotate(yaw, pitch, false)
-            }
             "motion" -> {
                 if (args.size < 4) return
                 val add = args[2].toIntOrNull() ?: return
@@ -298,8 +293,6 @@ object AutoP3: Module (
         val leap = args.any { it == "leap" }
         val left = args.any {it == "left"}
         val rotate = args.any {it == "rotate" || it == "look"}
-        var endPos = 0.0
-        var packets = mutableListOf<C04PacketPlayerPosition>()
         when (args[1].lowercase()) {
             "walk" -> {
                 modMessage("added walk")

@@ -16,6 +16,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+@Suppress("Unused")
 object BowUtils {
 
     private const val RANGE = 40

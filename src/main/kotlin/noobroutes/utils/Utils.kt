@@ -24,6 +24,7 @@ import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.features.ModuleManager
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.sendCommand
 import noobroutes.utils.skyblock.skyblockID
@@ -103,8 +104,6 @@ object Utils {
 
     val ItemStack?.ID: Int
         get() = Item.getIdFromItem(this?.item)
-
-
 
 }
 
@@ -256,19 +255,6 @@ fun Event.postAndCatch(): Boolean {
 }
 
 /**
- * Executes the specified function after the specified number of **minecraft** ticks.
- * @param ticks The number of ticks to wait.
- * @param func The function to execute after the specified number of
- */
-fun runIn(ticks: Int, server: Boolean = false, func: () -> Unit) {
-    if (ticks <= 0) {
-        func()
-        return
-    }
-    ModuleManager.tickTasks.add(ModuleManager.TickTask(ticks, server, func))
-}
-
-/**
  * Profiles the specified function with the specified string as profile section name.
  * Uses the minecraft profiler.
  *
@@ -302,7 +288,7 @@ fun endProfile() {
  */
 fun String.capitalizeFirst(): String = replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 
-fun noobroutes.utils.render.Color.coerceAlpha(min: Float, max: Float): noobroutes.utils.render.Color {
+fun Color.coerceAlpha(min: Float, max: Float): Color {
     return if (this.alpha < min) this.withAlpha(min)
     else if (this.alpha > max) this.withAlpha(max)
     else this
@@ -342,28 +328,6 @@ fun formatTime(time: Long, decimalPlaces: Int = 2): String {
     return "$hours$minutes${seconds}s"
 }
 
-val Char.isHexaDecimal
-    get() = isDigit() || lowercase().equalsOneOf("a","b","c","d","e","f")
-
-fun checkGLError(message: String) {
-    var i: Int
-    if ((GL11.glGetError().also { i = it }) != 0) {
-        val s = GLU.gluErrorString(i)
-        println("########## GL ERROR ##########")
-        println("@ $message")
-        println("$i: $s")
-    }
-}
-
-/**
- * Writes the given text to the clipboard.
- */
-fun writeToClipboard(text: String, successMessage: String = "§aCopied to clipboard.") {
-    GuiScreen.setClipboardString(text)
-    if (successMessage.isNotEmpty()) modMessage(
-        successMessage
-    )
-}
 
 private val romanMap = mapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
 private val numberRegex = Regex("^[0-9]+$")
@@ -380,12 +344,6 @@ fun romanToInt(s: String): Int {
     }
 }
 
-fun fillItemFromSack(amount: Int, itemId: String, sackName: String, sendMessage: Boolean) {
-    val needed = mc.thePlayer?.inventory?.mainInventory?.find { it?.skyblockID == itemId }?.stackSize ?: 0
-    if (needed != amount) sendCommand("gfs $sackName ${amount - needed}") else if (sendMessage) modMessage(
-        "§cAlready at max stack size."
-    )
-}
 
 inline fun <T> MutableCollection<T>.removeFirstOrNull(predicate: (T) -> Boolean): T? {
     val first = firstOrNull(predicate) ?: return null
@@ -395,14 +353,9 @@ inline fun <T> MutableCollection<T>.removeFirstOrNull(predicate: (T) -> Boolean)
 
 fun Int.rangeAdd(add: Int): IntRange = this..this+add
 
-val Entity.rotation get() = Pair(rotationYaw, rotationPitch)
 
 fun runOnMCThread(run: () -> Unit) {
     if (!mc.isCallingFromMinecraftThread) mc.addScheduledTask(run) else run()
-}
-
-fun EntityPlayer?.isOtherPlayer(): Boolean {
-    return this != null && this != mc.thePlayer && this.uniqueID.version() != 2
 }
 
 fun EntityLivingBase?.getSBMaxHealth(): Float {

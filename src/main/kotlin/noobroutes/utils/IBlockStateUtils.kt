@@ -9,7 +9,7 @@ import noobroutes.utils.skyblock.devMessage
 
 object IBlockStateUtils {
 
-    val airIBlockState = Block.getStateById(0)
+    val airIBlockState: IBlockState = Block.getStateById(0)
 
     fun getBlockStateFromName(name: String): BlockState? {
         return Block.getBlockFromName(name)?.blockState

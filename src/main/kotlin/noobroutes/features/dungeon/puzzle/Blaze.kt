@@ -111,10 +111,10 @@ object Blaze : Module(
         getBlaze()
         when (event.room.data.name) {
             "Lower Blaze" -> {
-                Etherwarper.etherwarpToVec3(event.room.getRealCoords(12, 70, 24).toVec3().add(0.5, 0.5, 0.5), silent)
+
             }
             "Higher Blaze" -> {
-                Etherwarper.etherwarpToVec3(event.room.getRealCoords(15, 69, 14).toVec3().add(0.5, 0.5, 0.5), silent)
+
             }
         }
 
@@ -135,7 +135,7 @@ object Blaze : Module(
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || Etherwarper.warping || mc.thePlayer == null) return
+        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
         val room = DungeonUtils.currentRoom ?: return
         if (!room.data.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
 
@@ -159,7 +159,7 @@ object Blaze : Module(
         currentEtherwarpTarget = closestBlock.toBlockPos()
 
         if (!isOnBlock(currentEtherwarpTarget!!)) {
-            Etherwarper.etherwarpToVec3(closestBlock.add(0.5, 1.1, 0.5), silent)
+
             return
         }
 
@@ -170,10 +170,10 @@ object Blaze : Module(
 
     private fun handleConnectPoints(room: Room): Boolean {
         if (room.data.name == "Lower Blaze" && isOnBlock(room.getRealCoords(BlockPos(12, 70, 24)))) {
-            Etherwarper.etherwarpToVec3(room.getRealCoords(22, 56, 16).toVec3().add(0.5, 1.0, 0.5), silent)
+
             return true
         } else if (room.data.name == "Higher Blaze" && isOnBlock(room.getRealCoords(BlockPos(15, 69, 14)))) {
-            Etherwarper.etherwarpToVec3(room.getRealCoords(20, 85, 11).toVec3().add(0.5, 1.0, 0.5), silent)
+
             return true
         }
         return false

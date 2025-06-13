@@ -21,6 +21,7 @@ import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.skyblockID
 import org.lwjgl.input.Keyboard
 
+@Suppress("Unused")
 object BlinkRelic: Module(
     name = "Blink Relics",
     Keyboard.KEY_NONE,

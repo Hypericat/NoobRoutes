@@ -78,8 +78,6 @@ class NoobRoutes {
             SwapManager,
             BowUtils,
             RotationUtils,
-            SilentRotator,
-            Etherwarper,
             BossEventDispatcher,
             SecretUtils,
             AutoRouteUtils

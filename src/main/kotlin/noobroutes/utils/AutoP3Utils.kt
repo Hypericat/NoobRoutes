@@ -41,6 +41,7 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.reflect.KClass
 
+@Suppress("Unused")
 object AutoP3Utils {
 
     val keyBindings = listOf(
@@ -219,7 +220,7 @@ object AutoP3Utils {
         if (mc.thePlayer.isInWater || mc.thePlayer.isInLava || !walking) return
 
         val sprintMultiplier = 1.3
-        var speed = mc.thePlayer.aiMoveSpeed.toDouble()
+        val speed = mc.thePlayer.aiMoveSpeed.toDouble()
 
         if (airTicks < 1) {
             var speedMultiplier = 2.806
