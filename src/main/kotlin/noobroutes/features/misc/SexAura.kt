@@ -33,9 +33,6 @@ object SexAura : Module(
     private val actuallySend by BooleanSetting("Im ready", false, description = "wether to actually start the rizz")
     private val sentList = mutableListOf<String>()
     private var lastMessage = System.currentTimeMillis()
-    val noobAccounts =
-        listOf("Noob0105", "ILickToes69420", "ISniffToes69420", "ISuckToes69420", "The69ToHis420", "ryealuwu", "WadeyIsMyPookie")
-    private val wadeyAccounts = listOf("Wadey36", "Tahudidu", "NoobIsMyPookie")
 
     private val pickupLines = listOf(
         "Are you WiFi? Because I’m feeling a strong connection… even though you’re clearly out of my league.",
@@ -85,18 +82,7 @@ object SexAura : Module(
     }
 
     private fun sendPickupLine(player: EntityPlayer) {
-        if (noobAccounts.contains(player.name) && !wadeyAccounts.contains(mc.thePlayer.name)) {
-            modMessage("im not a fucking hoe how dare u (ban in 3)")
-            Scheduler.schedulePreTickTask(20) { modMessage("2...") }
-            Scheduler.schedulePreTickTask(40) { modMessage("1...") }
-            Scheduler.schedulePreTickTask(60) { modMessage("now") }
-            Scheduler.schedulePreTickTask(69) { modMessage("lucky piece of shit i hope u die") }
-        } else if (wadeyAccounts.contains(player.name) && !noobAccounts.contains(mc.thePlayer.name)) {
-            modMessage("trying to pickup my pookie bear wadey are we?")
-            modMessage("i hope u fucking die a slow and painful death")
-            modMessage("keep ur hands off Wadey from now on")
-        } else if (actuallySend) sendCommand("msg ${player.name} ${pickupLines.random()}")
-        else modMessage("/msg ${player.name} ${pickupLines.random()}")
+        if (actuallySend) sendCommand("msg ${player.name} ${pickupLines.random()}") else modMessage("/msg ${player.name} ${pickupLines.random()}")
         sentList.add(player.name)
         Scheduler.schedulePreTickTask(200) { sentList.remove(player.name) }
         lastMessage = System.currentTimeMillis()

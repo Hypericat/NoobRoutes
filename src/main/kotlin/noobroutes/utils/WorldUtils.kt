@@ -7,6 +7,7 @@ import net.minecraft.block.BlockLever.EnumOrientation
 import net.minecraft.block.BlockSkull
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
+import net.minecraft.tileentity.TileEntitySkull
 import net.minecraft.util.*
 import noobroutes.Core.mc
 import noobroutes.utils.skyblock.devMessage
@@ -28,6 +29,15 @@ fun setBlock(blockPos: BlockPos, blockState: IBlockState){
     world.setBlockState(blockPos, blockState)
     world.markBlockForUpdate(blockPos)
 }
+
+inline val TileEntitySkull.skullTexture get() =
+    this.playerProfile?.properties?.get("textures")?.firstOrNull()?.value
+
+fun getSkull(pos: BlockPos): TileEntitySkull? {
+    return (mc.theWorld?.getTileEntity(pos) as? TileEntitySkull)
+}
+
+
 
 /**
  * Checks if the block at the specified `BlockPos` is considered "air" in the Minecraft world.

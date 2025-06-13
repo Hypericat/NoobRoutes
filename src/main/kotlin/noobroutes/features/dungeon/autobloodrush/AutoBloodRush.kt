@@ -3,10 +3,12 @@ package noobroutes.features.dungeon.autobloodrush
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.init.Blocks
+import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
+import net.minecraft.tileentity.TileEntitySkull
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -46,6 +48,7 @@ import noobroutes.utils.skyblock.dungeon.ScanUtils
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.skyblock.skyblockID
 import kotlin.math.floor
 
 object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for bloodrushing", category = Category.DUNGEON) {
@@ -227,10 +230,20 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         }
     }
 
+
+
+    private val skullIds = listOf(
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2JjYmJmOTRkNjAzNzQzYTFlNzE0NzAyNmUxYzEyNDBiZDk4ZmU4N2NjNGVmMDRkY2FiNTFhMzFjMzA5MTRmZCJ9fX0=",
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQ5ZDgwYjc5NDQyY2YxYTNhZmVhYTIzN2JkNmFkYWFhY2FiMGMyODgzMGZiMzZiNTcwNGNmNGQ5ZjU5MzdjNCJ9fX0="
+    )
+
+
+
     fun findRoomDoors(room: Room): Door? {
         val possibleDoors = getRoomDoors(room).map { room.getRealCoordsOdin(it) }
         val doors = possibleDoors.filter {
-            !isAir(it)
+
+            getSkull(it.add(-2, 1, -2))?.skullTexture in skullIds
         }
         val doorPos = doors.firstOrNull {it != currentDoor?.pos} ?: return null
         val roomRouteName = "${possibleDoors.indexOf(currentDoor?.pos)}>${possibleDoors.indexOf(doorPos)}"
@@ -280,6 +293,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent){
+
         val room = DungeonUtils.currentRoom ?: return
         if (editMode) {
             val doorPositions = if (room.data.name == "Entrance") oneByOneDoors.map { room.getRealCoordsOdin(it) } else getRoomDoors(room).map { room.getRealCoordsOdin(it) }
@@ -467,9 +481,9 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         val dx = if (clipS08.dir == 0) 1 else if (clipS08.dir == 1) -1 else 0
         val dz = if (clipS08.dir == 2) 1 else if (clipS08.dir == 3) -1 else 0
         if (mc.theWorld.getBlockState(BlockPos(event.packet.x, event.packet.y - 1, event.packet.z)).block == Blocks.cobblestone_wall) {
-            Scheduler.scheduleC03Task(0, true) { PacketUtils.sendPacket(C04PacketPlayerPosition(clipS08.x + 1.4 * dx, 70.0, clipS08.z + 1.4 * dz, true)) }
+            Scheduler.scheduleC03Task(0, true) { PacketUtils.sendPacket(C06PacketPlayerPosLook(clipS08.x + 1.4 * dx, 70.0, clipS08.z + 1.4 * dz, event.packet.yaw, 90f, true)) }
             Scheduler.scheduleC03Task(1, true) {
-                PacketUtils.sendPacket(C04PacketPlayerPosition(clipS08.x + 2.8 * dx, 70.0, clipS08.z + 2.8 * dz, true))
+                PacketUtils.sendPacket(C06PacketPlayerPosLook(clipS08.x + 2.8 * dx, 70.0, clipS08.z + 2.8 * dz,event.packet.yaw, 90f, true))
                 mc.thePlayer.setPosition(clipS08.x + 3.8 * dx + 0.8 * dz, 70.0, clipS08.z + 3.8 * dz - 0.8 * dx)
                 Scheduler.schedulePreTickTask {
                     AutoRouteUtils.etherwarp(event.packet.yaw, 90f, silent)
@@ -479,7 +493,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             return
         }
         Scheduler.scheduleC03Task(0, true) {
-            PacketUtils.sendPacket(C04PacketPlayerPosition(clipS08.x + 2.8 * dx, 70.0, clipS08.z + 2.8 * dz, true))
+            PacketUtils.sendPacket(C06PacketPlayerPosLook(clipS08.x + 2.8 * dx, 70.0, clipS08.z + 2.8 * dz, event.packet.yaw , 90f, true))
             mc.thePlayer.setPosition(clipS08.x + 3.8 * dx + 0.8 * dz, 70.0, clipS08.z + 3.8 * dz - 0.8 * dx)
             Scheduler.schedulePreTickTask {
                 AutoRouteUtils.etherwarp(event.packet.yaw, 90f, silent)
@@ -488,15 +502,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         }
     }
 
-    fun getDir(): Int {
-        return when {
-            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(0,1,1)) != null -> 0
-            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(0,1,-1)) != null -> 1
-            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(-1,1,0)) != null -> 2
-            mc.theWorld.getTileEntity(mc.thePlayer.positionVector.toBlockPos().add(1,1,0)) != null -> 3
-            else -> 69420
-        }
-    }
 
     var autoBrUnsneakRegistered = false
     @SubscribeEvent
