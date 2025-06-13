@@ -47,6 +47,7 @@ class BlinkRing(
     }
 
     override fun loadRingData(obj: JsonObject) {
+        super.loadRingData(obj)
         val packetsLoaded = mutableListOf<C04PacketPlayerPosition>()
         obj.get("packets").asJsonArray.forEach {
             val packet = it.asJsonObject
