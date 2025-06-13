@@ -56,13 +56,20 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
         if (xDec != 0.5 || zDec != 0.5) return
         val dir = getDir()
         val yaw = when (dir) {
-            0 -> 10f
-            1 -> -170f
-            2 -> 100f
-            3 -> -80f
+            0 -> 14.8f
+            1 -> -167.6f
+            2 -> 101.8f
+            3 -> -81.9f
             else -> return
         }
-        if (!silent) RotationUtils.setAngles(yaw, 68f)
+        val pitch = when (dir) {
+            0 -> 65.6f
+            1 -> 67.2f
+            2 -> 66.9f
+            3 -> 67.6f
+            else -> return
+        }
+        if (!silent) RotationUtils.setAngles(yaw, pitch)
         thrown = System.currentTimeMillis()
         devMessage(yaw)
         val expectedX = x + if (dir == 3) 1 else if (dir == 2) -1 else 0
@@ -81,16 +88,23 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
     ) {
         val dir = getDir()
         val yaw = when (dir) {
-            0 -> 10f
-            1 -> -170f
-            2 -> 100f
-            3 -> -80f
+            0 -> 14.8f
+            1 -> -167.6f
+            2 -> 101.8f
+            3 -> -81.9f
+            else -> return
+        }
+        val pitch = when (dir) {
+            0 -> 65.6f
+            1 -> 67.2f
+            2 -> 66.9f
+            3 -> 67.6f
             else -> return
         }
         event.yaw = yaw
-        event.pitch = 68f
+        event.pitch = pitch
         if (mc.thePlayer.isSneaking || !mc.thePlayer.heldItem.displayName.contains("pearl", true)) {
-            AutoRouteUtils.setRotation(yaw + offset, 68f)
+            AutoRouteUtils.setRotation(yaw + offset, pitch)
             Scheduler.schedulePreTickTask {
                 AutoBloodRush.autoBrUnsneakRegistered = true
             }
