@@ -26,6 +26,8 @@ import kotlin.math.*
 object RotationUtils {
     private const val SNEAKHEIGHT = 0.0800000429153443
 
+    inline val offset get() = ((Scheduler.runTime % 2 * 2 - 1) * 1e-6).toFloat()
+
     fun yawAndPitchVector(yaw: Float, pitch: Float): Vec3 {
         val f = cos(-yaw * 0.017453292519943295 - PI)
         val f1 = sin(-yaw * 0.017453292519943295 - PI)
