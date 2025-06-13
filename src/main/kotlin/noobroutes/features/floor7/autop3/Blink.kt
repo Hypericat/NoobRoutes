@@ -237,8 +237,8 @@ object Blink{
         if (!recording || event.packet !is C03PacketPlayer) return
         if (event.isCanceled) return
         modMessage("recording ${recordedPackets.size}")
-        if (event.packet is C03PacketPlayer.C04PacketPlayerPosition) {
-            if (recordedPackets.last() == C03PacketPlayer.C04PacketPlayerPosition(
+        if (event.packet is C04PacketPlayerPosition) {
+            if (recordedPackets.last() == C04PacketPlayerPosition(
                     event.packet.positionX,
                     event.packet.positionY,
                     event.packet.positionZ,
@@ -247,8 +247,8 @@ object Blink{
             ) return
             recordedPackets.add(event.packet)
         }
-        else if (event.packet is C03PacketPlayer.C06PacketPlayerPosLook) {
-            if (recordedPackets.last() == C03PacketPlayer.C04PacketPlayerPosition(
+        else if (event.packet is C06PacketPlayerPosLook) {
+            if (recordedPackets.last() == C04PacketPlayerPosition(
                     event.packet.positionX,
                     event.packet.positionY,
                     event.packet.positionZ,
@@ -256,7 +256,7 @@ object Blink{
                 )
             ) return
             recordedPackets.add(
-                C03PacketPlayer.C04PacketPlayerPosition(
+                C04PacketPlayerPosition(
                     event.packet.positionX,
                     event.packet.positionY,
                     event.packet.positionZ,
@@ -267,6 +267,7 @@ object Blink{
         if (recordedPackets.size == getRecordingGoalLength(lastWaypoint)) {
             modMessage("finished recording")
             recording = false
+
             AutoP3.actuallyAddRing(BlinkRing(
                 lastWaypoint.coords,
                 lastWaypoint.yaw,
@@ -276,7 +277,11 @@ object Blink{
                 lastWaypoint.center,
                 lastWaypoint.rotate,
                 recordedPackets,
-                mc.thePlayer.motionY
+                mc.thePlayer.motionY,
+                mc.thePlayer.motionX,
+                mc.thePlayer.motionZ,
+                lastWaypoint.walk,
+                AutoP3Utils.direction
             ))
         }
     }

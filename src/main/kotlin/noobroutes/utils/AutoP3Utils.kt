@@ -200,7 +200,7 @@ object AutoP3Utils {
         mc.thePlayer.motionZ = Utils.zPart(direction) * speed
     }
 
-    private var airTicks = 0
+    var airTicks = 0
     var jumping = false
 
     var jump1 = 2

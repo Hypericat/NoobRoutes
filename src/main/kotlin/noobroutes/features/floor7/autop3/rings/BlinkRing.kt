@@ -16,6 +16,8 @@ import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.Scheduler
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 
 @RingType("Blink")
@@ -28,12 +30,20 @@ class BlinkRing(
     center: Boolean = false,
     rotate: Boolean = false,
     var packets: List<C04PacketPlayerPosition> = listOf(),
-    var endYVelo: Double = 0.0
+    var endYVelo: Double = 0.0,
+    var endXVelo: Double = 0.0,
+    var endZVelo: Double = 0.0,
+    var walk: Boolean = false,
+    var dir: Float = 0f
 ) : Ring(coords, yaw, term, leap, left, center, rotate) {
 
 
     init {
         addDouble("endYVelo", {endYVelo}, {endYVelo = it})
+        addBoolean("walk", {walk}, {walk = it})
+        addDouble("endXVelo", {endXVelo}, {endXVelo = it})
+        addDouble("endZVelo", {endZVelo}, {endZVelo = it})
+        addFloat("dir", {dir}, {dir = it})
     }
 
     override fun loadRingData(obj: JsonObject) {
@@ -94,7 +104,17 @@ class BlinkRing(
         packets.forEach { PacketUtils.sendPacket(it) }
         val lastPacket = packets.last()
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
-        mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
+        devMessage(walk)
+        if (!walk) mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
+        else {
+            devMessage(endXVelo)
+            mc.thePlayer.setVelocity(endXVelo, endYVelo, endZVelo)
+            var airTicks = 0
+            packets.forEach { if (!it.isOnGround) airTicks++ else airTicks = 0 }
+            AutoP3Utils.airTicks = airTicks
+            devMessage(airTicks)
+            Scheduler.scheduleC03Task(0) { AutoP3Utils.startWalk(dir) }
+        }
         modMessage("§c§l$cancelled§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }
 }

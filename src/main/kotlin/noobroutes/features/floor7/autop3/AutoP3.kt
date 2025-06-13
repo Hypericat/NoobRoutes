@@ -464,7 +464,8 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate,
-                    length
+                    length,
+                    walk
                 )
                 waypoint.triggered = true
                 blinkStarts.add(waypoint)
@@ -492,6 +493,20 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate
+                )
+                )
+            }
+            "insta" -> {
+                modMessage("added insta")
+                actuallyAddRing(InstaRing(
+                    coords,
+                    mc.thePlayer.rotationYaw,
+                    term,
+                    leap,
+                    left,
+                    center,
+                    rotate,
+                    walk
                 )
                 )
             }
