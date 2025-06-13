@@ -478,11 +478,14 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             }
             return
         }
-        mc.thePlayer.setPosition(clipS08.x + 3.8 * dx + 0.8 * dz, 70.0, clipS08.z + 3.8 * dz - 0.8 * dx)
-        Scheduler.schedulePreTickTask {
-            AutoRouteUtils.etherwarp(event.packet.yaw, 90f, silent)
+        Scheduler.scheduleC03Task(0, true) {
+            PacketUtils.sendPacket(C04PacketPlayerPosition(clipS08.x + 2.8 * dx, 70.0, clipS08.z + 2.8 * dz, true))
+            mc.thePlayer.setPosition(clipS08.x + 3.8 * dx + 0.8 * dz, 70.0, clipS08.z + 3.8 * dz - 0.8 * dx)
+            Scheduler.schedulePreTickTask {
+                AutoRouteUtils.etherwarp(event.packet.yaw, 90f, silent)
+            }
+            thrown = 0
         }
-        thrown = 0
     }
 
     fun getDir(): Int {
