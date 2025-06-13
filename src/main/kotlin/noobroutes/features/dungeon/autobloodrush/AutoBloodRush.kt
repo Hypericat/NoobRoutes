@@ -450,42 +450,8 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         }
     }
 
-    var lastAttempt: Vec3? = null
     var direction: Rotations = Rotations.NONE
-    inline val doingShit get() = (lastAttempt?.distanceToPlayer ?: 5.0) < 3
-    var clipped = false
-    var skip = false
-    var expectedX = 0.0
-    var expectedZ = 0.0
-    var s08Pos = Pair(0.0, 0.0)
     var thrown = 0L
-    @SubscribeEvent
-    fun cancelC03(event: PacketEvent.Send) {
-        if (!doingShit) {
-            clipped = false
-            lastAttempt = null
-        }
-        if (!doingShit || event.packet !is C03PacketPlayer || clipped) return
-        if (skip) {
-            skip = false
-            return
-        }
-        devMessage("cancelled packet")
-        event.isCanceled = true
-    }
-
-    @SubscribeEvent
-    fun onS08(event: PacketEvent.Receive) {
-        if (event.packet !is S08PacketPlayerPosLook || !doingShit || clipped) return
-        s08Pos = Pair(event.packet.x, event.packet.z)
-        devMessage(s08Pos)
-        clipped = true
-        AutoP3Utils.unPressKeys()
-        event.isCanceled = true
-        PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
-        devMessage("sent packet")
-        clip()
-    }
 
     data class ExpectedS08(val x: Double, val z: Double, val dir: Int)
     lateinit var clipS08: ExpectedS08
@@ -528,49 +494,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             else -> 69420
         }
     }
-
-    private fun clip() {
-        val (dx, dz) = when (direction) {
-            Rotations.EAST -> -1 to 0
-            Rotations.WEST -> 1 to 0
-            Rotations.SOUTH -> 0 to -1
-            Rotations.NORTH -> 0 to 1
-            else -> return
-        }
-        mc.thePlayer.setPosition(
-            s08Pos.first + dx * clipDistance,
-            69.0,
-            s08Pos.second + dz * clipDistance
-        )
-        val speed = Core.mc.thePlayer.aiMoveSpeed.toDouble()
-        PlayerUtils.setMotion(
-            dx * 2.806 * speed,
-            dz * 2.806 * speed
-        )
-
-        Blocks.coal_block.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
-        Blocks.stained_hardened_clay.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
-        Blocks.monster_egg.setBlockBounds(-1f, -1f, -1f, -1f, -1f, -1f)
-        Scheduler.schedulePreTickTask {
-            PlayerUtils.setMotion(
-                dx * 2.806 * speed,
-                dz * 2.806 * speed
-            )
-        }
-        Scheduler.schedulePreTickTask(1) {
-            PlayerUtils.setMotion(
-                dx * 2.806 * speed,
-                dz * 2.806 * speed
-            )
-        }
-
-        Scheduler.schedulePreTickTask(4) {
-            Blocks.coal_block.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
-            Blocks.stained_hardened_clay.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
-            Blocks.monster_egg.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
-        }
-    }
-
 
     var autoBrUnsneakRegistered = false
     @SubscribeEvent

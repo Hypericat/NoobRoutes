@@ -107,42 +107,4 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
     }
 
 
-
-    private fun doorDirection(room: Room): Rotations {
-        val realCoord = room.getRealCoords(pos).toBlockPos()
-        return when {
-            isDoorBlock(realCoord.add(-1, 0, 0)) -> Rotations.EAST
-            isDoorBlock(realCoord.add(1, 0, 0)) -> Rotations.WEST
-            isDoorBlock(realCoord.add(0, 0, 1)) -> Rotations.NORTH
-            isDoorBlock(realCoord.add(0, 0, -1)) -> Rotations.SOUTH
-            else -> Rotations.NONE
-        }
-    }
-
-
-
-
-    private fun getYaw(): Float {
-        return when(direction) {
-            Rotations.EAST  -> 90f
-            Rotations.WEST  -> -90f
-            Rotations.SOUTH  -> -180f
-            Rotations.NORTH ->  0f
-            else -> 0f
-        }
-    }
-
-    private fun getPitch(orgPos: BlockPos): Float {
-        return if (isAir(orgPos.add(0, 3, 0))) -79f else 0f
-    }
-
-
-    private fun isDoorBlock(blockPosition: BlockPos): Boolean {
-        val state = mc.theWorld.getBlockState(blockPosition)
-        val block = state.block
-        val meta = block.getMetaFromState(state)
-        return block == Blocks.coal_block || (block == Blocks.stained_hardened_clay && meta == 14)
-    }
-
-
 }
