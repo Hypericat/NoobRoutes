@@ -7,7 +7,7 @@ import net.minecraft.util.Vec3
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.nodeColor
 import noobroutes.utils.AutoP3Utils.walking
-import noobroutes.utils.middle
+import noobroutes.utils.add
 import noobroutes.utils.offset
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
@@ -15,9 +15,6 @@ import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Room
-import kotlin.math.abs
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.editMode
-import noobroutes.utils.add
 
 abstract class BloodRushRoute(val name: String, var pos: Vec3) {
     var triggered = false

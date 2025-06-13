@@ -6,14 +6,17 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
+import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
+import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.ExpectedS08
+import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.clipS08
 import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.direction
+import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.getDir
 import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.silent
+import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.thrown
 import noobroutes.features.dungeon.autobloodrush.BloodRushRoute
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
-import noobroutes.utils.RotationUtils
-import noobroutes.utils.Scheduler
-import noobroutes.utils.SwapManager
-import noobroutes.utils.isAir
+import noobroutes.utils.*
+import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.skyblock.PlayerUtils
@@ -23,13 +26,6 @@ import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.sendChatMessage
-
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.doingShit
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.expectedX
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.expectedZ
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.lastAttempt
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.skip
-import noobroutes.utils.toBlockPos
 
 class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
 
@@ -43,7 +39,8 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
 
 
     override fun runTick(room: Room) {
-        if (doingShit) return modMessage("doing shit")
+        if (System.currentTimeMillis() - thrown < 10000) return modMessage("doing shit")
+        PlayerUtils.unSneak()
         val state = SwapManager.swapFromName("pearl")
         if (state == SwapManager.SwapState.UNKNOWN) return
         if (state == SwapManager.SwapState.TOO_FAST) {
@@ -54,40 +51,52 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
         val y = PlayerUtils.posY
         val z = PlayerUtils.posZ
         if (y != 69.0 || x > 0 || z > 0 || x < -200 || z < -200) return
-
-        val blockPosPlayer = Vec3(x,y,z).toBlockPos()
-        direction = doorDirection(room)
-        devMessage(direction)
-        lastAttempt = mc.thePlayer.positionVector
-        skip = true
-        val angles = Pair(getYaw(), getPitch(mc.thePlayer.positionVector.toBlockPos()))
-        if (!silent) RotationUtils.setAngles(angles.first, angles.second)
-        expectedX = blockPosPlayer.x + 0.5
-        expectedZ = blockPosPlayer.z + 0.5
+        val xDec = (x + 200) % 1
+        val zDec = (z + 200) % 1
+        if (xDec != 0.5 || zDec != 0.5) return
+        val dir = getDir()
+        val yaw = when (dir) {
+            0 -> 10f
+            1 -> -170f
+            2 -> 100f
+            3 -> -80f
+            else -> return
+        }
+        if (!silent) RotationUtils.setAngles(yaw, 68f)
+        thrown = System.currentTimeMillis()
+        devMessage(yaw)
+        val expectedX = x + if (dir == 3) 1 else if (dir == 2) -1 else 0
+        val expectedZ = z + if (dir == 0) 1 else if (dir == 1) -1 else 0
+        clipS08 = ExpectedS08(expectedX, expectedZ, dir)
         if (mc.isSingleplayer) {
-            Scheduler.schedulePreTickTask(2) { sendChatMessage("/tp $expectedX ${blockPosPlayer.y + 2.0} $expectedZ") }
+            Scheduler.schedulePreTickTask(2) { sendChatMessage("/tp $expectedX 70 $expectedZ") }
         }
-        PlayerUtils.unSneak()
-
-        if (state == SwapManager.SwapState.SWAPPED || mc.thePlayer.isSneaking) {
-            AutoRouteUtils.setRotation(angles.first, angles.second)
-            Scheduler.schedulePreTickTask {
-                AutoRouteUtils.aotvTarget = null
-                AutoRouteUtils.unsneakRegistered = true
-            }
-            return
-        }
-        AutoRouteUtils.aotvTarget = null
-        AutoRouteUtils.unsneakRegistered = true
     }
+
+
 
     override fun runMotion(
         room: Room,
         event: MotionUpdateEvent.Pre
     ) {
-        val angles = Pair(getYaw(), getPitch(mc.thePlayer.positionVector.toBlockPos()))
-        event.yaw = angles.first
-        event.pitch = angles.second
+        val dir = getDir()
+        val yaw = when (dir) {
+            0 -> 10f
+            1 -> -170f
+            2 -> 100f
+            3 -> -80f
+            else -> return
+        }
+        event.yaw = yaw
+        event.pitch = 68f
+        if (mc.thePlayer.isSneaking || !mc.thePlayer.heldItem.displayName.contains("pearl", true)) {
+            AutoRouteUtils.setRotation(yaw + offset, 68f)
+            Scheduler.schedulePreTickTask {
+                AutoBloodRush.autoBrUnsneakRegistered = true
+            }
+            return
+        }
+        AutoBloodRush.autoBrUnsneakRegistered = true
     }
 
     override fun getAsJsonObject(): JsonObject {

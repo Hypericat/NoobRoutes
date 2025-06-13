@@ -47,6 +47,11 @@ object AutoRouteUtils {
      * Call inside a ClientTickEvent (start)
      */
     fun etherwarpToVec3(vec3: Vec3, silent: Boolean = false){
+        val rot = RotationUtils.getYawAndPitch(vec3)
+        etherwarp(rot.first, rot.second, silent)
+    }
+
+    fun etherwarp(yaw: Float, pitch: Float, silent: Boolean = false){
         PlayerUtils.stopVelocity()
         val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.UNKNOWN) return
@@ -54,17 +59,16 @@ object AutoRouteUtils {
             modMessage("Tried to 0 tick swap gg")
             return
         }
-        val rot = RotationUtils.getYawAndPitch(vec3)
 
-        if (!silent) RotationUtils.setAngles(rot.first, rot.second)
+        if (!silent) RotationUtils.setAngles(yaw, pitch)
         walking = false
         PlayerUtils.sneak()
         Scheduler.schedulePreMotionUpdateTask {
             val event = it as MotionUpdateEvent.Pre
-            event.yaw = rot.first
-            event.pitch = rot.second
+            event.yaw = yaw
+            event.pitch = pitch
             if (!mc.thePlayer.isSneaking || state == SwapManager.SwapState.SWAPPED) {
-                setRotation(rot.first + offset, rot.second)
+                setRotation(yaw + offset, pitch)
                 Scheduler.schedulePreTickTask {
                     ether()
                 }
