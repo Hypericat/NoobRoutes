@@ -27,10 +27,13 @@ import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.*
+import noobroutes.utils.RotationUtils.setAngles
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.skyblock.EtherWarpHelper
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoordsOdin
@@ -209,7 +212,7 @@ object AutoP3: Module (
     }
 
     fun leapPlayers(): Int {
-        return if (mc.thePlayer.getDistanceSq(2.5, 109.0, 102.5) < 2) 3 //ee3 spot (core)
+        return if (mc.thePlayer.getDistanceSq(2.5, 109.0, 102.5) < 10) 3 //ee3 spot (core)
         else if (mc.thePlayer.posY >= 120) 1 //premine leap
         else 4
     }
@@ -263,6 +266,15 @@ object AutoP3: Module (
                 AutoP3Utils.jump1 = add
                 AutoP3Utils.jump2 = mult
                 modMessage("1 $add 2 $mult")
+            }
+            "ether" -> {
+                if (args.size < 5) return
+                val x = args[2].toIntOrNull() ?: return
+                val y = args[3].toIntOrNull() ?: return
+                val z = args[4].toIntOrNull() ?: return
+                val angles = EtherWarpHelper.getEtherYawPitch(BlockPos(x,y,z)) ?: return
+                devMessage(angles)
+                setAngles(angles.first, angles.second)
             }
             else -> {
                 modMessage("All tests passed")

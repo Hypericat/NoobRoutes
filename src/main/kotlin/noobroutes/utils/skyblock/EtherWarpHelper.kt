@@ -3,6 +3,7 @@ package noobroutes.utils.skyblock
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
+import noobroutes.features.dungeon.MapLobotomizer
 import noobroutes.utils.*
 import noobroutes.utils.render.RenderUtils.renderVec
 import kotlin.math.*
@@ -16,44 +17,47 @@ object EtherWarpHelper {
     }
     var etherPos: EtherPos = EtherPos.NONE
 
+    fun getEtherYawPitch(blockCoords: BlockPos): Pair<Float, Float>? {
+        val playerCoords = mc.thePlayer.positionVector
+        val centeredCoords = centerCoords(blockCoords)
+        val rotation = RotationUtils.getYawAndPitch(
+            centeredCoords.xCoord,
+            centeredCoords.yCoord + 0.5,
+            centeredCoords.zCoord,
+            true
+        )
 
-    /*
-    /**
- * Gets a valid Yaw/Pitch combination that you can etherwarp to in order to land at a specific block. Has terrible performance.
- * @param {Array} blockCoords
- * @returns Object with yaw and pitch or null if fail
- */
-export function getEtherYawPitch(blockCoords) {
-    const runStart = System.nanoTime()
-    const playerCoords = [Player.getX(), Player.getY(), Player.getZ()]
+        if (getEtherPos(playerCoords, rotation.first, rotation.second).pos == blockCoords) {
+            return rotation
+        }
+        var runs = 0
+        val distance = playerCoords.add(0.0,1.5399999618530273,0.0).distanceTo(centeredCoords)
+        val sweepDegrees = Math.toDegrees(2 * atan(0.707 / distance)).toFloat()
+        for (i in 0..10) {
+            val lowerYaw = rotation.first - sweepDegrees
+            val upperYaw = rotation.first + sweepDegrees
+            val lowerPitch = rotation.second - sweepDegrees
+            val upperPitch = rotation.second + sweepDegrees
 
-    const centeredCoords = centerCoords(blockCoords)
-    const rotation = calcYawPitch(centeredCoords[0], centeredCoords[1] + 0.5, centeredCoords[2], true)
-    // Return if you can aim at center of the block
-    if (rayTraceEtherBlock(playerCoords, rotation.yaw, rotation.pitch)?.every((coord, index) => coord === blockCoords[index])) return rotation
-    let runs = 0
-    for (let i = 0; i <= 10; i++) { // Exponentially less distance between steps...
-        let lowerLimit = { yaw: rotation.yaw - 2, pitch: rotation.pitch - 4 }
-        let upperLimit = { yaw: rotation.yaw + 2, pitch: rotation.pitch + 4 }
+            val yawStepSize = (1.0 / (1 + i * (2.0 / 3))).toFloat()
+            val pitchStepSize = (0.5 / (1 + i * 0.5)).toFloat()
 
-        let yawStepSize = (1 / (1 + i * (2 / 3)))
-        let pitchStepSize = (0.5 / (1 + (i * 0.5)))
-        for (let yaw = lowerLimit.yaw; yaw < upperLimit.yaw; yaw += yawStepSize) {
-            for (let pitch = lowerLimit.pitch; pitch < upperLimit.pitch; pitch += pitchStepSize) {
-                runs++
-                let prediction = rayTraceEtherBlock(playerCoords, yaw, pitch)
-                if (!prediction) continue
-                if (prediction.every((coord, index) => coord === blockCoords[index])) {
-                    debugMessage(`Found Yaw/Pitch combination in ${runs} attempts! Took ${(System.nanoTime() - runStart) / 1000000}ms. Shoutout to CT performance btw`, false)
-                    return { yaw, pitch }
+            var yaw = lowerYaw
+            while (yaw < upperYaw) {
+                var pitch = lowerPitch
+                while (pitch < upperPitch) {
+                    runs++
+                    val prediction = getEtherPos(playerCoords, yaw, pitch)
+                    if (prediction.pos == blockCoords) {
+                        return Pair(yaw, pitch)
+                    }
+                    pitch += pitchStepSize
                 }
+                yaw += yawStepSize
             }
         }
+        return null
     }
-    debugMessage(`Failed to find Yaw/Pitch combination. ${runs} attempts. Took ${(System.nanoTime() - runStart) / 1000000}ms. Shoutout to CT performance btw`, false)
-    return null
-}
-     */
 
 
 
@@ -80,6 +84,10 @@ export function getEtherYawPitch(blockCoords) {
         mc.thePlayer.rotationPitch
     ), distance: Double = 60.0): EtherPos {
         return getEtherPos(positionLook.pos, positionLook.yaw, positionLook.pitch, distance)
+    }
+
+    fun centerCoords(blockCoords: BlockPos): Vec3 {
+        return Vec3(blockCoords.x + 0.5, blockCoords.y.toDouble(), blockCoords.z + 0.5)
     }
 
     /**
