@@ -207,7 +207,7 @@ public class PathFinder {
         List<BlockPos> blockHits = new ArrayList<>();
         HashSet<BlockPos> cache = new HashSet<>();
 
-        Vec3 eyePos = VecUtilsKt.toCenteredVec3(pos).addVector(0.0, 2.539999957084656d, 0.0d);
+        Vec3 eyePos = VecUtilsKt.toCenteredVec3(pos).addVector(0.0d, 2.539999957084656d, 0.0d);
         float stepPitch = 2f;
         float stepYaw = 2f;
 
