@@ -12,6 +12,8 @@ import noobroutes.utils.RotationUtils;
 import noobroutes.utils.VecUtilsKt;
 import noobroutes.utils.pathfinding.openset.BinaryHeapOpenSet;
 import noobroutes.utils.skyblock.ChatUtilsKt;
+import noobroutes.utils.skyblock.EtherWarpHelper;
+import org.lwjgl.Sys;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -26,6 +28,12 @@ public class PathFinder {
     private final HashMap<Long, PathNode> cache;
     public final static double NEW_NODE_COST = 2d;
     public final static double MIN_IMPROVEMENT = 1d;
+    public final static double THREAD_COUNT = 0;
+
+    private PathNode bestNode;
+    private boolean complete;
+    private BinaryHeapOpenSet nodes;
+    private HashSet<PathNode> processing;
 
 
     public PathFinder(World world, Goal goal, BlockPos startPos) {
@@ -38,68 +46,133 @@ public class PathFinder {
     public Path calculate() {
         long time = System.currentTimeMillis();
 
-        BinaryHeapOpenSet nodes = new BinaryHeapOpenSet();
+        nodes = new BinaryHeapOpenSet();
+        processing = new HashSet<>();
         PathNode startNode = new PathNode(startPos, null, goal);
         startNode.setMoveCost(0d);
         nodes.insert(startNode);
 
-        PathNode bestNode = startNode;
-        boolean complete = false;
-
-        int nodeCount = 0;
-
-        while (!nodes.isEmpty()) {
-            PathNode checkNode = nodes.removeLowest();
-            nodeCount++;
-
-            PathfinderExecutor.currentBlock = checkNode.getPos(); // TEMP
-
-            if (goal.test(checkNode.getPos())) {
-                ChatUtilsKt.devMessage("Found path! " + nodeCount + " attempts!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
-                ChatUtilsKt.devMessage("Found at : " + checkNode.getPos(), "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
-                outTime(time);
-
-                if (!complete || checkNode.getMoveCost() < bestNode.getMoveCost()) bestNode = checkNode;
-                complete = true;
-
-                //Path path = new Path(startPos, startNode, checkNode, goal);
-
-                ////if (Minecraft.getMinecraft().isSingleplayer()) drawPath(path); // REMOVE THIS
-
-                //return path;
-            }
-
-            if (complete && checkNode.getMoveCost() > bestNode.getMoveCost()) continue;
-
-            for (BlockPos pos : findRaycastBlocks(checkNode.getPos(), PathFinder::isValidPos, 61, world)) {
-                PathNode neighborNode = getNodeAt(pos, pos.hashCode(), checkNode);
-                double newCost = checkNode.getMoveCost() + NEW_NODE_COST;
-
-                if (neighborNode.getMoveCost() - newCost > MIN_IMPROVEMENT) {
-                    neighborNode.updateParent(checkNode);
-                    // If was in heap move it up
-                    if (neighborNode.isOpen()) {
-                        nodes.update(neighborNode);
-                    } else {
-                        // Else add it back
-                        nodes.insert(neighborNode);
-                    }
-                    if (!complete && bestNode.getHeuristicCost() - neighborNode.getHeuristicCost() > MIN_IMPROVEMENT) {
-                        if (neighborNode.getMoveCost() < bestNode.getMoveCost())
-                            bestNode = neighborNode;
-                    }
-
-                }
-            }
+        bestNode = startNode;
+        complete = false;
+        for (int i = 0; i < THREAD_COUNT - 1; i++ ) {
+            Thread thread = new Thread(this::run);
+            thread.start();
         }
-        ChatUtilsKt.devMessage("Scanned all (" + nodeCount + ") nodes!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
+        run();
+
+
+        ChatUtilsKt.devMessage("Scanned all nodes!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
         ChatUtilsKt.devMessage("Returning best path!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
         outTime(time);
-        Path path = new Path(startPos, startNode, bestNode, goal);
 
-        //if (Minecraft.getMinecraft().isSingleplayer()) drawPath(path); // REMOVE THIS
+        return new Path(startPos, startNode, bestNode, goal);
+    }
 
-        return path;
+    private void run() {
+        while (!isDone()) {
+            checkNode(getLowest());
+        }
+    }
+
+
+    private synchronized void updateNodes(PathNode node) {
+        nodes.update(node);
+    }
+
+    private synchronized void insertNodes(PathNode node) {
+        nodes.insert(node);
+    }
+
+    private synchronized PathNode getLowest() {
+        if (nodes.isEmpty()) return null;
+        PathNode lowest = nodes.removeLowest();
+        processing.add(lowest);
+        return lowest;
+    }
+
+    private synchronized boolean isDone() {
+        return nodes.isEmpty() && processing.isEmpty();
+    }
+
+    private synchronized void setComplete(boolean complete) {
+        this.complete = complete;
+    }
+
+    private synchronized void finishNode(PathNode node) {
+        if (!processing.contains(node)) {
+            System.err.println("Found node not in processing!");
+        }
+        processing.remove(node);
+    }
+
+    private synchronized boolean isComplete() {
+        return this.complete;
+    }
+
+    private synchronized double getBestNodeMoveCost() {
+        return bestNode.getMoveCost();
+    }
+
+    private synchronized double getBestNodeHeuristic() {
+        return this.bestNode.getHeuristicCost();
+    }
+
+    private synchronized void setBestNode(PathNode node) {
+        if (complete) {
+            if (node.getMoveCost() < bestNode.getMoveCost()) {
+                bestNode = node;
+            }
+            return;
+        }
+        if (goal.test(node.getPos())) {
+            bestNode = node;
+            complete = true;
+            return;
+        }
+        if (bestNode.getHeuristicCost() - node.getHeuristicCost() > MIN_IMPROVEMENT) {
+            if (bestNode.getMoveCost() < getBestNodeMoveCost())
+                this.bestNode = node;
+        }
+
+    }
+
+    public void checkNode(PathNode checkNode) {
+        if (checkNode == null) return;
+        PathfinderExecutor.currentBlock = checkNode.getPos(); // TEMP
+
+        if (goal.test(checkNode.getPos())) {
+            ChatUtilsKt.devMessage("Found at : " + checkNode.getPos(), "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
+
+            if (!isComplete() || checkNode.getMoveCost() < getBestNodeMoveCost()) setBestNode(checkNode);
+        }
+
+
+
+        if (isComplete() && checkNode.getMoveCost() >= getBestNodeMoveCost()) {
+            finishNode(checkNode);
+            return;
+        }
+        for (BlockPos pos : findRaycastBlocks(checkNode.getPos(), PathFinder::isValidPos, 61, world)) {
+            PathNode neighborNode = getNodeAt(pos, pos.hashCode(), checkNode);
+            double newCost = checkNode.getMoveCost() + NEW_NODE_COST;
+
+            if (neighborNode.getMoveCost() - newCost > MIN_IMPROVEMENT) {
+                neighborNode.updateParent(checkNode);
+                // If was in heap move it up
+                if (neighborNode.isOpen()) {
+                    updateNodes(neighborNode);
+                } else {
+                    // Else add it back
+                    insertNodes(neighborNode);
+                }
+                if (!isComplete() && getBestNodeHeuristic() - neighborNode.getHeuristicCost() > MIN_IMPROVEMENT) {
+                    if (neighborNode.getMoveCost() < getBestNodeMoveCost())
+                        setBestNode(neighborNode);
+                }
+
+            }
+        }
+        finishNode(checkNode);
     }
 
     public static void outTime(long startTime) {
@@ -114,7 +187,7 @@ public class PathFinder {
         ;
     }
 
-    public PathNode getNodeAt(BlockPos pos, long hashcode, PathNode parent) {
+    public synchronized PathNode getNodeAt(BlockPos pos, long hashcode, PathNode parent) {
         PathNode node = cache.get(hashcode);
         if (node == null) {
             node = new PathNode(pos, parent, goal);
@@ -134,7 +207,7 @@ public class PathFinder {
         List<BlockPos> blockHits = new ArrayList<>();
         HashSet<BlockPos> cache = new HashSet<>();
 
-        Vec3 eyePos = VecUtilsKt.toCenteredVec3(pos).addVector(0.0, 2.539999957084656d, 0.0d);
+        Vec3 eyePos = VecUtilsKt.toCenteredVec3(pos).addVector(0.0, 1, 0.0d);
         float stepPitch = 2f;
         float stepYaw = 2f;
 
@@ -143,15 +216,9 @@ public class PathFinder {
             float yawStepAtThisPitch = stepYaw / Math.max(0.01f, (float) cos(pitchRadians)); // avoid div/0
 
             for (float yaw = 0f; yaw < 360f; yaw += yawStepAtThisPitch) {
-                Vec3 dir = RotationUtils.INSTANCE.yawAndPitchVector(yaw, pitch);
-                Vec3 end = eyePos.addVector(dir.xCoord * maxDist, dir.yCoord * maxDist, dir.zCoord * maxDist);
-
-                MovingObjectPosition res = world.rayTraceBlocks(eyePos, end, false, true, false);
-                if (res == null || res.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) continue;
-
-                BlockPos rayPos = res.getBlockPos();
-                if (cache.add(rayPos) && filter.test(rayPos)) {
-                    blockHits.add(rayPos);
+                EtherWarpHelper.EtherPos etherPos = EtherWarpHelper.INSTANCE.getEtherPosFromOrigin(eyePos, yaw, pitch, 61, false);
+                if (cache.add(etherPos.getPos()) && etherPos.getSucceeded()) {
+                    blockHits.add(etherPos.getPos());
                 }
             }
         }
