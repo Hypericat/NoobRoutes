@@ -105,16 +105,16 @@ class BlinkRing(
         packets.forEach { PacketUtils.sendPacket(it) }
         val lastPacket = packets.last()
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
-        devMessage(walk)
         if (!walk) mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
         else {
-            devMessage(endXVelo)
             mc.thePlayer.setVelocity(endXVelo, endYVelo, endZVelo)
             var airTicks = 0
             packets.forEach { if (!it.isOnGround) airTicks++ else airTicks = 0 }
-            AutoP3Utils.airTicks = airTicks
-            devMessage(airTicks)
-            Scheduler.scheduleC03Task(0) { AutoP3Utils.startWalk(dir) }
+            Scheduler.schedulePreTickTask {
+                AutoP3Utils.airTicks = airTicks
+                AutoP3Utils.walking = true
+                AutoP3Utils.direction = yaw
+            }
         }
         modMessage("§c§l$cancelled§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }
