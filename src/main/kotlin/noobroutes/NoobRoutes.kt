@@ -8,7 +8,11 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import noobroutes.Core.mc
-import noobroutes.commands.*
+import noobroutes.commands.AutoBloodRushCommand
+import noobroutes.commands.AutoP3Command
+import noobroutes.commands.AutoRouteCommand
+import noobroutes.commands.NoobRoutesCommand
+import noobroutes.commands.YawPitchCommand
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
 import noobroutes.features.ModuleManager
