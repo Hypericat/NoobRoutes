@@ -8,11 +8,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import noobroutes.Core.mc
-import noobroutes.commands.AutoBloodRushCommand
-import noobroutes.commands.AutoP3Command
-import noobroutes.commands.AutoRouteCommand
-import noobroutes.commands.NoobRoutesCommand
-import noobroutes.commands.YawPitchCommand
+import noobroutes.commands.*
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
 import noobroutes.features.ModuleManager
@@ -23,6 +19,7 @@ import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.*
 import noobroutes.utils.clock.Executor
+import noobroutes.utils.pathfinding.PathfinderExecutor
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.RenderUtils2D
 import noobroutes.utils.render.Renderer
@@ -48,6 +45,7 @@ class NoobRoutes {
         listOf(
             NoobRoutesCommand(),
             AutoP3Command(),
+            PathCommand(),
             //AuraTestCommand(),
             //EtherwarpTestCommand(),
             AutoRouteCommand(),
@@ -80,7 +78,8 @@ class NoobRoutes {
             RotationUtils,
             BossEventDispatcher,
             SecretUtils,
-            AutoRouteUtils
+            AutoRouteUtils,
+            PathfinderExecutor()
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }

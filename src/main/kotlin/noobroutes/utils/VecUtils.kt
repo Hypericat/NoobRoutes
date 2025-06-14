@@ -57,8 +57,8 @@ val Vec3.length get() = sqrt(this.xCoord * this.xCoord + this.yCoord * this.yCoo
 
 
 fun Vec3.bloomNormalize(): Vec3 {
-    val len = this.length
-    return Vec3(this.xCoord / len, this.yCoord / len, this.zCoord / len)
+    val len =  1 / this.length
+    return Vec3(this.xCoord * len, this.yCoord * len, this.zCoord * len)
 }
 
 
@@ -342,6 +342,12 @@ fun Vec3.toDoubleArray(): DoubleArray =
  */
 fun BlockPos.toVec3(): Vec3 =
     Vec3(x.toDouble(), y.toDouble(), z.toDouble())
+
+/**
+ * Turns a BlockPos into a centered Vec3.
+ */
+fun BlockPos.toCenteredVec3(): Vec3 =
+    Vec3(x.toDouble() + 0.5, y.toDouble(), z.toDouble() + 0.5)
 
 /**
  * Turns a double array into a Vec3.
