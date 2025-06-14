@@ -3,7 +3,6 @@ package noobroutes.utils.skyblock
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
-import noobroutes.features.dungeon.MapLobotomizer
 import noobroutes.utils.*
 import noobroutes.utils.render.RenderUtils.renderVec
 import kotlin.math.*
@@ -15,7 +14,6 @@ object EtherWarpHelper {
             val NONE = EtherPos(false, null)
         }
     }
-    var etherPos: EtherPos = EtherPos.NONE
 
     fun getEtherYawPitch(blockCoords: BlockPos): Pair<Float, Float>? {
         val playerCoords = mc.thePlayer.positionVector
@@ -27,7 +25,7 @@ object EtherWarpHelper {
             true
         )
 
-        if (getEtherPos(playerCoords, rotation.first, rotation.second).pos == blockCoords) {
+        if (getEtherPosOrigin(playerCoords, rotation.first, rotation.second).pos == blockCoords) {
             return rotation
         }
         var runs = 0
@@ -47,7 +45,7 @@ object EtherWarpHelper {
                 var pitch = lowerPitch
                 while (pitch < upperPitch) {
                     runs++
-                    val prediction = getEtherPos(playerCoords, yaw, pitch)
+                    val prediction = getEtherPosOrigin(playerCoords, yaw, pitch)
                     if (prediction.pos == blockCoords) {
                         return Pair(yaw, pitch)
                     }
@@ -57,6 +55,20 @@ object EtherWarpHelper {
             }
         }
         return null
+    }
+
+    /**
+     * Gets the position of an entity in the "ether" based on the origin's view direction.
+     *
+     * @param origin The initial position of the entity.
+     * @param yaw The yaw angle representing the player's horizontal viewing direction.
+     * @param pitch The pitch angle representing the player's vertical viewing direction.
+     * @return An `EtherPos` representing the calculated position in the "ether" or `EtherPos.NONE` if the player is not present.
+     */
+    fun getEtherPosFromOrigin(origin: Vec3, yaw: Float, pitch: Float, distance: Double = 60.0, returnEnd: Boolean = false): EtherPos {
+        mc.thePlayer ?: return EtherPos.NONE
+        val endPos = getLook(yaw = yaw, pitch = pitch).normalize().multiply(factor = distance).add(origin)
+        return traverseVoxels(origin, endPos).takeUnless { it == EtherPos.NONE && returnEnd } ?: EtherPos(true, endPos.toBlockPos())
     }
 
 
@@ -69,7 +81,7 @@ object EtherWarpHelper {
      * @param pitch The pitch angle representing the player's vertical viewing direction.
      * @return An `EtherPos` representing the calculated position in the "ether" or `EtherPos.NONE` if the player is not present.
      */
-    fun getEtherPos(pos: Vec3, yaw: Float, pitch: Float, distance: Double = 60.0, returnEnd: Boolean = false): EtherPos {
+    fun getEtherPosOrigin(pos: Vec3, yaw: Float, pitch: Float, distance: Double = 60.0, returnEnd: Boolean = false): EtherPos {
         mc.thePlayer ?: return EtherPos.NONE
 
         val startPos: Vec3 = getPositionEyes(pos)
@@ -78,12 +90,12 @@ object EtherWarpHelper {
         return traverseVoxels(startPos, endPos).takeUnless { it == EtherPos.NONE && returnEnd } ?: EtherPos(true, endPos.toBlockPos())
     }
 
-    fun getEtherPos(positionLook: PositionLook = PositionLook(
+    fun getEtherPosOrigin(positionLook: PositionLook = PositionLook(
         mc.thePlayer.renderVec,
         mc.thePlayer.rotationYaw,
         mc.thePlayer.rotationPitch
     ), distance: Double = 60.0): EtherPos {
-        return getEtherPos(positionLook.pos, positionLook.yaw, positionLook.pitch, distance)
+        return getEtherPosOrigin(positionLook.pos, positionLook.yaw, positionLook.pitch, distance)
     }
 
     fun centerCoords(blockCoords: BlockPos): Vec3 {
@@ -123,7 +135,7 @@ object EtherWarpHelper {
         return EtherPos.NONE
     }
     const val EYE_HEIGHT = 1.539999957084656
-    val degToRad = Math.PI / 180;
+    const val DEGREESTORADIAN = Math.PI / 180;
     /**
      * taken from MeowClient
      *
@@ -146,8 +158,8 @@ object EtherWarpHelper {
         val eyeY = playerY
             ?: ((mc.thePlayer.lastTickPosY + (mc.thePlayer.posY - mc.thePlayer.lastTickPosY) * partialTicks) + EYE_HEIGHT)
         val eyeZ = playerZ ?: (mc.thePlayer.lastTickPosZ + (mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ) * partialTicks)
-        val roundedYaw = (yaw.round(14) * degToRad).toDouble()
-        val roundedPitch = (pitch.round(14) * degToRad).toDouble()
+        val roundedYaw = (yaw.round(14) * DEGREESTORADIAN).toDouble()
+        val roundedPitch = (pitch.round(14) * DEGREESTORADIAN).toDouble()
         val cosPitch = cos(roundedPitch)
         val dx = -cosPitch * sin(roundedYaw)
         val dy = -sin(roundedPitch)

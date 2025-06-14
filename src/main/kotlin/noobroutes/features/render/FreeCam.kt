@@ -172,7 +172,6 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     }
 
     fun setAngles(yaw: Float, pitch: Float) {
-        devMessage("${MathHelper.wrapAngleTo180_float(((yaw * 0.15f) + freeCamPosition.yaw))}, ${MathHelper.clamp_float((freeCamPosition.pitch - pitch * 0.15f), -90f, 90f)}")
         freeCamPosition.yaw = MathHelper.wrapAngleTo180_float(((yaw * 0.15f) + freeCamPosition.yaw))
         freeCamPosition.pitch = MathHelper.clamp_float((freeCamPosition.pitch - pitch * 0.15f), -90f, 90f)
         lookVec = RotationUtils.yawAndPitchVector(freeCamPosition.yaw, freeCamPosition.pitch).toMutableVec3()
