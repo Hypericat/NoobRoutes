@@ -34,7 +34,7 @@ import org.lwjgl.input.Keyboard
 
 
 object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme but way less laggy.", category = Category.DUNGEON) {
-    private var editMode by BooleanSetting("Edit Mode", description = "Allows you to edit blocks")
+    var editMode by BooleanSetting("Edit Mode", description = "Allows you to edit blocks")
     val editModeToggle by KeybindSetting("Edit Mode Bind", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress { editMode = !editMode }
     val placeCooldown by NumberSetting("Place Cooldown", min = 0, max = 1000, default = 150,  description = "Cooldown between placing blocks in edit mode", unit = "ms")
     data class Block(val pos: BlockPos, val state: IBlockState)

@@ -139,7 +139,7 @@ object Zpew : Module(
 
 
     private fun doZeroPingEtherWarp(distance: Float = 57f) {
-        val etherBlock = EtherWarpHelper.getEtherPos(
+        val etherBlock = EtherWarpHelper.getEtherPosOrigin(
             Vec3(lastX, lastY, lastZ),
             lastYaw,
             lastPitch,
