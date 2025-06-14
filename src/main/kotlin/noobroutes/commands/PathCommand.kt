@@ -30,8 +30,9 @@ class PathCommand: CommandBase() {
         val x = args?.get(0)?.toFloatOrNull() ?: 0f
         val y = args?.get(1)?.toFloatOrNull() ?: 0f
         val z = args?.get(2)?.toFloatOrNull() ?: 0f
+        val c = args?.get(3)?.toFloatOrNull() ?: 0f
 
-        PathfinderExecutor.test(x, y, z)
+        PathfinderExecutor.test(x, y, z, c)
     }
 
     override fun canCommandSenderUseCommand(sender: ICommandSender?): Boolean {

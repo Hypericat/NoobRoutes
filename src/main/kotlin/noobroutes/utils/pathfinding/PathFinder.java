@@ -23,24 +23,24 @@ import static java.lang.Math.sin;
 
 public class PathFinder {
     private final Goal goal;
-    private final World world;
     private final BlockPos startPos;
     private final HashMap<Long, PathNode> cache;
-    public final static double NEW_NODE_COST = 2d;
+    public static double NEW_NODE_COST = 100d;
     public final static double MIN_IMPROVEMENT = 1d;
     public final static double THREAD_COUNT = 12;
 
     private PathNode bestNode;
     private boolean complete;
     private BinaryHeapOpenSet nodes;
-    private HashSet<PathNode> processing;
+    private HashSet<Integer> processing;
 
 
-    public PathFinder(World world, Goal goal, BlockPos startPos) {
+    public PathFinder(Goal goal, BlockPos startPos, double nodeCost) {
         this.goal = goal;
         this.cache = new HashMap<>();
-        this.world = world;
         this.startPos = startPos;
+
+        NEW_NODE_COST = nodeCost;
     }
 
     public Path calculate() {
@@ -86,7 +86,7 @@ public class PathFinder {
     private synchronized PathNode getLowest() {
         if (nodes.isEmpty()) return null;
         PathNode lowest = nodes.removeLowest();
-        processing.add(lowest);
+        processing.add(lowest.hashCode());
         return lowest;
     }
 
@@ -99,10 +99,10 @@ public class PathFinder {
     }
 
     private synchronized void finishNode(PathNode node) {
-        if (!processing.contains(node)) {
+        if (!processing.contains(node.hashCode())) {
             System.err.println("Found node not in processing!");
         }
-        processing.remove(node);
+        processing.remove(node.hashCode());
     }
 
     private synchronized boolean isComplete() {
@@ -141,7 +141,7 @@ public class PathFinder {
         PathfinderExecutor.currentBlock = checkNode.getPos(); // TEMP
 
         if (goal.test(checkNode.getPos())) {
-            ChatUtilsKt.devMessage("Found at : " + checkNode.getPos(), "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
+            ChatUtilsKt.devMessage("Found valid route length " + checkNode.getMoveCost() / NEW_NODE_COST, "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
 
             if (!isComplete() || checkNode.getMoveCost() < getBestNodeMoveCost()) setBestNode(checkNode);
         }
@@ -152,8 +152,8 @@ public class PathFinder {
             finishNode(checkNode);
             return;
         }
-        for (BlockPos pos : findRaycastBlocks(checkNode.getPos(), PathFinder::isValidPos, 61, world)) {
-            PathNode neighborNode = getNodeAt(pos, pos.hashCode(), checkNode);
+        for (BlockPos pos : findRaycastBlocks(checkNode.getPos())) {
+            PathNode neighborNode = getNodeAt(pos, PathNode.hashCode(pos), checkNode);
             double newCost = checkNode.getMoveCost() + NEW_NODE_COST;
 
             if (neighborNode.getMoveCost() - newCost > MIN_IMPROVEMENT) {
@@ -193,6 +193,12 @@ public class PathFinder {
             node = new PathNode(pos, parent, goal);
             cache.put(hashcode, node);
         }
+
+        if (!node.getPos().equals(pos)) {
+            System.err.println("HASHCODE ERROR!");
+            System.err.println("Hash1 : " + hashcode + ", Hash2 " + node.hashCode() + " pos 1 : " + pos + " pos 2 : " + node.getPos());
+        }
+
         return node;
     }
 
@@ -201,7 +207,7 @@ public class PathFinder {
         return Minecraft.getMinecraft().theWorld.getBlockState(blockPos);
     }
 
-    public static List<BlockPos> findRaycastBlocks(BlockPos pos, Predicate<BlockPos> filter, int maxDist, World world) {
+    public static List<BlockPos> findRaycastBlocks(BlockPos pos) {
         //long time = System.currentTimeMillis();
 
         List<BlockPos> blockHits = new ArrayList<>();

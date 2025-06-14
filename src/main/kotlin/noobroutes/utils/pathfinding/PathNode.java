@@ -1,6 +1,7 @@
 package noobroutes.utils.pathfinding;
 
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.Vec3i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +47,24 @@ public class PathNode {
         return heapPosition != -1;
     }
 
+    @Override
     public int hashCode() {
-        return pos.hashCode();
+        long hash = 3241;
+        hash = 3457689L * hash + this.pos.getX();
+        hash = 8734625L * hash + this.pos.getY();
+        hash = 2873465L * hash + this.pos.getZ();
+        return (int) hash;
     }
 
-    public PathNode getParent() {
+    public static int hashCode(BlockPos pos) {
+        long hash = 3241;
+        hash = 3457689L * hash + pos.getX();
+        hash = 8734625L * hash + pos.getY();
+        hash = 2873465L * hash + pos.getZ();
+        return (int) hash;
+    }
+
+    public synchronized PathNode getParent() {
         return this.parent;
     }
 
@@ -58,7 +72,7 @@ public class PathNode {
         if (predicate.test(pos)) blocks.add(pos);
     }
 
-    public double getCost() {
+    public synchronized double getCost() {
         return moveCost + heuristicCost;
     }
 
@@ -66,18 +80,19 @@ public class PathNode {
         return heuristicCost;
     }
 
-    public double getMoveCost() {
+    public synchronized double getMoveCost() {
         return moveCost;
     }
 
-    public void updateParent(PathNode parent) {
+    public synchronized void updateParent(PathNode parent) {
         this.parent = parent;
         this.moveCost = parent.moveCost + PathFinder.NEW_NODE_COST;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public synchronized boolean equals(Object obj) {
         PathNode other = (PathNode) obj;
         return pos.getX() == other.pos.getX() && pos.getY() == other.pos.getY() && pos.getZ() == other.pos.getZ();
     }
+
 }

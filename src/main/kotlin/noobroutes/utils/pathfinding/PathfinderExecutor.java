@@ -19,11 +19,11 @@ public class PathfinderExecutor {
     private static List<BlockPos> blocks;
     public static BlockPos currentBlock;
 
-    public static void test(float x, float y, float z) {
+    public static void test(float x, float y, float z, float nodeCost) {
         //blocks = new ArrayList<>();
         //blocks.addAll(PathFinder.findRaycastBlocks(Minecraft.getMinecraft().thePlayer.getPosition(), PathFinder::isValidPos, 61, Minecraft.getMinecraft().theWorld));
         //if (true) return;
-        PathFinder pathFinder = new PathFinder(Minecraft.getMinecraft().theWorld, new GoalXYZ(new BlockPos(x, y, z)), VecUtilsKt.toBlockPos(Minecraft.getMinecraft().thePlayer.getPositionVector().subtract(0, 1, 0), 0));
+        PathFinder pathFinder = new PathFinder(new GoalXYZ(new BlockPos(x, y, z)), VecUtilsKt.toBlockPos(Minecraft.getMinecraft().thePlayer.getPositionVector().subtract(0, 1, 0), 0), nodeCost);
 
         Thread thread = new Thread(() -> PathfinderExecutor.lastPath = pathFinder.calculate());
         thread.start();
