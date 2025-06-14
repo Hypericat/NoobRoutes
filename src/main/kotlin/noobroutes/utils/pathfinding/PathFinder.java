@@ -28,7 +28,7 @@ public class PathFinder {
     private final HashMap<Long, PathNode> cache;
     public final static double NEW_NODE_COST = 2d;
     public final static double MIN_IMPROVEMENT = 1d;
-    public final static double THREAD_COUNT = 0;
+    public final static double THREAD_COUNT = 12;
 
     private PathNode bestNode;
     private boolean complete;
@@ -207,7 +207,7 @@ public class PathFinder {
         List<BlockPos> blockHits = new ArrayList<>();
         HashSet<BlockPos> cache = new HashSet<>();
 
-        Vec3 eyePos = VecUtilsKt.toCenteredVec3(pos).addVector(0.0, 1, 0.0d);
+        Vec3 eyePos = VecUtilsKt.toCenteredVec3(pos).addVector(0.0, 2.539999957084656d, 0.0d);
         float stepPitch = 2f;
         float stepYaw = 2f;
 
