@@ -3,6 +3,7 @@ package noobroutes.commands
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import noobroutes.Core.mc
+import noobroutes.features.misc.EWPathfinderModule
 import noobroutes.features.render.ClickGUIModule.devMode
 import noobroutes.utils.pathfinding.PathFinder
 import noobroutes.utils.pathfinding.PathfinderExecutor
@@ -30,9 +31,8 @@ class PathCommand: CommandBase() {
         val x = args?.get(0)?.toFloatOrNull() ?: 0f
         val y = args?.get(1)?.toFloatOrNull() ?: 0f
         val z = args?.get(2)?.toFloatOrNull() ?: 0f
-        val c = args?.get(3)?.toFloatOrNull() ?: 0f
 
-        PathfinderExecutor.test(x, y, z, c)
+        EWPathfinderModule.execute(x, y, z);
     }
 
     override fun canCommandSenderUseCommand(sender: ICommandSender?): Boolean {

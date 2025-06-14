@@ -78,8 +78,7 @@ class NoobRoutes {
             RotationUtils,
             BossEventDispatcher,
             SecretUtils,
-            AutoRouteUtils,
-            PathfinderExecutor()
+            AutoRouteUtils
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }

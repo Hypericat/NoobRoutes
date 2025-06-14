@@ -14,6 +14,9 @@ public class PathNode {
     public int heapPosition;
     private final Goal goal;
     private PathNode parent;
+    private float yaw = Float.MIN_VALUE;
+    private float pitch = Float.MIN_VALUE;
+
 
     public PathNode(BlockPos pos, PathNode parent, Goal goal) {
         this.pos = pos;
@@ -26,6 +29,23 @@ public class PathNode {
 
     public BlockPos getPos() {
         return pos;
+    }
+
+
+    public float getYaw() {
+        return yaw;
+    }
+
+    public float getPitch() {
+        return pitch;
+    }
+
+    public void setYaw(float yaw) {
+        this.yaw = yaw;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
     }
 
     public List<BlockPos> getNear(Predicate<BlockPos> predicate) {

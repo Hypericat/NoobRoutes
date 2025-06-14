@@ -1,25 +1,17 @@
 package noobroutes.utils.pathfinding;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.init.Blocks;
+import com.mojang.realmsclient.util.Pair;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraft.util.Vec3i;
-import net.minecraft.world.World;
-import noobroutes.utils.RotationUtils;
+import noobroutes.features.misc.EWPathfinderModule;
 import noobroutes.utils.VecUtilsKt;
 import noobroutes.utils.pathfinding.openset.BinaryHeapOpenSet;
 import noobroutes.utils.skyblock.ChatUtilsKt;
 import noobroutes.utils.skyblock.EtherWarpHelper;
-import org.lwjgl.Sys;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 import static java.lang.Math.cos;
-import static java.lang.Math.sin;
 
 public class PathFinder {
     private final Goal goal;
@@ -29,16 +21,25 @@ public class PathFinder {
     public final static double MIN_IMPROVEMENT = 1d;
     public final static double THREAD_COUNT = 12;
 
+    public static final float SNEAK_EYE_HEIGHT = 1.6200000047683716f;
+
+    private final float yawStep;
+    private final float pitchStep;
+    private final boolean perfect;
+
     private PathNode bestNode;
     private boolean complete;
     private BinaryHeapOpenSet nodes;
     private HashSet<Integer> processing;
 
 
-    public PathFinder(Goal goal, BlockPos startPos, double nodeCost) {
+    public PathFinder(Goal goal, BlockPos startPos, double nodeCost, boolean perfect, float yawStep, float pitchStep) {
         this.goal = goal;
         this.cache = new HashMap<>();
         this.startPos = startPos;
+        this.perfect = perfect;
+        this.yawStep = yawStep;
+        this.pitchStep = pitchStep;
 
         NEW_NODE_COST = nodeCost;
     }
@@ -64,6 +65,9 @@ public class PathFinder {
         ChatUtilsKt.devMessage("Scanned all nodes!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
         ChatUtilsKt.devMessage("Returning best path!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
         outTime(time);
+
+        ChatUtilsKt.devMessage("Last yaw : " + bestNode.getYaw() + " pitch : " + bestNode.getPitch() , "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
+
 
         return new Path(startPos, startNode, bestNode, goal);
     }
@@ -138,7 +142,8 @@ public class PathFinder {
 
     public void checkNode(PathNode checkNode) {
         if (checkNode == null) return;
-        PathfinderExecutor.currentBlock = checkNode.getPos(); // TEMP
+        EWPathfinderModule.INSTANCE.setBestHeuristic(checkNode.getHeuristicCost());
+        EWPathfinderModule.INSTANCE.setCurrentBlock(checkNode.getPos());
 
         if (goal.test(checkNode.getPos())) {
             ChatUtilsKt.devMessage("Found valid route length " + checkNode.getMoveCost() / NEW_NODE_COST, "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
@@ -146,45 +151,38 @@ public class PathFinder {
             if (!isComplete() || checkNode.getMoveCost() < getBestNodeMoveCost()) setBestNode(checkNode);
         }
 
-
-
         if (isComplete() && checkNode.getMoveCost() >= getBestNodeMoveCost()) {
             finishNode(checkNode);
             return;
         }
-        for (BlockPos pos : findRaycastBlocks(checkNode.getPos())) {
-            PathNode neighborNode = getNodeAt(pos, PathNode.hashCode(pos), checkNode);
-            double newCost = checkNode.getMoveCost() + NEW_NODE_COST;
+        double newCost = checkNode.getMoveCost() + NEW_NODE_COST;
 
-            if (neighborNode.getMoveCost() - newCost > MIN_IMPROVEMENT) {
-                neighborNode.updateParent(checkNode);
-                // If was in heap move it up
-                if (neighborNode.isOpen()) {
-                    updateNodes(neighborNode);
-                } else {
-                    // Else add it back
-                    insertNodes(neighborNode);
-                }
-                if (!isComplete() && getBestNodeHeuristic() - neighborNode.getHeuristicCost() > MIN_IMPROVEMENT) {
-                    if (neighborNode.getMoveCost() < getBestNodeMoveCost())
-                        setBestNode(neighborNode);
-                }
+        for (Pair<PathNode, Float[]> pair : findRaycastBlocks(checkNode)) {
+            PathNode neighborNode = pair.first();
 
-            }
+                if (neighborNode.getMoveCost() - newCost > MIN_IMPROVEMENT) {
+                    neighborNode.updateParent(checkNode);
+                    neighborNode.setYaw(pair.second()[0]);
+                    neighborNode.setPitch(pair.second()[1]);
+                    // If was in heap move it up
+                    if (neighborNode.isOpen()) {
+                        updateNodes(neighborNode);
+                    } else {
+                        // Else add it back
+                        insertNodes(neighborNode);
+                    }
+                    if (!isComplete() && getBestNodeHeuristic() - neighborNode.getHeuristicCost() > MIN_IMPROVEMENT) {
+                        if (neighborNode.getMoveCost() < getBestNodeMoveCost())
+                            setBestNode(neighborNode);
+                    }
+
+                }
         }
         finishNode(checkNode);
     }
 
     public static void outTime(long startTime) {
         ChatUtilsKt.devMessage("Took " + (System.currentTimeMillis() - startTime) + "ms", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
-    }
-
-    // wrong for now
-    public static boolean isValidPos(BlockPos blockPos) {
-        return getBlockState(blockPos).getBlock() != Blocks.air
-                && getBlockState(blockPos.add(0, 1, 0)).getBlock() == Blocks.air
-                && getBlockState(blockPos.add(0, 2, 0)).getBlock() == Blocks.air
-        ;
     }
 
     public synchronized PathNode getNodeAt(BlockPos pos, long hashcode, PathNode parent) {
@@ -202,29 +200,23 @@ public class PathFinder {
         return node;
     }
 
-    public static IBlockState getBlockState(BlockPos blockPos) {
-        if (Minecraft.getMinecraft().theWorld == null) return null;
-        return Minecraft.getMinecraft().theWorld.getBlockState(blockPos);
-    }
-
-    public static List<BlockPos> findRaycastBlocks(BlockPos pos) {
+    public List<Pair<PathNode, Float[]>> findRaycastBlocks(PathNode parent) {
         //long time = System.currentTimeMillis();
 
-        List<BlockPos> blockHits = new ArrayList<>();
+        List<Pair<PathNode, Float[]>> blockHits = new ArrayList<>();
         HashSet<BlockPos> cache = new HashSet<>();
 
-        Vec3 eyePos = VecUtilsKt.toCenteredVec3(pos).addVector(0.0, 2.539999957084656d, 0.0d);
-        float stepPitch = 2f;
-        float stepYaw = 2f;
+        Vec3 eyePos = VecUtilsKt.toCenteredVec3(parent.getPos()).addVector(0.0, 1 + SNEAK_EYE_HEIGHT, 0.0d);
 
-        for (float pitch = -90f; pitch <= 90f; pitch += stepPitch) {
+        for (float pitch = -90f; pitch <= 90f; pitch += pitchStep) {
             float pitchRadians = (float) Math.toRadians(pitch);
-            float yawStepAtThisPitch = stepYaw / Math.max(0.01f, (float) cos(pitchRadians)); // avoid div/0
+            float yawStepAtThisPitch = yawStep / Math.max(0.01f, (float) cos(pitchRadians)); // avoid div/0
 
             for (float yaw = 0f; yaw < 360f; yaw += yawStepAtThisPitch) {
                 EtherWarpHelper.EtherPos etherPos = EtherWarpHelper.INSTANCE.getEtherPosFromOrigin(eyePos, yaw, pitch, 61, false);
-                if (cache.add(etherPos.getPos()) && etherPos.getSucceeded()) {
-                    blockHits.add(etherPos.getPos());
+                if (etherPos.getPos() != null && cache.add(etherPos.getPos()) && etherPos.getSucceeded()) {
+                    PathNode node = getNodeAt(etherPos.getPos(), PathNode.hashCode(etherPos.getPos()), parent);
+                    blockHits.add(Pair.of(node, new Float[]{yaw, pitch}));
                 }
             }
         }

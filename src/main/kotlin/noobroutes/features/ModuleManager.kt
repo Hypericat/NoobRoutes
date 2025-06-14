@@ -59,6 +59,7 @@ object ModuleManager {
         AutoP3,
         NoDebuff,
         Zpew,
+        EWPathfinderModule,
         //ElementTester,
         Simulation,
         CoreClip,
