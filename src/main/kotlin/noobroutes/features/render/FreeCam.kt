@@ -6,6 +6,7 @@ import net.minecraft.util.MathHelper
 import net.minecraft.util.MovementInput
 import net.minecraft.util.MovingObjectPosition
 import net.minecraft.util.Vec3
+import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
@@ -44,8 +45,11 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     private var freeCamPosition: EntityPosition = EntityPosition(0.0, 0.0, 0.0, 0f, 0f)
     private val playerPosition: EntityPosition = EntityPosition(0.0, 0.0, 0.0, 0f, 0f)
     private var renderingEntities = false
+    private var scrollWheelMultiplier = 2.0
+
 
     override fun onEnable() {
+        speedVector = Vec3(0.0, 0.0, 0.0)
         oldCameraType = mc.gameSettings.thirdPersonView
         oldInput = mc.thePlayer.movementInput
         mc.thePlayer.movementInput = MovementInput()
@@ -61,7 +65,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         freeCamPosition.z = camPos.zCoord
         freeCamPosition.pitch = viewEntity.rotationPitch
         freeCamPosition.yaw = viewEntity.rotationYaw
-        speedVector = Vec3(0.0, 0.0, 0.0)
+        scrollWheelMultiplier = 2.0
         super.onEnable()
     }
 
@@ -92,14 +96,22 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         val zImpulse = ((freeCamPosition.yaw.zPart * input.moveForward.sign) + (if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe.sign).zPart)) * (if (input.sneak) 0.3 else 1.0)
 
         val dragFactor = if (instantSlow && input.moveStrafe == 0f && input.moveForward == 0f) 0.0 else 0.4.pow(deltaTime * 20.0)
-        val xSpeed = speedVector.xCoord * dragFactor + xImpulse * deltaTime
-        val ySpeed = yImpulse * deltaTime
-        val zSpeed = speedVector.zCoord * dragFactor + zImpulse * deltaTime
+        val xSpeed = speedVector.xCoord * dragFactor + xImpulse * deltaTime * scrollWheelMultiplier
+        val ySpeed = yImpulse * deltaTime * scrollWheelMultiplier * 50
+        val zSpeed = speedVector.zCoord * dragFactor + zImpulse * deltaTime * scrollWheelMultiplier
         speedVector = Vec3(xSpeed, ySpeed, zSpeed)
         oldPos = pos
         pos = pos.add(speedVector)
     }
 
+    @SubscribeEvent
+    fun onMouseEvent(event: MouseEvent) {
+        if (event.dwheel != 0) {
+            event.isCanceled = true
+            scrollWheelMultiplier *= if (event.dwheel.sign == 1) 1.1 else 0.9
+            scrollWheelMultiplier = scrollWheelMultiplier.coerceIn(0.1..10.0)
+        }
+    }
 
 
     @SubscribeEvent
