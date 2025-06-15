@@ -105,9 +105,10 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         BlockPos(111, 69, -1),
         BlockPos(127, 69, 15),
         BlockPos(111, 69, 31),
-        BlockPos(15, 69, 31),
         BlockPos(79, 69, 31),
         BlockPos(47, 69, 31),
+        BlockPos(15, 69, 31),
+
     )
     val lShapedDoors = listOf(
         BlockPos(-1, 69, 47),
