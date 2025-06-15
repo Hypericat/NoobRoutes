@@ -48,6 +48,8 @@ public class PathFinder {
     }
 
     public Path calculate() {
+        ChatUtilsKt.modMessage("Attempting to path!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
+
         long time = System.currentTimeMillis();
 
         nodes = new BinaryHeapOpenSet();
@@ -70,10 +72,12 @@ public class PathFinder {
 
         ChatUtilsKt.devMessage("Scanned all nodes!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
         ChatUtilsKt.devMessage("Returning best path!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
-        outTime(time);
 
+        Path path = new Path(startPos, startNode, bestNode, goal);
 
-        return new Path(startPos, startNode, bestNode, goal);
+        outTime(time, "Used " + path.length() + " nodes!");
+
+        return path;
     }
 
     private void run() {
@@ -201,7 +205,10 @@ public class PathFinder {
     }
 
     public static void outTime(long startTime) {
-        ChatUtilsKt.devMessage("Took " + (System.currentTimeMillis() - startTime) + "ms", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
+        outTime(startTime, "");
+    }
+    public static void outTime(long startTime, String extra) {
+        ChatUtilsKt.modMessage("Pathing complete, took " + (System.currentTimeMillis() - startTime) + "ms. " + extra, "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
     }
 
     public synchronized PathNode getNodeAt(BlockPos pos, long hashcode, PathNode parent) {

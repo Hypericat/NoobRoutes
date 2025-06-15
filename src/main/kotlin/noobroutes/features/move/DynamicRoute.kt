@@ -96,7 +96,6 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
 
 
     fun addNode(node: DynNode) {
-        modMessage("Adding node!")
         if (Minecraft.getMinecraft().theWorld != null && fullBlock) {
             node.setPrevState(Minecraft.getMinecraft().theWorld.getBlockState(node.getBlockPos().subtract(Vec3i(0, 1, 0))))
 
@@ -140,6 +139,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
 
         when (args[0].lowercase()) {
             "restore" -> {
+                modMessage("Restoring node!")
                 addNode(deletedNodes.removeLastOrNull() ?: return modMessage("No node to restore!"))
             }
 
@@ -147,6 +147,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
             "delete", "remove", "begone", "eradicate", "flaccid" -> {
                 val node = getNode(args) ?: return
                 removeNode(node)
+                modMessage("Removed ${deletedNodes.last().name}")
             }
 
             "edit" -> {
@@ -176,6 +177,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
                             modMessage("No Target Found")
                             return
                         }
+                        modMessage("Adding node!")
                         addNode(DynNode(playerCoords, raytrace))
                     }
 
@@ -193,8 +195,6 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
 
         if (node.getPrevState() != null && Minecraft.getMinecraft().theWorld != null)
             Minecraft.getMinecraft().theWorld?.setBlockState(node.getBlockPos().subtract(Vec3i(0, 1, 0)), node.getPrevState())
-
-        modMessage("Removed ${deletedNodes.last().name}")
     }
 
 

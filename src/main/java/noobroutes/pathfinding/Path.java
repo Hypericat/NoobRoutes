@@ -32,6 +32,16 @@ public class Path {
         return endNode;
     }
 
+    public int length() {
+        int count = 0;
+        PathNode node = endNode;
+        while (node.getParent() != null) {
+            count++;
+            node = node.getParent();
+        }
+        return count;
+    }
+
     public Goal getGoal() {
         return goal;
     }

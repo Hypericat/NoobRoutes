@@ -46,6 +46,7 @@ class NoobRoutes {
             NoobRoutesCommand(),
             AutoP3Command(),
             PathCommand(),
+            CpCommand(),
             //AuraTestCommand(),
             //EtherwarpTestCommand(),
             AutoRouteCommand(),

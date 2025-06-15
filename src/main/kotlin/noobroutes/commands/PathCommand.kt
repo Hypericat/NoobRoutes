@@ -18,7 +18,7 @@ class PathCommand: CommandBase() {
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
         if (args == null || args.size < 3) {
-            devMessage("Invalid args!")
+            modMessage("Invalid args!")
             return
         }
 
