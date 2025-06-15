@@ -596,7 +596,8 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
 
 
-    private fun addNode(room: Room, node: Node) {
+    fun
+            addNode(room: Room, node: Node) {
         modMessage("adding node")
         if (nodes[room.data.name] == null) {
             nodes[room.data.name] = mutableListOf()

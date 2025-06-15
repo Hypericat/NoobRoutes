@@ -21,7 +21,7 @@ public class PathFinder {
     public final static double MIN_IMPROVEMENT = 1d;
     public final static double THREAD_COUNT = 12;
 
-    public static final float SNEAK_EYE_HEIGHT = 1.6200000047683716f;
+    public static final float EYE_HEIGHT = 1.6200000047683716f;
 
     private final float yawStep;
     private final float pitchStep;
@@ -71,8 +71,6 @@ public class PathFinder {
         ChatUtilsKt.devMessage("Scanned all nodes!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
         ChatUtilsKt.devMessage("Returning best path!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
         outTime(time);
-
-        ChatUtilsKt.devMessage("Last yaw : " + bestNode.getYaw() + " pitch : " + bestNode.getPitch() , "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
 
 
         return new Path(startPos, startNode, bestNode, goal);
@@ -149,7 +147,8 @@ public class PathFinder {
     }
 
     private synchronized double getBestHeuristicByIndex(int index) {
-        return bestCachedPath.getByIndex(index).getHeuristicCost();
+        PathNode node = bestCachedPath.getByIndex(index);
+        return node == null ? Double.MAX_VALUE : node.getHeuristicCost();
     }
 
     public void checkNode(PathNode checkNode) {
@@ -194,7 +193,6 @@ public class PathFinder {
                     if (!isComplete() && getBestNodeHeuristic() - neighborNode.getHeuristicCost() > MIN_IMPROVEMENT) {
                         if (neighborNode.getMoveCost() < getBestNodeMoveCost())
                             setBestNode(neighborNode);
-                        else System.out.println("False!");
                     }
 
                 }
@@ -227,7 +225,7 @@ public class PathFinder {
         List<Pair<PathNode, Float[]>> blockHits = new ArrayList<>();
         HashSet<BlockPos> cache = new HashSet<>();
 
-        Vec3 eyePos = VecUtilsKt.toCenteredVec3(parent.getPos()).addVector(0.0, 1 + SNEAK_EYE_HEIGHT, 0.0d);
+        Vec3 eyePos = VecUtilsKt.toCenteredVec3(parent.getPos()).addVector(0.0, 1 + EYE_HEIGHT, 0.0d);
 
         for (float pitch = -90f; pitch <= 90f; pitch += pitchStep) {
             float pitchRadians = (float) Math.toRadians(pitch);
@@ -236,6 +234,7 @@ public class PathFinder {
             for (float yaw = 0f; yaw < 360f; yaw += yawStepAtThisPitch) {
                 EtherWarpHelper.EtherPos etherPos = EtherWarpHelper.INSTANCE.getEtherPosFromOrigin(eyePos, yaw, pitch, 61, false);
                 if (etherPos.getPos() != null && cache.add(etherPos.getPos()) && etherPos.getSucceeded()) {
+                    etherPos.getVec();
                     PathNode node = getNodeAt(etherPos.getPos(), PathNode.hashCode(etherPos.getPos()), parent);
                     blockHits.add(Pair.of(node, new Float[]{yaw, pitch}));
                 }

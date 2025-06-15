@@ -1,6 +1,11 @@
 package noobroutes.pathfinding;
 
+import com.mojang.realmsclient.util.Pair;
 import net.minecraft.util.BlockPos;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Path {
     private final BlockPos start;
@@ -30,6 +35,5 @@ public class Path {
     public Goal getGoal() {
         return goal;
     }
-
 
 }
