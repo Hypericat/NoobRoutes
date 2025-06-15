@@ -340,8 +340,8 @@ fun Vec3.toDoubleArray(): DoubleArray =
 /**
  * Turns a BlockPos into a Vec3.
  */
-fun BlockPos.toVec3(): Vec3 =
-    Vec3(x.toDouble(), y.toDouble(), z.toDouble())
+fun BlockPos.toVec3(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): Vec3 =
+    Vec3(this.x.toDouble() + x, this.y.toDouble() + y, this.z.toDouble() + z)
 
 /**
  * Turns a BlockPos into a centered Vec3.

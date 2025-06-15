@@ -96,8 +96,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         BlockPos(79, 69, -1)
     )
 
-
-
     val fourByOneDoors = listOf(
         BlockPos(-1, 69, 15),
         BlockPos(15, 69, -1),
@@ -285,6 +283,21 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         }
     }
 
+    fun getDoorSpots(room: Room, doorNumber: Int): Pair<BlockPos, BlockPos>? {
+        return when (room.data.cores.size) {
+            1 -> oneByOneSpots[doorNumber]
+            2 -> twoByOneSpots[doorNumber]
+            3 -> {
+                if (room1x3Names.contains(room.data.name)) threeByOneSpots[doorNumber] else lShapedSpots[doorNumber]
+            }
+            4 -> {
+                if (room1x4Names.contains(room.data.name)) fourByOneSpots[doorNumber] else twoByTwoSpots[doorNumber]
+            }
+            else -> null
+        }
+    }
+
+
 
     private val skullIds = listOf(
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2JjYmJmOTRkNjAzNzQzYTFlNzE0NzAyNmUxYzEyNDBiZDk4ZmU4N2NjNGVmMDRkY2FiNTFhMzFjMzA5MTRmZCJ9fX0=",
@@ -347,7 +360,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent){
-
         val room = DungeonUtils.currentRoom ?: return
         if (editMode) {
             val doorPositions = if (room.data.name == "Entrance") oneByOneDoors.map { room.getRealCoordsOdin(it) } else getRoomDoors(room).map { room.getRealCoordsOdin(it) }
@@ -449,6 +461,16 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 }
                 modMessage("set to ${doorNumbers[0]}>${doorNumbers[1]}")
                 routeName = "${doorNumbers[0]}>${doorNumbers[1]}"
+                val routeList = routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}
+                if (!routeList.any { it.name == "Door" }) {
+                    val spot = getDoorSpots(currentRoom, doorNumbers[1]!!) ?: return
+                    val real = currentRoom.getRealCoordsOdin(spot.second.toVec3(0.5, 1.0, 0.5))
+
+
+                    routeList.add(DoorRoute(currentRoom.getRelativeCoords(real)))
+                }
+
+
             }
             "add" -> {
                 if (!editMode) return modMessage("Edit Mode Required")
