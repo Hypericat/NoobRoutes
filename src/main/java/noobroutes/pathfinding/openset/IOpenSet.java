@@ -15,9 +15,9 @@
  * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package noobroutes.utils.pathfinding.openset;
+package noobroutes.pathfinding.openset;
 
-import noobroutes.utils.pathfinding.PathNode;
+import noobroutes.pathfinding.PathNode;
 
 /**
  * An open set for A* or similar graph search algorithm

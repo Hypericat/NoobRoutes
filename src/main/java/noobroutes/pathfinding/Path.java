@@ -1,8 +1,6 @@
-package noobroutes.utils.pathfinding;
+package noobroutes.pathfinding;
 
 import net.minecraft.util.BlockPos;
-
-import java.util.LinkedList;
 
 public class Path {
     private final BlockPos start;
@@ -32,4 +30,6 @@ public class Path {
     public Goal getGoal() {
         return goal;
     }
+
+
 }

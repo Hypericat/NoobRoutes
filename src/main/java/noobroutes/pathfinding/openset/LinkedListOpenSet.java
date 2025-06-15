@@ -15,10 +15,10 @@
  * along with Baritone.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package noobroutes.utils.pathfinding.openset;
+package noobroutes.pathfinding.openset;
 
 
-import noobroutes.utils.pathfinding.PathNode;
+import noobroutes.pathfinding.PathNode;
 
 /**
  * A linked list implementation of an open set. This is the original implementation from MineBot.

@@ -1,11 +1,11 @@
-package noobroutes.utils.pathfinding;
+package noobroutes.pathfinding;
 
 import com.mojang.realmsclient.util.Pair;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import noobroutes.features.misc.EWPathfinderModule;
 import noobroutes.utils.VecUtilsKt;
-import noobroutes.utils.pathfinding.openset.BinaryHeapOpenSet;
+import noobroutes.pathfinding.openset.BinaryHeapOpenSet;
 import noobroutes.utils.skyblock.ChatUtilsKt;
 import noobroutes.utils.skyblock.EtherWarpHelper;
 
@@ -25,21 +25,24 @@ public class PathFinder {
 
     private final float yawStep;
     private final float pitchStep;
+    private final float heuristicThreshold;
     private final boolean perfect;
 
     private PathNode bestNode;
+    private CachedPath bestCachedPath;
     private boolean complete;
     private BinaryHeapOpenSet nodes;
     private HashSet<Integer> processing;
 
 
-    public PathFinder(Goal goal, BlockPos startPos, double nodeCost, boolean perfect, float yawStep, float pitchStep) {
+    public PathFinder(Goal goal, BlockPos startPos, double nodeCost, boolean perfect, float yawStep, float pitchStep, float heuristicThreshold) {
         this.goal = goal;
         this.cache = new HashMap<>();
         this.startPos = startPos;
         this.perfect = perfect;
         this.yawStep = yawStep;
         this.pitchStep = pitchStep;
+        this.heuristicThreshold = heuristicThreshold;
 
         NEW_NODE_COST = nodeCost;
     }
@@ -50,7 +53,10 @@ public class PathFinder {
         nodes = new BinaryHeapOpenSet();
         processing = new HashSet<>();
         PathNode startNode = new PathNode(startPos, null, goal);
-        startNode.setMoveCost(0d);
+
+        startNode.setYaw(Float.MAX_VALUE); // Important for recognition of new nodes, removing may lead to worse performance
+        startNode.setPitch(Float.MAX_VALUE); // Important for recognition of new nodes, removing may lead to worse performance
+
         nodes.insert(startNode);
 
         bestNode = startNode;
@@ -125,11 +131,13 @@ public class PathFinder {
         if (complete) {
             if (node.getMoveCost() < bestNode.getMoveCost()) {
                 bestNode = node;
+                bestCachedPath = new CachedPath(node);
             }
             return;
         }
         if (goal.test(node.getPos())) {
             bestNode = node;
+            bestCachedPath = new CachedPath(node);
             complete = true;
             return;
         }
@@ -140,27 +148,39 @@ public class PathFinder {
 
     }
 
+    private synchronized double getBestHeuristicByIndex(int index) {
+        return bestCachedPath.getByIndex(index).getHeuristicCost();
+    }
+
     public void checkNode(PathNode checkNode) {
         if (checkNode == null) return;
         EWPathfinderModule.INSTANCE.setBestHeuristic(checkNode.getHeuristicCost());
         EWPathfinderModule.INSTANCE.setCurrentBlock(checkNode.getPos());
 
         if (goal.test(checkNode.getPos())) {
-            ChatUtilsKt.devMessage("Found valid route length " + checkNode.getMoveCost() / NEW_NODE_COST, "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
+            ChatUtilsKt.devMessage("Found valid route length " + checkNode.getIndex(), "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
 
             if (!isComplete() || checkNode.getMoveCost() < getBestNodeMoveCost()) setBestNode(checkNode);
         }
+
 
         if (isComplete() && checkNode.getMoveCost() >= getBestNodeMoveCost()) {
             finishNode(checkNode);
             return;
         }
+
+        if (!perfect && isComplete() && checkNode.getHeuristicCost() >= getBestHeuristicByIndex(checkNode.getIndex()) * heuristicThreshold) {
+            finishNode(checkNode);
+            return;
+        }
+
+
         double newCost = checkNode.getMoveCost() + NEW_NODE_COST;
 
         for (Pair<PathNode, Float[]> pair : findRaycastBlocks(checkNode)) {
             PathNode neighborNode = pair.first();
 
-                if (neighborNode.getMoveCost() - newCost > MIN_IMPROVEMENT) {
+                if (!neighborNode.hasBeenScanned() || neighborNode.getMoveCost() - newCost > MIN_IMPROVEMENT) {
                     neighborNode.updateParent(checkNode);
                     neighborNode.setYaw(pair.second()[0]);
                     neighborNode.setPitch(pair.second()[1]);
@@ -174,6 +194,7 @@ public class PathFinder {
                     if (!isComplete() && getBestNodeHeuristic() - neighborNode.getHeuristicCost() > MIN_IMPROVEMENT) {
                         if (neighborNode.getMoveCost() < getBestNodeMoveCost())
                             setBestNode(neighborNode);
+                        else System.out.println("False!");
                     }
 
                 }

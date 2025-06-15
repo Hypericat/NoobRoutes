@@ -1,7 +1,6 @@
-package noobroutes.utils.pathfinding;
+package noobroutes.pathfinding;
 
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,20 +8,19 @@ import java.util.function.Predicate;
 
 public class PathNode {
     private final BlockPos pos;
-    private double moveCost;
     private final double heuristicCost;
     public int heapPosition;
-    private final Goal goal;
     private PathNode parent;
     private float yaw = Float.MIN_VALUE;
     private float pitch = Float.MIN_VALUE;
 
+    private int index;
+
 
     public PathNode(BlockPos pos, PathNode parent, Goal goal) {
         this.pos = pos;
-        this.goal = goal;
         this.parent = parent;
-        this.moveCost = 2147483647;
+        this.index = (parent == null ? 0 : (parent.index + 1));
         this.heapPosition = -1;
         this.heuristicCost = goal.heuristic(pos);
     }
@@ -48,6 +46,10 @@ public class PathNode {
         this.pitch = pitch;
     }
 
+    public boolean hasBeenScanned() {
+        return this.yaw != Float.MIN_VALUE;
+    }
+
     public List<BlockPos> getNear(Predicate<BlockPos> predicate) {
         List<BlockPos> blocks = new ArrayList<>();
         testOffset(predicate, blocks, pos.add(1, 0, 0));
@@ -57,10 +59,6 @@ public class PathNode {
         testOffset(predicate, blocks, pos.add(0, -1, 0));
         testOffset(predicate, blocks, pos.add(0, 1, 0));
         return blocks;
-    }
-
-    public void setMoveCost(double cost) {
-        this.moveCost = cost;
     }
 
     public boolean isOpen() {
@@ -84,6 +82,10 @@ public class PathNode {
         return (int) hash;
     }
 
+    public int getIndex() {
+        return index;
+    }
+
     public synchronized PathNode getParent() {
         return this.parent;
     }
@@ -92,8 +94,9 @@ public class PathNode {
         if (predicate.test(pos)) blocks.add(pos);
     }
 
+
     public synchronized double getCost() {
-        return moveCost + heuristicCost;
+        return getMoveCost() + heuristicCost;
     }
 
     public double getHeuristicCost() {
@@ -101,12 +104,12 @@ public class PathNode {
     }
 
     public synchronized double getMoveCost() {
-        return moveCost;
+        return index * PathFinder.NEW_NODE_COST;
     }
 
     public synchronized void updateParent(PathNode parent) {
         this.parent = parent;
-        this.moveCost = parent.moveCost + PathFinder.NEW_NODE_COST;
+        this.index = parent.index + 1;
     }
 
     @Override

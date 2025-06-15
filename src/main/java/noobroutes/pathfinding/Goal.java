@@ -1,4 +1,4 @@
-package noobroutes.utils.pathfinding;
+package noobroutes.pathfinding;
 
 import net.minecraft.util.BlockPos;
 

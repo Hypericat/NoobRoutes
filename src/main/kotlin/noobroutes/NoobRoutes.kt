@@ -19,7 +19,6 @@ import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.*
 import noobroutes.utils.clock.Executor
-import noobroutes.utils.pathfinding.PathfinderExecutor
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.RenderUtils2D
 import noobroutes.utils.render.Renderer

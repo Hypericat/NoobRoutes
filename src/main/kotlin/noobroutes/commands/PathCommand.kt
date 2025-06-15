@@ -2,11 +2,8 @@ package noobroutes.commands
 
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
-import noobroutes.Core.mc
 import noobroutes.features.misc.EWPathfinderModule
 import noobroutes.features.render.ClickGUIModule.devMode
-import noobroutes.utils.pathfinding.PathFinder
-import noobroutes.utils.pathfinding.PathfinderExecutor
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 
