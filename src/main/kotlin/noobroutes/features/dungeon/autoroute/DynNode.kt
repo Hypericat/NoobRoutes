@@ -37,32 +37,14 @@ class DynNode(
     var reset: Boolean = false,
 ) {
 
-    var delete = true
-    var delayTriggered = false
+
     var triggered = false
-    var secretTriggered = false
-    var centerTriggered = false
-    var resetTriggered = false
 
-    open fun reset() {
-        delayTriggered = false
+
+    fun reset() {
         triggered = false
-        secretTriggered = false
-        centerTriggered = false
-        resetTriggered = false
-        delete = true
     }
 
-    fun awaitTick() {
-        val angles = RotationUtils.getYawAndPitch(target)
-        if (!DynamicRoute.silent) setAngles(angles.first, angles.second)
-    }
-
-    fun awaitMotion(event: MotionUpdateEvent.Pre) {
-        val angles = RotationUtils.getYawAndPitch(target)
-        devMessage("yaw: ${angles.first}, pitch: ${angles.second}")
-        AutoRouteUtils.setRotation(angles.first + offset,angles.second)
-    }
 
     fun tick() {
         val angles = RotationUtils.getYawAndPitch(target)

@@ -34,10 +34,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
 
 
     private var lastRoute = 0L
-    val routing get() = System.currentTimeMillis() - lastRoute < 200
-
     private var nodes : MutableList<DynNode> = LinkedList();
-    private var deletedNodes = mutableListOf<Node>()
 
 
     @SubscribeEvent
@@ -76,27 +73,6 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     }
 
 
-    private fun getNode(args: Array<out String>): DynNode? {
-        if (args.size > 1) {
-            val index = args[1].toIntOrNull()?.absoluteValue
-            if (index == null) {
-                modMessage("Provide a number for index")
-                return null
-            }
-            if (nodes.isEmpty() || index !in nodes.indices) {
-                modMessage("No node with index: $index")
-                return null
-            }
-            return nodes[index]
-        }
-        if (nodes.isEmpty()) return null
-
-        val node = nodes.minByOrNull {
-            it.pos.distanceToPlayerSq
-        }!!
-        return node
-    }
-
 
     fun addNode(node: DynNode) {
         modMessage("Adding node!")
@@ -114,10 +90,8 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
 
         resetRotation()
         node.tick()
-        //devMessage("runTick: ${System.currentTimeMillis()}")
         Scheduler.schedulePreMotionUpdateTask {
             node.motion((it as MotionUpdateEvent.Pre))
-        //devMessage("motionUpdate: ${System.currentTimeMillis()}")
         }
     }
 
