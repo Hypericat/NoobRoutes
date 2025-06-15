@@ -353,10 +353,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             val doorPositions = if (room.data.name == "Entrance") oneByOneDoors.map { room.getRealCoordsOdin(it) } else getRoomDoors(room).map { room.getRealCoordsOdin(it) }
             doorPositions.forEachIndexed { index, pos ->
                 Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), doorNumberColor, scale = 0.1f)
-                Renderer.drawBlock(room.getRealCoordsOdin(twoByTwoSpots[index]?.first ?: return@forEachIndexed), Color.GREEN)
-                Renderer.drawBlock(room.getRealCoordsOdin(twoByTwoSpots[index]?.second ?: return@forEachIndexed), Color.RED)
-                Renderer.drawStringInWorld(index.toString(), room.getRealCoordsOdin(twoByTwoSpots[index]?.second ?: return@forEachIndexed).toVec3().add(0.5, 1.0, 0.5), doorNumberColor, scale = 0.03f)
-            }
+                }
         }
         if (routeName == "" && editMode) return
         val key = if (editMode) routeName else activeRoutes[room.data.name] ?: return
