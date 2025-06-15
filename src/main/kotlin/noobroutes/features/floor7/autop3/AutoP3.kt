@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import net.minecraft.client.gui.GuiScreen
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S18PacketEntityTeleport
@@ -13,7 +14,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import noobroutes.Core
 import noobroutes.Core.logger
 import noobroutes.config.DataManager
 import noobroutes.events.BossEventDispatcher.inF7Boss
@@ -21,19 +21,25 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.TermOpenEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.dungeon.autoroute.AutoRoute
+import noobroutes.features.dungeon.autoroute.nodes.Etherwarp
 import noobroutes.features.floor7.autop3.Blink.blinkStarts
 import noobroutes.features.floor7.autop3.rings.*
+import noobroutes.features.misc.EWPathfinderModule.getEtherPosFromOrigin
 import noobroutes.features.misc.SexAura
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
+import noobroutes.pathfinding.GoalXYZ
+import noobroutes.pathfinding.Path
+import noobroutes.pathfinding.PathFinder
+import noobroutes.pathfinding.PathNode
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.*
-import noobroutes.utils.RotationUtils.setAngles
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
-import noobroutes.utils.skyblock.EtherWarpHelper
+import noobroutes.utils.skyblock.EtherWarpHelper.EYE_HEIGHT
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
@@ -234,6 +240,8 @@ object AutoP3: Module (
         }
     }
 
+    data class Shit(val pos: BlockPos, val yaw: Float, val pitch: Float)
+
     private fun testFunctions(args: Array<out String>) {
         if (args.size < 2) {
             modMessage("Test: sgToggle, roomName, relativePos")
@@ -252,8 +260,10 @@ object AutoP3: Module (
             "relativeplayerpos", "relppos", "relplayer", "playerrel" -> {
                 modMessage(DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector))
             }
-            "odinrelative" -> {
-                modMessage(DungeonUtils.currentRoom?.getRelativeCoordsOdin(mc.objectMouseOver.blockPos))
+            "odinrelative", "or", "oblock" -> {
+                val blockPos = DungeonUtils.currentRoom?.getRelativeCoordsOdin(mc.objectMouseOver.blockPos) ?: return
+                modMessage(blockPos)
+                GuiScreen.setClipboardString("BlockPos(${blockPos.x}, ${blockPos.y}, ${blockPos.z})")
             }
             /*"speed" -> {
                 if (args.size < 3) return
@@ -273,9 +283,30 @@ object AutoP3: Module (
                 val x = args[2].toIntOrNull() ?: return
                 val y = args[3].toIntOrNull() ?: return
                 val z = args[4].toIntOrNull() ?: return
-                val angles = EtherWarpHelper.getEtherYawPitch(BlockPos(x,y,z), Core.mc.thePlayer.positionVector) ?: return
-                devMessage(angles)
-                setAngles(angles.first, angles.second)
+
+
+                fun getOrderedPositions(path: Path): MutableList<Shit> {
+                    val shits = mutableListOf<Shit>()
+                    var lastNode: PathNode? = null
+                    var node: PathNode? = path.endNode
+
+                    shits.reverse() // From start to end
+                    return shits
+                }
+
+                val pathFinder = PathFinder(
+                    GoalXYZ(BlockPos(x.toDouble(), y.toDouble(), z.toDouble())),
+                    mc.thePlayer.positionVector.subtract(0.0, 1.0, 0.0).toBlockPos(),
+                    100.0,
+                    false,
+                    1f,
+                    1f,
+                    2f
+                )
+
+
+                val thread = Thread(Runnable { devMessage(getOrderedPositions(pathFinder.calculate())) })
+                thread.start()
             }
             else -> {
                 modMessage("All tests passed")
