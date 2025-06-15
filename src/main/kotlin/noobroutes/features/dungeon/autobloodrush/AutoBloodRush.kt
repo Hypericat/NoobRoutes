@@ -132,6 +132,17 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         BlockPos(-1, 69, 15),
     )
 
+    val threeByOneSpots = mapOf(
+        0 to Pair(BlockPos(93, 68, 14), BlockPos(93, 68, 16)),
+        1 to Pair(BlockPos(80, 68, 29), BlockPos(80, 68, 29)),
+        2 to Pair(BlockPos(48, 68, 29), BlockPos(46, 68, 29)),
+        3 to Pair(BlockPos(16, 68, 29), BlockPos(14, 68, 29)),
+        4 to Pair(BlockPos(1, 68, 16), BlockPos(1, 68, 14)),
+        5 to Pair(BlockPos(14, 68, 1), BlockPos(16, 68, 1)),
+        6 to Pair(BlockPos(46, 68, 1), BlockPos(48, 68, 1)),
+        7 to Pair(BlockPos(78, 68, 1), BlockPos(80, 68, 1)),
+    )
+
     val lShapedSpots = mapOf(
         0 to Pair(BlockPos(14, 68, 1), BlockPos(16, 68, 1)),
         1 to Pair(BlockPos(29, 68, 14), BlockPos(29, 68, 16)),
