@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import noobroutes.Core
 import noobroutes.Core.logger
 import noobroutes.config.DataManager
 import noobroutes.events.BossEventDispatcher.inF7Boss
@@ -272,7 +273,7 @@ object AutoP3: Module (
                 val x = args[2].toIntOrNull() ?: return
                 val y = args[3].toIntOrNull() ?: return
                 val z = args[4].toIntOrNull() ?: return
-                val angles = EtherWarpHelper.getEtherYawPitch(BlockPos(x,y,z)) ?: return
+                val angles = EtherWarpHelper.getEtherYawPitch(BlockPos(x,y,z), Core.mc.thePlayer.positionVector) ?: return
                 devMessage(angles)
                 setAngles(angles.first, angles.second)
             }

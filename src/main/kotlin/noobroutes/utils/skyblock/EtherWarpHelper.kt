@@ -15,8 +15,7 @@ object EtherWarpHelper {
         }
     }
 
-    fun getEtherYawPitch(blockCoords: BlockPos): Pair<Float, Float>? {
-        val playerCoords = mc.thePlayer.positionVector
+    fun getEtherYawPitch(blockCoords: BlockPos, startCoords: Vec3): Pair<Float, Float>? {
         val centeredCoords = centerCoords(blockCoords)
         val rotation = RotationUtils.getYawAndPitch(
             centeredCoords.xCoord,
@@ -24,11 +23,11 @@ object EtherWarpHelper {
             centeredCoords.zCoord
         )
 
-        if (getEtherPosOrigin(playerCoords, rotation.first, rotation.second).pos == blockCoords) {
+        if (getEtherPosOrigin(startCoords, rotation.first, rotation.second).pos == blockCoords) {
             return rotation
         }
         var runs = 0
-        val distance = playerCoords.add(0.0,1.6200000047683716,0.0).distanceTo(centeredCoords)
+        val distance = startCoords.add(0.0,1.6200000047683716,0.0).distanceTo(centeredCoords)
         val sweepDegrees = Math.toDegrees(2 * atan(0.707 / distance)).toFloat()
         for (i in 0..10) {
             val lowerYaw = rotation.first - sweepDegrees
@@ -44,7 +43,7 @@ object EtherWarpHelper {
                 var pitch = lowerPitch
                 while (pitch < upperPitch) {
                     runs++
-                    val prediction = getEtherPosOrigin(playerCoords, yaw, pitch)
+                    val prediction = getEtherPosOrigin(startCoords, yaw, pitch)
                     if (prediction.pos == blockCoords) {
                         return Pair(yaw, pitch)
                     }
@@ -208,11 +207,12 @@ object EtherWarpHelper {
     }
 
 
+
     /**
      * Checks if the block at the given position is a valid block to etherwarp onto.
      * @author Bloom
      */
-    private fun isValidEtherWarpBlock(pos: BlockPos): Boolean {
+    fun isValidEtherWarpBlock(pos: BlockPos): Boolean {
         // Checking the actual block to etherwarp ontop of
         // Can be at foot level, but not etherwarped onto directly.
         if (getBlockAt(pos).registryName in validEtherwarpFeetBlocks || getBlockAt(pos.up(1)).registryName !in validEtherwarpFeetBlocks) return false

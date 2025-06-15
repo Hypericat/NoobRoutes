@@ -60,6 +60,7 @@ object ModuleManager {
         NoDebuff,
         Zpew,
         EWPathfinderModule,
+        DynamicRoute,
         //ElementTester,
         Simulation,
         CoreClip,
