@@ -10,6 +10,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
+import noobroutes.Core.logger
 import noobroutes.events.impl.ClickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
@@ -20,7 +21,6 @@ import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
-import noobroutes.utils.skyblock.devMessage
 import kotlin.math.pow
 import kotlin.math.sign
 
@@ -74,46 +74,33 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         super.onDisable()
     }
 
-
+    var lastTime = System.currentTimeMillis()
     @SubscribeEvent
     fun onRenderTick(event: RenderTickEvent){
-        if (!event.isStart) return
+        if (event.isEnd) return
         val partialTicks = event.renderTickTime
         val interpPos = oldPos.add(pos.subtract(oldPos).multiply(partialTicks))
-
         freeCamPosition.x = interpPos.xCoord
         freeCamPosition.y = interpPos.yCoord
         freeCamPosition.z = interpPos.zCoord
-
-    }
-
-    var lastTime = System.currentTimeMillis()
-
-    fun calculateVelocity(){
-
-    }
-
-
-    @SubscribeEvent
-    fun onTick(event: RenderTickEvent) {
-        if (event.isEnd) return
         val currentTime = System.currentTimeMillis()
-        val frameTime = currentTime - lastTime / 1.0e9f
+        val deltaTime = (currentTime - lastTime).toDouble() / 10000.0
         lastTime = currentTime
         val input = oldInput
         val yImpulse = (if (input.jump) 1 else 0) + (if (input.sneak) -1 else 0)
         val xImpulse = ((freeCamPosition.yaw.xPart * input.moveForward.sign) + (if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe.sign).xPart)) * (if (input.sneak) 0.3 else 1.0)
         val zImpulse = ((freeCamPosition.yaw.zPart * input.moveForward.sign) + (if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe.sign).zPart)) * (if (input.sneak) 0.3 else 1.0)
-        val dragFactor = if (instantSlow && input.moveStrafe == 0f && input.moveForward == 0f) 0.0 else 20.0 * frameTime
 
-
-        val xSpeed = speedVector.xCoord * dragFactor + xImpulse * 0.1 //adjust values as needed
-        val ySpeed = yImpulse * 1.0
-        val zSpeed = speedVector.zCoord * dragFactor + zImpulse * 0.1
+        val dragFactor = if (instantSlow && input.moveStrafe == 0f && input.moveForward == 0f) 0.0 else 0.4.pow(deltaTime * 20.0)
+        val xSpeed = speedVector.xCoord * dragFactor + xImpulse * deltaTime
+        val ySpeed = yImpulse * deltaTime
+        val zSpeed = speedVector.zCoord * dragFactor + zImpulse * deltaTime
         speedVector = Vec3(xSpeed, ySpeed, zSpeed)
         oldPos = pos
         pos = pos.add(speedVector)
     }
+
+
 
     @SubscribeEvent
     fun onClientTick(event: ClientTickEvent){

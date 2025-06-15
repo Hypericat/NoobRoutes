@@ -1,5 +1,6 @@
 package noobroutes.utils
 
+import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -100,7 +101,15 @@ object Utils {
 
 }
 
-
+/**
+ * Writes the given text to the clipboard.
+ */
+fun writeToClipboard(text: String, successMessage: String = "§aCopied to clipboard.") {
+    GuiScreen.setClipboardString(text)
+    if (successMessage.isNotEmpty()) modMessage(
+        successMessage
+    )
+}
 
 fun isOnBlock(vec3: Vec3): Boolean {
     return vec3.add(0.5, 1.0, 0.5).distanceTo(mc.thePlayer.positionVector) < 0.1
