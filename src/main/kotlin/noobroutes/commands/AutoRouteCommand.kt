@@ -15,7 +15,7 @@ class AutoRouteCommand: CommandBase() {
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Edit, Load")
+        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Edit, Clear, Load")
         AutoRoute.handleAutoRouteCommand(args)
     }
 

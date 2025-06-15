@@ -80,7 +80,7 @@ object EtherWarpHelper {
      * @param pitch The pitch angle representing the player's vertical viewing direction.
      * @return An `EtherPos` representing the calculated position in the "ether" or `EtherPos.NONE` if the player is not present.
      */
-    fun getEtherPosOrigin(pos: Vec3, yaw: Float, pitch: Float, distance: Double = 60.0, returnEnd: Boolean = false): EtherPos {
+    fun getEtherPosOrigin(pos: Vec3, yaw: Float, pitch: Float, distance: Double = 61.0, returnEnd: Boolean = false): EtherPos {
         mc.thePlayer ?: return EtherPos.NONE
 
         val startPos: Vec3 = getPositionEyes(pos)
@@ -133,8 +133,8 @@ object EtherWarpHelper {
 
         return EtherPos.NONE
     }
-    const val EYE_HEIGHT = 1.539999957084656
-    const val DEGREESTORADIAN = Math.PI / 180;
+    const val EYE_HEIGHT = 1.6200000047683716
+    const val DEGREES_TO_RADIAN = Math.PI / 180;
     /**
      * taken from MeowClient
      *
@@ -157,8 +157,8 @@ object EtherWarpHelper {
         val eyeY = playerY
             ?: ((mc.thePlayer.lastTickPosY + (mc.thePlayer.posY - mc.thePlayer.lastTickPosY) * partialTicks) + EYE_HEIGHT)
         val eyeZ = playerZ ?: (mc.thePlayer.lastTickPosZ + (mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ) * partialTicks)
-        val roundedYaw = (yaw.round(14) * DEGREESTORADIAN).toDouble()
-        val roundedPitch = (pitch.round(14) * DEGREESTORADIAN).toDouble()
+        val roundedYaw = (yaw.round(14) * DEGREES_TO_RADIAN).toDouble()
+        val roundedPitch = (pitch.round(14) * DEGREES_TO_RADIAN).toDouble()
         val cosPitch = cos(roundedPitch)
         val dx = -cosPitch * sin(roundedYaw)
         val dy = -sin(roundedPitch)
