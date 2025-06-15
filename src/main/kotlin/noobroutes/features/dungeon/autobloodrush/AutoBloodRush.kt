@@ -172,6 +172,17 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         5 to Pair(BlockPos(16, 68, 29), BlockPos(14, 68, 29))
     )
 
+    val twoByTwoSpots = mapOf(
+        0 to Pair(BlockPos(14, 68, 1), BlockPos(16, 68, 1)),
+        1 to Pair(BlockPos(46, 68, 1), BlockPos(48, 68, 1)),
+        2 to Pair(BlockPos(61, 68, 14), BlockPos(61, 68, 16)),
+        3 to Pair(BlockPos(61, 68, 46), BlockPos(61, 68, 48)),
+        4 to Pair(BlockPos(48, 68, 61), BlockPos(46, 68, 61)),
+        5 to Pair(BlockPos(16, 68, 61), BlockPos(14, 68, 61)),
+        6 to Pair(BlockPos(1, 68, 48), BlockPos(1, 68, 46)),
+        7 to Pair(BlockPos(1, 68, 16), BlockPos(1, 68, 14))
+    )
+
 
     var activeRoutes: MutableMap<String, String> = mutableMapOf()
     var currentDoor: Door? = null
@@ -264,7 +275,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     }
 
 
-
     private val skullIds = listOf(
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2JjYmJmOTRkNjAzNzQzYTFlNzE0NzAyNmUxYzEyNDBiZDk4ZmU4N2NjNGVmMDRkY2FiNTFhMzFjMzA5MTRmZCJ9fX0=",
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQ5ZDgwYjc5NDQyY2YxYTNhZmVhYTIzN2JkNmFkYWFhY2FiMGMyODgzMGZiMzZiNTcwNGNmNGQ5ZjU5MzdjNCJ9fX0="
@@ -332,9 +342,9 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             val doorPositions = if (room.data.name == "Entrance") oneByOneDoors.map { room.getRealCoordsOdin(it) } else getRoomDoors(room).map { room.getRealCoordsOdin(it) }
             doorPositions.forEachIndexed { index, pos ->
                 Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), doorNumberColor, scale = 0.1f)
-                Renderer.drawBlock(room.getRealCoordsOdin(twoByOneSpots[index]?.first ?: return@forEachIndexed), Color.GREEN)
-                Renderer.drawBlock(room.getRealCoordsOdin(twoByOneSpots[index]?.second ?: return@forEachIndexed), Color.RED)
-                Renderer.drawStringInWorld(index.toString(), room.getRealCoordsOdin(twoByOneSpots[index]?.second ?: return@forEachIndexed).toVec3().add(0.5, 1.0, 0.5), doorNumberColor, scale = 0.03f)
+                Renderer.drawBlock(room.getRealCoordsOdin(twoByTwoSpots[index]?.first ?: return@forEachIndexed), Color.GREEN)
+                Renderer.drawBlock(room.getRealCoordsOdin(twoByTwoSpots[index]?.second ?: return@forEachIndexed), Color.RED)
+                Renderer.drawStringInWorld(index.toString(), room.getRealCoordsOdin(twoByTwoSpots[index]?.second ?: return@forEachIndexed).toVec3().add(0.5, 1.0, 0.5), doorNumberColor, scale = 0.03f)
             }
         }
         if (routeName == "" && editMode) return
