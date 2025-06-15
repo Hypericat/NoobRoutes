@@ -15,6 +15,7 @@ import noobroutes.features.ModuleManager
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.SecretUtils
 import noobroutes.features.floor7.autop3.Blink
+import noobroutes.features.move.DynamicRoute
 import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.*
@@ -48,6 +49,7 @@ class NoobRoutes {
             //AuraTestCommand(),
             //EtherwarpTestCommand(),
             AutoRouteCommand(),
+            DynamicRouteCommand(),
             YawPitchCommand(),
             AutoBloodRushCommand()
         ).forEach {

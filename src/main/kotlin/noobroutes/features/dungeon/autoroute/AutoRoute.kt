@@ -100,7 +100,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         Pair("UseItem", UseItem::class)
     )
 
-    private var lastRoute = 0L
+    var lastRoute = 0L
     val routing get() = System.currentTimeMillis() - lastRoute < 200
 
     private var nodes = mutableMapOf<String, MutableList<Node>>()
@@ -256,7 +256,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     fun onTick(event: ClientTickEvent) {
         if (event.isEnd || mc.thePlayer == null) return
         val room = DungeonUtils.currentRoom ?: roomReplacement
-        if (nodes[room.data.name] == null || editMode || PlayerUtils.movementKeysPressed) {
+        if (PlayerUtils.movementKeysPressed) {
             resetRotation()
             nodesToRun.clear()
             return

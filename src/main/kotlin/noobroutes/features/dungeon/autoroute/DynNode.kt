@@ -1,21 +1,18 @@
 package noobroutes.features.dungeon.autoroute
 
-import com.google.gson.JsonObject
+import net.minecraft.block.state.IBlockState
+import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.ether
 import noobroutes.features.move.DynamicRoute
+import noobroutes.utils.*
 import noobroutes.utils.AutoP3Utils.walking
-import noobroutes.utils.RotationUtils
 import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.RotationUtils.setAngles
-import noobroutes.utils.Scheduler
-import noobroutes.utils.SwapManager
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
-import noobroutes.utils.add
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
@@ -28,21 +25,28 @@ class DynNode(
     var pos: Vec3 = Vec3(0.0, 0.0, 0.0),
     var target: Vec3 = Vec3(0.0, 0.0, 0.0),
     val name: String = "DynNode",
-    var awaitSecret: Int = 0,
-    var maybeSecret: Boolean = false,
-    var delay: Long = 0,
-    var center: Boolean = false,
-    var stop: Boolean = false,
-    var chain: Boolean = false,
-    var reset: Boolean = false,
+    var chain: Boolean = false
 ) {
+
+    private var prevState: IBlockState? = null;
 
 
     var triggered = false
 
-
     fun reset() {
         triggered = false
+    }
+
+    fun setPrevState(state: IBlockState) {
+        this.prevState = state
+    }
+
+    fun getPrevState() : IBlockState? {
+        return this.prevState;
+    }
+
+    fun getBlockPos() : BlockPos {
+        return this.pos.toBlockPos()
     }
 
 
