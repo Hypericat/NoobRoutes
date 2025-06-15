@@ -78,12 +78,13 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     )
     val twoByOneDoors =  listOf(
         BlockPos(-1, 69, 15),
-        BlockPos(15, 69, 31),
-        BlockPos(47, 69, 31),
-        BlockPos(63, 69, 15),
+        BlockPos(15, 69, -1),
         BlockPos(47, 69, -1),
-        BlockPos(15, 69, -1)
+        BlockPos(63, 69, 15),
+        BlockPos(47, 69, 31),
+        BlockPos(15, 69, 31),
     )
+
     val threeByOneDoors = listOf(
         BlockPos(95, 69, 15),
         BlockPos(79, 69, 31),
@@ -108,29 +109,27 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         BlockPos(79, 69, 31),
         BlockPos(47, 69, 31),
         BlockPos(15, 69, 31),
-
     )
     val lShapedDoors = listOf(
-        BlockPos(-1, 69, 47),
-        BlockPos(15, 69, 63),
-        BlockPos(47, 69, 63),
-        BlockPos(63, 69, 47),
-        BlockPos(47, 69, 31),
-        BlockPos(31, 69, 15),
         BlockPos(15, 69, -1),
+        BlockPos(31, 69, 15),
+        BlockPos(47, 69, 31),
+        BlockPos(63, 69, 47),
+        BlockPos(47, 69, 63),
+        BlockPos(15, 69, 63),
+        BlockPos(-1, 69, 47),
         BlockPos(-1, 69, 15)
     )
 
     val twoByTwoDoors = listOf(
         BlockPos(15, 69, -1),
-        BlockPos(-1, 69, 15),
-        BlockPos(-1, 69, 47),
-        BlockPos(15, 69, 63),
-        BlockPos(47, 69, 63),
-        BlockPos(63, 69, 47),
+        BlockPos(47, 69, -1),
         BlockPos(63, 69, 15),
-        BlockPos(47, 69, -1)
-
+        BlockPos(63, 69, 47),
+        BlockPos(47, 69, 63),
+        BlockPos(15, 69, 63),
+        BlockPos(-1, 69, 47),
+        BlockPos(-1, 69, 15),
     )
 
     val lShapedSpots = mapOf(
