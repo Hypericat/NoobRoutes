@@ -291,7 +291,7 @@ object Blaze : Module(
     private fun shootAt(pos: Vec3) {
         lastShotTime = System.currentTimeMillis()
         lastShotTarget = currentBlazeTarget
-        val rot = RotationUtils.getYawAndPitch(pos, true)
+        val rot = RotationUtils.getYawAndPitch(pos)
         val state = SwapManager.swapFromSBId(
             "ARTISANAL_SHORTBOW",
             "DRAGON_SHORTBOW",

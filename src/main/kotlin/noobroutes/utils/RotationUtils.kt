@@ -13,6 +13,8 @@ import kotlin.math.*
 object RotationUtils {
     private const val SNEAKHEIGHT = 0.0800000429153443
 
+
+
     inline val offset get() = ((Scheduler.runTime % 2 * 2 - 1) * 1e-6).toFloat()
 
     fun yawAndPitchVector(yaw: Float, pitch: Float): Vec3 {
@@ -23,16 +25,17 @@ object RotationUtils {
         return Vec3(f1*f2, f3, f*f2).bloomNormalize()
     }
 
+    //1.6200000047683716
+
     /**
      * Taken from cga
      * @param x X position to aim at.
      * @param y Y position to aim at.
      * @param z Z position to aim at.
-     * @param sneaking determines whether the function accounts for sneak height.
      */
-    fun getYawAndPitch(x: Double, y: Double, z: Double, sneaking: Boolean = false): Pair<Float, Float> {
+    fun getYawAndPitch(x: Double, y: Double, z: Double): Pair<Float, Float> {
         val dx = x - mc.thePlayer.posX
-        val dy = y - (mc.thePlayer.posY + mc.thePlayer.eyeHeight - if (sneaking) SNEAKHEIGHT else 0.0)
+        val dy = y - (mc.thePlayer.posY + 1.6200000047683716)
         val dz = z - mc.thePlayer.posZ
 
         val horizontalDistance = sqrt(dx * dx + dz * dz)
@@ -45,9 +48,9 @@ object RotationUtils {
         return Pair(normalizedYaw.toFloat(), pitch.toFloat())
     }
 
-    fun getYawAndPitchOrigin(originX: Double, originY: Double, originZ: Double, x: Double, y: Double, z: Double, sneaking: Boolean = false): Pair<Float, Float> {
+    fun getYawAndPitchOrigin(originX: Double, originY: Double, originZ: Double, x: Double, y: Double, z: Double): Pair<Float, Float> {
         val dx = x - originX
-        val dy = y - (originY + 1.62f - if (sneaking) SNEAKHEIGHT else 0.0)
+        val dy = y - (originY + 1.6200000047683716)
         val dz = z - originZ
 
         val horizontalDistance = sqrt(dx * dx + dz * dz)
@@ -60,18 +63,17 @@ object RotationUtils {
         return Pair(normalizedYaw.toFloat(), pitch.toFloat())
     }
 
-    fun getYawAndPitchOrigin(origin: Vec3, target: Vec3, sneaking: Boolean = false): Pair<Float, Float>{
-        return getYawAndPitchOrigin(origin.xCoord, origin.yCoord, origin.zCoord, target.xCoord, target.yCoord, target.zCoord, sneaking)
+    fun getYawAndPitchOrigin(origin: Vec3, target: Vec3): Pair<Float, Float>{
+        return getYawAndPitchOrigin(origin.xCoord, origin.yCoord, origin.zCoord, target.xCoord, target.yCoord, target.zCoord)
     }
 
     /**
      * Gets the angle to aim at a Vec3.
      *
      * @param pos Vec3 to aim at.
-     * @param sneaking determines whether the function accounts for sneak height.
      */
-    fun getYawAndPitch(pos: Vec3, sneaking: Boolean = false): Pair<Float, Float> {
-        return getYawAndPitch(pos.xCoord, pos.yCoord, pos.zCoord, sneaking)
+    fun getYawAndPitch(pos: Vec3): Pair<Float, Float> {
+        return getYawAndPitch(pos.xCoord, pos.yCoord, pos.zCoord)
     }
 
 
@@ -81,8 +83,8 @@ object RotationUtils {
     }
 
 
-    fun setAngleToVec3(vec3: Vec3, sneaking: Boolean = false) {
-        val angles = getYawAndPitch(vec3.xCoord, vec3.yCoord, vec3.zCoord, sneaking)
+    fun setAngleToVec3(vec3: Vec3) {
+        val angles = getYawAndPitch(vec3.xCoord, vec3.yCoord, vec3.zCoord)
         setAngles(angles.first, angles.second)
     }
 

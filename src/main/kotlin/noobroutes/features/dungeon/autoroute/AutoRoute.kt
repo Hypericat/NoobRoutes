@@ -82,7 +82,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         handleAutoRouteCommand(arrayOf("add", "ew"))
     }
 
-    private val roomReplacement
+    val roomReplacement
         get() = Room(
             Rotations.NORTH,
             RoomData(LocationUtils.currentArea.name, RoomType.NORMAL, cores = listOf(0, 0), 0, 0, 0),

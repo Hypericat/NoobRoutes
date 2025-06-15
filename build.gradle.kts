@@ -81,7 +81,6 @@ val shadowImpl: Configuration by configurations.creating {
 
 
 dependencies {
-
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     implementation(kotlin("stdlib-jdk8"))

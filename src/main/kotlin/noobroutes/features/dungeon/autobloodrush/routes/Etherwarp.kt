@@ -33,7 +33,7 @@ class Etherwarp(pos: Vec3, var target: Vec3) : BloodRushRoute(name = "Etherwarp"
 
 
     override fun runTick(room: Room) {
-        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target), true)
+        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.UNKNOWN) return
         if (state == SwapManager.SwapState.TOO_FAST) {
@@ -46,7 +46,7 @@ class Etherwarp(pos: Vec3, var target: Vec3) : BloodRushRoute(name = "Etherwarp"
     }
 
     override fun runMotion(room: Room, event: MotionUpdateEvent.Pre) {
-        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target), true)
+        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         event.yaw = angles.first
         event.pitch = angles.second
         if (!mc.thePlayer.isSneaking || mc.thePlayer.heldItem.skyblockID != "ASPECT_OF_THE_VOID") {

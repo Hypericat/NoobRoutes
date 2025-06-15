@@ -21,15 +21,14 @@ object EtherWarpHelper {
         val rotation = RotationUtils.getYawAndPitch(
             centeredCoords.xCoord,
             centeredCoords.yCoord + 0.5,
-            centeredCoords.zCoord,
-            true
+            centeredCoords.zCoord
         )
 
         if (getEtherPosOrigin(playerCoords, rotation.first, rotation.second).pos == blockCoords) {
             return rotation
         }
         var runs = 0
-        val distance = playerCoords.add(0.0,1.5399999618530273,0.0).distanceTo(centeredCoords)
+        val distance = playerCoords.add(0.0,1.6200000047683716,0.0).distanceTo(centeredCoords)
         val sweepDegrees = Math.toDegrees(2 * atan(0.707 / distance)).toFloat()
         for (i in 0..10) {
             val lowerYaw = rotation.first - sweepDegrees
