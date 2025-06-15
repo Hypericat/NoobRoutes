@@ -250,7 +250,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     }
     var delay = 0L
 
-    private val canRoute get() = (System.currentTimeMillis() - delay >= 0) && PlayerUtils.canSendC08
+    val canRoute get() = (System.currentTimeMillis() - delay >= 0) && PlayerUtils.canSendC08
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: ClientTickEvent) {

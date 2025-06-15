@@ -13,21 +13,18 @@ class PathCommand: CommandBase() {
     }
 
     override fun getCommandUsage(sender: ICommandSender?): String {
-        return "Pathfinding test command"
+        return "Pathfinding command"
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (!devMode) {
-            modMessage("Requires Dev Mode")
+        if (args == null || args.size < 3) {
+            devMessage("Invalid args!")
             return
         }
 
-        if (args == null || args.size < 3) {
-            devMessage("invalid args")
-        }
-        val x = args?.get(0)?.toFloatOrNull() ?: 0f
-        val y = args?.get(1)?.toFloatOrNull() ?: 0f
-        val z = args?.get(2)?.toFloatOrNull() ?: 0f
+        val x = args[0].toFloatOrNull() ?: 0f
+        val y = args[1].toFloatOrNull() ?: 0f
+        val z = args[2].toFloatOrNull() ?: 0f
 
         EWPathfinderModule.execute(x, y, z);
     }

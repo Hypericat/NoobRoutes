@@ -9,7 +9,11 @@ import noobroutes.Core
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.dungeon.autoroute.AutoRoute
+import noobroutes.features.dungeon.autoroute.DynNode
 import noobroutes.features.dungeon.autoroute.nodes.Etherwarp
+import noobroutes.features.move.DynamicRoute
+import noobroutes.features.render.ClickGUIModule
+import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.pathfinding.Path
@@ -42,7 +46,7 @@ object EWPathfinderModule : Module(
     private val ewCost by NumberSetting("Etherwarp Cost", 100f, description = "Etherwarp Pathfinding cost.", min = 10f, max = 200f, increment = 5f, unit = "f")
     private val heuristicThreshold by NumberSetting("Heuristic Threshold", 2f, description = "Use greater values for more complex rooms, default 2.", min = 0.5f, max = 10f, increment = 0.5f, unit = "f")
 
-    private val displayRaytrace by BooleanSetting("Raytrace Display", false, description = "Shows etherwarp blocks in the player's view")
+    private val displayDebug by BooleanSetting("Debug Display", false, description = "Shows pathfinder debug positions").withDependency { ClickGUIModule.devMode }
 
     var lastPath: Path? = null
     var blocks: List<BlockPos>? = null
@@ -64,7 +68,6 @@ object EWPathfinderModule : Module(
         while (node != null) {
             if (lastNode != null) {
                 val nodeVec3 = Vec3(node.pos.x.toDouble() + 0.5, node.pos.y.toDouble() + 1, node.pos.z + 0.5)
-                //val targetVec3 : Vec3? = EtherWarpHelper.rayTraceBlock(61, 1f, lastNode.yaw, lastNode.pitch, nodeVec3.xCoord, nodeVec3.yCoord + PathFinder.EYE_HEIGHT, nodeVec3.zCoord)
                 val targetVec3 : Vec3? = getEtherPosFromOrigin(nodeVec3.add(0.0, EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch)
 
                 if (targetVec3 == null) {
@@ -74,7 +77,7 @@ object EWPathfinderModule : Module(
                     continue
                 }
 
-                AutoRoute.addNode(currentRoom, Etherwarp(currentRoom.getRelativeCoords(nodeVec3), currentRoom.getRelativeCoords(targetVec3)))
+                DynamicRoute.addNode(DynNode(nodeVec3, targetVec3))
             }
             lastNode = node
             node = node.parent
@@ -83,8 +86,7 @@ object EWPathfinderModule : Module(
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent?) {
-
-        //devMessage("Best Heuristic : $bestHeuristic")
+        if (!displayDebug || !ClickGUIModule.devMode) return
 
         if (lastPath != null) {
             var last = lastPath?.endNode
