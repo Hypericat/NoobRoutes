@@ -112,6 +112,44 @@ object SwapManager {
     }
 
     /**
+     * Attempts to swap the player's held item in their inventory to the first slot
+     * containing an item with a matching Skyblock ID from the provided list.
+     *
+     * @param skyblockID Vararg parameter containing one or more Skyblock IDs to search for in the player's inventory.
+     * @param bitch Stop bitching in the chat ffs
+     * @return A [SwapState] indicating the result of the swap attempt. Possible values are:
+     * - [SwapState.SWAPPED]: The item with the matching Skyblock ID was successfully swapped to the active slot.
+     * - [SwapState.ALREADY_HELD]: The item with the matching Skyblock ID was already in the active slot.
+     * - [SwapState.TOO_FAST]: A previous swap was performed too recently, preventing a new swap.
+     * - [SwapState.UNKNOWN]: No item with a matching Skyblock ID was found in the player's inventory.
+     */
+    fun swapFromSBId(bitch: Boolean, vararg skyblockID: String): SwapState {
+        if (bitch) devMessage("swapped: ${System.currentTimeMillis()}")
+        for (i in 0..8) {
+            val stack: ItemStack? = mc.thePlayer.inventory.getStackInSlot(i)
+            val itemName = stack?.skyblockID
+            if (itemName != null) {
+                if (skyblockID.any { it == itemName }) {
+                    if (mc.thePlayer.inventory.currentItem != i) {
+                        if (recentlySwapped) {
+                            modMessage("yo somethings wrong $itemName")
+                            return SwapState.TOO_FAST
+                        }
+                        lastSwap = System.currentTimeMillis()
+                        mc.thePlayer.inventory.currentItem = i
+                        return SwapState.SWAPPED
+                    } else {
+                        return SwapState.ALREADY_HELD
+                    }
+                }
+            }
+        }
+        if (bitch) modMessage("${skyblockID.first()} not found.")
+        return SwapState.UNKNOWN
+    }
+
+
+    /**
      * Attempts to swap the currently held inventory item to an item with the given ID
      * in the player's inventory. Ensures that swaps are not performed too frequently.
      *

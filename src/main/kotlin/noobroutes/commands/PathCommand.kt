@@ -2,6 +2,7 @@ package noobroutes.commands
 
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
+import net.minecraft.util.BlockPos
 import noobroutes.features.misc.EWPathfinderModule
 import noobroutes.features.render.ClickGUIModule.devMode
 import noobroutes.utils.skyblock.devMessage
@@ -22,12 +23,14 @@ class PathCommand: CommandBase() {
             return
         }
 
-        val x = args[0].toFloatOrNull() ?: 0f
-        val y = args[1].toFloatOrNull() ?: 0f
-        val z = args[2].toFloatOrNull() ?: 0f
+        val x = args[0].toFloatOrNull() ?: return
+        val y = args[1].toFloatOrNull() ?: return
+        val z = args[2].toFloatOrNull() ?: return
 
-        EWPathfinderModule.execute(x, y, z);
+        EWPathfinderModule.execute(BlockPos(x.toInt(), y.toInt(), z.toInt()), false);
     }
+
+
 
     override fun canCommandSenderUseCommand(sender: ICommandSender?): Boolean {
         return true

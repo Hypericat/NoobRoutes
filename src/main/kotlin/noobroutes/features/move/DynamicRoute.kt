@@ -20,14 +20,10 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.MapLobotomizer
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.lastRoute
-import noobroutes.features.dungeon.autoroute.AutoRoute.roomReplacement
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.features.dungeon.autoroute.DynNode
-import noobroutes.features.misc.EWPathfinderModule
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
@@ -53,6 +49,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
 
     val dynColor by ColorSetting("Dyn Node Color", default = Color.BLUE, description = "Color of dynamic nodes").withDependency { this.renderRoutes }
     private var editMode by BooleanSetting("Edit Mode", description = "Prevents nodes from triggering")
+    val extraDebug by BooleanSetting("Warn Missing Item", description = "Get ts out of my face", default = true)
 
 
     private var nodes : MutableList<DynNode> = mutableListOf();
@@ -135,6 +132,8 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
         Scheduler.schedulePreMotionUpdateTask {
             node.motion((it as MotionUpdateEvent.Pre))
         }
+
+        if (node.singleUse) removeNode(node)
     }
 
     fun clearRoute() {
@@ -168,6 +167,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
                 while (nodes.isNotEmpty()) {
                     removeNode(nodes.first())
                 }
+                modMessage("Removed all dynamic nodes!")
             }
 
             "add", "create", "erect" -> {

@@ -8,31 +8,24 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.DynNode
-import noobroutes.features.dungeon.autoroute.nodes.Etherwarp
 import noobroutes.features.move.DynamicRoute
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.pathfinding.Path
-import noobroutes.pathfinding.PathFinder
 import noobroutes.pathfinding.PathNode
 import noobroutes.pathfinding.PathfinderExecutor
 import noobroutes.utils.*
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer.drawBox
-import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.EtherWarpHelper.EYE_HEIGHT
-import noobroutes.utils.skyblock.EtherWarpHelper.EtherPos
-import noobroutes.utils.skyblock.EtherWarpHelper.isValidEtherWarpBlock
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import java.util.*
+import noobroutes.utils.skyblock.EtherWarpHelper.centerCoords
+import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.modMessage
 import kotlin.math.abs
 import kotlin.math.floor
-import kotlin.math.max
 import kotlin.math.sign
 
 object EWPathfinderModule : Module(
@@ -45,7 +38,8 @@ object EWPathfinderModule : Module(
     val pitchStep by NumberSetting("Pitch Step", 1f, description = "Pitch step when raytracing.", min = 0.1f, max = 5f, increment = 0.1f, unit = "f")
     val ewCost by NumberSetting("Etherwarp Cost", 100f, description = "Etherwarp Pathfinding cost.", min = 10f, max = 200f, increment = 5f, unit = "f")
     val heuristicThreshold by NumberSetting("Heuristic Threshold", 2f, description = "Use greater values for more complex rooms, default 2.", min = 0.5f, max = 10f, increment = 0.5f, unit = "f")
-    val threads by NumberSetting("Thread Count", min = 1, max = 12, description = "The number of threads on the cpu the path finding uses", default = 10)
+    val centerAngle by BooleanSetting("Center Angle", default = true, description = "Attempts to use angles closer to the center of the block.").withDependency { !perfectPathing }
+    val threads by NumberSetting("Thread Count", min = 1, max = 32, description = "The number of threads on the cpu the path finding uses", default = 10)
 
 
     private val displayDebug by BooleanSetting("Debug Display", false, description = "Shows pathfinder debug positions").withDependency { ClickGUIModule.devMode }
@@ -54,12 +48,38 @@ object EWPathfinderModule : Module(
     var currentBlock: BlockPos? = null
     var bestHeuristic: Double = 0.0
 
-    fun execute(x: Float, y: Float, z: Float) {
-        PathfinderExecutor.run(x, y, z, perfectPathing, yawStep, pitchStep, ewCost, heuristicThreshold)
+    fun execute(target: BlockPos, singleUse: Boolean) {
+        if (!this.enabled) {
+            modMessage("Please enable Pathfinder!")
+            return
+        }
+
+        PathfinderExecutor.run(target, perfectPathing, yawStep, pitchStep, ewCost, heuristicThreshold, singleUse)
+    }
+
+    fun findCenteredVector(targetBlockPos: BlockPos, nodePos: Vec3) : Vec3? {
+        val centeredTarget = centerCoords(targetBlockPos).add(0.0, 0.5, 0.0)
+
+        var vec : Vec3? = traverseVoxels(nodePos.add(0.0, EYE_HEIGHT, 0.0), centeredTarget);
+        if (vec != null && vec.toBlockPos() != targetBlockPos) {
+            System.out.println("Mismatch 1 : " + vec.toBlockPos())
+            System.out.println("Mismatch 1.5 : " + vec)
+            System.out.println("Mismatch 2 : " + targetBlockPos)
+            vec = null
+        }
+
+        return vec
     }
 
     @Synchronized
     fun onSolve(path : Path) {
+        onSolve(path, false)
+    }
+
+    @Synchronized
+    fun onSolve(path : Path, singleUse: Boolean) {
+        if (path == null) return; // Can sometimes happen
+
         this.lastPath = path
 
         var lastNode: PathNode? = null
@@ -68,7 +88,16 @@ object EWPathfinderModule : Module(
         while (node != null) {
             if (lastNode != null) {
                 val nodeVec3 = Vec3(node.pos.x.toDouble() + 0.5, node.pos.y.toDouble() + 1, node.pos.z + 0.5)
-                val targetVec3 : Vec3? = getEtherPosFromOrigin(nodeVec3.add(0.0, EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch)
+
+                var targetVec3 : Vec3? = null
+                if (centerAngle) {
+                    targetVec3 = findCenteredVector(lastNode.pos, nodeVec3)
+                    if (targetVec3 == null) {
+                        devMessage("Could not find yaw/pitch")
+                    }
+                }
+
+                if (targetVec3 == null) targetVec3 = getEtherPosFromOrigin(nodeVec3.add(0.0, EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch);
 
                 if (targetVec3 == null) {
                     System.err.println("Invalid YAW / PITCH : " + lastNode.yaw + " : " + lastNode.pitch)
@@ -77,12 +106,13 @@ object EWPathfinderModule : Module(
                     continue
                 }
 
-                DynamicRoute.addNode(DynNode(nodeVec3, targetVec3))
+                DynamicRoute.addNode(DynNode(nodeVec3, targetVec3, singleUse = singleUse))
             }
             lastNode = node
             node = node.parent
         }
     }
+
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent?) {

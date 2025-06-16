@@ -15,6 +15,7 @@ import noobroutes.features.ModuleManager
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.SecretUtils
 import noobroutes.features.floor7.autop3.Blink
+import noobroutes.features.move.AutoPath
 import noobroutes.features.move.DynamicRoute
 import noobroutes.font.OdinFont
 import noobroutes.ui.clickgui.ClickGUI
@@ -41,6 +42,8 @@ class NoobRoutes {
         } catch (e: java.io.IOException) {
             throw java.lang.RuntimeException(e)
         }
+
+        AutoPath.onInitKeys()
 
         listOf(
             NoobRoutesCommand(),

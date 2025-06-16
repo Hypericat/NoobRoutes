@@ -48,6 +48,11 @@ public class PathFinder {
     }
 
     public Path calculate() {
+        if (!goal.isPossible()) {
+            ChatUtilsKt.modMessage("Goal is impossible!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
+            return null;
+        }
+
         ChatUtilsKt.modMessage("Attempting to path!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
 
         long time = System.currentTimeMillis();

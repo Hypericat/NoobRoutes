@@ -1,6 +1,7 @@
 package noobroutes.pathfinding;
 
 import net.minecraft.util.BlockPos;
+import noobroutes.utils.skyblock.EtherWarpHelper;
 
 public class GoalXYZ implements Goal {
     private final BlockPos endPos;
@@ -21,5 +22,10 @@ public class GoalXYZ implements Goal {
         int zDif = z - endPos.getZ();
 
         return xDif * xDif + yDif * yDif + zDif * zDif;
+    }
+
+    @Override
+    public boolean isPossible() {
+        return EtherWarpHelper.INSTANCE.isValidEtherWarpBlock(endPos);
     }
 }

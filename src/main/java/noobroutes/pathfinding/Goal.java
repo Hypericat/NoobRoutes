@@ -16,6 +16,8 @@ public interface Goal {
         return heuristic(pos.getX(), pos.getY(), pos.getZ());
     }
 
+    default boolean isPossible() {return true;}
+
 
 
 

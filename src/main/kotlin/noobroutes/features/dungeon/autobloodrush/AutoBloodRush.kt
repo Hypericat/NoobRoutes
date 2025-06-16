@@ -56,7 +56,14 @@ import kotlin.math.floor
 object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for bloodrushing", category = Category.DUNGEON) {
 
 
-    private val clipDistance by NumberSetting(name = "Clip Distance", description = "how far u clip", min = 0.0, max = 2, default = 0.5, increment = 0.1)
+    private val clipDistance by NumberSetting(
+        name = "Clip Distance",
+        description = "how far u clip",
+        min = 0.0,
+        max = 2,
+        default = 0.5,
+        increment = 0.1
+    )
     val silent by BooleanSetting("Silent", default = true, description = "Server side rotations")
     private val pathfind by BooleanSetting("Pathfind", default = false, description = "path as u br")
     val further by BooleanSetting("go further", default = false, description = "clip further")
@@ -74,11 +81,14 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         description = "Color of Route Nodes",
         default = Color.Companion.GREEN
     ).withDependency { editMode }
-    private val placeDoors by BooleanSetting("Place Doors", description = "Places doors at all possible locations in a room").withDependency { editMode }
-
+    private val placeDoors by BooleanSetting(
+        "Place Doors",
+        description = "Places doors at all possible locations in a room"
+    ).withDependency { editMode }
 
 
     var routes = mutableMapOf<String, MutableMap<String, MutableList<BloodRushRoute>>>()
+
     data class Door(val pos: BlockPos, val rotation: Rotations)
 
     val oneByOneDoors = listOf(
@@ -87,7 +97,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         BlockPos(31, 69, 15), // added this for testing(its a real coord)
         BlockPos(15, 69, 31)
     )
-    val twoByOneDoors =  listOf(
+    val twoByOneDoors = listOf(
         BlockPos(-1, 69, 15),
         BlockPos(15, 69, -1),
         BlockPos(47, 69, -1),
@@ -400,7 +410,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             room2x2Names.contains(room.data.name) -> twoByTwoSpots
             else -> mapOf()
         }
-        }
     }
 
 
@@ -554,7 +563,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             val closestSpot = getDoorSpots(room)[closestIndex]?.first ?: return
             val closestRealSpot = room.getRealCoordsOdin(closestSpot)
             if (closestRealSpot == mc.thePlayer.positionVector.subtract(0.0,1.0,0.0).toBlockPos() && routeTo == null) {
-                EWPathfinderModule.execute(realSpot.x.toFloat(), realSpot.y.toFloat(), realSpot.z.toFloat())
+                EWPathfinderModule.execute(realSpot, false)
                 if (isBlock(door.pos, Blocks.stained_hardened_clay)) bloodNext = true
                 routeTo = realSpot
                 waiting = false

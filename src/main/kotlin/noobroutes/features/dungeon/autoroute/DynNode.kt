@@ -25,7 +25,8 @@ class DynNode(
     var pos: Vec3 = Vec3(0.0, 0.0, 0.0),
     var target: Vec3 = Vec3(0.0, 0.0, 0.0),
     val name: String = "DynNode",
-    var chain: Boolean = false
+    var chain: Boolean = false,
+    val singleUse: Boolean = false
 ) {
 
     private var prevState: IBlockState? = null;
@@ -52,7 +53,7 @@ class DynNode(
 
     fun tick() {
         val angles = RotationUtils.getYawAndPitch(target)
-        val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+        val state = SwapManager.swapFromSBId(DynamicRoute.extraDebug, "ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.UNKNOWN) return
         if (state == SwapManager.SwapState.TOO_FAST) {
             modMessage("Tried to 0 tick swap gg")
