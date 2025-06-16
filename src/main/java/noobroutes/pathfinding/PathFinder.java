@@ -63,7 +63,7 @@ public class PathFinder {
 
         bestNode = startNode;
         complete = false;
-        for (int i = 0; i < THREAD_COUNT - 1; i++ ) {
+        for (int i = 0; i < EWPathfinderModule.INSTANCE.getThreads() - 1; i++ ) {
             Thread thread = new Thread(this::run);
             thread.start();
         }

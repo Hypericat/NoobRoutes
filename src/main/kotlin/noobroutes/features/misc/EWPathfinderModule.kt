@@ -40,11 +40,13 @@ object EWPathfinderModule : Module(
     category = Category.MISC,
     description = "Etherwarp Pathfinder"
 ) {
-    private val perfectPathing by BooleanSetting("Perfect Pathing", false, description = "Finds only the most optimal path.")
-    private val yawStep by NumberSetting("Yaw Step", 1f, description = "Yaw step when raytracing.", min = 0.1f, max = 5f, increment = 0.1f, unit = "f")
-    private val pitchStep by NumberSetting("Pitch Step", 1f, description = "Pitch step when raytracing.", min = 0.1f, max = 5f, increment = 0.1f, unit = "f")
-    private val ewCost by NumberSetting("Etherwarp Cost", 100f, description = "Etherwarp Pathfinding cost.", min = 10f, max = 200f, increment = 5f, unit = "f")
-    private val heuristicThreshold by NumberSetting("Heuristic Threshold", 2f, description = "Use greater values for more complex rooms, default 2.", min = 0.5f, max = 10f, increment = 0.5f, unit = "f")
+    val perfectPathing by BooleanSetting("Perfect Pathing", false, description = "Finds only the most optimal path.")
+    val yawStep by NumberSetting("Yaw Step", 1f, description = "Yaw step when raytracing.", min = 0.1f, max = 5f, increment = 0.1f, unit = "f")
+    val pitchStep by NumberSetting("Pitch Step", 1f, description = "Pitch step when raytracing.", min = 0.1f, max = 5f, increment = 0.1f, unit = "f")
+    val ewCost by NumberSetting("Etherwarp Cost", 100f, description = "Etherwarp Pathfinding cost.", min = 10f, max = 200f, increment = 5f, unit = "f")
+    val heuristicThreshold by NumberSetting("Heuristic Threshold", 2f, description = "Use greater values for more complex rooms, default 2.", min = 0.5f, max = 10f, increment = 0.5f, unit = "f")
+    val threads by NumberSetting("Thread Count", min = 1, max = 12, description = "The number of threads on the cpu the path finding uses", default = 10)
+
 
     private val displayDebug by BooleanSetting("Debug Display", false, description = "Shows pathfinder debug positions").withDependency { ClickGUIModule.devMode }
 
@@ -59,8 +61,6 @@ object EWPathfinderModule : Module(
     @Synchronized
     fun onSolve(path : Path) {
         this.lastPath = path
-
-        val currentRoom = DungeonUtils.currentRoom ?: AutoRoute.roomReplacement
 
         var lastNode: PathNode? = null
         var node: PathNode? = path.endNode

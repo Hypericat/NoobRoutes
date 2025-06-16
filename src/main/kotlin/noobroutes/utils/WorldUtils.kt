@@ -74,6 +74,9 @@ fun isGold(blockPos: BlockPos): Boolean =
 fun getBlockAt(pos: BlockPos): Block =
     mc.theWorld?.chunkProvider?.provideChunk(pos.x shr 4, pos.z shr 4)?.getBlock(pos) ?: Blocks.air
 
+
+
+
 /**
  * Retrieves the block state at the specified `BlockPos` in the Minecraft world.
  *

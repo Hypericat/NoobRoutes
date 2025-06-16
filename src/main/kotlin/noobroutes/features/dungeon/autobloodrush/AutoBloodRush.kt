@@ -6,6 +6,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
+import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -19,21 +20,27 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.dungeon.autobloodrush.routes.DoorRoute
 import noobroutes.features.dungeon.autobloodrush.routes.Etherwarp
+import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.serverSneak
+import noobroutes.features.misc.EWPathfinderModule
+import noobroutes.features.misc.EWPathfinderModule.getEtherPosFromOrigin
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.pathfinding.GoalXYZ
+import noobroutes.pathfinding.Path
+import noobroutes.pathfinding.PathFinder
+import noobroutes.pathfinding.PathNode
 import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
-import noobroutes.utils.skyblock.EtherWarpHelper
-import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.*
+import noobroutes.utils.skyblock.EtherWarpHelper.EYE_HEIGHT
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoordsOdin
@@ -41,7 +48,6 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.ScanUtils
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.dungeon.tiles.Rotations
-import noobroutes.utils.skyblock.modMessage
 import kotlin.math.floor
 
 object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for bloodrushing", category = Category.DUNGEON) {
@@ -63,7 +69,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         description = "Color of Route Nodes",
         default = Color.Companion.GREEN
     ).withDependency { editMode }
-
+    private val placeDoors by BooleanSetting("Place Doors", description = "Places doors at all possible locations in a room").withDependency { editMode }
 
 
 
@@ -132,7 +138,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
     val threeByOneSpots = mapOf(
         0 to Pair(BlockPos(93, 68, 14), BlockPos(93, 68, 16)),
-        1 to Pair(BlockPos(80, 68, 29), BlockPos(80, 68, 29)),
+        1 to Pair(BlockPos(80, 68, 29), BlockPos(78, 68, 29)),
         2 to Pair(BlockPos(48, 68, 29), BlockPos(46, 68, 29)),
         3 to Pair(BlockPos(16, 68, 29), BlockPos(14, 68, 29)),
         4 to Pair(BlockPos(1, 68, 16), BlockPos(1, 68, 14)),
@@ -283,17 +289,17 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         }
     }
 
-    fun getDoorSpots(room: Room, doorNumber: Int): Pair<BlockPos, BlockPos>? {
+    fun getDoorSpots(room: Room): Map<Int, Pair<BlockPos, BlockPos>> {
         return when (room.data.cores.size) {
-            1 -> oneByOneSpots[doorNumber]
-            2 -> twoByOneSpots[doorNumber]
+            1 -> oneByOneSpots
+            2 -> twoByOneSpots
             3 -> {
-                if (room1x3Names.contains(room.data.name)) threeByOneSpots[doorNumber] else lShapedSpots[doorNumber]
+                if (room1x3Names.contains(room.data.name)) threeByOneSpots else lShapedSpots
             }
             4 -> {
-                if (room1x4Names.contains(room.data.name)) fourByOneSpots[doorNumber] else twoByTwoSpots[doorNumber]
+                if (room1x4Names.contains(room.data.name)) fourByOneSpots else twoByTwoSpots
             }
-            else -> null
+            else -> mapOf()
         }
     }
 
@@ -365,11 +371,20 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             val doorPositions = if (room.data.name == "Entrance") oneByOneDoors.map { room.getRealCoordsOdin(it) } else getRoomDoors(room).map { room.getRealCoordsOdin(it) }
             doorPositions.forEachIndexed { index, pos ->
                 Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), doorNumberColor, scale = 0.1f)
-                }
+            }
+            val doorSpots = if (room.data.name == "Entrance") oneByOneSpots.map { it.key to Pair(room.getRealCoordsOdin(it.value.first), room.getRealCoordsOdin(it.value.second)) } else
+                getDoorSpots(room).map { it.key to Pair(room.getRealCoordsOdin(it.value.first), room.getRealCoordsOdin(it.value.second)) }
+
+            doorSpots.forEach {
+                Renderer.drawBlock(it.second.first, Color.RED)
+                Renderer.drawBlock(it.second.second, Color.BLUE)
+            }
+
+
         }
         if (routeName == "" && editMode) return
         val key = if (editMode) routeName else activeRoutes[room.data.name] ?: return
-        val nodeList = routes.getOrPut(room.data.name) {mutableMapOf()}.getOrPut(key) {mutableListOf()}
+        val nodeList = routes.getOrPut(room.data.name) {mutableMapOf()}.getOrPut(key) {mutableListOf()}.toList()
         if (editMode) nodeList.forEachIndexed {
             index, node ->
             node.renderIndex(room, index)
@@ -463,10 +478,8 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 routeName = "${doorNumbers[0]}>${doorNumbers[1]}"
                 val routeList = routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}
                 if (!routeList.any { it.name == "Door" }) {
-                    val spot = getDoorSpots(currentRoom, doorNumbers[1]!!) ?: return
-                    val real = currentRoom.getRealCoordsOdin(spot.second.toVec3(0.5, 1.0, 0.5))
-
-
+                    val spot = getDoorSpots(currentRoom)[doorNumbers[1]!!] ?: return
+                    val real = currentRoom.getRealCoordsOdin(spot.second).toVec3(0.5, 1.0, 0.5)
                     routeList.add(DoorRoute(currentRoom.getRelativeCoords(real)))
                 }
 
@@ -537,6 +550,26 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             "load" -> {
                 loadFile()
             }
+            "generate" -> {
+                val room = DungeonUtils.currentRoom ?: return modMessage("not in room")
+                generateRoutes(room)
+            }
+            "placedoor" -> {
+                val room = DungeonUtils.currentRoom ?: return modMessage("not in room")
+                val door = getRoomDoors(room).map { room.getRealCoordsOdin(it) }.minByOrNull { it.distanceToPlayerSq } ?: return
+                val closestComponent = room.roomComponents.minByOrNull { it.blockPos.distanceSq(door) }!!
+                val rotation = when {
+                    door.x < closestComponent.x -> Rotations.EAST
+                    door.x > closestComponent.x -> Rotations.WEST
+                    door.z > closestComponent.z -> Rotations.NORTH
+                    door.z < closestComponent.z -> Rotations.SOUTH
+                    else -> Rotations.NORTH
+                }
+                placeWitherDoor(door, rotation)
+            }
+            "stop" -> {
+                routesToGenerate.clear()
+            }
         }
     }
 
@@ -545,6 +578,139 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
     data class ExpectedS08(val x: Double, val z: Double, val dir: Int)
     lateinit var clipS08: ExpectedS08
+
+
+
+    val blockList = mapOf(
+        "minecraft:cobblestone_wall" to listOf(
+            BlockPos(2, 0, 2),
+            BlockPos(2, 2, 2),
+            BlockPos(2, 0, -2),
+            BlockPos(2, 2, -2),
+            BlockPos(-2, 0, 2),
+            BlockPos(-2, 2, 2),
+            BlockPos(-2, 0, -2),
+            BlockPos(-2, 2, -2)
+        ),
+        "minecraft:iron_bars" to listOf(
+            BlockPos(2, 1, 2),
+            BlockPos(2, 1, -2),
+            BlockPos(-2, 1, 2),
+            BlockPos(-2, 1, -2)
+        ),
+        "minecraft:stone_brick_stairs" to listOf(
+            BlockPos(2, 3, 2),
+            BlockPos(2, 3, 1),
+            BlockPos(2, 3, -1),
+            BlockPos(2, 3, -2),
+            BlockPos(-2, 3, 2),
+            BlockPos(-2, 3, 1),
+            BlockPos(-2, 3, -1),
+            BlockPos(-2, 3, -2),
+        ),
+        "minecraft:stonebrick" to listOf(
+            BlockPos(2, 4, 2),
+            BlockPos(2, 4, 1),
+            BlockPos(2, 4, 0),
+            BlockPos(2, 4, -1),
+            BlockPos(2, 4, -2),
+            BlockPos(1, 0, 2),
+            BlockPos(1, 1, 2),
+            BlockPos(1, 2, 2),
+            BlockPos(1, 3, 2),
+            BlockPos(1, 4, 2),
+            BlockPos(1, 4, 1),
+            BlockPos(1, 4, 0),
+            BlockPos(1, 4, -1),
+            BlockPos(1, 0, -2),
+            BlockPos(1, 1, -2),
+            BlockPos(1, 2, -2),
+            BlockPos(1, 3, -2),
+            BlockPos(1, 4, -2),
+            BlockPos(0, 0, 2),
+            BlockPos(0, 1, 2),
+            BlockPos(0, 2, 2),
+            BlockPos(0, 3, 2),
+            BlockPos(0, 4, 2),
+            BlockPos(0, 4, 1),
+            BlockPos(0, 4, 0),
+            BlockPos(0, 4, -1),
+            BlockPos(0, 0, -2),
+            BlockPos(0, 1, -2),
+            BlockPos(0, 2, -2),
+            BlockPos(0, 3, -2),
+            BlockPos(0, 4, -2),
+            BlockPos(-1, 0, 2),
+            BlockPos(-1, 1, 2),
+            BlockPos(-1, 2, 2),
+            BlockPos(-1, 3, 2),
+            BlockPos(-1, 4, 2),
+            BlockPos(-1, 4, 1),
+            BlockPos(-1, 4, 0),
+            BlockPos(-1, 4, -1),
+            BlockPos(-1, 0, -2),
+            BlockPos(-1, 1, -2),
+            BlockPos(-1, 2, -2),
+            BlockPos(-1, 3, -2),
+            BlockPos(-1, 4, -2),
+            BlockPos(-2, 4, 2),
+            BlockPos(-2, 4, 1),
+            BlockPos(-2, 4, 0),
+            BlockPos(-2, 4, -1),
+            BlockPos(-2, 4, -2),
+        ),
+        "minecraft:stone_slab" to listOf(
+            BlockPos(2, 3, 0),
+            BlockPos(-2, 3, 0)
+        )
+    )
+
+
+    fun placeWitherDoor(pos: BlockPos, rotations: Rotations){
+        val rotation = when (rotations) {
+            Rotations.WEST -> Rotations.NORTH
+            Rotations.EAST -> Rotations.NORTH
+            Rotations.NORTH -> Rotations.EAST
+            Rotations.SOUTH -> Rotations.EAST
+            Rotations.NONE -> return devMessage("error with door rotation")
+        }
+
+        
+        val list = blockList.toList()
+        val placeList = mutableListOf<Pair<String, List<BlockPos>>>()
+        list.forEach { (key, value) ->
+            placeList.add(Pair(key, value.map { it.toVec3().rotateAroundNorth(rotation).toBlockPos().add(pos) }.toList()))
+        }
+
+        val air = Vec3(-2.0, 0.0, -1.0).rotateAroundNorth(rotation).toBlockPos().add(pos)
+        val air1 = Vec3(2.0, 3.0, 1.0).rotateAroundNorth(rotation).toBlockPos().add(pos)
+        sendChatMessage("/fill ${air.x} ${air.y} ${air.z} ${air1.x} ${air1.y} ${air1.z} air")
+        for (blockType in placeList) {
+            blockType.second.forEach {
+                sendChatMessage("/setblock ${it.x} ${it.y} ${it.z} ${blockType.first}")
+            }
+        }
+
+    }
+
+    @SubscribeEvent
+    fun onRoomEnter(event: RoomEnterEvent){
+        if (LocationUtils.isSinglePlayer && editMode && placeDoors && event.room != null) {
+            val doors = getRoomDoors(event.room)
+            doors.map { event.room.getRealCoordsOdin(it) }.forEach {door ->
+                val closestComponent = event.room.roomComponents.minByOrNull { it.blockPos.distanceSq(door) }!!
+                val rotation = when {
+                    door.x < closestComponent.x -> Rotations.EAST
+                    door.x > closestComponent.x -> Rotations.WEST
+                    door.z > closestComponent.z -> Rotations.NORTH
+                    door.z < closestComponent.z -> Rotations.SOUTH
+                    else -> Rotations.NORTH
+                }
+                placeWitherDoor(door, rotation)
+            }
+        }
+    }
+
 
 
 
@@ -575,6 +741,84 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 AutoRouteUtils.etherwarp(event.packet.yaw, 90f, silent)
             }
             thrown = 0
+        }
+    }
+
+    @Synchronized
+    fun onSolve(path: Path, routeName: String){
+        val currentRoom = DungeonUtils.currentRoom ?: AutoRoute.roomReplacement
+        var lastNode: PathNode? = null
+        var node: PathNode? = path.endNode
+        while (node != null) {
+            if (lastNode != null) {
+                val nodeVec3 = Vec3(node.pos.x.toDouble() + 0.5, node.pos.y.toDouble() + 1, node.pos.z + 0.5)
+                val targetVec3 : Vec3? = getEtherPosFromOrigin(nodeVec3.add(0.0, EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch)
+
+                if (targetVec3 == null) {
+                    System.err.println("Invalid YAW / PITCH : " + lastNode.yaw + " : " + lastNode.pitch)
+                    lastNode = node
+                    node = node.parent
+                    continue
+                }
+
+                routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.add(
+                    Etherwarp(currentRoom.getRelativeCoords(nodeVec3), currentRoom.getRelativeCoords(targetVec3))
+                )
+            }
+            lastNode = node
+            node = node.parent
+        }
+        isSolving = false
+
+    }
+
+    @Volatile
+    var isSolving = false
+
+    //pathFindRoute(room.getRealCoordsOdin(doorSpots[door]!!.first), room.getRealCoordsOdin(doorSpots[door1]!!.second))
+
+    fun pathFindRoute(start: BlockPos, end: BlockPos, routeName: String){
+        if (isSolving) return
+        isSolving = true
+        val pathFinder = PathFinder(GoalXYZ(end), start, EWPathfinderModule.ewCost.toDouble(), EWPathfinderModule.perfectPathing,
+            EWPathfinderModule.yawStep, EWPathfinderModule.pitchStep, EWPathfinderModule.heuristicThreshold)
+        val thread = Thread { onSolve(pathFinder.calculate(), routeName) }
+        thread.start()
+    }
+
+    val routesToGenerate = mutableListOf<Triple<String, BlockPos, BlockPos>>()
+    @SubscribeEvent
+    fun pathGeneratorTick(event: TickEvent.ClientTickEvent){
+        if (event.isEnd || isSolving) return
+        val currentRoom = DungeonUtils.currentRoom ?: return
+        val route = routesToGenerate.removeFirstOrNull() ?: return
+        routeName = route.first
+        val routeList = routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}
+        val routeNumbers = route.first.split(">").map { it.toIntOrNull() ?: return }
+        if (!routeList.any { it.name == "Door" }) {
+            val spot = getDoorSpots(currentRoom)[routeNumbers[1]] ?: return
+            val real = currentRoom.getRealCoordsOdin(spot.second).toVec3(0.5, 1.0, 0.5)
+            routeList.add(DoorRoute(currentRoom.getRelativeCoords(real)))
+        }
+
+        pathFindRoute(route.second, route.third, route.first)
+    }
+
+    fun generateRoutes(room: Room){
+        val maxDoors = getRoomDoors(room).size - 1
+        val doorSpots = getDoorSpots(room)
+        for (door in 0..maxDoors) {
+            for (door1 in 0..maxDoors) {
+                if (door == door1) continue
+                val origin = room.getRealCoordsOdin(doorSpots[door]!!.first)
+                if (!isAir(origin.add(0, 1, 0))) continue
+                val target = room.getRealCoordsOdin(doorSpots[door1]!!.second)
+                if (!isAir(target.add(0, 1, 0))) continue
+                
+                routeName = "$door>$door1"
+                devMessage(routeName)
+                routesToGenerate.add(Triple("$door>$door1", origin, target))
+            }
         }
     }
 

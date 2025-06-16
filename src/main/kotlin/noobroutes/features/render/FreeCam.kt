@@ -55,7 +55,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         mc.thePlayer.movementInput = MovementInput()
         mc.gameSettings.thirdPersonView = 0
         val viewEntity = mc.renderViewEntity
-        val eyePos = viewEntity.getPositionEyes(1f)
+        val eyePos = mc.thePlayer.positionVector.add(0.0, 1.6200000047683716, 0.0)
         lookVec = RotationUtils.yawAndPitchVector(viewEntity.rotationYaw, viewEntity.rotationPitch).toMutableVec3()
         val camPos = eyePos.subtract(Vec3(lookVec.x, lookVec.y, lookVec.z).multiply(1.5))
         pos = camPos
@@ -65,6 +65,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         freeCamPosition.z = camPos.zCoord
         freeCamPosition.pitch = viewEntity.rotationPitch
         freeCamPosition.yaw = viewEntity.rotationYaw
+        lastTime = System.currentTimeMillis()
         scrollWheelMultiplier = 2.0
         super.onEnable()
     }
