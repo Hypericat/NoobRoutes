@@ -49,7 +49,6 @@ object EWPathfinderModule : Module(
     private val displayDebug by BooleanSetting("Debug Display", false, description = "Shows pathfinder debug positions").withDependency { ClickGUIModule.devMode }
 
     var lastPath: Path? = null
-    var blocks: List<BlockPos>? = null
     var currentBlock: BlockPos? = null
     var bestHeuristic: Double = 0.0
 
@@ -57,6 +56,7 @@ object EWPathfinderModule : Module(
         PathfinderExecutor.run(x, y, z, perfectPathing, yawStep, pitchStep, ewCost, heuristicThreshold)
     }
 
+    @Synchronized
     fun onSolve(path : Path) {
         this.lastPath = path
 

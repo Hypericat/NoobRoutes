@@ -17,14 +17,17 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.dungeon.MapLobotomizer
+import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.lastRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.roomReplacement
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.features.dungeon.autoroute.DynNode
+import noobroutes.features.misc.EWPathfinderModule
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
@@ -37,8 +40,6 @@ import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer2D
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.floor
@@ -57,7 +58,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     private var nodes : MutableList<DynNode> = mutableListOf();
     private var deletedNodes : MutableList<DynNode> = mutableListOf();
 
-
+    @Synchronized
     @SubscribeEvent
     fun onRenderWorldLast(event: RenderWorldLastEvent) {
         if (mc.thePlayer == null) return
@@ -73,6 +74,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     }
 
 
+    @Synchronized
     private fun inNodes(): MutableList<DynNode> {
         val inNodes = mutableListOf<DynNode>()
         nodes.forEach { node ->
@@ -94,7 +96,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     }
 
 
-
+    @Synchronized
     fun addNode(node: DynNode) {
         if (Minecraft.getMinecraft().theWorld != null && fullBlock) {
             node.setPrevState(Minecraft.getMinecraft().theWorld.getBlockState(node.getBlockPos().subtract(Vec3i(0, 1, 0))))
@@ -107,6 +109,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
         nodes.add(node)
     }
 
+    @Synchronized
     @SubscribeEvent
     fun onUnloadWorldLoad(event: WorldEvent.Unload) {
         nodes.clear()
@@ -134,6 +137,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
         }
     }
 
+    @Synchronized
     fun handleDynamicRouteCommand(args: Array<out String>) {
         val chain = args.containsOneOf("chain", ignoreCase = true)
 
@@ -189,6 +193,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
         }
     }
 
+    @Synchronized
     private fun removeNode(node: DynNode) {
         deletedNodes.add(node)
         nodes.remove(node)
@@ -198,7 +203,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     }
 
 
-
+    @Synchronized
     @SubscribeEvent
     fun onKeyInput(event: MouseEvent) {
         if (event.button == 1 && event.buttonstate && System.currentTimeMillis() - lastRoute < 150) {
@@ -226,6 +231,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
         }
     }
 
+    @Synchronized
     private fun getNode(args : Array<out String>): DynNode? {
         if (args.size > 1) {
             val index = args[1].toIntOrNull()?.absoluteValue
@@ -246,5 +252,4 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
         }!!
         return node
     }
-
 }
