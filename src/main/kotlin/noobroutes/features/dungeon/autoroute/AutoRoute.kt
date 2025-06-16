@@ -19,6 +19,7 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.features.dungeon.autoroute.SecretUtils.secretCount
 import noobroutes.features.dungeon.autoroute.nodes.*
@@ -280,6 +281,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }
 
         if (DynamicRoute.enabled && !DynamicRoute.editMode && DynamicRoute.isInNode()) return
+        if (AutoBloodRush.waiting != false || AutoBloodRush.routeTo != null) return
 
         nodesToRun.firstOrNull()?.let { node ->
             lastRoute = System.currentTimeMillis()

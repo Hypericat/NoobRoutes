@@ -53,15 +53,6 @@ import kotlin.math.floor
 
 object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for bloodrushing", category = Category.DUNGEON) {
 
-
-    private val clipDistance by NumberSetting(
-        name = "Clip Distance",
-        description = "how far u clip",
-        min = 0.0,
-        max = 2,
-        default = 0.5,
-        increment = 0.1
-    )
     val silent by BooleanSetting("Silent", default = true, description = "Server side rotations")
     private val pathfind by BooleanSetting("Pathfind", default = false, description = "path as u br")
     val further by BooleanSetting("go further", default = false, description = "clip further")
@@ -269,62 +260,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         return scannedRoom
     }
 
-    val room1x1Names = hashSetOf(
-        "Arrow Trap",
-        "Banners",
-        "Basement",
-        "Blue Skulls",
-        "Cage",
-        "Cell",
-        "Duncan",
-        "Entrance",
-        "Golden Oasis",
-        "Jumping Skulls",
-        "Leaves",
-        "Locked Away",
-        "Mirror",
-        "Multicolored",
-        "Mural",
-        "Mushroom",
-        "Prison Cell",
-        "Silver Sword",
-        "Sloth",
-        "Steps",
-        "Andesite",
-        "Beams",
-        "Big Red Flag",
-        "Cages",
-        "Chains",
-        "Cobble Wall Pillar",
-        "Dip",
-        "Dome",
-        "Drop",
-        "End",
-        "Granite",
-        "Overgrown Chains",
-        "Painting",
-        "Perch",
-        "Quad Lava",
-        "Scaffolding",
-        "Slabs",
-        "Small Stairs",
-        "Water",
-        "Black Flag",
-        "Double Diamond",
-        "Dueces",
-        "Knight",
-        "Long Hall",
-        "Lots Of Floors",
-        "Overgrown",
-        "Red Green",
-        "Redstone Key",
-        "Sarcophagus",
-        "Spikes",
-        "Temple",
-        "Logs",
-        "Raccoon"
-    )
-
     val room1x2Names = hashSetOf(
         "Gold",
         "Skull",
@@ -343,22 +278,22 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     )
 
     val room1x3Names = hashSetOf(
-        "Slime",
-        "Red Blue",
         "Diagonal",
-        "Gravel",
-        "Deathmite",
+        "Red Blue",
+        "Wizard",
+        "Slime",
         "Catwalk",
-        "Wizard"
+        "Deathmite",
+        "Gravel"
     )
 
     val room1x4Names = hashSetOf(
-        "Quartz Knight",
-        "Pipes",
-        "Pit",
         "Hallway",
-        "Waterfall",
-        "Mossy"
+        "Mossy",
+        "Pit",
+        "Pipes",
+        "Quartz Knight",
+        "Waterfall"
     )
 
     val room2x2Names = hashSetOf(
@@ -374,7 +309,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     )
 
     val roomLShapedNames = hashSetOf(
-        "Dino Dig Site",
+        "Dino Site",
         "Withermancer",
         "Chambers",
         "Market",
@@ -382,31 +317,31 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         "Melon",
         "Well",
         "Layers",
-        "Spider"
+        "Spider",
+        "Pirate",
+        "Altar"
     )
 
 
     fun getRoomDoors(room: Room): List<BlockPos> {
         return when {
-            room1x1Names.contains(room.data.name) -> oneByOneDoors
             room1x2Names.contains(room.data.name) -> twoByOneDoors
             room1x3Names.contains(room.data.name) -> threeByOneDoors
             roomLShapedNames.contains(room.data.name) -> lShapedDoors
             room1x4Names.contains(room.data.name) -> fourByOneDoors
             room2x2Names.contains(room.data.name) -> twoByTwoDoors
-            else -> listOf()
+            else -> oneByOneDoors
         }
     }
 
     fun getDoorSpots(room: Room): Map<Int, Pair<BlockPos, BlockPos>> {
         return when {
-            room1x1Names.contains(room.data.name) -> oneByOneSpots
             room1x2Names.contains(room.data.name) -> twoByOneSpots
             room1x3Names.contains(room.data.name) -> threeByOneSpots
             roomLShapedNames.contains(room.data.name) -> lShapedSpots
             room1x4Names.contains(room.data.name) -> fourByOneSpots
             room2x2Names.contains(room.data.name) -> twoByTwoSpots
-            else -> mapOf()
+            else -> oneByOneSpots
         }
     }
 
@@ -533,8 +468,8 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         customRoom = null
     }
 
-    private var routeTo : BlockPos? = null
-    private var waiting = false
+    var routeTo : BlockPos? = null
+    var waiting = false
     private var bloodNext = false
     private var customRoom: Room? = null
 
@@ -594,8 +529,8 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent){
-        val room = DungeonUtils.currentRoom ?: return
-        if (room.data.name == "Entrance") customRoom = room
+        val room = customRoom ?: return
+        if (DungeonUtils.currentRoom?.data?.name == "Entrance") customRoom = room ?: return
         if (editMode) {
             val doorPositions = if (room.data.name == "Entrance") oneByOneDoors.map { room.getRealCoordsOdin(it) } else getRoomDoors(room).map { room.getRealCoordsOdin(it) }
             doorPositions.forEachIndexed { index, pos ->
@@ -974,8 +909,11 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             }
         } else {
             mc.thePlayer.setPosition(clipS08.x + 3.8 * dx + 0.8 * dz, 70.0, clipS08.z + 3.8 * dz - 0.8 * dx)
+            Scheduler.scheduleC03Task(0, true) {
+                PacketUtils.sendPacket(C06PacketPlayerPosLook(clipS08.x + 3.8 * dx + 0.8 * dz, 70.0, clipS08.z + 3.8 * dz - 0.8 * dx, 0f, 90f, true))
+            }
             Scheduler.schedulePreTickTask(1) { //the delay is important wadey. if u remove the delay, ill remove ur heads(bottom one first)
-                AutoRouteUtils.etherwarp(event.packet.yaw, 90f, silent)
+                AutoRouteUtils.etherwarp(0f, 90f, silent)
             }
             thrown = 0
         }
