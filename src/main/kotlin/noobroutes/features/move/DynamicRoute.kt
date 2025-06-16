@@ -134,7 +134,8 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
         lastRoute = System.currentTimeMillis()
 
         resetRotation()
-        node.tick()
+         if (!node.tick()) return // Could not get correct item
+
         Scheduler.schedulePreMotionUpdateTask {
             node.motion((it as MotionUpdateEvent.Pre))
         }

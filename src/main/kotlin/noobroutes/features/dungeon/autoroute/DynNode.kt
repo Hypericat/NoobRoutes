@@ -1,6 +1,9 @@
 package noobroutes.features.dungeon.autoroute
 
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.Minecraft
+import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
@@ -51,17 +54,19 @@ class DynNode(
     }
 
 
-    fun tick() {
+    fun tick() : Boolean {
         val angles = RotationUtils.getYawAndPitch(target)
-        val state = SwapManager.swapFromSBId(DynamicRoute.extraDebug, "ASPECT_OF_THE_VOID")
-        if (state == SwapManager.SwapState.UNKNOWN) return
+        var state = SwapManager.swapFromSBId(DynamicRoute.extraDebug, "ASPECT_OF_THE_VOID")
+        if (state == SwapManager.SwapState.UNKNOWN && Minecraft.getMinecraft().isSingleplayer) state = SwapManager.swapFromId(Item.getIdFromItem(Items.diamond_shovel))
+        if (state == SwapManager.SwapState.UNKNOWN) return false
         if (state == SwapManager.SwapState.TOO_FAST) {
             modMessage("Tried to 0 tick swap gg")
-            return
+            return false
         }
         if (!DynamicRoute.silent) setAngles(angles.first, angles.second)
         stopWalk()
         PlayerUtils.sneak()
+        return true
     }
 
 

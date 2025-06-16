@@ -53,7 +53,7 @@ public class PathFinder {
             return null;
         }
 
-        ChatUtilsKt.modMessage("Attempting to path!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
+        if (EWPathfinderModule.INSTANCE.getDisplayDebug()) ChatUtilsKt.modMessage("Attempting to path!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
 
         long time = System.currentTimeMillis();
 
@@ -74,13 +74,13 @@ public class PathFinder {
         }
         run();
 
-
-        ChatUtilsKt.devMessage("Scanned all nodes!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
-        ChatUtilsKt.devMessage("Returning best path!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
-
         Path path = new Path(startPos, startNode, bestNode, goal);
 
-        outTime(time, "Used " + path.length() + " nodes!");
+        if (EWPathfinderModule.INSTANCE.getDisplayDebug()) {
+            ChatUtilsKt.devMessage("Scanned all nodes!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
+            ChatUtilsKt.devMessage("Returning best path!", "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
+            outTime(time, "Used " + path.length() + " nodes!");
+        }
 
         return path;
     }

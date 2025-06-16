@@ -12,7 +12,6 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
-import noobroutes.Core.mc
 import noobroutes.config.DataManager
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
@@ -49,7 +48,6 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoordsOdin
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.ScanUtils
 import noobroutes.utils.skyblock.dungeon.tiles.Room
-import noobroutes.utils.skyblock.dungeon.tiles.RoomState
 import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import kotlin.math.floor
 
@@ -413,19 +411,33 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     }
 
 
+    private const val WITHER_SKULL_ID = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2JjYmJmOTRkNjAzNzQzYTFlNzE0NzAyNmUxYzEyNDBiZDk4ZmU4N2NjNGVmMDRkY2FiNTFhMzFjMzA5MTRmZCJ9fX0="
+    private const val BLOOD_SKULL_ID = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQ5ZDgwYjc5NDQyY2YxYTNhZmVhYTIzN2JkNmFkYWFhY2FiMGMyODgzMGZiMzZiNTcwNGNmNGQ5ZjU5MzdjNCJ9fX0="
 
-    private val skullIds = listOf(
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2JjYmJmOTRkNjAzNzQzYTFlNzE0NzAyNmUxYzEyNDBiZDk4ZmU4N2NjNGVmMDRkY2FiNTFhMzFjMzA5MTRmZCJ9fX0=",
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQ5ZDgwYjc5NDQyY2YxYTNhZmVhYTIzN2JkNmFkYWFhY2FiMGMyODgzMGZiMzZiNTcwNGNmNGQ5ZjU5MzdjNCJ9fX0="
-    )
+
+    fun isWitherDoor(door: Door) : Boolean {
+        return isWitherDoor(door.pos)
+    }
+
+    fun isWitherDoor(doorPos: BlockPos) : Boolean {
+        return getSkull(doorPos.add(-2, 1, -2))?.skullTexture == WITHER_SKULL_ID
+    }
+
+    fun isBloodDoor(door: Door) : Boolean {
+        return isBloodDoor(door.pos)
+    }
+
+    fun isBloodDoor(doorPos: BlockPos) : Boolean {
+        return getSkull(doorPos.add(-2, 1, -2))?.skullTexture == BLOOD_SKULL_ID
+    }
+
 
 
 
     fun findRoomDoors(room: Room): Door? {
         val possibleDoors = getRoomDoors(room).map { room.getRealCoordsOdin(it) }
         val doors = possibleDoors.filter {
-
-            getSkull(it.add(-2, 1, -2))?.skullTexture in skullIds
+            isWitherDoor(it) || isBloodDoor(it)
         }
         val doorPos = doors.firstOrNull {it != currentDoor?.pos} ?: return null
         if (possibleDoors.indexOf(currentDoor?.pos) == -1) devMessage(currentDoor!!.pos, "spamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspam")
@@ -447,8 +459,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     fun getOtherDoor(room: Room): Door? {
         val possibleDoors = getRoomDoors(room).map { room.getRealCoordsOdin(it) }
         val doors = possibleDoors.filter {
-
-            getSkull(it.add(-2, 1, -2))?.skullTexture in skullIds
+            isWitherDoor(it) || isBloodDoor(it)
         }
         val doorPos = doors.firstOrNull {it != getClosestDoorToPlayer(room)?.pos} ?: return null
         val closestComponent = room.roomComponents.minByOrNull { it.blockPos.distanceSq(doorPos) }!!
