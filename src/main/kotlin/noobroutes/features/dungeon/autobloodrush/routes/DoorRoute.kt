@@ -31,7 +31,7 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
 
     var cancelMotion = false
     override fun runTick(room: Room) {
-        if (System.currentTimeMillis() - thrown < 3000)  {
+        if (System.currentTimeMillis() - thrown < 10000)  {
             cancelMotion = true
             return modMessage("doing shit")
         }
