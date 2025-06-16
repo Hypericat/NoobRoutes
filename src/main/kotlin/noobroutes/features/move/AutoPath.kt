@@ -61,7 +61,7 @@ object AutoPath: Module(
         val doorSpots = if (room.data.name == "Entrance") oneByOneSpots.map { it.key to Pair(room.getRealCoordsOdin(it.value.first), room.getRealCoordsOdin(it.value.second)) } else
             getDoorSpots(room).map { it.key to Pair(room.getRealCoordsOdin(it.value.first), room.getRealCoordsOdin(it.value.second)) }
 
-        if (key > doorSpots.size || key < 0) {
+        if (key >= doorSpots.size || key < 0) {
             devMessage("Invalid index for pathing!")
             return
         }
