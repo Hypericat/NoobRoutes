@@ -56,7 +56,6 @@ import kotlin.math.floor
 object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for bloodrushing", category = Category.DUNGEON) {
 
 
-    private val clipDistance by NumberSetting(name = "Clip Distance", description = "how far u clip", min = 0.0, max = 2, default = 0.5, increment = 0.1)
     val silent by BooleanSetting("Silent", default = true, description = "Server side rotations")
     private val pathfind by BooleanSetting("Pathfind", default = false, description = "path as u br")
     val further by BooleanSetting("go further", default = false, description = "clip further")
@@ -399,7 +398,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             room1x4Names.contains(room.data.name) -> fourByOneSpots
             room2x2Names.contains(room.data.name) -> twoByTwoSpots
             else -> mapOf()
-        }
         }
     }
 
