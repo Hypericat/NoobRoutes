@@ -137,6 +137,12 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
         }
     }
 
+    fun clearRoute() {
+        while (nodes.isNotEmpty()) {
+            removeNode(nodes.first())
+        }
+    }
+
     @Synchronized
     fun handleDynamicRouteCommand(args: Array<out String>) {
         val chain = args.containsOneOf("chain", ignoreCase = true)

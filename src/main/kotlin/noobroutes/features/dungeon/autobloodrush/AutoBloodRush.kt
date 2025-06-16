@@ -26,6 +26,7 @@ import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.serverSneak
 import noobroutes.features.misc.EWPathfinderModule
 import noobroutes.features.misc.EWPathfinderModule.getEtherPosFromOrigin
+import noobroutes.features.move.DynamicRoute
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
@@ -55,6 +56,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
     private val clipDistance by NumberSetting(name = "Clip Distance", description = "how far u clip", min = 0.0, max = 2, default = 0.5, increment = 0.1)
     val silent by BooleanSetting("Silent", default = true, description = "Server side rotations")
+    val pathfind by BooleanSetting("Pathfind", default = false, description = "path as u br")
     val editMode by BooleanSetting(
         "Edit Mode",
         description = "Allows you to edit routes"
@@ -334,15 +336,86 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         return Door(doorPos, rotation)
     }
 
+    fun getOtherDoor(room: Room): Door? {
+        val possibleDoors = getRoomDoors(room).map { room.getRealCoordsOdin(it) }
+        val doors = possibleDoors.filter {
+
+            getSkull(it.add(-2, 1, -2))?.skullTexture in skullIds
+        }
+        val doorPos = doors.firstOrNull {it != getClosestDoorToPlayer(room)?.pos} ?: return null
+        val closestComponent = room.roomComponents.minByOrNull { it.blockPos.distanceSq(doorPos) }!!
+        val rotation = when {
+            doorPos.x < closestComponent.x -> Rotations.EAST
+            doorPos.x > closestComponent.x -> Rotations.WEST
+            doorPos.z > closestComponent.z -> Rotations.NORTH
+            doorPos.z < closestComponent.z -> Rotations.SOUTH
+            else -> Rotations.NORTH
+        }
+        return Door(doorPos, rotation)
+    }
+
+    fun getDoorIndex(room: Room, door: Door): Int? {
+        val doorList = when {
+            room.data.name == "Entrance" -> oneByOneDoors
+            room.data.cores.size == 1 -> oneByOneDoors
+            room.data.cores.size == 2 -> twoByOneDoors
+            room1x3Names.contains(room.data.name) -> threeByOneDoors
+            room.data.cores.size == 3 -> lShapedDoors
+            room1x4Names.contains(room.data.name) -> fourByOneDoors
+            room.data.cores.size == 4 -> twoByTwoDoors
+            else -> return null
+        }
+
+        return doorList.indexOfFirst { relativePos ->
+            val realPos = room.getRealCoordsOdin(relativePos)
+            realPos == door.pos
+        }.takeIf { it != -1 }
+    }
+
+    fun getClosestDoorToPlayer(room: Room): Door? {
+        val doorPositions = if (room.data.name == "Entrance") {
+            oneByOneDoors
+        } else {
+            getRoomDoors(room)
+        }.map { room.getRealCoordsOdin(it) }
+        val closestPos = doorPositions.minByOrNull { it.distanceToPlayerSq } ?: return null
+        val closestComponent = room.roomComponents.minByOrNull { it.blockPos.distanceSq(closestPos) } ?: return null
+        val rotation = when {
+            closestPos.x < closestComponent.x -> Rotations.EAST
+            closestPos.x > closestComponent.x -> Rotations.WEST
+            closestPos.z > closestComponent.z -> Rotations.NORTH
+            closestPos.z < closestComponent.z -> Rotations.SOUTH
+            else -> Rotations.NORTH
+        }
+        return Door(closestPos, rotation)
+    }
+
     var started = false
 
     @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {
+        /*started = false
+        activeRoutes.clear()
+        currentDoor = null
+        doors.clear()*/
         started = false
         activeRoutes.clear()
         currentDoor = null
         doors.clear()
+        fairyRoom = null
+        routeTo = null
+        waiting = false
+        routeName = ""
+        direction = Rotations.NONE
+        thrown = 0L
+        isSolving = false
+        routesToGenerate.clear()
+        autoBrUnsneakRegistered = false
     }
+
+    private var routeTo : BlockPos? = null
+    private var waiting = false
+    private var bloodNext = false
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -350,6 +423,35 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         if (event.isEnd && currentDoor != null) {
             scanForDoors()
             if (currentDoor == null) devMessage(doors)
+        }
+        if (!editMode && pathfind) {
+            val room = DungeonUtils.currentRoom ?: return devMessage("no room")
+            if (routeTo == mc.thePlayer.positionVector.subtract(0.0,1.0,0.0).toBlockPos()) {
+                if (waiting) return
+                val doorNode = DoorRoute(routeTo!!.toVec3(0.5, 1.0, 0.5))
+                doorNode.runTick(room)
+                Scheduler.schedulePreMotionUpdateTask {
+                    doorNode.runMotion(room, it as MotionUpdateEvent.Pre)
+                }
+                waiting = true
+                if (bloodNext) DynamicRoute.clearRoute()
+                routeTo = null
+                return
+            }
+            val door = getOtherDoor(room) ?: return
+            val index = getDoorIndex(room, door) ?: return
+            val spot = getDoorSpots(room)[index]?.second ?: return
+            val realSpot = room.getRealCoordsOdin(spot)
+            val closestDoor = getClosestDoorToPlayer(room) ?: return
+            val closestIndex = getDoorIndex(room, closestDoor)
+            val closestSpot = getDoorSpots(room)[closestIndex]?.first ?: return
+            val closestRealSpot = room.getRealCoordsOdin(closestSpot)
+            if (closestRealSpot == mc.thePlayer.positionVector.subtract(0.0,1.0,0.0).toBlockPos() && routeTo == null) {
+                EWPathfinderModule.execute(realSpot.x.toFloat(), realSpot.y.toFloat(), realSpot.z.toFloat())
+                if (isBlock(door.pos, Blocks.stained_hardened_clay)) bloodNext = true
+                routeTo = realSpot
+                waiting = false
+            }
         }
         if (event.isEnd || (activeRoutes.isEmpty() && !editMode) || !PlayerUtils.canSendC08) return
         val room = DungeonUtils.currentRoom ?: return
@@ -362,7 +464,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             node.runMotion(room, it as MotionUpdateEvent.Pre)
         }
     }
-
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent){
