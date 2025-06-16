@@ -22,6 +22,7 @@ import noobroutes.features.Module
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.features.dungeon.autoroute.SecretUtils.secretCount
 import noobroutes.features.dungeon.autoroute.nodes.*
+import noobroutes.features.move.DynamicRoute
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
@@ -261,7 +262,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             nodesToRun.clear()
             return
         }
-        if (!canRoute) return
+        if (!canRoute || nodes[room.data.name] == null || editMode) return
 
         val inNodes = inNodes(room)
         if (inNodes.isNotEmpty()) {
@@ -271,10 +272,15 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             } else inNodes.coerceMax(1)
             nodesToRun = inNodes
         }
+
+
         if (nodesToRun.isEmpty()) {
             if (secretCount < 0) secretCount = 0
             return
         }
+
+        if (DynamicRoute.enabled && !DynamicRoute.editMode && DynamicRoute.isInNode()) return
+
         nodesToRun.firstOrNull()?.let { node ->
             lastRoute = System.currentTimeMillis()
             if (node.reset && !node.resetTriggered) {

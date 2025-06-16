@@ -48,7 +48,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     val fullBlock by BooleanSetting("Place Full Blocks", default = true, description = "Make the blocks under the nodes full blocks.")
 
     val dynColor by ColorSetting("Dyn Node Color", default = Color.BLUE, description = "Color of dynamic nodes").withDependency { this.renderRoutes }
-    private var editMode by BooleanSetting("Edit Mode", description = "Prevents nodes from triggering")
+    val editMode by BooleanSetting("Edit Mode", description = "Prevents nodes from triggering")
     val extraDebug by BooleanSetting("Warn Missing Item", description = "Get ts out of my face", default = true)
 
 
@@ -67,6 +67,12 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
             nodes.forEachIndexed { index, node ->
                 node.drawIndex(index)
             }
+        }
+    }
+
+    fun isInNode() : Boolean {
+        return nodes.any {
+            it.pos.distanceToPlayerSq <= 0.25
         }
     }
 
