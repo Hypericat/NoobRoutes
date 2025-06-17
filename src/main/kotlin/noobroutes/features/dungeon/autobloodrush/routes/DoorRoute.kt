@@ -143,8 +143,7 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
             3 -> 67.6f
             else -> return
         }
-        event.yaw = yaw
-        event.pitch = pitch
+        AutoRouteUtils.setRotation(yaw, pitch)
         if (mc.thePlayer.isSneaking || !mc.thePlayer.heldItem.displayName.contains("pearl", true)) {
             AutoRouteUtils.setRotation(yaw + offset, pitch)
             Scheduler.schedulePreTickTask {

@@ -44,6 +44,7 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeYaw
 import noobroutes.utils.skyblock.dungeon.RoomData
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.dungeon.tiles.RoomType
+import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import org.lwjgl.input.Keyboard
 import kotlin.math.abs
@@ -84,7 +85,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     }
 
     val roomReplacement
-        get() = UniqueRoom(0, 0, Room(0, 0, RoomData(LocationUtils.currentArea.name, RoomType.NORMAL, listOf(), 0, 0)))
+        get() = UniqueRoom(0, 0, Room(0, 0, RoomData(LocationUtils.currentArea.name, RoomType.NORMAL, listOf(), 0, 0))).apply { rotation =
+            Rotations.NORTH
+        }
 
     private val nodeRegistry = mapOf(
         Pair("Etherwarp", Etherwarp::class),
