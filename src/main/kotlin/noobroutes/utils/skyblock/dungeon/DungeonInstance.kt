@@ -1,4 +1,4 @@
-package noobroutes.utils.skyblock.dungeonScanning
+package noobroutes.utils.skyblock.dungeon
 
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S38PacketPlayerListItem
@@ -9,7 +9,7 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.utils.*
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 
 
 class DungeonInstance(val floor: Floor) {

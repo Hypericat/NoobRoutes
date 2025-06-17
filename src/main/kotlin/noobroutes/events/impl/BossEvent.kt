@@ -1,7 +1,7 @@
 package noobroutes.events.impl
 
 import net.minecraftforge.fml.common.eventhandler.Event
-import noobroutes.utils.skyblock.dungeonScanning.Floor
+import noobroutes.utils.skyblock.dungeon.Floor
 
 open class BossEvent(val floor: Floor) : Event() {
     class PhaseChange(floor: Floor, val phase: Phase) : BossEvent(floor)

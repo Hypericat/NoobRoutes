@@ -16,9 +16,9 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.IceFillFloors
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Rotations
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.toVec3
 import java.io.InputStreamReader

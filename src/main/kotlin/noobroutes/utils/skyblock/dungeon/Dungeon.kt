@@ -1,4 +1,4 @@
-package noobroutes.utils.skyblock.dungeonScanning
+package noobroutes.utils.skyblock.dungeon
 
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -9,10 +9,10 @@ import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.postAndCatch
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Puzzle
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Tile
-import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Unknown
+import noobroutes.utils.skyblock.dungeon.tiles.Puzzle
+import noobroutes.utils.skyblock.dungeon.tiles.Tile
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
+import noobroutes.utils.skyblock.dungeon.tiles.Unknown
 
 object Dungeon {
     var lastRoom: UniqueRoom? = null
@@ -25,6 +25,10 @@ object Dungeon {
     @SubscribeEvent
     fun onRoomEnter(event: RoomEnterEvent) {
         devMessage("${event.room?.name}, ${event.room?.rotation}")
+        event.room?.roomComponents?.forEach {
+            devMessage("${it.first.x}, 70, ${it.first.z}")
+        }
+        devMessage("${event.room?.mainRoom?.x}, ${event.room?.mainRoom?.z}")
     }
 
     @SubscribeEvent

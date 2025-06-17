@@ -1,7 +1,7 @@
-package noobroutes.utils.skyblock.dungeonScanning
+package noobroutes.utils.skyblock.dungeon
 
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
-import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
+import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 
 object MapUpdate {
     var roomAdded = false

@@ -17,9 +17,9 @@ import noobroutes.utils.noControlCodes
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.currentRoomName
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.inDungeons
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.currentRoomName
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons
 
 /**
  * Based on odin

@@ -15,9 +15,9 @@ import noobroutes.utils.SwapManager
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealYaw
-import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 
 class Pearl(

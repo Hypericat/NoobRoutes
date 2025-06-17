@@ -1,4 +1,4 @@
-package noobroutes.utils.skyblock.dungeonScanning.tiles
+package noobroutes.utils.skyblock.dungeon.tiles
 
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
@@ -7,7 +7,7 @@ import noobroutes.Core.mc
 import noobroutes.utils.Vec2i
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.getBlockIdAt
-import noobroutes.utils.skyblock.dungeonScanning.Dungeon
+import noobroutes.utils.skyblock.dungeon.Dungeon
 
 
 class UniqueRoom(arrX: Int, arrY: Int, room: Room) {

@@ -14,8 +14,8 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.utils.*
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import java.io.InputStreamReader

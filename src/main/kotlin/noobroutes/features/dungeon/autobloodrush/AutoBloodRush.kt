@@ -43,14 +43,13 @@ import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.EtherWarpHelper.EYE_HEIGHT
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
-import noobroutes.utils.skyblock.dungeonScanning.Dungeon
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRelativeCoords
-import noobroutes.utils.skyblock.dungeonScanning.ScanUtils
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Rotations
-import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
+import noobroutes.utils.skyblock.dungeon.Dungeon
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
+import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeon.tiles.Rotations
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import kotlin.math.floor
 
 object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for bloodrushing", category = Category.DUNGEON) {

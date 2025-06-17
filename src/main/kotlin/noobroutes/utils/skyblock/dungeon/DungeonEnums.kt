@@ -1,4 +1,4 @@
-package noobroutes.utils.skyblock.dungeonScanning
+package noobroutes.utils.skyblock.dungeon
 
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ResourceLocation

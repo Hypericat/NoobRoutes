@@ -1,4 +1,4 @@
-package noobroutes.utils.skyblock.dungeonScanning.tiles
+package noobroutes.utils.skyblock.dungeon.tiles
 
 
 class Door(override val x: Int, override val z: Int, var type: DoorType) : Tile {

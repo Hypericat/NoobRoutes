@@ -13,9 +13,8 @@ import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
-import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 
 abstract class BloodRushRoute(val name: String, var pos: Vec3) {
     var triggered = false

@@ -1,21 +1,21 @@
-package noobroutes.utils.skyblock.dungeonScanning
+package noobroutes.utils.skyblock.dungeon
 
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import noobroutes.Core.mc
 import noobroutes.utils.equalsOneOf
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Door
-import noobroutes.utils.skyblock.dungeonScanning.tiles.DoorType
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
-import noobroutes.utils.skyblock.dungeonScanning.tiles.RoomType
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Tile
-import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Unknown
+import noobroutes.utils.skyblock.dungeon.tiles.Door
+import noobroutes.utils.skyblock.dungeon.tiles.DoorType
+import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeon.tiles.RoomType
+import noobroutes.utils.skyblock.dungeon.tiles.Tile
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
+import noobroutes.utils.skyblock.dungeon.tiles.Unknown
 
 object DungeonScan {
 
     /**
-     * The size of each dungeonScanning room in blocks.
+     * The size of each dungeon room in blocks.
      */
     const val roomSize = 32
 

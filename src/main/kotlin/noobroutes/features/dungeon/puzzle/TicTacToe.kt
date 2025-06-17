@@ -21,10 +21,10 @@ import noobroutes.utils.*
 import noobroutes.utils.Utils.isClose
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.currentRoomName
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRelativeCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.currentRoomName
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import kotlin.experimental.and
 
 object TicTacToe : Module(

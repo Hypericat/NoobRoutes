@@ -1,4 +1,4 @@
-package noobroutes.utils.skyblock.dungeonScanning
+package noobroutes.utils.skyblock.dungeon
 
 import net.minecraft.block.BlockSkull
 import net.minecraft.block.state.IBlockState
@@ -18,9 +18,8 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.utils.*
 import noobroutes.utils.skyblock.*
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Rotations
-import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
+import noobroutes.utils.skyblock.dungeon.tiles.Rotations
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import kotlin.math.floor
 import kotlin.math.roundToLong
 
@@ -58,10 +57,10 @@ object DungeonUtils {
 
 
     /**
-     * Checks if the current dungeonScanning floor number matches any of the specified options.
+     * Checks if the current dungeon floor number matches any of the specified options.
      *
-     * @param options The floor number options to compare with the current dungeonScanning floor.
-     * @return `true` if the current dungeonScanning floor matches any of the specified options, otherwise `false`.
+     * @param options The floor number options to compare with the current dungeon floor.
+     * @return `true` if the current dungeon floor matches any of the specified options, otherwise `false`.
      */
     fun isFloor(vararg options: Int): Boolean {
         return floorNumber in options
@@ -179,7 +178,7 @@ object DungeonUtils {
     }
 
     fun UniqueRoom.getRelativeCoords(pos: Vec3): Vec3 {
-        val center = this.center
+        val center = this.getCenter()
         val x = pos.xCoord - center.x
         val z = pos.zCoord - center.z
         return when (this.rotation) {
@@ -216,7 +215,7 @@ object DungeonUtils {
         var maxZ = MIN_SAFE_INTEGER.toDouble()
         for (component in this.roomComponents) {
             val x = component.first.x + 0.5
-            val z = component.second.z + 0.5
+            val z = component.first.z + 0.5
             minX = if (x < minX) x else minX
             maxX = if (x > maxX) x else maxX
             minZ = if (z < minZ) z else minZ
@@ -227,7 +226,7 @@ object DungeonUtils {
 
 
     fun UniqueRoom.getRealCoords(pos: Vec3): Vec3 {
-        val center = this.getCenter()
+        val center = if (this.name != "Entrance") this.getCenter() else Vec2(this.mainRoom.x.toDouble() + 0.5, this.mainRoom.z.toDouble() + 0.5)
         val rotatedPos = when (this.rotation) {
             Rotations.NORTH -> {
                 Vec2(pos.xCoord, pos.zCoord)

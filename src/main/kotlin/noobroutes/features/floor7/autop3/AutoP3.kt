@@ -37,8 +37,8 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRelativeCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse

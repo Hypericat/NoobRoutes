@@ -24,8 +24,8 @@ import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.RenderUtils2D
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.LocationUtils
-import noobroutes.utils.skyblock.dungeonScanning.Dungeon
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.Dungeon
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import java.io.File
 
 

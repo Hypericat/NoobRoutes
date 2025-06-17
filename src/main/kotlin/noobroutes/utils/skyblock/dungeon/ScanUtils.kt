@@ -1,4 +1,4 @@
-package noobroutes.utils.skyblock.dungeonScanning
+package noobroutes.utils.skyblock.dungeon
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
@@ -13,11 +13,11 @@ import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.utils.Vec2i
 import noobroutes.utils.equalsOneOf
-import noobroutes.utils.skyblock.dungeonScanning.DungeonScan.startX
-import noobroutes.utils.skyblock.dungeonScanning.DungeonScan.startZ
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
-import noobroutes.utils.skyblock.dungeonScanning.tiles.RoomType
-import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
+import noobroutes.utils.skyblock.dungeon.DungeonScan.startX
+import noobroutes.utils.skyblock.dungeon.DungeonScan.startZ
+import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeon.tiles.RoomType
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import java.io.FileNotFoundException
 import java.lang.reflect.Type
 import kotlin.collections.orEmpty

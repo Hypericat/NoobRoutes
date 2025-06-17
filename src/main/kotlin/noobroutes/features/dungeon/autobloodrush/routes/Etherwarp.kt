@@ -16,9 +16,8 @@ import noobroutes.utils.SwapManager
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
-import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.skyblockID
 

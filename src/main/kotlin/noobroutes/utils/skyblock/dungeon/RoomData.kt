@@ -1,6 +1,6 @@
-package noobroutes.utils.skyblock.dungeonScanning
+package noobroutes.utils.skyblock.dungeon
 
-import noobroutes.utils.skyblock.dungeonScanning.tiles.RoomType
+import noobroutes.utils.skyblock.dungeon.tiles.RoomType
 
 data class RoomData(
     val name: String,

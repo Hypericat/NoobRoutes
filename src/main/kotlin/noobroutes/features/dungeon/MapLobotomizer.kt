@@ -27,9 +27,9 @@ import noobroutes.utils.removeFirstOrNull
 import noobroutes.utils.setBlock
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRelativeCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import org.lwjgl.input.Keyboard
 
 

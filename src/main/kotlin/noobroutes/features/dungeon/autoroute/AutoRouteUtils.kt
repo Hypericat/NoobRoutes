@@ -22,8 +22,8 @@ import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 
 object AutoRouteUtils {

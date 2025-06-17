@@ -1,7 +1,7 @@
-package noobroutes.utils.skyblock.dungeonScanning.tiles
+package noobroutes.utils.skyblock.dungeon.tiles
 
 import noobroutes.utils.Vec2i
-import noobroutes.utils.skyblock.dungeonScanning.RoomData
+import noobroutes.utils.skyblock.dungeon.RoomData
 
 
 class Room(override val x: Int, override val z: Int, var data: RoomData) : Tile {

@@ -14,10 +14,9 @@ import noobroutes.utils.clock.Executor
 import noobroutes.utils.clock.Executor.Companion.register
 import noobroutes.utils.postAndCatch
 import noobroutes.utils.sidebarLines
-import noobroutes.utils.skyblock.dungeonScanning.Dungeon
-import noobroutes.utils.skyblock.dungeonScanning.DungeonInstance
-import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
-import noobroutes.utils.skyblock.dungeonScanning.Floor
+import noobroutes.utils.skyblock.dungeon.DungeonInstance
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.Floor
 
 object LocationUtils {
 
@@ -113,7 +112,7 @@ object LocationUtils {
         return Island.entries.firstOrNull { area?.contains(it.displayName, true) == true } ?: Island.Unknown
     }
 
-    fun getFloor(): noobroutes.utils.skyblock.dungeonScanning.Floor? {
+    fun getFloor(): noobroutes.utils.skyblock.dungeon.Floor? {
         if (currentArea.isArea(Island.SinglePlayer)) return Floor.E
         for (i in sidebarLines) {
             return Floor.valueOf(Regex("The Catacombs \\((\\w+)\\)\$").find(cleanSB(i))?.groupValues?.get(1) ?: continue)

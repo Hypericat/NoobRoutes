@@ -1,4 +1,4 @@
-package noobroutes.utils.skyblock.dungeonScanning.tiles
+package noobroutes.utils.skyblock.dungeon.tiles
 
 import noobroutes.utils.equalsOneOf
 
