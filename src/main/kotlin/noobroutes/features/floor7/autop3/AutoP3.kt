@@ -36,11 +36,9 @@ import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
-import noobroutes.utils.skyblock.EtherWarpHelper.EYE_HEIGHT
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoordsOdin
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
@@ -252,15 +250,14 @@ object AutoP3: Module (
                 modMessage(DungeonUtils.currentRoomName)
             }
             "relativepos" , "relpos", "rel" -> {
-                modMessage(DungeonUtils.currentRoom?.getRelativeCoords(mc.objectMouseOver.blockPos))
+                val blockPos = DungeonUtils.currentRoom?.getRelativeCoords(mc.objectMouseOver.blockPos ?: return) ?: return
+                GuiScreen.setClipboardString("BlockPos(${blockPos.x}, ${blockPos.y}, ${blockPos.z})")
+                modMessage(blockPos)
             }
             "relativeplayerpos", "relppos", "relplayer", "playerrel" -> {
-                modMessage(DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector))
-            }
-            "odinrelative", "or", "oblock" -> {
-                val blockPos = DungeonUtils.currentRoom?.getRelativeCoordsOdin(mc.objectMouseOver.blockPos) ?: return
-                modMessage(blockPos)
-                GuiScreen.setClipboardString("BlockPos(${blockPos.x}, ${blockPos.y}, ${blockPos.z})")
+                val pos = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector) ?: return
+                GuiScreen.setClipboardString("Vec3(${pos.xCoord}, ${pos.yCoord}, ${pos.zCoord})")
+                modMessage(pos)
             }
             /*"speed" -> {
                 if (args.size < 3) return

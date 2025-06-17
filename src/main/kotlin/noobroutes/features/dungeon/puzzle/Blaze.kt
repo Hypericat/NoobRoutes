@@ -19,9 +19,9 @@ import noobroutes.utils.*
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils.renderVec
 import noobroutes.utils.render.Renderer
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 
 
 object Blaze : Module(
@@ -87,7 +87,7 @@ object Blaze : Module(
      */
     private fun getBlaze() {
         val room = DungeonUtils.currentRoom ?: return
-        if (!DungeonUtils.inDungeons || !room.data.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
+        if (!DungeonUtils.inDungeons || !room.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
         val hpMap = mutableMapOf<EntityArmorStand, Int>()
         blazes.clear()
         mc.theWorld?.loadedEntityList?.forEach { entity ->
@@ -98,7 +98,7 @@ object Blaze : Module(
             hpMap[entity] = hp
             blazes.add(entity)
         }
-        if (room.data.name == "Lower Blaze") blazes.sortByDescending { hpMap[it] }
+        if (room.name == "Lower Blaze") blazes.sortByDescending { hpMap[it] }
         else blazes.sortBy { hpMap[it] }
     }
 
@@ -107,9 +107,9 @@ object Blaze : Module(
     fun onEnterRoom(event: RoomEnterEvent) {
         if (awaitingRoomChange) {SecretGuideIntegration.setSecretGuideAura(true); awaitingRoomChange = false}
         hasAuraedBlock = false
-        if (event.room?.data == null || !event.room.data.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
+        if (event.room == null || !event.room.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
         getBlaze()
-        when (event.room.data.name) {
+        when (event.room.name) {
             "Lower Blaze" -> {
 
             }
@@ -137,7 +137,7 @@ object Blaze : Module(
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
         val room = DungeonUtils.currentRoom ?: return
-        if (!room.data.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
+        if (!room.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
 
         if (auraSecret && mc.thePlayer.renderVec.distanceTo(room.getRealCoords(2, 68, 27).toVec3()) < 5.7 && !hasAuraedBlock) {
             AuraManager.auraBlock(room.getRealCoords(2, 68, 27))
@@ -147,9 +147,9 @@ object Blaze : Module(
         if (handleConnectPoints(room)) return
         if (blazes.isEmpty()) return
         currentBlazeTarget = blazes[0]
-        if (mc.thePlayer.posY > 60 && room.data.name == "Lower Blaze") return
-        if (mc.thePlayer.posY < 78 && room.data.name == "Higher Blaze") return
-        val ewPoints: List<Vec3> = if (room.data.name == "Lower Blaze") {
+        if (mc.thePlayer.posY > 60 && room.name == "Lower Blaze") return
+        if (mc.thePlayer.posY < 78 && room.name == "Higher Blaze") return
+        val ewPoints: List<Vec3> = if (room.name == "Lower Blaze") {
             lowerBlazeEWLocations.map { room.getRealCoords(it) }
         } else {
             higherBlazeEWLocations.map { room.getRealCoords(it) }
@@ -168,11 +168,11 @@ object Blaze : Module(
         shootAt(currentBlazeTarget!!.positionVector.add(0.0, -0.9, 0.0))
     }
 
-    private fun handleConnectPoints(room: Room): Boolean {
-        if (room.data.name == "Lower Blaze" && isOnBlock(room.getRealCoords(BlockPos(12, 70, 24)))) {
+    private fun handleConnectPoints(room: UniqueRoom): Boolean {
+        if (room.name == "Lower Blaze" && isOnBlock(room.getRealCoords(BlockPos(12, 70, 24)))) {
 
             return true
-        } else if (room.data.name == "Higher Blaze" && isOnBlock(room.getRealCoords(BlockPos(15, 69, 14)))) {
+        } else if (room.name == "Higher Blaze" && isOnBlock(room.getRealCoords(BlockPos(15, 69, 14)))) {
 
             return true
         }
@@ -181,7 +181,7 @@ object Blaze : Module(
 
 
 
-    private fun findClosestEwBlock(locations: List<Vec3>, target: EntityArmorStand, room: Room): Vec3? {
+    private fun findClosestEwBlock(locations: List<Vec3>, target: EntityArmorStand, room: UniqueRoom): Vec3? {
         return locations
             .asSequence()
             .map { loc ->
@@ -205,12 +205,12 @@ object Blaze : Module(
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         val room = DungeonUtils.currentRoom ?: return
-        if (!room.data.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
+        if (!room.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
         currentEtherwarpTarget?.let {
             if (blazeHighlight) Renderer.drawBlock(it, blazeHighlightColor)
         }
 
-        if (room.data.name == "Higher Blaze") {
+        if (room.name == "Higher Blaze") {
             higherBlazeEWLocations.forEach {
                 val pos1 = room.getRealCoords(it).add(0.5, 1.0, 0.5)
                 Renderer.drawBox(

@@ -5,7 +5,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.Category
 import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
-import noobroutes.font.OdinFont
+import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.SearchBar.currentSearch
 import noobroutes.ui.clickgui.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.elements.ModuleButton
@@ -103,7 +103,7 @@ class Panel(
 
         }
 
-        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT / 2f, ColorUtil.textColor, 15f, type = OdinFont.BOLD, TextAlign.Middle)
+        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT / 2f, ColorUtil.textColor, 15f, type = MinecraftFont.BOLD, TextAlign.Middle)
 
         //draw Panel Line
         if (extended && moduleButtons.isNotEmpty()) roundedRectangle(x, y + HEIGHT - 2, WIDTH, 2, ColorUtil.clickGUIColor.brighter(1.65f))

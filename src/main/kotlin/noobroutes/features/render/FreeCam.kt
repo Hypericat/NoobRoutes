@@ -11,7 +11,6 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
-import noobroutes.Core.logger
 import noobroutes.events.impl.ClickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module

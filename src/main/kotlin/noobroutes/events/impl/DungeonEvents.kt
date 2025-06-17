@@ -1,6 +1,7 @@
 package noobroutes.events.impl
 
 import net.minecraftforge.fml.common.eventhandler.Event
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 
-data class RoomEnterEvent(val room: Room?) : Event()
+
+data class RoomEnterEvent(val room: UniqueRoom?) : Event()

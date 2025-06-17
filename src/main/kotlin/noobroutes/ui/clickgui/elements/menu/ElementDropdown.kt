@@ -1,7 +1,7 @@
 package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.settings.impl.DropdownSetting
-import noobroutes.font.OdinFont
+import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.elements.Element
@@ -33,7 +33,7 @@ class ElementDropdown(parent: ModuleButton, setting: DropdownSetting) : Element<
 
     override fun draw() {
         roundedRectangle(x, y, w, h, elementBackground)
-        text(name, x + TEXTOFFSET, y + h / 2f, textColor, 12f, OdinFont.REGULAR)
+        text(name, x + TEXTOFFSET, y + h / 2f, textColor, 12f, MinecraftFont.REGULAR)
 
         val rotation = linearAnimation.get(90f, 0f  , !setting.value)
         drawArrow(x + w - 12f, y + 16, rotation, scale = 0.8f)

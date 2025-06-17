@@ -9,7 +9,7 @@ import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.TextPos
 import kotlin.math.max
 
-object OdinFont {
+object MinecraftFont {
 
     private lateinit var fontRenderer: FontRenderer
 

@@ -9,7 +9,7 @@ import net.minecraft.util.Vec3
 import net.minecraft.util.Vec3i
 import noobroutes.Core.mc
 import noobroutes.utils.render.RenderUtils.outlineBounds
-import noobroutes.utils.skyblock.dungeon.tiles.Rotations
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Rotations
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
@@ -420,7 +420,7 @@ fun wrapAngle(angle: Float): Float {
 fun bezier(t: Float, initial: Float, p1: Float, p2: Float, final: Float): Float =
     (1 - t).pow(3) * initial + 3 * (1 - t).pow(2) * t * p1 + 3 * (1 - t) * t.pow(2) * p2 + t.pow(3) * final
 
-fun BlockPos.addRotationCoords(rotation: noobroutes.utils.skyblock.dungeon.tiles.Rotations, x: Int, z: Int): BlockPos =
+fun BlockPos.addRotationCoords(rotation: Rotations, x: Int, z: Int): BlockPos =
     when (rotation) {
         Rotations.NORTH -> BlockPos(this.x + x, this.y, this.z + z)
         Rotations.SOUTH -> BlockPos(this.x - x, this.y, this.z - z)

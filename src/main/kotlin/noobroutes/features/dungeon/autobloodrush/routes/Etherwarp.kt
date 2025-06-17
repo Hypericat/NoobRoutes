@@ -16,8 +16,9 @@ import noobroutes.utils.SwapManager
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.skyblockID
 
@@ -32,7 +33,7 @@ class Etherwarp(pos: Vec3, var target: Vec3) : BloodRushRoute(name = "Etherwarp"
     }
 
 
-    override fun runTick(room: Room) {
+    override fun runTick(room: UniqueRoom) {
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.UNKNOWN) return
@@ -45,7 +46,7 @@ class Etherwarp(pos: Vec3, var target: Vec3) : BloodRushRoute(name = "Etherwarp"
         PlayerUtils.sneak()
     }
 
-    override fun runMotion(room: Room, event: MotionUpdateEvent.Pre) {
+    override fun runMotion(room: UniqueRoom, event: MotionUpdateEvent.Pre) {
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         event.yaw = angles.first
         event.pitch = angles.second

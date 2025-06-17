@@ -22,8 +22,8 @@ import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 
 object AutoRouteUtils {
@@ -34,7 +34,7 @@ object AutoRouteUtils {
     /**
      * Call inside a ClientTickEvent (start)
      */
-    fun etherwarpToRelativeVec3(vec3: Vec3, room: Room, silent: Boolean = false){
+    fun etherwarpToRelativeVec3(vec3: Vec3, room: UniqueRoom, silent: Boolean = false){
         val target = room.getRealCoords(vec3)
         etherwarpToVec3(target, silent)
     }
@@ -214,10 +214,9 @@ object AutoRouteUtils {
                 "aotv" -> {
                     val yaw = data.get("yaw").asFloat
                     val pitch = data.get("pitch").asFloat
-                    val target = BlockPos(data.get("x").asInt, data.get("y").asInt, data.get("z").asInt)
                     val aotv = Aotv(
                         coords,
-                        target,
+                        null,
                         yaw,
                         pitch,
                         await,
@@ -228,7 +227,7 @@ object AutoRouteUtils {
                         false,
                         false
                     )
-                    aotv.meow = true
+
                     routeMap[room]?.add(
                         aotv
                     )

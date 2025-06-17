@@ -14,9 +14,8 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.utils.*
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoordsOdin
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import java.io.InputStreamReader
@@ -40,14 +39,14 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
     private var c08Delay = System.currentTimeMillis()
 
     fun scan(optimized: Boolean) = with (DungeonUtils.currentRoom) {
-        if (this?.data?.name != "Water Board" || patternIdentifier != -1) return@with
+        if (this?.name != "Water Board" || patternIdentifier != -1) return@with
         val extendedSlots = WoolColor.entries.joinToString("") { if (it.isExtended) it.ordinal.toString() else "" }.takeIf { it.length == 3 } ?: return
 
         patternIdentifier = when {
-            getBlockAt(getRealCoordsOdin(14, 77, 27)) == Blocks.hardened_clay -> 0 // right block == clay
-            getBlockAt(getRealCoordsOdin(16, 78, 27)) == Blocks.emerald_block -> 1 // left block == emerald
-            getBlockAt(getRealCoordsOdin(14, 78, 27)) == Blocks.diamond_block -> 2 // right block == diamond
-            getBlockAt(getRealCoordsOdin(14, 78, 27)) == Blocks.quartz_block  -> 3 // right block == quartz
+            getBlockAt(getRealCoords(14, 77, 27)) == Blocks.hardened_clay -> 0 // right block == clay
+            getBlockAt(getRealCoords(16, 78, 27)) == Blocks.emerald_block -> 1 // left block == emerald
+            getBlockAt(getRealCoords(14, 78, 27)) == Blocks.diamond_block -> 2 // right block == diamond
+            getBlockAt(getRealCoords(14, 78, 27)) == Blocks.quartz_block  -> 3 // right block == quartz
             else -> return@with modMessage("§cFailed to get Water Board pattern. Was the puzzle already started?")
         }
 

@@ -3,7 +3,7 @@ package noobroutes.ui.hud
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.config.Config
 import noobroutes.features.ModuleManager.huds
-import noobroutes.font.OdinFont
+import noobroutes.font.MinecraftFont
 import noobroutes.ui.Screen
 import noobroutes.ui.clickgui.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.util.ColorUtil.textColor
@@ -61,7 +61,7 @@ object EditHUDGui : Screen() {
             Display.getHeight() * .86f,
             textColor,
             18f,
-            OdinFont.REGULAR,
+            MinecraftFont.REGULAR,
             TextAlign.Middle,
             TextPos.Bottom
         )

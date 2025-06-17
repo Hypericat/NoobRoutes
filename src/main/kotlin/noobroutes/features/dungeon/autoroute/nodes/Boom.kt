@@ -11,8 +11,8 @@ import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asBlockPos
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 
 class Boom(
@@ -38,11 +38,11 @@ class Boom(
     reset
 ) {
 
-    override fun drawIndex(index: Int, room: Room) {
+    override fun drawIndex(index: Int, room: UniqueRoom) {
         Renderer.drawStringInWorld(index.toString(), room.getRealCoords(pos).add(Vec3(0.0, 0.6, 0.0)), renderIndexColor(), depth = depth)
     }
 
-    override fun tick(room: Room) {
+    override fun tick(room: UniqueRoom) {
         val pos = room.getRealCoords(target)
         if (isAir(pos)) {
             return
@@ -76,7 +76,7 @@ class Boom(
         }
 
     }
-    override fun render(room: Room) {
+    override fun render(room: UniqueRoom) {
         drawNode(room, AutoRoute.boomColor)
 
     }

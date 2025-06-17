@@ -1,4 +1,4 @@
-package noobroutes.utils.skyblock.dungeon.tiles
+package noobroutes.utils.skyblock.dungeonScanning.tiles
 
 enum class Rotations(
     val x: Int,

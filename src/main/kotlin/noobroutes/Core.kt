@@ -9,7 +9,7 @@ import noobroutes.config.Config
 import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.floor7.autop3.AutoP3
-import noobroutes.font.OdinFont
+import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.util.shader.RoundedRect
 import org.apache.logging.log4j.LogManager
@@ -29,7 +29,7 @@ object Core {
     var display: GuiScreen? = null
 
     fun init() {
-        OdinFont.init()
+        MinecraftFont.init()
 
 
     }

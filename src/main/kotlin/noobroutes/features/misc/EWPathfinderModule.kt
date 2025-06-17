@@ -69,8 +69,6 @@ object EWPathfinderModule : Module(
 
     @Synchronized
     fun onSolve(path : Path, singleUse: Boolean) {
-        if (path == null) return; // Can sometimes happen
-
         this.lastPath = path
 
         var lastNode: PathNode? = null

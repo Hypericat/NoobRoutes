@@ -1,4 +1,5 @@
-package noobroutes.utils.skyblock.dungeon.tiles
+package noobroutes.utils.skyblock.dungeonScanning.tiles
+
 
 interface Tile {
     val x: Int

@@ -4,7 +4,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.Module
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.*
-import noobroutes.font.OdinFont
+import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.clickgui.Panel
 import noobroutes.ui.clickgui.animations.impl.ColorAnimation
@@ -106,7 +106,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
 
         roundedRectangle(x, y, width, height, moduleButtonColor)
 
-        text(module.name, x + width / 2, y + height / 2, color, 14f, OdinFont.REGULAR, TextAlign.Middle)
+        text(module.name, x + width / 2, y + height / 2, color, 14f, MinecraftFont.REGULAR, TextAlign.Middle)
         val textWidth = getTextWidth(module.name, 18f)
 
         if (textWidth < width - 80) {// too long text, not drawing symbol
