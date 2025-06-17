@@ -8,6 +8,7 @@ import noobroutes.utils.VecUtilsKt;
 import noobroutes.pathfinding.openset.BinaryHeapOpenSet;
 import noobroutes.utils.skyblock.ChatUtilsKt;
 import noobroutes.utils.skyblock.EtherWarpHelper;
+import noobroutes.utils.skyblock.PlayerUtils;
 
 import java.util.*;
 
@@ -21,7 +22,7 @@ public class PathFinder {
     public final static double MIN_IMPROVEMENT = 1d;
     public final static double THREAD_COUNT = 12;
 
-    public static final float EYE_HEIGHT = 1.6200000047683716f;
+    public static final float EYE_HEIGHT = (float) PlayerUtils.SNEAK_EYE_HEIGHT;
 
     private final float yawStep;
     private final float pitchStep;

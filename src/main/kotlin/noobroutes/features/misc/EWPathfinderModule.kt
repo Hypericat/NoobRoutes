@@ -20,9 +20,8 @@ import noobroutes.pathfinding.PathfinderExecutor
 import noobroutes.utils.*
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer.drawBox
-import noobroutes.utils.skyblock.EtherWarpHelper
-import noobroutes.utils.skyblock.EtherWarpHelper.EYE_HEIGHT
 import noobroutes.utils.skyblock.EtherWarpHelper.centerCoords
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.abs
@@ -59,7 +58,7 @@ object EWPathfinderModule : Module(
 
     fun findCenteredVector(targetBlockPos: BlockPos, nodePos: Vec3) : Vec3? {
         val centeredTarget = centerCoords(targetBlockPos).add(0.0, 0.5, 0.0)
-        return traverseVoxels(nodePos.add(0.0, EYE_HEIGHT + 1, 0.0), centeredTarget, targetBlockPos)
+        return traverseVoxels(nodePos.add(0.0, PlayerUtils.SNEAK_EYE_HEIGHT + 1, 0.0), centeredTarget, targetBlockPos)
     }
 
     @Synchronized
@@ -82,7 +81,7 @@ object EWPathfinderModule : Module(
                 if (centerAngle)
                     targetVec3 = findCenteredVector(lastNode.pos, nodeVec3)
 
-                if (targetVec3 == null) targetVec3 = getEtherPosFromOrigin(nodeVec3.add(0.0, EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch);
+                if (targetVec3 == null) targetVec3 = getEtherPosFromOrigin(nodeVec3.add(0.0, PlayerUtils.SNEAK_EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch);
 
                 if (targetVec3 == null) {
                     System.err.println("Invalid YAW / PITCH : " + lastNode.yaw + " : " + lastNode.pitch)

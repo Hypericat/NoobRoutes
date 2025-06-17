@@ -19,8 +19,9 @@ import kotlin.math.sqrt
 object PlayerUtils {
     var shouldBypassVolume = false
 
-
-
+    const val STAND_EYE_HEIGHT = 1.6200000047683716
+    const val SNEAK_EYE_HEIGHT = 1.5399999618530273
+    const val SNEAK_HEIGHT_INVERTED = 0.0800000429153443
 
     /**
      * Plays a sound at a specified volume and pitch, bypassing the default volume setting.

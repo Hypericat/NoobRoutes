@@ -58,8 +58,9 @@ class Aotv(
     }
 
     override fun motion(event: MotionUpdateEvent.Pre, room: UniqueRoom) {
-        event.pitch = pitch
-        event.yaw = room.getRealYaw(yaw)
+        //event.pitch = pitch
+        //event.yaw = room.getRealYaw(yaw)
+        AutoRouteUtils.setRotation(pitch, room.getRealYaw(yaw))
     }
 
     override fun awaitTick(room: UniqueRoom) {

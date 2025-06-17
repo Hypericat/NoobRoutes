@@ -41,7 +41,6 @@ import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.*
-import noobroutes.utils.skyblock.EtherWarpHelper.EYE_HEIGHT
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
@@ -921,7 +920,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 if (centerAngle)
                     targetVec3 = findCenteredVector(lastNode.pos, nodeVec3)
 
-                if (targetVec3 == null) targetVec3 = getEtherPosFromOrigin(nodeVec3.add(0.0, EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch);
+                if (targetVec3 == null) targetVec3 = getEtherPosFromOrigin(nodeVec3.add(0.0, PlayerUtils.SNEAK_EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch);
 
                 if (targetVec3 == null) {
                     System.err.println("Invalid YAW / PITCH : " + lastNode.yaw + " : " + lastNode.pitch)
@@ -998,7 +997,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         if (Core.mc.thePlayer.isSneaking) PlayerUtils.unSneak()
         if (serverSneak) return
         PlayerUtils.airClick()
-        resetRotation()
         autoBrUnsneakRegistered = false
     }
 }

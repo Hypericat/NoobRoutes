@@ -17,7 +17,6 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.lastRoute
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.features.dungeon.autoroute.DynNode
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
@@ -112,11 +111,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: ClientTickEvent) {
-        if (event.isEnd || mc.thePlayer == null || editMode) return
-        if (PlayerUtils.movementKeysPressed) {
-            resetRotation()
-            return
-        }
+        if (event.isEnd || mc.thePlayer == null || editMode || PlayerUtils.movementKeysPressed) return
 
         if (!AutoRoute.canRoute) return
 
@@ -124,7 +119,6 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
 
         lastRoute = System.currentTimeMillis()
 
-        resetRotation()
          if (!node.tick()) return // Could not get correct item
 
         Scheduler.schedulePreMotionUpdateTask {

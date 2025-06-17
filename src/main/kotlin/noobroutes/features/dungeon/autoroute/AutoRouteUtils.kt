@@ -29,9 +29,6 @@ import noobroutes.utils.skyblock.modMessage
 
 object AutoRouteUtils {
 
-
-
-
     /**
      * Call inside a ClientTickEvent (start)
      */
@@ -44,7 +41,7 @@ object AutoRouteUtils {
      * Call inside a ClientTickEvent (start)
      */
     fun etherwarpToVec3(vec3: Vec3, silent: Boolean = false){
-        val rot = RotationUtils.getYawAndPitch(vec3)
+        val rot = RotationUtils.getYawAndPitch(vec3, true)
         etherwarp(rot.first, rot.second, silent)
     }
 
@@ -60,10 +57,12 @@ object AutoRouteUtils {
         if (!silent) RotationUtils.setAngles(yaw, pitch)
         walking = false
         PlayerUtils.sneak()
+        lastRoute = System.currentTimeMillis()
         Scheduler.schedulePreMotionUpdateTask {
             val event = it as MotionUpdateEvent.Pre
-            event.yaw = yaw
-            event.pitch = pitch
+            setRotation(yaw, pitch)
+            //event.yaw = yaw
+            //event.pitch = pitch
             if (!mc.thePlayer.isSneaking || state == SwapManager.SwapState.SWAPPED) {
                 setRotation(yaw + offset, pitch)
                 Scheduler.schedulePreTickTask {
@@ -137,7 +136,6 @@ object AutoRouteUtils {
         if (serverSneak) return
         PlayerUtils.airClick()
         aotvTarget?.let { Zpew.doZeroPingAotv(it) }
-        resetRotation()
         unsneakRegistered = false
         PlayerUtils.resyncSneak()
     }
@@ -148,7 +146,6 @@ object AutoRouteUtils {
         if (!mc.thePlayer.isSneaking) PlayerUtils.sneak()
         if (!serverSneak) return
         PlayerUtils.airClick()
-        resetRotation()
         sneakRegistered = false
         PlayerUtils.resyncSneak()
     }
@@ -170,6 +167,11 @@ object AutoRouteUtils {
     var rotatingPitch: Float? = null
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun motion(event: MotionUpdateEvent.Pre) {
+        if (PlayerUtils.movementKeysPressed) {
+            resetRotation()
+            return
+        }
+
         if (rotating) {
             rotatingYaw?.let {
                 event.yaw = it + offset
@@ -180,7 +182,9 @@ object AutoRouteUtils {
         }
     }
 
-    inline val canResetRotation get() = false
+    var lastRoute = 0L
+
+    inline val canResetRotation get() = System.currentTimeMillis() - lastRoute > 51
 
     @SubscribeEvent
     fun onMouse(event: MouseEvent){

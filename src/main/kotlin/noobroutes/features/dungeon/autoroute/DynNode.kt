@@ -9,6 +9,7 @@ import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.ether
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
 import noobroutes.features.move.DynamicRoute
 import noobroutes.utils.*
 import noobroutes.utils.AutoP3Utils.walking
@@ -54,7 +55,7 @@ class DynNode(
 
 
     fun tick() : Boolean {
-        val angles = RotationUtils.getYawAndPitch(target)
+        val angles = RotationUtils.getYawAndPitch(target, true)
         var state = SwapManager.swapFromSBId(DynamicRoute.extraDebug, "ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.UNKNOWN && Minecraft.getMinecraft().isSingleplayer) state = SwapManager.swapFromId(Item.getIdFromItem(Items.diamond_shovel))
         if (state == SwapManager.SwapState.UNKNOWN) return false
@@ -70,9 +71,11 @@ class DynNode(
 
 
     fun motion(event: MotionUpdateEvent.Pre) {
-        val angles = RotationUtils.getYawAndPitch(target)
-        event.yaw = angles.first
-        event.pitch = angles.second
+        val angles = RotationUtils.getYawAndPitch(target, true)
+        //event.yaw = angles.first
+        //event.pitch = angles.second
+        lastRoute = System.currentTimeMillis()
+        AutoRouteUtils.setRotation(angles.first, angles.second)
         if (!mc.thePlayer.isSneaking || mc.thePlayer.heldItem.skyblockID != "ASPECT_OF_THE_VOID") {
             AutoRouteUtils.setRotation(angles.first + offset, angles.second)
             Scheduler.schedulePreTickTask {
@@ -100,7 +103,7 @@ class DynNode(
     fun render() {
         drawNode(DynamicRoute.dynColor)
         if (!AutoRoute.drawEtherLines) return
-        val lookVec = RotationUtils.getYawAndPitchOrigin(pos, target)
+        val lookVec = RotationUtils.getYawAndPitchOrigin(pos, target, true)
         if (lookVec.second.absoluteValue != 90f) {
             Renderer.draw3DLine(
                 listOf(

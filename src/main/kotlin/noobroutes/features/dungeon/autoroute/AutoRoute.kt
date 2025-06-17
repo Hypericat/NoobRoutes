@@ -20,7 +20,6 @@ import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.features.dungeon.autoroute.SecretUtils.secretCount
 import noobroutes.features.dungeon.autoroute.nodes.*
 import noobroutes.features.move.DynamicRoute
@@ -255,7 +254,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         if (event.isEnd || mc.thePlayer == null) return
         val room = DungeonUtils.currentRoom ?: roomReplacement
         if (PlayerUtils.movementKeysPressed) {
-            resetRotation()
             nodesToRun.clear()
             return
         }
@@ -280,6 +278,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         if (AutoBloodRush.waiting || AutoBloodRush.routeTo != null) return
 
         nodesToRun.firstOrNull()?.let { node ->
+            AutoRouteUtils.lastRoute = System.currentTimeMillis()
             lastRoute = System.currentTimeMillis()
             if (node.reset && !node.resetTriggered) {
                 secretCount = 0
@@ -292,7 +291,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                         PlayerUtils.posY >= node.pos.yCoord - 0.01 && PlayerUtils.posY <= node.pos.yCoord + 0.5
                 ) else realCoord.distanceToPlayer <= 0.5) && node.name != "Pearl") {
                 nodesToRun.remove(node)
-                resetRotation()
                 return
             }
 
@@ -320,7 +318,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 return //makes it wait a tick before executing the rest
             }
             node.secretTriggered = false
-            resetRotation()
             secretCount = 0
             node.tick(room)
             Scheduler.schedulePreMotionUpdateTask {

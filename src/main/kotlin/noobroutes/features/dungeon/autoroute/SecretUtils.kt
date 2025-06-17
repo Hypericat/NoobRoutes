@@ -15,7 +15,6 @@ import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute.delay
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.aotv
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.aotvTarget
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.utils.*
 import noobroutes.utils.Utils.getEntitiesOfType
 import noobroutes.utils.Utils.isEnd
@@ -67,7 +66,6 @@ object SecretUtils {
             val room = DungeonUtils.currentRoom ?: return
             awaitingNode?.tick(room)
             Scheduler.schedulePreMotionUpdateTask {
-                resetRotation()
                 awaitingNode?.motion((it as MotionUpdateEvent.Pre), room)
                 awaitingNode = null
             }
@@ -116,7 +114,6 @@ object SecretUtils {
             if (bat.positionVector.distanceToPlayerSq > 225) continue
             devMessage("Bat Spawned")
             aotvTarget?.let { it1 -> aotv(it1) }
-            resetRotation()
             batSpawnRegistered = false
         }
     }

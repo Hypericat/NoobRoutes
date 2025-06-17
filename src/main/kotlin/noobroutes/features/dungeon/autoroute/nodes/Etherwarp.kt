@@ -56,18 +56,18 @@ class Etherwarp(
 ) {
 
     override fun awaitTick(room: UniqueRoom) {
-        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
+        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target), true)
         if (!silent) setAngles(angles.first, angles.second)
     }
 
     override fun awaitMotion(event: MotionUpdateEvent.Pre, room: UniqueRoom) {
-        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
+        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target), true)
         devMessage("yaw: ${angles.first}, pitch: ${angles.second}")
         AutoRouteUtils.setRotation(angles.first + offset,angles.second)
     }
 
     override fun tick(room: UniqueRoom) {
-        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
+        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target), true)
         val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.UNKNOWN) return
         if (state == SwapManager.SwapState.TOO_FAST) {
@@ -81,9 +81,10 @@ class Etherwarp(
 
 
     override fun motion(event: MotionUpdateEvent.Pre, room: UniqueRoom) {
-        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
-        event.yaw = angles.first
-        event.pitch = angles.second
+        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target), true)
+        //event.yaw = angles.first
+        //event.pitch = angles.second
+        AutoRouteUtils.setRotation(angles.first, angles.second)
         if (!mc.thePlayer.isSneaking || mc.thePlayer.heldItem.skyblockID != "ASPECT_OF_THE_VOID") {
             AutoRouteUtils.setRotation(angles.first + offset, angles.second)
             Scheduler.schedulePreTickTask {
@@ -100,7 +101,7 @@ class Etherwarp(
         if (!AutoRoute.drawEtherLines) return
         val nodeCoords = room.getRealCoords(pos)
         val targetCoords = room.getRealCoords(target)
-        val lookVec = RotationUtils.getYawAndPitchOrigin(nodeCoords, targetCoords)
+        val lookVec = RotationUtils.getYawAndPitchOrigin(nodeCoords, targetCoords, true)
         if (edgeRoutes && lookVec.second.absoluteValue != 90f) {
             Renderer.draw3DLine(
                 listOf(

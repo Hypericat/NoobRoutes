@@ -5,6 +5,7 @@ import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.utils.*
 import noobroutes.utils.render.RenderUtils.renderVec
+import noobroutes.utils.skyblock.PlayerUtils.SNEAK_EYE_HEIGHT
 import kotlin.math.*
 
 object EtherWarpHelper {
@@ -27,7 +28,7 @@ object EtherWarpHelper {
             return rotation
         }
         var runs = 0
-        val distance = startCoords.add(0.0,1.6200000047683716,0.0).distanceTo(centeredCoords)
+        val distance = startCoords.add(0.0,SNEAK_EYE_HEIGHT,0.0).distanceTo(centeredCoords)
         val sweepDegrees = Math.toDegrees(2 * atan(0.707 / distance)).toFloat()
         for (i in 0..10) {
             val lowerYaw = rotation.first - sweepDegrees
@@ -132,7 +133,6 @@ object EtherWarpHelper {
 
         return EtherPos.NONE
     }
-    const val EYE_HEIGHT = 1.6200000047683716
     const val DEGREES_TO_RADIAN = Math.PI / 180;
     /**
      * taken from MeowClient
@@ -154,7 +154,7 @@ object EtherWarpHelper {
         val eyeX = playerX ?: (mc.thePlayer.lastTickPosX + (mc.thePlayer.posX - mc.thePlayer.lastTickPosX) * partialTicks)
 
         val eyeY = playerY
-            ?: ((mc.thePlayer.lastTickPosY + (mc.thePlayer.posY - mc.thePlayer.lastTickPosY) * partialTicks) + EYE_HEIGHT)
+            ?: ((mc.thePlayer.lastTickPosY + (mc.thePlayer.posY - mc.thePlayer.lastTickPosY) * partialTicks) + SNEAK_EYE_HEIGHT)
         val eyeZ = playerZ ?: (mc.thePlayer.lastTickPosZ + (mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ) * partialTicks)
         val roundedYaw = (yaw.round(14) * DEGREES_TO_RADIAN).toDouble()
         val roundedPitch = (pitch.round(14) * DEGREES_TO_RADIAN).toDouble()
