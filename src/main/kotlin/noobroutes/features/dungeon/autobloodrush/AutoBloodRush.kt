@@ -25,6 +25,8 @@ import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.serverSneak
 import noobroutes.features.misc.EWPathfinderModule
+import noobroutes.features.misc.EWPathfinderModule.centerAngle
+import noobroutes.features.misc.EWPathfinderModule.findCenteredVector
 import noobroutes.features.misc.EWPathfinderModule.getEtherPosFromOrigin
 import noobroutes.features.move.DynamicRoute
 import noobroutes.features.settings.Setting.Companion.withDependency
@@ -928,7 +930,12 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         while (node != null) {
             if (lastNode != null) {
                 val nodeVec3 = Vec3(node.pos.x.toDouble() + 0.5, node.pos.y.toDouble() + 1, node.pos.z + 0.5)
-                val targetVec3 : Vec3? = getEtherPosFromOrigin(nodeVec3.add(0.0, EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch)
+
+                var targetVec3 : Vec3? = null
+                if (centerAngle)
+                    targetVec3 = findCenteredVector(lastNode.pos, nodeVec3)
+
+                if (targetVec3 == null) targetVec3 = getEtherPosFromOrigin(nodeVec3.add(0.0, EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch);
 
                 if (targetVec3 == null) {
                     System.err.println("Invalid YAW / PITCH : " + lastNode.yaw + " : " + lastNode.pitch)
@@ -945,7 +952,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             node = node.parent
         }
         isSolving = false
-
     }
 
     @Volatile

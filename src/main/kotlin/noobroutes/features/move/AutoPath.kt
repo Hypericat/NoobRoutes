@@ -35,7 +35,7 @@ object AutoPath: Module(
 ) {
 
     private val useAltKeys by BooleanSetting("Use Alt Key", true, false, "Use Alt Key to select door")
-    private val altKey by KeybindSetting("Alt Key", Keyboard.KEY_SLASH, "Alt Key keybind", false).withDependency { this.useAltKeys }
+    private val altKey by KeybindSetting("Alt Key", Keyboard.KEY_PERIOD, "Alt Key keybind", false).withDependency { this.useAltKeys }
     private val doorNumberColor by ColorSetting("Door Number Color", description = "I wonder what this could possibly mean", default = Color.GREEN)
 
 

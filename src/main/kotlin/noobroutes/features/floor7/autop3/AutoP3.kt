@@ -21,11 +21,8 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.TermOpenEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.autoroute.AutoRoute
-import noobroutes.features.dungeon.autoroute.nodes.Etherwarp
 import noobroutes.features.floor7.autop3.Blink.blinkStarts
 import noobroutes.features.floor7.autop3.rings.*
-import noobroutes.features.misc.EWPathfinderModule.getEtherPosFromOrigin
 import noobroutes.features.misc.SexAura
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
