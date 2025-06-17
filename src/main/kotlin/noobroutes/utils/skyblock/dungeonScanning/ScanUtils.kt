@@ -1,6 +1,5 @@
-package noobroutes.utils.skyblock.dungeonscanning
+package noobroutes.utils.skyblock.dungeonScanning
 
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -10,16 +9,18 @@ import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import net.minecraft.block.Block
 import net.minecraft.util.BlockPos
-import net.minecraft.util.ResourceLocation
 import noobroutes.Core.logger
 import noobroutes.Core.mc
+import noobroutes.utils.Vec2i
 import noobroutes.utils.equalsOneOf
-import noobroutes.utils.skyblock.dungeonscanning.tiles.Room
-import noobroutes.utils.skyblock.dungeonscanning.tiles.RoomType
+import noobroutes.utils.skyblock.dungeonScanning.DungeonScan.startX
+import noobroutes.utils.skyblock.dungeonScanning.DungeonScan.startZ
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.tiles.RoomType
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 import java.io.FileNotFoundException
 import java.lang.reflect.Type
 import kotlin.collections.orEmpty
-import kotlin.div
 import kotlin.math.roundToInt
 
 object ScanUtils {
@@ -38,6 +39,19 @@ object ScanUtils {
         val roomX = ((posX - DungeonScan.startX) / 32f).roundToInt()
         val roomZ = ((posZ - DungeonScan.startZ) / 32f).roundToInt()
         return Pair(roomX * 32 + DungeonScan.startX, roomZ * 32 + DungeonScan.startZ)
+    }
+
+    fun getRealCoordsFromRoomCoords(vec2: Vec2i): Vec2i {
+        return Vec2i(startX + vec2.x * 32, startZ + vec2.z * 32)
+    }
+
+    fun getRoomComponents(name: String): List<Room> {
+        return Dungeon.Info.dungeonList.filter {(it as? Room)?.data?.name == name && !it.isSeparator}.map { it as Room }
+    }
+    
+    fun getUniqueRoomFromPos(pos: BlockPos): UniqueRoom? {
+        val roomPos = getRoomFromPos(pos)
+        return Dungeon.Info.uniqueRooms.firstOrNull {it.name == roomPos?.data?.name}
     }
 
     fun getRoomFromPos(pos: BlockPos): Room? {

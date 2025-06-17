@@ -1,28 +1,21 @@
-package noobroutes.utils.skyblock.dungeonscanning
+package noobroutes.utils.skyblock.dungeonScanning
 
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
-import net.minecraft.util.EnumFacing
 import noobroutes.Core.mc
-import noobroutes.utils.Vec2i
 import noobroutes.utils.equalsOneOf
-import noobroutes.utils.getBlockIdAt
-import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.tiles.Rotations
-import noobroutes.utils.skyblock.dungeonscanning.tiles.Door
-import noobroutes.utils.skyblock.dungeonscanning.tiles.DoorType
-import noobroutes.utils.skyblock.dungeonscanning.tiles.Room
-import noobroutes.utils.skyblock.dungeonscanning.tiles.RoomType
-import noobroutes.utils.skyblock.dungeonscanning.tiles.Tile
-import noobroutes.utils.skyblock.dungeonscanning.tiles.UniqueRoom
-import noobroutes.utils.skyblock.dungeonscanning.tiles.Unknown
-import kotlin.collections.get
-import kotlin.inc
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Door
+import noobroutes.utils.skyblock.dungeonScanning.tiles.DoorType
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.tiles.RoomType
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Tile
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Unknown
 
 object DungeonScan {
 
     /**
-     * The size of each dungeon room in blocks.
+     * The size of each dungeonScanning room in blocks.
      */
     const val roomSize = 32
 
@@ -61,7 +54,7 @@ object DungeonScan {
                         } else if (Dungeon.Info.uniqueRooms.none {unique -> unique.name == it.data.name}) {
                             UniqueRoom(x, z, it)
                         }
-                        MapUpdate.roomAdded
+                        MapUpdate.roomAdded = true
                     }
                     Dungeon.Info.dungeonList[z * 11 + x] = it
                 }
@@ -69,7 +62,6 @@ object DungeonScan {
         }
 
         if (MapUpdate.roomAdded) {
-
             MapUpdate.updateUniques()
         }
         if (allChunksLoaded) {

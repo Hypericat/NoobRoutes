@@ -21,8 +21,8 @@ import noobroutes.utils.add
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoordsOdin
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
 import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 
@@ -63,13 +63,13 @@ object AutoPath: Module(
 
         val room = DungeonUtils.currentRoom ?: return
 
-        val doorPositions = if (room.data.name == "Entrance") oneByOneDoors.map { room.getRealCoordsOdin(it) } else getRoomDoors(room).map { room.getRealCoordsOdin(it) }
+        val doorPositions = if (room.name == "Entrance") oneByOneDoors.map { room.getRealCoords(it) } else getRoomDoors(room).map { room.getRealCoords(it) }
         doorPositions.forEachIndexed { index, pos ->
             Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), getColor(pos), scale = 0.1f)
         }
 
-        val doorSpots = if (room.data.name == "Entrance") oneByOneSpots.map { it.key to Pair(room.getRealCoordsOdin(it.value.first), room.getRealCoordsOdin(it.value.second)) } else
-            getDoorSpots(room).map { it.key to Pair(room.getRealCoordsOdin(it.value.first), room.getRealCoordsOdin(it.value.second)) }
+        val doorSpots = if (room.name == "Entrance") oneByOneSpots.map { it.key to Pair(room.getRealCoords(it.value.first), room.getRealCoords(it.value.second)) } else
+            getDoorSpots(room).map { it.key to Pair(room.getRealCoords(it.value.first), room.getRealCoords(it.value.second)) }
 
         doorSpots.forEach {
             Renderer.drawBlock(it.second.first, Color.RED, 3, 1, 0)
@@ -95,8 +95,8 @@ object AutoPath: Module(
     private fun pathToDoor(key: Int) {
         val room = DungeonUtils.currentRoom ?: return
 
-        val doorSpots = if (room.data.name == "Entrance") oneByOneSpots.map { it.key to Pair(room.getRealCoordsOdin(it.value.first), room.getRealCoordsOdin(it.value.second)) } else
-            getDoorSpots(room).map { it.key to Pair(room.getRealCoordsOdin(it.value.first), room.getRealCoordsOdin(it.value.second)) }
+        val doorSpots = if (room.name == "Entrance") oneByOneSpots.map { it.key to Pair(room.getRealCoords(it.value.first), room.getRealCoords(it.value.second)) } else
+            getDoorSpots(room).map { it.key to Pair(room.getRealCoords(it.value.first), room.getRealCoords(it.value.second)) }
 
         if (key >= doorSpots.size || key < 0) {
             devMessage("Invalid index for pathing!")

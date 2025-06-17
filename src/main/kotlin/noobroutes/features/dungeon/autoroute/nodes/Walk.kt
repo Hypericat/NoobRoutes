@@ -13,9 +13,9 @@ import noobroutes.utils.Scheduler
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealYaw
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 
 class Walk(
     pos: Vec3 = Vec3(0.0, 0.0, 0.0),
@@ -29,13 +29,13 @@ class Walk(
     reset: Boolean = false,
 ) : Node("Walk", 4,  pos = pos, awaitSecrets = awaitSecret, maybeSecret = maybeSecret, delay = delay, center = center, stop = stop, chain = chain, reset) {
 
-    override fun awaitTick(room: Room) {
+    override fun awaitTick(room: UniqueRoom) {
         PlayerUtils.unSneak()
         val yaw = room.getRealYaw(yaw)
         if (!silent) mc.thePlayer.rotationYaw = yaw
     }
 
-    override fun tick(room: Room) {
+    override fun tick(room: UniqueRoom) {
         PlayerUtils.unSneak()
         val yaw = room.getRealYaw(yaw)
         if (serverSneak) {
@@ -49,7 +49,7 @@ class Walk(
 
 
 
-    override fun render(room: Room) {
+    override fun render(room: UniqueRoom) {
         Renderer.drawCylinder(room.getRealCoords(pos.add(Vec3(0.0, 0.03, 0.0))), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0,
             walkColor, depth = depth)
     }

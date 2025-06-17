@@ -3,7 +3,7 @@ package noobroutes.ui.clickgui.elements.menu
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.HudSetting
-import noobroutes.font.OdinFont
+import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.animations.impl.ColorAnimation
@@ -53,7 +53,7 @@ class ElementHud(parent: ModuleButton, setting: HudSetting) : Element<HudSetting
 
     override fun draw() {
         roundedRectangle(x, y, w, h, ColorUtil.elementBackground)
-        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, OdinFont.REGULAR)
+        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, MinecraftFont.REGULAR)
 
         var offset = 30f
         if (setting.displayToggle) {

@@ -17,9 +17,9 @@ import noobroutes.Core.scope
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.*
 import noobroutes.utils.*
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.dungeonItemDrops
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.isSecret
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.dungeonItemDrops
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.inDungeons
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.isSecret
 import noobroutes.utils.skyblock.unformattedName
 
 object EventDispatcher {

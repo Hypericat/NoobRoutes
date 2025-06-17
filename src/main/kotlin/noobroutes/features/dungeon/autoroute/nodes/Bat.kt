@@ -23,10 +23,10 @@ import noobroutes.utils.json.JsonUtils.asBlockPos
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealYaw
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRelativeCoords
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.absoluteValue
 
@@ -56,20 +56,20 @@ class Bat(
 ) {
 
 
-    override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
+    override fun awaitMotion(event: MotionUpdateEvent.Pre, room: UniqueRoom) {
         AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
     }
 
-    override fun motion(event: MotionUpdateEvent.Pre, room: Room) {
+    override fun motion(event: MotionUpdateEvent.Pre, room: UniqueRoom) {
         event.pitch = pitch
         event.yaw = room.getRealYaw(yaw)
     }
 
-    override fun awaitTick(room: Room) {
+    override fun awaitTick(room: UniqueRoom) {
         PlayerUtils.unSneak()
     }
 
-    override fun tick(room: Room) {
+    override fun tick(room: UniqueRoom) {
         if (!AutoRoute.silent) RotationUtils.setAngles(room.getRealYaw(yaw), pitch)
         val state = SwapManager.swapFromSBId("HYPERION", "ASTRAEA", "VALKYRIE", "SCYLLA", "NECRON_BLADE")
         stopWalk()
@@ -98,7 +98,7 @@ class Bat(
         aotvTarget = tpTarget
     }
 
-    fun tpSetter(tpTarget: BlockPos?, room: Room){
+    fun tpSetter(tpTarget: BlockPos?, room: UniqueRoom){
         if (tpTarget == null) {
             val timeClicked = System.currentTimeMillis()
             Scheduler.scheduleLowS08Task {
@@ -125,7 +125,7 @@ class Bat(
     }
 
 
-    override fun render(room: Room) {
+    override fun render(room: UniqueRoom) {
         drawNode(room, batColor)
         if (!AutoRoute.drawAotvLines) return
         val targetCoords = target?.let { room.getRealCoords(it) } ?: return

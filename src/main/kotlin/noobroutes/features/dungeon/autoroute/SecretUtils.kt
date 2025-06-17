@@ -21,7 +21,7 @@ import noobroutes.utils.Utils.getEntitiesOfType
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
 
 object SecretUtils {
 

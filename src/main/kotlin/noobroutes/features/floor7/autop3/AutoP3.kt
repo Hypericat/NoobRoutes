@@ -21,11 +21,8 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.TermOpenEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.autoroute.AutoRoute
-import noobroutes.features.dungeon.autoroute.nodes.Etherwarp
 import noobroutes.features.floor7.autop3.Blink.blinkStarts
 import noobroutes.features.floor7.autop3.rings.*
-import noobroutes.features.misc.EWPathfinderModule.getEtherPosFromOrigin
 import noobroutes.features.misc.SexAura
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
@@ -39,11 +36,9 @@ import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
-import noobroutes.utils.skyblock.EtherWarpHelper.EYE_HEIGHT
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoordsOdin
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
@@ -255,15 +250,14 @@ object AutoP3: Module (
                 modMessage(DungeonUtils.currentRoomName)
             }
             "relativepos" , "relpos", "rel" -> {
-                modMessage(DungeonUtils.currentRoom?.getRelativeCoords(mc.objectMouseOver.blockPos))
+                val blockPos = DungeonUtils.currentRoom?.getRelativeCoords(mc.objectMouseOver.blockPos ?: return) ?: return
+                GuiScreen.setClipboardString("BlockPos(${blockPos.x}, ${blockPos.y}, ${blockPos.z})")
+                modMessage(blockPos)
             }
             "relativeplayerpos", "relppos", "relplayer", "playerrel" -> {
-                modMessage(DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector))
-            }
-            "odinrelative", "or", "oblock" -> {
-                val blockPos = DungeonUtils.currentRoom?.getRelativeCoordsOdin(mc.objectMouseOver.blockPos) ?: return
-                modMessage(blockPos)
-                GuiScreen.setClipboardString("BlockPos(${blockPos.x}, ${blockPos.y}, ${blockPos.z})")
+                val pos = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector) ?: return
+                GuiScreen.setClipboardString("Vec3(${pos.xCoord}, ${pos.yCoord}, ${pos.zCoord})")
+                modMessage(pos)
             }
             /*"speed" -> {
                 if (args.size < 3) return

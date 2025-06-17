@@ -30,7 +30,6 @@ import noobroutes.features.move.DynamicRoute
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
-import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.pathfinding.GoalXYZ
 import noobroutes.pathfinding.Path
 import noobroutes.pathfinding.PathFinder
@@ -42,13 +41,14 @@ import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.EtherWarpHelper.EYE_HEIGHT
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoordsOdin
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import noobroutes.utils.skyblock.dungeon.ScanUtils
-import noobroutes.utils.skyblock.dungeon.tiles.Room
-import noobroutes.utils.skyblock.dungeon.tiles.Rotations
+import noobroutes.utils.skyblock.dungeonScanning.Dungeon
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRelativeCoords
+import noobroutes.utils.skyblock.dungeonScanning.ScanUtils
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Rotations
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 import kotlin.math.floor
 
 object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for bloodrushing", category = Category.DUNGEON) {
@@ -211,10 +211,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
     fun scanForDoors() {
         val nextRoom = getNextRoom() ?: return
-        if (nextRoom.data.cores.size != nextRoom.roomComponents.size) {
-            Core.logger.info("room cores and components not equal")
-            return
-        }
         val nextDoor = findRoomDoors(nextRoom) ?: return
         doors.add(nextDoor)
         if (isBlock(nextDoor.pos, Blocks.stained_hardened_clay)) {
@@ -224,7 +220,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         currentDoor = nextDoor
     }
 
-    fun getNextRoom(): Room? {
+    fun getNextRoom(): UniqueRoom? {
         val corePos = currentDoor?.let {
             when (it.rotation) {
                 Rotations.SOUTH -> {
@@ -249,15 +245,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 }
             }
         } ?: return null
-
-        val cached = ScanUtils.passedRooms.firstOrNull { room ->
-            room.roomComponents.any {
-                it.x == corePos.x && it.z == corePos.z
-            }
-        }
-        if (cached != null) return cached
-        val scannedRoom = ScanUtils.scanRoom(Vec2i(corePos.x, corePos.z)) ?: return null
-        return scannedRoom
+        return Dungeon.Info.uniqueRooms.firstOrNull { room -> room.roomComponents.any { it.first.x == corePos.x && it.first.z == corePos.z }}
     }
 
     val room1x2Names = hashSetOf(
@@ -323,24 +311,24 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     )
 
 
-    fun getRoomDoors(room: Room): List<BlockPos> {
+    fun getRoomDoors(room: UniqueRoom): List<BlockPos> {
         return when {
-            room1x2Names.contains(room.data.name) -> twoByOneDoors
-            room1x3Names.contains(room.data.name) -> threeByOneDoors
-            roomLShapedNames.contains(room.data.name) -> lShapedDoors
-            room1x4Names.contains(room.data.name) -> fourByOneDoors
-            room2x2Names.contains(room.data.name) -> twoByTwoDoors
+            room1x2Names.contains(room.name) -> twoByOneDoors
+            room1x3Names.contains(room.name) -> threeByOneDoors
+            roomLShapedNames.contains(room.name) -> lShapedDoors
+            room1x4Names.contains(room.name) -> fourByOneDoors
+            room2x2Names.contains(room.name) -> twoByTwoDoors
             else -> oneByOneDoors
         }
     }
 
-    fun getDoorSpots(room: Room): Map<Int, Pair<BlockPos, BlockPos>> {
+    fun getDoorSpots(room: UniqueRoom): Map<Int, Pair<BlockPos, BlockPos>> {
         return when {
-            room1x2Names.contains(room.data.name) -> twoByOneSpots
-            room1x3Names.contains(room.data.name) -> threeByOneSpots
-            roomLShapedNames.contains(room.data.name) -> lShapedSpots
-            room1x4Names.contains(room.data.name) -> fourByOneSpots
-            room2x2Names.contains(room.data.name) -> twoByTwoSpots
+            room1x2Names.contains(room.name) -> twoByOneSpots
+            room1x3Names.contains(room.name) -> threeByOneSpots
+            roomLShapedNames.contains(room.name) -> lShapedSpots
+            room1x4Names.contains(room.name) -> fourByOneSpots
+            room2x2Names.contains(room.name) -> twoByTwoSpots
             else -> oneByOneSpots
         }
     }
@@ -369,76 +357,75 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
 
 
-    fun findRoomDoors(room: Room): Door? {
-        val possibleDoors = getRoomDoors(room).map { room.getRealCoordsOdin(it) }
+    fun findRoomDoors(room: UniqueRoom): Door? {
+        val possibleDoors = getRoomDoors(room).map { room.getRealCoords(it) }
         val doors = possibleDoors.filter {
             isWitherDoor(it) || isBloodDoor(it)
         }
         val doorPos = doors.firstOrNull {it != currentDoor?.pos} ?: return null
         if (possibleDoors.indexOf(currentDoor?.pos) == -1) devMessage(currentDoor!!.pos, "spamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspamspam")
         val roomRouteName = "${possibleDoors.indexOf(currentDoor?.pos)}>${possibleDoors.indexOf(doorPos)}"
-        activeRoutes[room.data.name] = roomRouteName
-        devMessage(Pair(room.data.name, roomRouteName))
-        val closestComponent = room.roomComponents.minByOrNull { it.blockPos.distanceSq(doorPos) }!!
+        activeRoutes[room.name] = roomRouteName
+        devMessage(Pair(room.name, roomRouteName))
+        val closestComponent = room.roomComponents.minByOrNull { BlockPos(it.first.x, 70, it.first.z).distanceSq(doorPos) }!!
         val rotation = when {
-            doorPos.x < closestComponent.x -> Rotations.EAST
-            doorPos.x > closestComponent.x -> Rotations.WEST
-            doorPos.z > closestComponent.z -> Rotations.NORTH
-            doorPos.z < closestComponent.z -> Rotations.SOUTH
+            doorPos.x < closestComponent.first.x -> Rotations.EAST
+            doorPos.x > closestComponent.first.x -> Rotations.WEST
+            doorPos.z > closestComponent.first.z -> Rotations.NORTH
+            doorPos.z < closestComponent.first.z -> Rotations.SOUTH
             else -> Rotations.NORTH
         }
-        ScanUtils.addCachedRoom(room)
         return Door(doorPos, rotation)
     }
 
-    fun getOtherDoor(room: Room): Door? {
-        val possibleDoors = getRoomDoors(room).map { room.getRealCoordsOdin(it) }
+    fun getOtherDoor(room: UniqueRoom): Door? {
+        val possibleDoors = getRoomDoors(room).map { room.getRealCoords(it) }
         val doors = possibleDoors.filter {
             isWitherDoor(it) || isBloodDoor(it)
         }
         val doorPos = doors.firstOrNull {it != getClosestDoorToPlayer(room)?.pos} ?: return null
-        val closestComponent = room.roomComponents.minByOrNull { it.blockPos.distanceSq(doorPos) }!!
+        val closestComponent = room.roomComponents.minByOrNull { BlockPos(it.first.x, 70, it.first.z).distanceSq(doorPos) }!!
         val rotation = when {
-            doorPos.x < closestComponent.x -> Rotations.EAST
-            doorPos.x > closestComponent.x -> Rotations.WEST
-            doorPos.z > closestComponent.z -> Rotations.NORTH
-            doorPos.z < closestComponent.z -> Rotations.SOUTH
+            doorPos.x < closestComponent.first.x -> Rotations.EAST
+            doorPos.x > closestComponent.first.x -> Rotations.WEST
+            doorPos.z > closestComponent.first.z -> Rotations.NORTH
+            doorPos.z < closestComponent.first.z -> Rotations.SOUTH
             else -> Rotations.NORTH
         }
         return Door(doorPos, rotation)
     }
 
-    fun getDoorIndex(room: Room, door: Door): Int? {
+    fun getDoorIndex(room: UniqueRoom, door: Door): Int? {
         val doorList = when {
-            room.data.name == "Entrance" -> oneByOneDoors
-            room.data.cores.size == 1 -> oneByOneDoors
-            room.data.cores.size == 2 -> twoByOneDoors
-            room1x3Names.contains(room.data.name) -> threeByOneDoors
-            room.data.cores.size == 3 -> lShapedDoors
-            room1x4Names.contains(room.data.name) -> fourByOneDoors
-            room.data.cores.size == 4 -> twoByTwoDoors
+            room.name == "Entrance" -> oneByOneDoors
+            room.roomComponents.size == 1 -> oneByOneDoors
+            room.roomComponents.size == 2 -> twoByOneDoors
+            room1x3Names.contains(room.name) -> threeByOneDoors
+            room.roomComponents.size == 3 -> lShapedDoors
+            room1x4Names.contains(room.name) -> fourByOneDoors
+            room.roomComponents.size == 4 -> twoByTwoDoors
             else -> return null
         }
 
         return doorList.indexOfFirst { relativePos ->
-            val realPos = room.getRealCoordsOdin(relativePos)
+            val realPos = room.getRealCoords(relativePos)
             realPos == door.pos
         }.takeIf { it != -1 }
     }
 
-    fun getClosestDoorToPlayer(room: Room): Door? {
-        val doorPositions = if (room.data.name == "Entrance") {
+    fun getClosestDoorToPlayer(room: UniqueRoom): Door? {
+        val doorPositions = if (room.name == "Entrance") {
             oneByOneDoors
         } else {
             getRoomDoors(room)
-        }.map { room.getRealCoordsOdin(it) }
+        }.map { room.getRealCoords(it) }
         val closestPos = doorPositions.minByOrNull { it.distanceToPlayerSq } ?: return null
-        val closestComponent = room.roomComponents.minByOrNull { it.blockPos.distanceSq(closestPos) } ?: return null
+        val closestComponent = room.roomComponents.minByOrNull { BlockPos(it.first.x, 70, it.first.z).distanceSq(closestPos) } ?: return null
         val rotation = when {
-            closestPos.x < closestComponent.x -> Rotations.EAST
-            closestPos.x > closestComponent.x -> Rotations.WEST
-            closestPos.z > closestComponent.z -> Rotations.NORTH
-            closestPos.z < closestComponent.z -> Rotations.SOUTH
+            closestPos.x < closestComponent.first.x -> Rotations.EAST
+            closestPos.x > closestComponent.first.x -> Rotations.WEST
+            closestPos.z > closestComponent.first.z -> Rotations.NORTH
+            closestPos.z < closestComponent.first.z -> Rotations.SOUTH
             else -> Rotations.NORTH
         }
         return Door(closestPos, rotation)
@@ -471,12 +458,12 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     var routeTo : BlockPos? = null
     var waiting = false
     private var bloodNext = false
-    private var customRoom: Room? = null
+    private var customRoom: UniqueRoom? = null
 
     @SubscribeEvent
     fun setRoom(event: RoomEnterEvent) {
         customRoom = event.room
-        devMessage(customRoom!!.data.name)
+        devMessage(customRoom!!.name)
     }
 
     @SubscribeEvent
@@ -503,11 +490,11 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             val door = getOtherDoor(room) ?: return
             val index = getDoorIndex(room, door) ?: return
             val spot = getDoorSpots(room)[index]?.second ?: return
-            val realSpot = room.getRealCoordsOdin(spot)
+            val realSpot = room.getRealCoords(spot)
             val closestDoor = getClosestDoorToPlayer(room) ?: return
             val closestIndex = getDoorIndex(room, closestDoor)
             val closestSpot = getDoorSpots(room)[closestIndex]?.first ?: return
-            val closestRealSpot = room.getRealCoordsOdin(closestSpot)
+            val closestRealSpot = room.getRealCoords(closestSpot)
             if (closestRealSpot == mc.thePlayer.positionVector.subtract(0.0,1.0,0.0).toBlockPos() && routeTo == null) {
                 EWPathfinderModule.execute(realSpot, false)
                 if (isBlock(door.pos, Blocks.stained_hardened_clay)) bloodNext = true
@@ -517,10 +504,10 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         }
         if (event.isEnd || (activeRoutes.isEmpty() && !editMode) || !PlayerUtils.canSendC08) return
         val room = DungeonUtils.currentRoom ?: return
-        if (!activeRoutes.any { it.key == room.data.name } && !editMode) return
-        val key = if (editMode) routeName else activeRoutes[room.data.name]!!
+        if (!activeRoutes.any { it.key == room.name } && !editMode) return
+        val key = if (editMode) routeName else activeRoutes[room.name]!!
 
-        val node = routes.getOrPut(room.data.name) {mutableMapOf()}.getOrPut(key) {mutableListOf()}.firstOrNull { it.inNode(room) } ?: return
+        val node = routes.getOrPut(room.name) {mutableMapOf()}.getOrPut(key) {mutableListOf()}.firstOrNull { it.inNode(room) } ?: return
         node.runTick(room)
         Scheduler.schedulePreMotionUpdateTask {
             node.runMotion(room, it as MotionUpdateEvent.Pre)
@@ -530,14 +517,14 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent){
         val room = customRoom ?: return
-        if (DungeonUtils.currentRoom?.data?.name == "Entrance") customRoom = room ?: return
+        if (DungeonUtils.currentRoom?.name == "Entrance") customRoom = room
         if (editMode) {
-            val doorPositions = if (room.data.name == "Entrance") oneByOneDoors.map { room.getRealCoordsOdin(it) } else getRoomDoors(room).map { room.getRealCoordsOdin(it) }
+            val doorPositions = if (room.name == "Entrance") oneByOneDoors.map { room.getRealCoords(it) } else getRoomDoors(room).map { room.getRealCoords(it) }
             doorPositions.forEachIndexed { index, pos ->
                 Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), doorNumberColor, scale = 0.1f)
             }
-            val doorSpots = if (room.data.name == "Entrance") oneByOneSpots.map { it.key to Pair(room.getRealCoordsOdin(it.value.first), room.getRealCoordsOdin(it.value.second)) } else
-                getDoorSpots(room).map { it.key to Pair(room.getRealCoordsOdin(it.value.first), room.getRealCoordsOdin(it.value.second)) }
+            val doorSpots = if (room.name == "Entrance") oneByOneSpots.map { it.key to Pair(room.getRealCoords(it.value.first), room.getRealCoords(it.value.second)) } else
+                getDoorSpots(room).map { it.key to Pair(room.getRealCoords(it.value.first), room.getRealCoords(it.value.second)) }
 
             doorSpots.forEach {
                 Renderer.drawBlock(it.second.first, Color.RED)
@@ -547,8 +534,8 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
         }
         if (routeName == "" && editMode) return
-        val key = if (editMode) routeName else activeRoutes[room.data.name] ?: return
-        val nodeList = routes.getOrPut(room.data.name) {mutableMapOf()}.getOrPut(key) {mutableListOf()}.toList()
+        val key = if (editMode) routeName else activeRoutes[room.name] ?: return
+        val nodeList = routes.getOrPut(room.name) {mutableMapOf()}.getOrPut(key) {mutableListOf()}.toList()
         if (editMode) nodeList.forEachIndexed {
             index, node ->
             node.renderIndex(room, index)
@@ -563,9 +550,9 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     @SubscribeEvent
     fun onEnterDungeon(event: RoomEnterEvent) {
         routeName = ""
-        if (event.room?.data?.name != "Entrance" || started) return
+        if (event.room?.name != "Entrance" || started) return
         started = true
-        val door = Door(event.room.getRealCoordsOdin(15, 69, -1), event.room.rotation)
+        val door = Door(event.room.getRealCoords(15, 69, -1), event.room.rotation)
         currentDoor = door
         doors.add(door)
         scanForDoors()
@@ -640,10 +627,10 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 }
                 modMessage("set to ${doorNumbers[0]}>${doorNumbers[1]}")
                 routeName = "${doorNumbers[0]}>${doorNumbers[1]}"
-                val routeList = routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}
+                val routeList = routes.getOrPut(currentRoom.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}
                 if (!routeList.any { it.name == "Door" }) {
                     val spot = getDoorSpots(currentRoom)[doorNumbers[1]!!] ?: return
-                    val real = currentRoom.getRealCoordsOdin(spot.second).toVec3(0.5, 1.0, 0.5)
+                    val real = currentRoom.getRealCoords(spot.second).toVec3(0.5, 1.0, 0.5)
                     routeList.add(DoorRoute(currentRoom.getRelativeCoords(real)))
                 }
 
@@ -669,14 +656,14 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                         return
                     }
                     val target = currentRoom.getRelativeCoords(raytrace)
-                    routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.add(
+                    routes.getOrPut(currentRoom.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.add(
                         Etherwarp(playerCoords, target)
                     )
                     saveFile()
                     return
                 }
                 if (args[1].lowercase() == "door") {
-                    routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.add(
+                    routes.getOrPut(currentRoom.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.add(
                         DoorRoute(playerCoords)
                     )
                     saveFile()
@@ -687,7 +674,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 if (!editMode) return modMessage("Edit Mode Required")
                 val currentRoom = DungeonUtils.currentRoom ?: return modMessage("Not in room")
                 if (routeName == "") return modMessage("No route set")
-                routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.clear()
+                routes.getOrPut(currentRoom.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.clear()
                 saveFile()
             }
 
@@ -695,7 +682,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 if (!editMode) return modMessage("Edit Mode Required")
                 val currentRoom = DungeonUtils.currentRoom ?: return modMessage("Not in room")
                 if (routeName == "") return modMessage("No route set")
-                val nodeList = routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}
+                val nodeList = routes.getOrPut(currentRoom.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}
                 if (nodeList.isEmpty()) return modMessage("No Nodes")
                 if (args.size > 1) {
                     val index = args[1].toIntOrNull() ?: return modMessage("Invalid Index")
@@ -720,13 +707,13 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             }
             "placedoor" -> {
                 val room = DungeonUtils.currentRoom ?: return modMessage("not in room")
-                val door = getRoomDoors(room).map { room.getRealCoordsOdin(it) }.minByOrNull { it.distanceToPlayerSq } ?: return
-                val closestComponent = room.roomComponents.minByOrNull { it.blockPos.distanceSq(door) }!!
+                val door = getRoomDoors(room).map { room.getRealCoords(it) }.minByOrNull { it.distanceToPlayerSq } ?: return
+                val closestComponent = room.roomComponents.minByOrNull { BlockPos(it.first.x, 70, it.first.z).distanceSq(door) }!!
                 val rotation = when {
-                    door.x < closestComponent.x -> Rotations.EAST
-                    door.x > closestComponent.x -> Rotations.WEST
-                    door.z > closestComponent.z -> Rotations.NORTH
-                    door.z < closestComponent.z -> Rotations.SOUTH
+                    door.x < closestComponent.first.x -> Rotations.EAST
+                    door.x > closestComponent.first.x -> Rotations.WEST
+                    door.z > closestComponent.first.z -> Rotations.NORTH
+                    door.z < closestComponent.first.z -> Rotations.SOUTH
                     else -> Rotations.NORTH
                 }
                 placeWitherDoor(door, rotation)
@@ -861,13 +848,13 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     fun onRoomEnter(event: RoomEnterEvent){
         if (LocationUtils.isSinglePlayer && editMode && placeDoors && event.room != null) {
             val doors = getRoomDoors(event.room)
-            doors.map { event.room.getRealCoordsOdin(it) }.forEach {door ->
-                val closestComponent = event.room.roomComponents.minByOrNull { it.blockPos.distanceSq(door) }!!
+            doors.map { event.room.getRealCoords(it) }.forEach {door ->
+                val closestComponent = event.room.roomComponents.minByOrNull { BlockPos(it.first.x, 70, it.first.z).distanceSq(door) }!!
                 val rotation = when {
-                    door.x < closestComponent.x -> Rotations.EAST
-                    door.x > closestComponent.x -> Rotations.WEST
-                    door.z > closestComponent.z -> Rotations.NORTH
-                    door.z < closestComponent.z -> Rotations.SOUTH
+                    door.x < closestComponent.first.x -> Rotations.EAST
+                    door.x > closestComponent.first.x -> Rotations.WEST
+                    door.z > closestComponent.first.z -> Rotations.NORTH
+                    door.z < closestComponent.first.z -> Rotations.SOUTH
                     else -> Rotations.NORTH
                 }
                 placeWitherDoor(door, rotation)
@@ -937,7 +924,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                     continue
                 }
 
-                routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.add(
+                routes.getOrPut(currentRoom.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.add(
                     Etherwarp(currentRoom.getRelativeCoords(nodeVec3), currentRoom.getRelativeCoords(targetVec3))
                 )
             }
@@ -969,26 +956,26 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         val currentRoom = DungeonUtils.currentRoom ?: return
         val route = routesToGenerate.removeFirstOrNull() ?: return
         routeName = route.first
-        val routeList = routes.getOrPut(currentRoom.data.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}
+        val routeList = routes.getOrPut(currentRoom.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}
         val routeNumbers = route.first.split(">").map { it.toIntOrNull() ?: return }
         if (!routeList.any { it.name == "Door" }) {
             val spot = getDoorSpots(currentRoom)[routeNumbers[1]] ?: return
-            val real = currentRoom.getRealCoordsOdin(spot.second).toVec3(0.5, 1.0, 0.5)
+            val real = currentRoom.getRealCoords(spot.second).toVec3(0.5, 1.0, 0.5)
             routeList.add(DoorRoute(currentRoom.getRelativeCoords(real)))
         }
 
         pathFindRoute(route.second, route.third, route.first)
     }
 
-    fun generateRoutes(room: Room){
+    fun generateRoutes(room: UniqueRoom){
         val maxDoors = getRoomDoors(room).size - 1
         val doorSpots = getDoorSpots(room)
         for (door in 0..maxDoors) {
             for (door1 in 0..maxDoors) {
                 if (door == door1) continue
-                val origin = room.getRealCoordsOdin(doorSpots[door]!!.first)
+                val origin = room.getRealCoords(doorSpots[door]!!.first)
                 if (!isAir(origin.add(0, 1, 0))) continue
-                val target = room.getRealCoordsOdin(doorSpots[door1]!!.second)
+                val target = room.getRealCoords(doorSpots[door1]!!.second)
                 if (!isAir(target.add(0, 1, 0))) continue
                 
                 routeName = "$door>$door1"

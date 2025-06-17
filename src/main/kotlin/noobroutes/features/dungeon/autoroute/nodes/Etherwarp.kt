@@ -26,8 +26,8 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.skyblockID
 import kotlin.math.absoluteValue
@@ -55,18 +55,18 @@ class Etherwarp(
     reset
 ) {
 
-    override fun awaitTick(room: Room) {
+    override fun awaitTick(room: UniqueRoom) {
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         if (!silent) setAngles(angles.first, angles.second)
     }
 
-    override fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {
+    override fun awaitMotion(event: MotionUpdateEvent.Pre, room: UniqueRoom) {
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         devMessage("yaw: ${angles.first}, pitch: ${angles.second}")
         AutoRouteUtils.setRotation(angles.first + offset,angles.second)
     }
 
-    override fun tick(room: Room) {
+    override fun tick(room: UniqueRoom) {
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         val state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.UNKNOWN) return
@@ -80,7 +80,7 @@ class Etherwarp(
     }
 
 
-    override fun motion(event: MotionUpdateEvent.Pre, room: Room) {
+    override fun motion(event: MotionUpdateEvent.Pre, room: UniqueRoom) {
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target))
         event.yaw = angles.first
         event.pitch = angles.second
@@ -95,7 +95,7 @@ class Etherwarp(
     }
 
 
-    override fun render(room: Room) {
+    override fun render(room: UniqueRoom) {
         drawNode(room, etherwarpColor)
         if (!AutoRoute.drawEtherLines) return
         val nodeCoords = room.getRealCoords(pos)

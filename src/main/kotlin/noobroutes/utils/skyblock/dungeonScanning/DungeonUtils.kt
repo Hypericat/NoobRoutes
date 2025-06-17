@@ -1,4 +1,4 @@
-package noobroutes.utils.skyblock.dungeon
+package noobroutes.utils.skyblock.dungeonScanning
 
 import net.minecraft.block.BlockSkull
 import net.minecraft.block.state.IBlockState
@@ -18,8 +18,9 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.utils.*
 import noobroutes.utils.skyblock.*
-import noobroutes.utils.skyblock.dungeon.tiles.Room
-import noobroutes.utils.skyblock.dungeon.tiles.Rotations
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Rotations
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 import kotlin.math.floor
 import kotlin.math.roundToLong
 
@@ -34,52 +35,11 @@ object DungeonUtils {
     inline val floor: Floor
         get() = LocationUtils.currentDungeon?.floor ?: Floor.E
 
-
-
-    inline val secretCount: Int
-        get() = LocationUtils.currentDungeon?.dungeonStats?.secretsFound ?: 0
-
-    inline val knownSecrets: Int
-        get() = LocationUtils.currentDungeon?.dungeonStats?.knownSecrets ?: 0
-
-    inline val secretPercentage: Float
-        get() = LocationUtils.currentDungeon?.dungeonStats?.secretsPercent ?: 0f
-
-    inline val totalSecrets: Int
-        get() = if (secretCount == 0 || secretPercentage == 0f) 0 else floor(100 / secretPercentage * secretCount + 0.5).toInt()
-
-    inline val deathCount: Int
-        get() = LocationUtils.currentDungeon?.dungeonStats?.deaths ?: 0
-
-    inline val cryptCount: Int
-        get() = LocationUtils.currentDungeon?.dungeonStats?.crypts ?: 0
-
-    inline val openRoomCount: Int
-        get() = LocationUtils.currentDungeon?.dungeonStats?.openedRooms ?: 0
-
-    inline val completedRoomCount: Int
-        get() = LocationUtils.currentDungeon?.dungeonStats?.completedRooms ?: 0
-
-    inline val percentCleared: Int
-        get() = LocationUtils.currentDungeon?.dungeonStats?.percentCleared ?: 0
-
-    inline val totalRooms: Int
-        get() = if (completedRoomCount == 0 || percentCleared == 0) 0 else floor((completedRoomCount / (percentCleared * 0.01).toFloat()) + 0.4).toInt()
-
     inline val puzzles: List<Puzzle>
         get() = LocationUtils.currentDungeon?.puzzles.orEmpty()
 
-    inline val puzzleCount: Int
-        get() = LocationUtils.currentDungeon?.puzzles?.size ?: 0
-
-    inline val dungeonTime: String
-        get() = LocationUtils.currentDungeon?.dungeonStats?.elapsedTime ?: "00m 00s"
-
-    inline val isGhost: Boolean
-        get() = getItemSlot("Haunt", true) != null
-
     inline val currentRoomName: String
-        get() = LocationUtils.currentDungeon?.currentRoom?.data?.name ?: "Unknown"
+        get() = LocationUtils.currentDungeon?.currentRoom?.name ?: "Unknown"
 
     inline val dungeonTeammates: ArrayList<DungeonPlayer>
         get() = LocationUtils.currentDungeon?.dungeonTeammates ?: ArrayList()
@@ -93,32 +53,15 @@ object DungeonUtils {
     inline val currentDungeonPlayer: DungeonPlayer
         get() = dungeonTeammates.find { it.name == mc.thePlayer?.name } ?: DungeonPlayer(mc.thePlayer?.name ?: "Unknown", DungeonClass.Unknown, 0, entity = mc.thePlayer)
 
-    inline val doorOpener: String
-        get() = LocationUtils.currentDungeon?.dungeonStats?.doorOpener ?: "Unknown"
-
-    inline val mimicKilled: Boolean
-        get() = LocationUtils.currentDungeon?.dungeonStats?.mimicKilled == true
-
-    inline val currentRoom: Room?
+    inline val currentRoom: UniqueRoom?
         get() = LocationUtils.currentDungeon?.currentRoom
-
-    inline val passedRooms: Set<Room>
-        get() = LocationUtils.currentDungeon?.passedRooms.orEmpty()
-
-    inline val isPaul: Boolean
-        get() = LocationUtils.currentDungeon?.paul == true
-
-
-
-    inline val bloodDone: Boolean
-        get() = LocationUtils.currentDungeon?.dungeonStats?.bloodDone == true
 
 
     /**
-     * Checks if the current dungeon floor number matches any of the specified options.
+     * Checks if the current dungeonScanning floor number matches any of the specified options.
      *
-     * @param options The floor number options to compare with the current dungeon floor.
-     * @return `true` if the current dungeon floor matches any of the specified options, otherwise `false`.
+     * @param options The floor number options to compare with the current dungeonScanning floor.
+     * @return `true` if the current dungeonScanning floor matches any of the specified options, otherwise `false`.
      */
     fun isFloor(vararg options: Int): Boolean {
         return floorNumber in options
@@ -146,6 +89,8 @@ object DungeonUtils {
         else 1 - 0.25 - (floor(currentDungeonPlayer.clazzLvl / 2.0) / 100) * if (dungeonTeammates.count { it.clazz == DungeonClass.Mage } == 1) 2 else 1
     }
 
+
+
     /**
      * Gets the new ability cooldown after mage cooldown reductions.
      * @param baseSeconds The base cooldown of the ability in seconds. Eg 10
@@ -162,7 +107,7 @@ object DungeonUtils {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRoomEnter(event: RoomEnterEvent) {
-        if (inDungeons) LocationUtils.currentDungeon?.enterDungeonRoom(event)
+        if (inDungeons) LocationUtils.currentDungeon?.enterDungeonRoom(event.room)
     }
 
     @SubscribeEvent
@@ -233,11 +178,11 @@ object DungeonUtils {
         }
     }
 
-    fun Room.getRelativeCoords(pos: Vec3): Vec3 {
+    fun UniqueRoom.getRelativeCoords(pos: Vec3): Vec3 {
         val center = this.getCenter()
         val x = pos.xCoord - center.x
         val z = pos.zCoord - center.z
-        return when ( this.rotation) {
+        return when (this.rotation) {
             Rotations.NORTH -> {
                 Vec3(x, pos.yCoord, z)
             }
@@ -264,14 +209,14 @@ object DungeonUtils {
     const val MAX_SAFE_INTEGER: Long = 9007199254740991L
     const val MIN_SAFE_INTEGER = -9007199254740991L
 
-    fun Room.getCenter(): Vec2 {
+    fun UniqueRoom.getCenter(): Vec2 {
         var minX = MAX_SAFE_INTEGER.toDouble()
         var maxX = MIN_SAFE_INTEGER.toDouble()
         var minZ = MAX_SAFE_INTEGER.toDouble()
         var maxZ = MIN_SAFE_INTEGER.toDouble()
         for (component in this.roomComponents) {
-            val x = component.x + 0.5
-            val z = component.z + 0.5
+            val x = component.first.x + 0.5
+            val z = component.second.z + 0.5
             minX = if (x < minX) x else minX
             maxX = if (x > maxX) x else maxX
             minZ = if (z < minZ) z else minZ
@@ -281,7 +226,7 @@ object DungeonUtils {
     }
 
 
-    fun Room.getRealCoords(pos: Vec3): Vec3 {
+    fun UniqueRoom.getRealCoords(pos: Vec3): Vec3 {
         val center = this.getCenter()
         val rotatedPos = when (this.rotation) {
             Rotations.NORTH -> {
@@ -305,14 +250,9 @@ object DungeonUtils {
 
     }
 
+    fun UniqueRoom.getRelativeCoords(x: Double, y: Double, z: Double) = getRelativeCoords(Vec3(x, y, z))
 
-
-
-
-
-    fun Room.getRelativeCoords(x: Double, y: Double, z: Double) = getRelativeCoords(Vec3(x, y, z))
-
-    fun Room.getRealYaw(yaw: Float): Float {
+    fun UniqueRoom.getRealYaw(yaw: Float): Float {
         val realYaw = when (this.rotation) {
             Rotations.NORTH -> yaw
             Rotations.WEST -> yaw - 90
@@ -322,7 +262,7 @@ object DungeonUtils {
         }
         return MathHelper.wrapAngleTo180_float(realYaw)
     }
-    fun Room.getRelativeYaw(yaw: Float): Float {
+    fun UniqueRoom.getRelativeYaw(yaw: Float): Float {
         val relativeYaw = when (this.rotation) {
             Rotations.NORTH -> yaw
             Rotations.WEST -> yaw + 90
@@ -333,20 +273,10 @@ object DungeonUtils {
         return MathHelper.wrapAngleTo180_float(relativeYaw)
     }
 
-
-
-    fun Room.getRelativeCoordsOdin(pos: Vec3) = pos.subtractVec(x = clayPos.x, z = clayPos.z).rotateToNorth(rotation)
-    fun Room.getRealCoordsOdin(pos: Vec3) = pos.rotateAroundNorth(rotation).addVec(x = clayPos.x, z = clayPos.z)
-    fun Room.getRelativeCoordsOdin(pos: BlockPos) = getRelativeCoordsOdin(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
-    fun Room.getRealCoordsOdin(pos: BlockPos) = getRealCoordsOdin(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
-    fun Room.getRelativeCoordsOdin(x: Int, y: Int, z: Int) = getRelativeCoordsOdin(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
-    fun Room.getRealCoordsOdin(x: Int, y: Int, z: Int) = getRealCoordsOdin(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
-
-
-    fun Room.getRelativeCoords(pos: BlockPos) = getRelativeCoords(Vec3(pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5)).toBlockPos()
-    fun Room.getRealCoords(pos: BlockPos) = getRealCoords(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
-    fun Room.getRelativeCoords(x: Int, y: Int, z: Int) = getRelativeCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
-    fun Room.getRealCoords(x: Int, y: Int, z: Int) = getRealCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
+    fun UniqueRoom.getRelativeCoords(pos: BlockPos) = getRelativeCoords(Vec3(pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5)).toBlockPos()
+    fun UniqueRoom.getRealCoords(pos: BlockPos) = getRealCoords(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
+    fun UniqueRoom.getRelativeCoords(x: Int, y: Int, z: Int) = getRelativeCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
+    fun UniqueRoom.getRealCoords(x: Int, y: Int, z: Int) = getRealCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
 
     val dungeonItemDrops = listOf(
         "Health Potion VIII Splash Potion", "Healing Potion 8 Splash Potion", "Healing Potion VIII Splash Potion", "Healing VIII Splash Potion", "Healing 8 Splash Potion",

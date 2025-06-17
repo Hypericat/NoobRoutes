@@ -40,8 +40,8 @@ object SecretGuideManager : Module(
             secretGuideBoolean?.let { SecretGuideIntegration.setSecretGuideAura(it) }
             secretGuideBoolean = null
         }
-        lastRoom = event.room?.data?.name
-        if (event.room?.data?.name != "Water Board" || !inWaterBoard) return
+        lastRoom = event.room?.name
+        if (event.room?.name != "Water Board" || !inWaterBoard) return
         secretGuideBoolean = SecretGuideIntegration.getSecretGuideAura()
         SecretGuideIntegration.setSecretGuideAura(false)
     }

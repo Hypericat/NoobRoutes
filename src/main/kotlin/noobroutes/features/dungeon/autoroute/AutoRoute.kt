@@ -38,14 +38,14 @@ import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer2D
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeYaw
-import noobroutes.utils.skyblock.dungeon.tiles.Room
-import noobroutes.utils.skyblock.dungeon.tiles.RoomData
-import noobroutes.utils.skyblock.dungeon.tiles.RoomType
-import noobroutes.utils.skyblock.dungeon.tiles.Rotations
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRelativeCoords
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRelativeYaw
+import noobroutes.utils.skyblock.dungeonScanning.RoomData
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.tiles.RoomType
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 import org.lwjgl.input.Keyboard
 import kotlin.math.abs
 import kotlin.math.absoluteValue
@@ -85,11 +85,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     }
 
     val roomReplacement
-        get() = Room(
-            Rotations.NORTH,
-            RoomData(LocationUtils.currentArea.name, RoomType.NORMAL, cores = listOf(0, 0), 0, 0, 0),
-            roomComponents = mutableSetOf()
-        )
+        get() = UniqueRoom(0, 0, Room(0, 0, RoomData(LocationUtils.currentArea.name, RoomType.NORMAL, listOf(), 0, 0)))
 
     private val nodeRegistry = mapOf(
         Pair("Etherwarp", Etherwarp::class),
@@ -118,7 +114,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     fun onKeyInput(event: MouseEvent) {
         if (event.button == 1 && event.buttonstate && System.currentTimeMillis() - lastRoute < 150) {
             val room = DungeonUtils.currentRoom ?: roomReplacement
-            val nodes = nodes[room.data.name]?.filter { node ->
+            val nodes = nodes[room.name]?.filter { node ->
                 val realCoord = room.getRealCoords(node.pos)
                 if (node.chain) (
                                 abs(PlayerUtils.posX - realCoord.xCoord) < 0.001 &&
@@ -135,8 +131,8 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 return
             }
             val room = DungeonUtils.currentRoom ?: roomReplacement
-            nodes[room.data.name]?.forEach { it.reset() }
-            if (nodes[room.data.name]?.firstOrNull {node ->
+            nodes[room.name]?.forEach { it.reset() }
+            if (nodes[room.name]?.firstOrNull {node ->
                 val realCoord = room.getRealCoords(node.pos)
                     (if (node.chain) (
                             abs(PlayerUtils.posX - realCoord.xCoord) < 0.001 &&
@@ -210,12 +206,12 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     fun onRenderWorldLast(event: RenderWorldLastEvent) {
         if (mc.thePlayer == null) return
         val room = DungeonUtils.currentRoom ?: roomReplacement
-        if (!renderRoutes || nodes[room.data.name] == null) return
-        nodes[room.data.name]?.forEach {
+        if (!renderRoutes || nodes[room.name] == null) return
+        nodes[room.name]?.forEach {
             it.render(room)
         }
         if (renderIndex) {
-            nodes[room.data.name]?.forEachIndexed { index, node ->
+            nodes[room.name]?.forEachIndexed { index, node ->
                 node.drawIndex(index, room)
             }
         }
@@ -226,9 +222,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
 
 
-    private fun inNodes(room: Room): MutableList<Node> {
+    private fun inNodes(room: UniqueRoom): MutableList<Node> {
         val inNodes = mutableListOf<Node>()
-        nodes[room.data.name]?.forEach { node ->
+        nodes[room.name]?.forEach { node ->
             val realCoord = room.getRealCoords(node.pos)
             val inNode =
                 if (node.chain) (
@@ -263,7 +259,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             nodesToRun.clear()
             return
         }
-        if (!canRoute || nodes[room.data.name] == null || editMode) return
+        if (!canRoute || nodes[room.name] == null || editMode) return
 
         val inNodes = inNodes(room)
         if (inNodes.isNotEmpty()) {
@@ -281,7 +277,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }
 
         if (DynamicRoute.enabled && !DynamicRoute.editMode && DynamicRoute.isInNode()) return
-        if (AutoBloodRush.waiting != false || AutoBloodRush.routeTo != null) return
+        if (AutoBloodRush.waiting || AutoBloodRush.routeTo != null) return
 
         nodesToRun.firstOrNull()?.let { node ->
             lastRoute = System.currentTimeMillis()
@@ -327,10 +323,8 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             resetRotation()
             secretCount = 0
             node.tick(room)
-            //devMessage("runTick: ${System.currentTimeMillis()}")
             Scheduler.schedulePreMotionUpdateTask {
                 node.motion((it as MotionUpdateEvent.Pre), room)
-                //devMessage("motionUpdate: ${System.currentTimeMillis()}")
             }
             if (node.delete) nodesToRun.remove(node)
         }
@@ -383,7 +377,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             "delete", "remove", "begone", "eradicate", "flaccid" -> {
                 val node = getNode(room, args) ?: return
                 deletedNodes.add(node)
-                nodes[room.data.name]?.remove(node)
+                nodes[room.name]?.remove(node)
                 saveFile()
                 modMessage("Removed ${deletedNodes.last().name}")
             }
@@ -399,7 +393,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 saveFile()
             }
             "clear" -> {
-                nodes[room.data.name] = mutableListOf()
+                nodes[room.name] = mutableListOf()
                 saveFile()
             }
 
@@ -579,8 +573,8 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }
     }
 
-    private fun getNode(room: Room, args: Array<out String>): Node? {
-        val nodeList = nodes[room.data.name]
+    private fun getNode(room: UniqueRoom, args: Array<out String>): Node? {
+        val nodeList = nodes[room.name]
         if (args.size > 1) {
             val index = args[1].toIntOrNull()?.absoluteValue
             if (index == null) {
@@ -605,20 +599,20 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
 
     fun
-            addNode(room: Room, node: Node) {
+            addNode(room: UniqueRoom, node: Node) {
         modMessage("adding node")
-        if (nodes[room.data.name] == null) {
-            nodes[room.data.name] = mutableListOf()
+        if (nodes[room.name] == null) {
+            nodes[room.name] = mutableListOf()
         }
-        nodes[room.data.name]?.add(node)
-        //devMessage(nodes[room.data.name])
+        nodes[room.name]?.add(node)
+        //devMessage(nodes[room.name])
         saveFile()
     }
 
     @SubscribeEvent
     fun meowTranslator(event: RoomEnterEvent){
         event.room ?: return
-        nodes[event.room.data.name]?.filter {it.name == "Aotv"}?.forEach {
+        nodes[event.room.name]?.filter {it.name == "Aotv"}?.forEach {
             it.meowConvert(event.room)
         }
         saveFile()

@@ -1,20 +1,7 @@
-package noobroutes.utils.skyblock.dungeonscanning
+package noobroutes.utils.skyblock.dungeonScanning
 
-import net.minecraft.init.Blocks
-import net.minecraft.util.BlockPos
-import noobroutes.Core.mc
-import noobroutes.utils.equalsOneOf
-import noobroutes.utils.skyblock.dungeonscanning.tiles.Door
-import noobroutes.utils.skyblock.dungeonscanning.tiles.DoorType
-import noobroutes.utils.skyblock.dungeonscanning.tiles.Room
-import noobroutes.utils.skyblock.dungeonscanning.tiles.RoomState
-import noobroutes.utils.skyblock.dungeonscanning.tiles.RoomType
-import noobroutes.utils.skyblock.dungeonscanning.tiles.UniqueRoom
-import noobroutes.utils.skyblock.dungeonscanning.tiles.Unknown
-import kotlin.collections.get
-import kotlin.shr
-import kotlin.text.compareTo
-import kotlin.text.set
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 
 object MapUpdate {
     var roomAdded = false
@@ -49,6 +36,7 @@ object MapUpdate {
                 }
             }
         }
+        Dungeon.Info.uniqueRooms.forEach { it.updateRotation() }
         roomAdded = false
     }
 

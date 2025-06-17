@@ -23,7 +23,7 @@ import noobroutes.features.settings.impl.*
 import noobroutes.utils.*
 import noobroutes.utils.Utils.ID
 import noobroutes.utils.skyblock.*
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
 import kotlin.math.floor
 
 object Zpew : Module(

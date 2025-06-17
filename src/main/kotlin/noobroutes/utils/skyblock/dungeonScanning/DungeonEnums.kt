@@ -1,7 +1,8 @@
-package noobroutes.utils.skyblock.dungeon
+package noobroutes.utils.skyblock.dungeonScanning
 
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ResourceLocation
+import noobroutes.utils.render.Color
 
 /**
  * Data class representing a player in a dungeon, including their name, class, skin location, and associated player entity.
@@ -65,17 +66,17 @@ sealed class PuzzleStatus {
  *
  */
 enum class DungeonClass(
-    val color: noobroutes.utils.render.Color,
+    val color: Color,
     val colorCode: Char,
     val defaultQuadrant: Int,
     var priority: Int,
 ) {
-    Archer(_root_ide_package_.noobroutes.utils.render.Color.Companion.ORANGE, '6', 0, 2),
-    Berserk(_root_ide_package_.noobroutes.utils.render.Color.Companion.DARK_RED, '4', 1, 0),
-    Healer(_root_ide_package_.noobroutes.utils.render.Color.Companion.PINK, 'd', 2, 2),
-    Mage(_root_ide_package_.noobroutes.utils.render.Color.Companion.BLUE, 'b', 3, 2),
-    Tank(_root_ide_package_.noobroutes.utils.render.Color.Companion.DARK_GREEN, '2', 3, 1),
-    Unknown(_root_ide_package_.noobroutes.utils.render.Color.Companion.WHITE, 'f', 0, 0)
+    Archer(Color.Companion.ORANGE, '6', 0, 2),
+    Berserk(Color.Companion.DARK_RED, '4', 1, 0),
+    Healer(Color.Companion.PINK, 'd', 2, 2),
+    Mage(Color.Companion.BLUE, 'b', 3, 2),
+    Tank(Color.Companion.DARK_GREEN, '2', 3, 1),
+    Unknown(Color.Companion.WHITE, 'f', 0, 0)
 }
 
 enum class Blessing(

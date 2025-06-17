@@ -15,9 +15,9 @@ import noobroutes.utils.SwapManager
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealYaw
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 
 class Pearl(
@@ -56,20 +56,20 @@ class Pearl(
         triggered = false
     }
 
-    override fun awaitTick(room: Room) {
+    override fun awaitTick(room: UniqueRoom) {
         if (!silent) RotationUtils.setAngles(room.getRealYaw(yaw), pitch)
         PlayerUtils.unSneak()
     }
 
     override fun awaitMotion(
         event: MotionUpdateEvent.Pre,
-        room: Room
+        room: UniqueRoom
     ) {
         AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
     }
 
 
-    override fun tick(room: Room) {
+    override fun tick(room: UniqueRoom) {
         if (count < 1) return modMessage("Invalid Clip Distance")
         PlayerUtils.unSneak()
         delete = false
@@ -91,13 +91,13 @@ class Pearl(
 
     override fun motion(
         event: MotionUpdateEvent.Pre,
-        room: Room
+        room: UniqueRoom
     ) {
         event.pitch = pitch
         event.yaw = room.getRealYaw(yaw)
     }
 
-    override fun render(room: Room) {
+    override fun render(room: UniqueRoom) {
         drawNode(room, pearlColor)
         if (AutoRoute.drawPearlCountText) Renderer.drawStringInWorld("Pearls: $count", room.getRealCoords(pos).add(Vec3(0.0, 0.9, 0.0)), pearlColor, depth = depth)
     }

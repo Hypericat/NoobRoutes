@@ -12,8 +12,8 @@ import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.AuraManager
 import noobroutes.utils.Utils.getEntitiesOfType
 import noobroutes.utils.Utils.isEnd
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.M7Phases
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
+import noobroutes.utils.skyblock.dungeonScanning.M7Phases
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 

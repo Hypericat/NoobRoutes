@@ -1,4 +1,4 @@
-package noobroutes.utils.skyblock.dungeonscanning.tiles
+package noobroutes.utils.skyblock.dungeonScanning.tiles
 
 enum class DoorType {
     BLOOD,

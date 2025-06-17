@@ -27,9 +27,9 @@ import noobroutes.utils.removeFirstOrNull
 import noobroutes.utils.setBlock
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoordsOdin
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoordsOdin
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRelativeCoords
 import org.lwjgl.input.Keyboard
 
 
@@ -56,9 +56,9 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
         if (event.type == ClickEvent.ClickType.Middle) {
             selectedBlockState = getBlockStateAt(target)
         }
-        val blockList = blocks.getOrPut(room?.data?.name ?: getLocation()) { mutableSetOf() }
+        val blockList = blocks.getOrPut(room?.name ?: getLocation()) { mutableSetOf() }
         if (event.type == ClickEvent.ClickType.Left) {
-            val pos = room?.getRelativeCoordsOdin(target) ?: target
+            val pos = room?.getRelativeCoords(target) ?: target
             val removed = blockList.removeFirstOrNull {
                 it.pos == pos
             }
@@ -72,7 +72,7 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
             lastPlace = System.currentTimeMillis()
             val facing = mouseOver.sideHit
             val offset = target.offset(facing)
-            val pos = room?.getRelativeCoordsOdin(target) ?: target
+            val pos = room?.getRelativeCoords(target) ?: target
             setBlock(offset, selectedBlockState)
             blockList.add(Block(pos, selectedBlockState))
         }
@@ -89,7 +89,7 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
     fun onRoomEnterEvent(event: RoomEnterEvent){
         if (event.room == null) return
         pendingBlocks.addAll(
-            blocks[event.room.data.name]?.map { Block(event.room.getRealCoordsOdin(it.pos), it.state) } ?: return
+            blocks[event.room.name]?.map { Block(event.room.getRealCoords(it.pos), it.state) } ?: return
         )
         devMessage("something")
     }
@@ -118,17 +118,17 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
     fun onPacket(event: PacketEvent){
         val room = DungeonUtils.currentRoom
         if (event.packet is S23PacketBlockChange) {
-            val position = room?.getRelativeCoordsOdin(event.packet.blockPosition) ?: event.packet.blockPosition
-            val block = blocks[room?.data?.name ?: getLocation()]?.firstOrNull {
+            val position = room?.getRelativeCoords(event.packet.blockPosition) ?: event.packet.blockPosition
+            val block = blocks[room?.name ?: getLocation()]?.firstOrNull {
                 it.pos == position
             } ?: return
             setBlock(event.packet.blockPosition, block.state)
             event.isCanceled = true
         }
         if (event.packet is S22PacketMultiBlockChange) {
-            val blockList = blocks[room?.data?.name ?: getLocation()] ?: return
+            val blockList = blocks[room?.name ?: getLocation()] ?: return
             event.packet.changedBlocks.forEach { changedBlock ->
-                val block = blockList.firstOrNull{ it.pos == (room?.getRealCoordsOdin(changedBlock.pos) ?: changedBlock.pos) }
+                val block = blockList.firstOrNull{ it.pos == (room?.getRealCoords(changedBlock.pos) ?: changedBlock.pos) }
                 if (block == null) {
                     setBlock(changedBlock.pos, changedBlock.blockState)
                     return@forEach

@@ -13,8 +13,9 @@ import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 
 abstract class BloodRushRoute(val name: String, var pos: Vec3) {
     var triggered = false
@@ -27,15 +28,15 @@ abstract class BloodRushRoute(val name: String, var pos: Vec3) {
         PlayerUtils.unPressKeys()
     }
 
-    fun renderIndex(room: Room, index: Int) {
+    fun renderIndex(room: UniqueRoom, index: Int) {
         Renderer.drawStringInWorld(index.toString(), room.getRealCoords(pos).add(0.0, 0.6, 0.0), nodeColor)
     }
 
-    fun render(room: Room) {
+    fun render(room: UniqueRoom) {
         RenderUtils.drawOutlinedAABB(AxisAlignedBB.fromBounds(-0.5, 0.0, -0.5, 0.5, 0.4, 0.5).offset(room.getRealCoords(pos)), color = nodeColor)
     }
 
-    fun inNode(room: Room): Boolean{
+    fun inNode(room: UniqueRoom): Boolean{
         val realCoords = room.getRealCoords(pos)
         val inNode = realCoords.distanceToPlayer <= 0.5
         if (inNode && !triggered) {
@@ -48,8 +49,8 @@ abstract class BloodRushRoute(val name: String, var pos: Vec3) {
         return false
     }
 
-    abstract fun runTick(room: Room)
-    abstract fun runMotion(room: Room, event: MotionUpdateEvent.Pre)
+    abstract fun runTick(room: UniqueRoom)
+    abstract fun runMotion(room: UniqueRoom, event: MotionUpdateEvent.Pre)
     abstract fun getAsJsonObject(): JsonObject
 
 

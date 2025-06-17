@@ -9,8 +9,8 @@ import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 
 abstract class Node(
     val name: String,
@@ -41,22 +41,22 @@ abstract class Node(
         delete = true
     }
 
-    open fun meowConvert(room: Room) {
+    open fun meowConvert(room: UniqueRoom) {
 
     }
 
-    open fun awaitMotion(event: MotionUpdateEvent.Pre, room: Room) {}
-    open fun motion(event: MotionUpdateEvent.Pre, room: Room) {}
-    open fun awaitTick(room: Room) {}
-    open fun tick(room: Room) {
+    open fun awaitMotion(event: MotionUpdateEvent.Pre, room: UniqueRoom) {}
+    open fun motion(event: MotionUpdateEvent.Pre, room: UniqueRoom) {}
+    open fun awaitTick(room: UniqueRoom) {}
+    open fun tick(room: UniqueRoom) {
     }
-    abstract fun render(room: Room)
+    abstract fun render(room: UniqueRoom)
     abstract fun nodeAddInfo(obj: JsonObject)
     abstract fun loadNodeInfo(obj: JsonObject)
     abstract fun renderIndexColor(): Color
 
 
-    open fun drawIndex(index: Int, room: Room) {
+    open fun drawIndex(index: Int, room: UniqueRoom) {
         Renderer.drawStringInWorld(index.toString(), room.getRealCoords(pos).add(Vec3(0.0, 0.3, 0.0)), renderIndexColor(), depth = depth)
     }
 
@@ -87,7 +87,7 @@ abstract class Node(
 
 
 
-    internal fun drawNode(room: Room, color: Color) {
+    internal fun drawNode(room: UniqueRoom, color: Color) {
         Renderer.drawCylinder(room.getRealCoords(pos.add(Vec3(0.0, 0.03, 0.0))), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, color, depth = depth)
     }
 

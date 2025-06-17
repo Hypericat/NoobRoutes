@@ -10,8 +10,8 @@ import noobroutes.events.impl.*
 import noobroutes.utils.postAndCatch
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.Floor
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils
+import noobroutes.utils.skyblock.dungeonScanning.Floor
 
 object BossEventDispatcher {
 

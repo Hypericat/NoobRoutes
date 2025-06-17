@@ -16,8 +16,7 @@ import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.SecretUtils
 import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.move.AutoPath
-import noobroutes.features.move.DynamicRoute
-import noobroutes.font.OdinFont
+import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.*
 import noobroutes.utils.clock.Executor
@@ -25,8 +24,7 @@ import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.RenderUtils2D
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.LocationUtils
-import noobroutes.utils.skyblock.dungeon.ScanUtils
-import noobroutes.utils.skyblock.dungeonscanning.Dungeon
+import noobroutes.utils.skyblock.dungeonScanning.Dungeon
 import java.io.File
 
 
@@ -88,7 +86,7 @@ class NoobRoutes {
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }
-        OdinFont.init()
+        MinecraftFont.init()
     }
     @Mod.EventHandler
     fun postInit(event: FMLPostInitializationEvent) {

@@ -2,7 +2,7 @@ package noobroutes.ui.clickgui.elements.menu
 
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.settings.impl.ColorSetting
-import noobroutes.font.OdinFont
+import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.animations.impl.ColorAnimation
 import noobroutes.ui.clickgui.animations.impl.EaseInOut
@@ -61,7 +61,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         hover.handle(x + w - 41, y, 31.5f, 19f)
 
         roundedRectangle(x, y, w, h, elementBackground)
-        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, OdinFont.REGULAR)
+        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, MinecraftFont.REGULAR)
         roundedRectangle(x + w - 40f, y + 9, 31f, 19f, color.brighter(1 + hover.percent() / 500f), 5f)
         rectangleOutline(x + w - 40f, y + 9, 31f, 19f, color.darker().withAlpha(1f), 5f, 1.5f)
 
@@ -107,7 +107,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
 
         val stringWidth = getTextWidth(hexString, 12f)
         roundedRectangle(x + w / 2 - stringWidth / 2 - 12, y + 260, stringWidth + 24, 22f, buttonColor, 5f)
-        text(hexString, x + w / 2, y + 271, Color.WHITE, 12f, OdinFont.REGULAR, TextAlign.Middle, TextPos.Middle)
+        text(hexString, x + w / 2, y + 271, Color.WHITE, 12f, MinecraftFont.REGULAR, TextAlign.Middle, TextPos.Middle)
 
         if (listeningForString || colorAnim.isAnimating()) {
             val color = colorAnim.get(ColorUtil.clickGUIColor, buttonColor, listeningForString)

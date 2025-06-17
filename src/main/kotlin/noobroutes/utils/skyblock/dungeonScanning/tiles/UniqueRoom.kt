@@ -1,4 +1,4 @@
-package noobroutes.utils.skyblock.dungeonscanning.tiles
+package noobroutes.utils.skyblock.dungeonScanning.tiles
 
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
@@ -7,8 +7,7 @@ import noobroutes.Core.mc
 import noobroutes.utils.Vec2i
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.getBlockIdAt
-import noobroutes.utils.skyblock.dungeon.tiles.Rotations
-import noobroutes.utils.skyblock.dungeonscanning.Dungeon
+import noobroutes.utils.skyblock.dungeonScanning.Dungeon
 
 
 class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
@@ -18,6 +17,11 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
         private set
     var mainRoom = room
     val tiles = mutableListOf(room to Vec2i(arrX, arrY))
+    var rotation: Rotations = Rotations.NONE
+    var clayPos: BlockPos = BlockPos(0, 0, 0)
+
+    val roomComponents get() = tiles.filter { !it.first.isSeparator }
+
 
     init {
         if (room.data.name == "Unknown") {
@@ -115,18 +119,19 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
         val height = chunk.getHeightValue(vec2i.x and 15, vec2i.z and 15) - 1
         return if (chunk.getBlock(vec2i.x, height, vec2i.z) == Blocks.gold_block) height - 1 else height
     }
-    /*
+
     fun updateRotation() {
-        val roomHeight = getTopLayerOfRoom(this.tiles.first().vec2i)
-        if (room.data.name == "Fairy") { // Fairy room doesn't have a clay block so we need to set it manually
-            room.clayPos = room.roomComponents.firstOrNull()?.let { BlockPos(it.x - 15, roomHeight, it.z - 15) } ?: return
-            room.rotation = Rotations.SOUTH
+        if (rotation != Rotations.NONE) return
+        val roomHeight = getTopLayerOfRoom(roomComponents.first().first.vec2i)
+        if (name == "Fairy") { // Fairy room doesn't have a clay block so we need to set it manually
+            clayPos = roomComponents.firstOrNull()?.let { BlockPos(it.first.x - 15, roomHeight, it.first.z - 15) } ?: return
+            rotation = Rotations.SOUTH
             return
         }
-        room.rotation = Rotations.entries.dropLast(1).find { rotation ->
-            room.roomComponents.any { component ->
-                BlockPos(component.x + rotation.x, roomHeight, component.z + rotation.z).let { blockPos ->
-                    getBlockIdAt(blockPos) == 159 && (room.roomComponents.size == 1 || EnumFacing.HORIZONTALS.all { facing ->
+        rotation = Rotations.entries.dropLast(1).find { rotation ->
+            roomComponents.any { component ->
+                BlockPos(component.first.x + rotation.x, roomHeight, component.first.z + rotation.z).let { blockPos ->
+                    getBlockIdAt(blockPos) == 159 && (roomComponents.size == 1 || EnumFacing.HORIZONTALS.all { facing ->
                         getBlockIdAt(
                             blockPos.add(
                                 facing.frontOffsetX,
@@ -134,13 +139,14 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
                                 facing.frontOffsetZ
                             )
                         ).equalsOneOf(159, 0)
-                    }).also { isCorrectClay -> if (isCorrectClay) room.clayPos = blockPos }
+                    }).also { isCorrectClay -> if (isCorrectClay) clayPos = blockPos }
                 }
             }
         } ?: Rotations.NONE // Rotation isn't found if we can't find the clay block
+        //devMessage(rotation)
     }
 
-     */
+
 
 
 

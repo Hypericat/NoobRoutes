@@ -5,7 +5,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.Core.mc
-import noobroutes.font.OdinFont
+import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.shader.RoundedRect
 import noobroutes.utils.*
@@ -110,15 +110,15 @@ fun circle(x: Number, y: Number, radius: Number, color: Color, borderColor: Colo
     }
 }
 
-fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = OdinFont.REGULAR, align: TextAlign = _root_ide_package_.noobroutes.utils.render.TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false) {
-    OdinFont.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
+fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = MinecraftFont.REGULAR, align: TextAlign = _root_ide_package_.noobroutes.utils.render.TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false) {
+    MinecraftFont.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
 }
 
 fun mcText(text: String, x: Number, y: Number, scale: Number, color: Color, shadow: Boolean = true, center: Boolean = true) {
     RenderUtils.drawText("$text§r", x.toFloat(), y.toFloat(), scale.toDouble(), color, shadow, center)
 }
 
-fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = OdinFont.REGULAR, align: TextAlign = _root_ide_package_.noobroutes.utils.render.TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false): Float {
+fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = MinecraftFont.REGULAR, align: TextAlign = _root_ide_package_.noobroutes.utils.render.TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false): Float {
     text(text, x, y, color, size, type, align, verticalAlign, shadow)
     return getTextWidth(text, size).toFloat()
 }
@@ -130,11 +130,11 @@ fun mcTextAndWidth(text: String, x: Number, y: Number, scale: Number, color: Col
 
 fun getMCTextWidth(text: String) = mc.fontRendererObj.getStringWidth(text)
 
-fun getTextWidth(text: String, size: Float) = OdinFont.getTextWidth(text, size) / 8
+fun getTextWidth(text: String, size: Float) = MinecraftFont.getTextWidth(text, size) / 8
 
 fun getMCTextHeight() = mc.fontRendererObj.FONT_HEIGHT
 
-fun getTextHeight(size: Float) = OdinFont.getTextHeight(size) / 8
+fun getTextHeight(size: Float) = MinecraftFont.getTextHeight(size) / 8
 
 fun translate(x: Number, y: Number, z: Number = 1f) = GlStateManager.translate(x.toDouble(), y.toDouble(), z.toDouble())
 
@@ -228,12 +228,12 @@ fun drawDynamicTexture(dynamicTexture: DynamicTexture, x: Number, y: Number, w: 
     GlStateManager.popMatrix()
 }
 
-fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = OdinFont.REGULAR, shadow: Boolean = false) {
-    OdinFont.wrappedText(text, x, y, w, color, size, type, shadow = shadow)
+fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = MinecraftFont.REGULAR, shadow: Boolean = false) {
+    MinecraftFont.wrappedText(text, x, y, w, color, size, type, shadow = shadow)
 }
 
 fun wrappedTextBounds(text: String, width: Float, size: Float): Pair<Float, Float> {
-    return OdinFont.wrappedTextBounds(text, width, size)
+    return MinecraftFont.wrappedTextBounds(text, width, size)
 }
 
 enum class TextAlign {

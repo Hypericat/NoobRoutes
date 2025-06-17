@@ -17,7 +17,8 @@ import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.sendChatMessage
 
@@ -30,7 +31,7 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
 
 
     var cancelMotion = false
-    override fun runTick(room: Room) {
+    override fun runTick(room: UniqueRoom) {
         if (System.currentTimeMillis() - thrown < 10000)  {
             cancelMotion = true
             return modMessage("doing shit")
@@ -119,7 +120,7 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
     }
 
     override fun runMotion(
-        room: Room,
+        room: UniqueRoom,
         event: MotionUpdateEvent.Pre
     ) {
         if (cancelMotion) {

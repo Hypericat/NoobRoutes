@@ -18,8 +18,8 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeonScanning.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeonScanning.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.sendChatMessage
 
@@ -45,19 +45,19 @@ class PearlClip(
     chain,
     reset
 ) {
-    override fun awaitTick(room: Room) {
+    override fun awaitTick(room: UniqueRoom) {
         if (!silent) mc.thePlayer.rotationPitch = 90f
     }
 
     override fun awaitMotion(
         event: MotionUpdateEvent.Pre,
-        room: Room
+        room: UniqueRoom
     ) {
         AutoRouteUtils.setRotation(null, 90f)
     }
 
 
-    override fun tick(room: Room) {
+    override fun tick(room: UniqueRoom) {
         if (distance > 70) return modMessage("Invalid Clip Distance")
         stopWalk()
         val state = SwapManager.swapFromName("ender pearl")
@@ -81,12 +81,12 @@ class PearlClip(
 
     override fun motion(
         event: MotionUpdateEvent.Pre,
-        room: Room
+        room: UniqueRoom
     ) {
         AutoRouteUtils.setRotation(null, 90f)
     }
 
-    override fun render(room: Room) {
+    override fun render(room: UniqueRoom) {
         drawNode(room, pearlClipColor)
         if (AutoRoute.drawPearlClipText) Renderer.drawStringInWorld("PearlClip: $distance", room.getRealCoords(pos).add(Vec3(0.0, 0.9, 0.0)), pearlClipColor, depth = depth)
     }

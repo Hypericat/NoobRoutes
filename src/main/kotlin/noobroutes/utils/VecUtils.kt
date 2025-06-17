@@ -9,7 +9,7 @@ import net.minecraft.util.Vec3
 import net.minecraft.util.Vec3i
 import noobroutes.Core.mc
 import noobroutes.utils.render.RenderUtils.outlineBounds
-import noobroutes.utils.skyblock.dungeon.tiles.Rotations
+import noobroutes.utils.skyblock.dungeonScanning.tiles.Rotations
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
