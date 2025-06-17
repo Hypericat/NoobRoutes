@@ -121,13 +121,13 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
     }
 
     fun updateRotation() {
-        if (rotation != Rotations.NONE) return
         val roomHeight = getTopLayerOfRoom(roomComponents.first().first.vec2i)
         if (name == "Fairy") { // Fairy room doesn't have a clay block so we need to set it manually
             clayPos = roomComponents.firstOrNull()?.let { BlockPos(it.first.x - 15, roomHeight, it.first.z - 15) } ?: return
             rotation = Rotations.SOUTH
             return
         }
+
         rotation = Rotations.entries.dropLast(1).find { rotation ->
             roomComponents.any { component ->
                 BlockPos(component.first.x + rotation.x, roomHeight, component.first.z + rotation.z).let { blockPos ->
@@ -142,7 +142,7 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
                     }).also { isCorrectClay -> if (isCorrectClay) clayPos = blockPos }
                 }
             }
-        } ?: Rotations.NONE // Rotation isn't found if we can't find the clay block
+        } ?: return // Rotation isn't found if we can't find the clay block
         //devMessage(rotation)
     }
 

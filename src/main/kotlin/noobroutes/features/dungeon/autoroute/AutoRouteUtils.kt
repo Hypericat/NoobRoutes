@@ -7,6 +7,7 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -177,6 +178,13 @@ object AutoRouteUtils {
                 event.pitch = it + offset
             }
         }
+    }
+
+    inline val canResetRotation get() = false
+
+    @SubscribeEvent
+    fun onMouse(event: MouseEvent){
+        if ((event.dx != 0 || event.dy != 0) && canResetRotation) resetRotation()
     }
 
     fun meowConverter(file: Map<String, JsonArray>): MutableMap<String, MutableList<Node>> {
