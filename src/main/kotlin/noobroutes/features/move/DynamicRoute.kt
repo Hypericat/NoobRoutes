@@ -78,13 +78,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     private fun inNodes(): MutableList<DynNode> {
         val inNodes = mutableListOf<DynNode>()
         nodes.forEach { node ->
-            val inNode =
-                if (node.chain) (
-                        abs(PlayerUtils.posX - node.pos.xCoord) < 0.001 &&
-                                abs(PlayerUtils.posZ - node.pos.zCoord) < 0.001 &&
-                                PlayerUtils.posY >= node.pos.yCoord - 0.01 && PlayerUtils.posY <= node.pos.yCoord + 0.5
-                        )
-                else node.pos.distanceToPlayerSq <= 0.25
+            val inNode = node.pos.distanceToPlayerSq <= 0.25
             if (inNode && !node.triggered) {
                 node.triggered = true
                 inNodes.add(node)

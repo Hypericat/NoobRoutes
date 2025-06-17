@@ -20,6 +20,7 @@ import noobroutes.pathfinding.PathfinderExecutor
 import noobroutes.utils.*
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer.drawBox
+import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.EtherWarpHelper.EYE_HEIGHT
 import noobroutes.utils.skyblock.EtherWarpHelper.centerCoords
 import noobroutes.utils.skyblock.devMessage
@@ -58,16 +59,7 @@ object EWPathfinderModule : Module(
 
     fun findCenteredVector(targetBlockPos: BlockPos, nodePos: Vec3) : Vec3? {
         val centeredTarget = centerCoords(targetBlockPos).add(0.0, 0.5, 0.0)
-
-        var vec : Vec3? = traverseVoxels(nodePos.add(0.0, EYE_HEIGHT, 0.0), centeredTarget);
-        if (vec != null && vec.toBlockPos() != targetBlockPos) {
-            System.out.println("Mismatch 1 : " + vec.toBlockPos())
-            System.out.println("Mismatch 1.5 : " + vec)
-            System.out.println("Mismatch 2 : " + targetBlockPos)
-            vec = null
-        }
-
-        return vec
+        return traverseVoxels(nodePos.add(0.0, EYE_HEIGHT + 1, 0.0), centeredTarget, targetBlockPos)
     }
 
     @Synchronized
@@ -87,12 +79,8 @@ object EWPathfinderModule : Module(
                 val nodeVec3 = Vec3(node.pos.x.toDouble() + 0.5, node.pos.y.toDouble() + 1, node.pos.z + 0.5)
 
                 var targetVec3 : Vec3? = null
-                if (centerAngle) {
+                if (centerAngle)
                     targetVec3 = findCenteredVector(lastNode.pos, nodeVec3)
-                    if (targetVec3 == null) {
-                        devMessage("Could not find yaw/pitch")
-                    }
-                }
 
                 if (targetVec3 == null) targetVec3 = getEtherPosFromOrigin(nodeVec3.add(0.0, EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch);
 
@@ -136,7 +124,7 @@ object EWPathfinderModule : Module(
      * Traverses voxels from start to end and returns the first non-air block it hits.
      * @author Bloom
      */
-    fun traverseVoxels(start: Vec3, end: Vec3): Vec3? {
+    fun traverseVoxels(start: Vec3, end: Vec3, target: BlockPos?): Vec3? {
         val direction = end.subtract(start)
         val step = IntArray(3) { sign(direction[it]).toInt() }
         val invDirection = DoubleArray(3) { if (direction[it] != 0.0) 1.0 / direction[it] else Double.MAX_VALUE }
@@ -155,6 +143,13 @@ object EWPathfinderModule : Module(
         repeat(1000) {
             val blockPos = BlockPos(currentPos[0], currentPos[1], currentPos[2])
             if (getBlockIdAt(blockPos) != 0) {
+                if (target != null && blockPos != target) {
+                    System.out.println("Target mismatch!")
+                    System.out.println(blockPos)
+                    System.out.println(target)
+                    return null;
+                }
+
                 // Calculate hit point
                 val hitX = start.xCoord + direction.xCoord * t
                 val hitY = start.yCoord + direction.yCoord * t
@@ -188,7 +183,7 @@ object EWPathfinderModule : Module(
     fun getEtherPosFromOrigin(origin: Vec3, yaw: Float, pitch: Float, distance: Double = 61.0, returnEnd: Boolean = false): Vec3? {
         Core.mc.thePlayer ?: return null;
         val endPos = getLook(yaw = yaw, pitch = pitch).normalize().multiply(factor = distance).add(origin)
-        return traverseVoxels(origin, endPos);
+        return traverseVoxels(origin, endPos, null);
     }
 
 
