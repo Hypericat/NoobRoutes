@@ -94,7 +94,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         BlockPos(47, 69, -1),
         BlockPos(63, 69, 15),
         BlockPos(47, 69, 31),
-        BlockPos(15, 69, 31),
+        BlockPos(15, 69, 31)
     )
 
     val threeByOneDoors = listOf(

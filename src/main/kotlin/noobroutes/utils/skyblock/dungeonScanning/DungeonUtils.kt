@@ -179,7 +179,7 @@ object DungeonUtils {
     }
 
     fun UniqueRoom.getRelativeCoords(pos: Vec3): Vec3 {
-        val center = this.getCenter()
+        val center = this.center
         val x = pos.xCoord - center.x
         val z = pos.zCoord - center.z
         return when (this.rotation) {

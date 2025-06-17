@@ -51,13 +51,15 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
         }
         val dir = getDir()
 
-        val isOpen = when (dir) {
+        val isOpen = isAir(AutoBloodRush.getClosestDoorToPlayer(room)?.pos ?: return)
+
+        /*val isOpen = when (dir) {
             0 -> isAir(mc.thePlayer.positionVector.toBlockPos().add(1, 0, 0))
             1 -> isAir(mc.thePlayer.positionVector.toBlockPos().add(-1, 0, 0))
             2 -> isAir(mc.thePlayer.positionVector.toBlockPos().add(0, 0, 1))
             3 -> isAir(mc.thePlayer.positionVector.toBlockPos().add(0, 0, -1))
             else -> false
-        }
+        }*/
         if (isOpen) {
             devMessage("4")
             val dx = if (dir == 0) 1 else if (dir == 1) -1 else 0
