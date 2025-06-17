@@ -1,9 +1,11 @@
 package noobroutes.features.move
 
+import net.minecraft.client.Minecraft
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
@@ -17,12 +19,14 @@ import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.features.settings.impl.KeybindSetting
+import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.add
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoordsOdin
+import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 
@@ -34,12 +38,15 @@ object AutoPath: Module(
     description = "Automatically PathFinds to doors"
 ) {
 
+    private val resetPos by BooleanSetting("Align to node", true, false, "Moves the player to the center of the node after pathing.")
     private val useAltKeys by BooleanSetting("Use Alt Key", true, false, "Use Alt Key to select door")
     private val altKey by KeybindSetting("Alt Key", Keyboard.KEY_PERIOD, "Alt Key keybind", false).withDependency { this.useAltKeys }
     private val doorNumberColor by ColorSetting("Door Number Color", description = "I wonder what this could possibly mean", default = Color.GREEN)
 
 
+
     private var validKeys: HashSet<Int>? = null;
+    private var resetBlockPos: BlockPos? = null
 
     fun onInitKeys() {
         validKeys = HashSet()
@@ -49,6 +56,19 @@ object AutoPath: Module(
             validKeys!!.add(i)
         }
         validKeys!!.add(0x0B)
+    }
+
+    @SubscribeEvent
+    fun onTick(event: ClientTickEvent) {
+        if (event.isEnd || resetBlockPos == null) return
+        if (!resetPos) {
+            resetBlockPos = null
+            return
+        }
+        if (!DynamicRoute.isInNode()) {
+            Minecraft.getMinecraft().thePlayer.setPosition(resetBlockPos!!.x.toDouble() + 0.5, Minecraft.getMinecraft().thePlayer.posY, resetBlockPos!!.z.toDouble() + 0.5)
+            resetBlockPos = null
+        }
     }
 
     private fun getColor(pos: BlockPos) : Color {
@@ -104,6 +124,7 @@ object AutoPath: Module(
         }
 
         EWPathfinderModule.execute(doorSpots[key].second.second, true)
+        if (resetPos) resetBlockPos = BlockPos(Minecraft.getMinecraft().thePlayer.positionVector);
     }
 
     fun shouldCancelKey(keyCode: Int) : Boolean {
