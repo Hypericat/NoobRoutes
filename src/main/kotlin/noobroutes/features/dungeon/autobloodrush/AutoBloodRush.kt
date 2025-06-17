@@ -82,63 +82,63 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     data class Door(val pos: BlockPos, val rotation: Rotations)
 
     val oneByOneDoors = listOf(
-        BlockPos(-1, 69, 15),
-        BlockPos(15, 69, -1),
-        BlockPos(31, 69, 15), // added this for testing(its a real coord)
-        BlockPos(15, 69, 31)
+        BlockPos(0, 69, 16),
+        BlockPos(-16, 69, 0),
+        BlockPos(0, 69, -16), // added this for testing(its a real coord)
+        BlockPos(16, 69, 0)
     )
     val twoByOneDoors = listOf(
-        BlockPos(-1, 69, 15),
-        BlockPos(15, 69, -1),
-        BlockPos(47, 69, -1),
-        BlockPos(63, 69, 15),
-        BlockPos(47, 69, 31),
-        BlockPos(15, 69, 31)
+        BlockPos(-32, 69, 0),
+        BlockPos(-16, 69, -16),
+        BlockPos(16, 69, -16),
+        BlockPos(32, 69, 0),
+        BlockPos(16, 69, 16),
+        BlockPos(-16, 69, 16)
     )
 
     val threeByOneDoors = listOf(
-        BlockPos(95, 69, 15),
-        BlockPos(79, 69, 31),
-        BlockPos(47, 69, 31),
-        BlockPos(15, 69, 31),
-        BlockPos(-1, 69, 15),
-        BlockPos(15, 69, -1),
-        BlockPos(47, 69, -1),
-        BlockPos(79, 69, -1)
+        BlockPos(48, 69, 0),
+        BlockPos(32, 69, 16),
+        BlockPos(0, 69, 16),
+        BlockPos(-32, 69, 16),
+        BlockPos(-48, 69, 0),
+        BlockPos(-32, 69, -16),
+        BlockPos(0, 69, -16),
+        BlockPos(32, 69, -16)
     )
 
     val fourByOneDoors = listOf(
-        BlockPos(-1, 69, 15),
-        BlockPos(15, 69, -1),
-        BlockPos(47, 69, -1),
-        BlockPos(79, 69, -1),
-        BlockPos(111, 69, -1),
-        BlockPos(127, 69, 15),
-        BlockPos(111, 69, 31),
-        BlockPos(79, 69, 31),
-        BlockPos(47, 69, 31),
-        BlockPos(15, 69, 31),
+        BlockPos(-64, 69, 0),
+        BlockPos(-48, 69, -16),
+        BlockPos(-16, 69, -16),
+        BlockPos(16, 69, -16),
+        BlockPos(48, 69, -16),
+        BlockPos(64, 69, 0),
+        BlockPos(48, 69, 16),
+        BlockPos(16, 69, 16),
+        BlockPos(-16, 69, 16),
+        BlockPos(-48, 69, 16),
     )
     val lShapedDoors = listOf(
-        BlockPos(15, 69, -1),
-        BlockPos(31, 69, 15),
-        BlockPos(47, 69, 31),
-        BlockPos(63, 69, 47),
-        BlockPos(47, 69, 63),
-        BlockPos(15, 69, 63),
-        BlockPos(-1, 69, 47),
-        BlockPos(-1, 69, 15)
+        BlockPos(32, 69, -16),
+        BlockPos(32, 69, 16),
+        BlockPos(16, 69, 32),
+        BlockPos(0, 69, 16),
+        BlockPos(-16, 69, 0),
+        BlockPos(-32, 69, -16),
+        BlockPos(-16, 69, -32),
+        BlockPos(16, 69, -32)
     )
 
     val twoByTwoDoors = listOf(
-        BlockPos(15, 69, -1),
-        BlockPos(47, 69, -1),
-        BlockPos(63, 69, 15),
-        BlockPos(63, 69, 47),
-        BlockPos(47, 69, 63),
-        BlockPos(15, 69, 63),
-        BlockPos(-1, 69, 47),
-        BlockPos(-1, 69, 15),
+        BlockPos(32, 69, -16),
+        BlockPos(32, 69, 16),
+        BlockPos(16, 69, 32),
+        BlockPos(-16, 69, 32),
+        BlockPos(-32, 69, 16),
+        BlockPos(-32, 69, -16),
+        BlockPos(-16, 69, -32),
+        BlockPos(16, 69, -32),
     )
 
     val threeByOneSpots = mapOf(
@@ -464,7 +464,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     @SubscribeEvent
     fun setRoom(event: RoomEnterEvent) {
         customRoom = event.room
-        devMessage(customRoom!!.name)
+        devMessage(customRoom?.name)
     }
 
     @SubscribeEvent

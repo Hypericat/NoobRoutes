@@ -28,7 +28,7 @@ object Dungeon {
         event.room?.roomComponents?.forEach {
             devMessage("${it.first.x}, 70, ${it.first.z}")
         }
-        devMessage("${event.room?.mainRoom?.x}, ${event.room?.mainRoom?.z}")
+        //devMessage("${event.room?.mainRoom?.x}, ${event.room?.mainRoom?.z}")
     }
 
     @SubscribeEvent
