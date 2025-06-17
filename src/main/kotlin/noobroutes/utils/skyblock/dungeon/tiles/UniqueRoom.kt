@@ -121,7 +121,7 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
     }
 
     fun updateRotation() {
-        val roomHeight = getTopLayerOfRoom(roomComponents.first().first.vec2i)
+        val roomHeight = getTopLayerOfRoom(roomComponents.firstOrNull()?.first?.vec2i ?: return)
         if (name == "Fairy") { // Fairy room doesn't have a clay block so we need to set it manually
             clayPos = roomComponents.firstOrNull()?.let { BlockPos(it.first.x - 15, roomHeight, it.first.z - 15) } ?: return
             rotation = Rotations.SOUTH

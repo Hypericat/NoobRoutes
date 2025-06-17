@@ -84,7 +84,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     val oneByOneDoors = listOf(
         BlockPos(0, 69, 16),
         BlockPos(-16, 69, 0),
-        BlockPos(0, 69, -16), // added this for testing(its a real coord)
+        BlockPos(0, 69, -16),
         BlockPos(16, 69, 0)
     )
     val twoByOneDoors = listOf(
@@ -142,65 +142,65 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     )
 
     val threeByOneSpots = mapOf(
-        0 to Pair(BlockPos(93, 68, 14), BlockPos(93, 68, 16)),
-        1 to Pair(BlockPos(80, 68, 29), BlockPos(78, 68, 29)),
-        2 to Pair(BlockPos(48, 68, 29), BlockPos(46, 68, 29)),
-        3 to Pair(BlockPos(16, 68, 29), BlockPos(14, 68, 29)),
-        4 to Pair(BlockPos(1, 68, 16), BlockPos(1, 68, 14)),
-        5 to Pair(BlockPos(14, 68, 1), BlockPos(16, 68, 1)),
-        6 to Pair(BlockPos(46, 68, 1), BlockPos(48, 68, 1)),
-        7 to Pair(BlockPos(78, 68, 1), BlockPos(80, 68, 1)),
+        0 to Pair(BlockPos(46, 68, -1), BlockPos(46, 68, 1)),
+        1 to Pair(BlockPos(33, 68, 14), BlockPos(31, 68, 14)),
+        2 to Pair(BlockPos(1, 68, 14), BlockPos(-1, 68, 14)),
+        3 to Pair(BlockPos(-31, 68, 14), BlockPos(-33, 68, 14)),
+        4 to Pair(BlockPos(-46, 68, 1), BlockPos(-46, 68, -1)),
+        5 to Pair(BlockPos(-33, 68, -14), BlockPos(-31, 68, -14)),
+        6 to Pair(BlockPos(-1, 68, -14), BlockPos(1, 68, -14)),
+        7 to Pair(BlockPos(31, 68, -14), BlockPos(33, 68, -14)),
     )
 
     val lShapedSpots = mapOf(
-        0 to Pair(BlockPos(14, 68, 1), BlockPos(16, 68, 1)),
-        1 to Pair(BlockPos(29, 68, 14), BlockPos(29, 68, 16)),
-        2 to Pair(BlockPos(46, 68, 33), BlockPos(48, 68, 33)),
-        3 to Pair(BlockPos(61, 68, 46), BlockPos(61, 68, 48)),
-        4 to Pair(BlockPos(48, 68, 61), BlockPos(46, 68, 61)),
-        5 to Pair(BlockPos(16, 68, 61), BlockPos(14, 68, 61)),
-        6 to Pair(BlockPos(1, 68, 48), BlockPos(1, 68, 46)),
-        7 to Pair(BlockPos(1, 68, 16), BlockPos(1, 68, 14))
+        0 to Pair(BlockPos(30, 68, -17), BlockPos(30, 68, -15)),
+        1 to Pair(BlockPos(30, 68, 15), BlockPos(30, 68, 17)),
+        2 to Pair(BlockPos(17, 68, 30), BlockPos(15, 68, 30)),
+        3 to Pair(BlockPos(2, 68, 17), BlockPos(2, 68, 15)),
+        4 to Pair(BlockPos(-15, 68, -2), BlockPos(-17, 68, -2)),
+        5 to Pair(BlockPos(-30, 68, -15), BlockPos(-30, 68, -17)),
+        6 to Pair(BlockPos(-17, 68, -30), BlockPos(-15, 68, -30)),
+        7 to Pair(BlockPos(15, 68, -30), BlockPos(17, 68, -30))
     )
 
     val fourByOneSpots = mapOf(
-        0 to Pair(BlockPos(1, 68, 16), BlockPos(1, 68, 14)),
-        1 to Pair(BlockPos(14, 68, 1), BlockPos(16, 68, 1)),
-        2 to Pair(BlockPos(46, 68, 1), BlockPos(48, 68, 1)),
-        3 to Pair(BlockPos(78, 68, 1), BlockPos(80, 68, 1)),
-        4 to Pair(BlockPos(110, 68, 1), BlockPos(112, 68, 1)),
-        5 to Pair(BlockPos(125, 68, 14), BlockPos(125, 68, 16)),
-        6 to Pair(BlockPos(112, 68, 29), BlockPos(110, 68, 29)),
-        7 to Pair(BlockPos(80, 68, 29), BlockPos(78, 68, 29)),
-        8 to Pair(BlockPos(48, 68, 29), BlockPos(46, 68, 29)),
-        9 to Pair(BlockPos(16, 68, 29), BlockPos(14, 68, 29))
+        0 to Pair(BlockPos(-62, 68, 1), BlockPos(-62, 68, -1)),
+        1 to Pair(BlockPos(-49, 68, -14), BlockPos(-47, 68, -14)),
+        2 to Pair(BlockPos(-17, 68, -14), BlockPos(-15, 68, -14)),
+        3 to Pair(BlockPos(15, 68, -14), BlockPos(17, 68, -14)),
+        4 to Pair(BlockPos(47, 68, -14), BlockPos(49, 68, -14)),
+        5 to Pair(BlockPos(62, 68, -1), BlockPos(62, 68, 1)),
+        6 to Pair(BlockPos(49, 68, 14), BlockPos(47, 68, 14)),
+        7 to Pair(BlockPos(17, 68, 14), BlockPos(15, 68, 14)),
+        8 to Pair(BlockPos(-15, 68, 14), BlockPos(-17, 68, 14)),
+        9 to Pair(BlockPos(-47, 68, 14), BlockPos(-49, 68, 14))
     )
 
     val oneByOneSpots = mapOf(
-        0 to Pair(BlockPos(1, 68, 16), BlockPos(1, 68, 14)),
-        1 to Pair(BlockPos(14, 68, 1), BlockPos(16, 68, 1)),
-        2 to Pair(BlockPos(29, 68, 14), BlockPos(29, 68, 16)),
-        3 to Pair(BlockPos(16, 68, 29), BlockPos(14, 68, 29))
+        0 to Pair(BlockPos(1, 68, 14), BlockPos(-1, 68, 14)),
+        1 to Pair(BlockPos(-14, 68, 1), BlockPos(-14, 68, -1)),
+        2 to Pair(BlockPos(-1, 68, -14), BlockPos(1, 68, -14)),
+        3 to Pair(BlockPos(14, 68, -1), BlockPos(14, 68, 1))
     )
 
     val twoByOneSpots = mapOf(
-        0 to Pair(BlockPos(1, 68, 16), BlockPos(1, 68, 14)),
-        1 to Pair(BlockPos(14, 68, 1), BlockPos(16, 68, 1)),
-        2 to Pair(BlockPos(46, 68, 1), BlockPos(48, 68, 1)),
-        3 to Pair(BlockPos(61, 68, 14), BlockPos(61, 68, 16)),
-        4 to Pair(BlockPos(48, 68, 29), BlockPos(46, 68, 29)),
-        5 to Pair(BlockPos(16, 68, 29), BlockPos(14, 68, 29))
+        0 to Pair(BlockPos(-30, 68, 1), BlockPos(-30, 68, -1)),
+        1 to Pair(BlockPos(-17, 68, -14), BlockPos(-15, 68, -14)),
+        2 to Pair(BlockPos(15, 68, -14), BlockPos(17, 68, -14)),
+        3 to Pair(BlockPos(30, 68, -1), BlockPos(30, 68, 1)),
+        4 to Pair(BlockPos(17, 68, 14), BlockPos(15, 68, 14)),
+        5 to Pair(BlockPos(-15, 68, 14), BlockPos(-17, 68, 14))
     )
 
     val twoByTwoSpots = mapOf(
-        0 to Pair(BlockPos(14, 68, 1), BlockPos(16, 68, 1)),
-        1 to Pair(BlockPos(46, 68, 1), BlockPos(48, 68, 1)),
-        2 to Pair(BlockPos(61, 68, 14), BlockPos(61, 68, 16)),
-        3 to Pair(BlockPos(61, 68, 46), BlockPos(61, 68, 48)),
-        4 to Pair(BlockPos(48, 68, 61), BlockPos(46, 68, 61)),
-        5 to Pair(BlockPos(16, 68, 61), BlockPos(14, 68, 61)),
-        6 to Pair(BlockPos(1, 68, 48), BlockPos(1, 68, 46)),
-        7 to Pair(BlockPos(1, 68, 16), BlockPos(1, 68, 14))
+        0 to Pair(BlockPos(30, 68, -17), BlockPos(30, 68, -15)),
+        1 to Pair(BlockPos(30, 68, 15), BlockPos(30, 68, 17)),
+        2 to Pair(BlockPos(17, 68, 30), BlockPos(15, 68, 30)),
+        3 to Pair(BlockPos(-15, 68, 30), BlockPos(-17, 68, 30)),
+        4 to Pair(BlockPos(-30, 68, 17), BlockPos(-30, 68, 15)),
+        5 to Pair(BlockPos(-30, 68, -15), BlockPos(-30, 68, -17)),
+        6 to Pair(BlockPos(-17, 68, -30), BlockPos(-15, 68, -30)),
+        7 to Pair(BlockPos(15, 68, -30), BlockPos(17, 68, -30))
     )
 
 
