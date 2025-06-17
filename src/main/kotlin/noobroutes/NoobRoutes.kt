@@ -26,6 +26,7 @@ import noobroutes.utils.render.RenderUtils2D
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.dungeon.ScanUtils
+import noobroutes.utils.skyblock.dungeonscanning.Dungeon
 import java.io.File
 
 
@@ -73,7 +74,6 @@ class NoobRoutes {
             Scheduler,
             PacketUtils,
             NettyS2DPacketInterceptor,
-            ScanUtils,
             AuraManager,
             Utils,
             LocationUtils,
@@ -83,7 +83,8 @@ class NoobRoutes {
             RotationUtils,
             BossEventDispatcher,
             SecretUtils,
-            AutoRouteUtils
+            AutoRouteUtils,
+            Dungeon
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }

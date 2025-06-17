@@ -26,6 +26,7 @@ import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.tiles.*
+import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import java.io.FileNotFoundException
 
 object ScanUtils {
