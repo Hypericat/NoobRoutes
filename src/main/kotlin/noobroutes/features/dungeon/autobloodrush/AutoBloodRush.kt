@@ -453,6 +453,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         routesToGenerate.clear()
         autoBrUnsneakRegistered = false
         customRoom = null
+        DynamicRoute.clearRoute()
     }
 
     var routeTo : BlockPos? = null
@@ -483,8 +484,8 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                     doorNode.runMotion(room, it as MotionUpdateEvent.Pre)
                 }
                 waiting = true
-                if (bloodNext) DynamicRoute.clearRoute()
-                routeTo = null
+                //if (bloodNext) DynamicRoute.clearRoute()
+                Scheduler.schedulePreTickTask(2) { routeTo = null }
                 return
             }
             val door = getOtherDoor(room) ?: return
@@ -496,7 +497,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             val closestSpot = getDoorSpots(room)[closestIndex]?.first ?: return
             val closestRealSpot = room.getRealCoords(closestSpot)
             if (closestRealSpot == mc.thePlayer.positionVector.subtract(0.0,1.0,0.0).toBlockPos() && routeTo == null) {
-                EWPathfinderModule.execute(realSpot, false)
+                EWPathfinderModule.execute(realSpot, true)
                 if (isBlock(door.pos, Blocks.stained_hardened_clay)) bloodNext = true
                 routeTo = realSpot
                 waiting = false

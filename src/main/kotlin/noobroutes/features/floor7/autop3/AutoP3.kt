@@ -64,7 +64,8 @@ object AutoP3: Module (
     val silentLook by BooleanSetting("Silent Look", false, description = "when activating a look ring only rotate serverside (may lead to desync)")
     val fuckingLook by BooleanSetting("Loud Look", false, description = "always look for if u want to make ur autop3 seem mroe legit or smth")
     val renderStyle by SelectorSetting("ring design", "normal", arrayListOf("normal", "simple", "box"), false, description = "how rings should look")
-    val onlyCenter by BooleanSetting("Only Starts", false, description = "only renders rings with the center property(should be only start rings) and blinks")
+    val onlyCenter by BooleanSetting("Only Starts", false, description = "walking of edges doesnt give u a boost forward")
+    val walkFix by BooleanSetting("walk fix", false, description = "always look for if u want to make ur autop3 seem mroe legit or smth")
     private val blinkShit by DropdownSetting(name = "Blink Settings")
     val speedRings by BooleanSetting(name = "Speed Rings", description = "Toggles the use of tickshift rings").withDependency { blinkShit }
     val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink").withDependency { blinkShit }

@@ -233,7 +233,7 @@ object AutoP3Utils {
             return
         }
 
-        val movementFactor = if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0)) {
+        val movementFactor = if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0 && !AutoP3.walkFix)) {
             speed * sprintMultiplier
         } else {
             0.02 * sprintMultiplier
