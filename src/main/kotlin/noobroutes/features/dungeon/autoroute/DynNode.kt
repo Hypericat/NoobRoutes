@@ -79,6 +79,7 @@ class DynNode(
         if (!mc.thePlayer.isSneaking || mc.thePlayer.heldItem.skyblockID != "ASPECT_OF_THE_VOID") {
             AutoRouteUtils.setRotation(angles.first + offset, angles.second)
             Scheduler.schedulePreTickTask {
+                lastRoute = System.currentTimeMillis()
                 ether()
             }
             return

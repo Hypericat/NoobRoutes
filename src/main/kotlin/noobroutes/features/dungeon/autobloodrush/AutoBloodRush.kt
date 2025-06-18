@@ -22,6 +22,7 @@ import noobroutes.features.dungeon.autobloodrush.routes.DoorRoute
 import noobroutes.features.dungeon.autobloodrush.routes.Etherwarp
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.serverSneak
 import noobroutes.features.misc.EWPathfinderModule
@@ -474,11 +475,13 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             scanForDoors()
             if (currentDoor == null) devMessage(doors)
         }
+        if (event.isEnd) return
         if (!editMode && pathfind) {
             val room = customRoom ?: return
             if (routeTo == mc.thePlayer.positionVector.subtract(0.0,1.0,0.0).toBlockPos()) {
                 if (waiting) return
                 val doorNode = DoorRoute(routeTo!!.toVec3(0.5, 1.0, 0.5))
+                lastRoute = System.currentTimeMillis()
                 doorNode.runTick(room)
                 Scheduler.schedulePreMotionUpdateTask {
                     doorNode.runMotion(room, it as MotionUpdateEvent.Pre)
@@ -503,12 +506,12 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 waiting = false
             }
         }
-        if (event.isEnd || (activeRoutes.isEmpty() && !editMode) || !PlayerUtils.canSendC08) return
+        if ((activeRoutes.isEmpty() && !editMode) || !PlayerUtils.canSendC08) return
         val room = DungeonUtils.currentRoom ?: return
         if (!activeRoutes.any { it.key == room.name } && !editMode) return
         val key = if (editMode) routeName else activeRoutes[room.name]!!
-
         val node = routes.getOrPut(room.name) {mutableMapOf()}.getOrPut(key) {mutableListOf()}.firstOrNull { it.inNode(room) } ?: return
+        lastRoute = System.currentTimeMillis()
         node.runTick(room)
         Scheduler.schedulePreMotionUpdateTask {
             node.runMotion(room, it as MotionUpdateEvent.Pre)

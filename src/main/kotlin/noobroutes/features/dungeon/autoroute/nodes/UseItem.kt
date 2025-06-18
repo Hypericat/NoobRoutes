@@ -6,6 +6,7 @@ import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.useItemColor
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.Scheduler
@@ -64,16 +65,19 @@ class UseItem(
             modMessage("Tried to 0 tick swap gg")
             return
         }
+        PlayerUtils.unSneak()
 
         if (state != SwapManager.SwapState.ALREADY_HELD) {
             AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
             Scheduler.scheduleLowestPreTickTask(1) {
-                PlayerUtils.airClick()
+                lastRoute = System.currentTimeMillis()
+                AutoRouteUtils.unsneak()
             }
             return
         }
         Scheduler.scheduleLowestPreTickTask {
-            PlayerUtils.airClick()
+            lastRoute = System.currentTimeMillis()
+            AutoRouteUtils.unsneak()
         }
 
     }

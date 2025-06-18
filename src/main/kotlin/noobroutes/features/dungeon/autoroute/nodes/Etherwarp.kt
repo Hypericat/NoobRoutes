@@ -11,6 +11,7 @@ import noobroutes.features.dungeon.autoroute.AutoRoute.etherwarpColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.ether
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.RotationUtils.offset
@@ -88,6 +89,7 @@ class Etherwarp(
         if (!mc.thePlayer.isSneaking || mc.thePlayer.heldItem.skyblockID != "ASPECT_OF_THE_VOID") {
             AutoRouteUtils.setRotation(angles.first + offset, angles.second)
             Scheduler.schedulePreTickTask {
+                lastRoute = System.currentTimeMillis()
                 ether()
             }
             return

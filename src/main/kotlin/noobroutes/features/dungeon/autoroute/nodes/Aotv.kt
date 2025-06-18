@@ -11,6 +11,7 @@ import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.aotvColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.edgeRoutes
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.serverSneak
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.*
@@ -82,6 +83,7 @@ class Aotv(
             PlayerUtils.unSneak()
             AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
             Scheduler.schedulePreTickTask(1) {
+                lastRoute = System.currentTimeMillis()
                 AutoRouteUtils.aotv(tpTarget)
                 tpSetter(tpTarget, room)
             }

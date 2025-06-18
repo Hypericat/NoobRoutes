@@ -8,6 +8,7 @@ import noobroutes.features.dungeon.autoroute.AutoRoute.depth
 import noobroutes.features.dungeon.autoroute.AutoRoute.pearlColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.Scheduler
@@ -83,7 +84,8 @@ class Pearl(
 
         if (!silent) RotationUtils.setAngles(room.getRealYaw(yaw), pitch)
         Scheduler.schedulePreTickTask {
-            PlayerUtils.airClick()
+            lastRoute = System.currentTimeMillis()
+            AutoRouteUtils.unsneak()
         }
 
         if (pearlsThrown >= count) delete = true

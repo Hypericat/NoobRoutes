@@ -82,11 +82,6 @@ abstract class Node(
         return obj
     }
 
-
-
-
-
-
     internal fun drawNode(room: UniqueRoom, color: Color) {
         Renderer.drawCylinder(room.getRealCoords(pos.add(Vec3(0.0, 0.03, 0.0))), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, color, depth = depth)
     }

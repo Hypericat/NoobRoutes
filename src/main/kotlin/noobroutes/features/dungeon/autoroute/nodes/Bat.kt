@@ -12,6 +12,7 @@ import noobroutes.features.dungeon.autoroute.AutoRoute.batColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.edgeRoutes
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.aotvTarget
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.serverSneak
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.features.dungeon.autoroute.SecretUtils
@@ -88,6 +89,7 @@ class Bat(
             PlayerUtils.unSneak()
             AutoRouteUtils.setRotation(room.getRealYaw(yaw), pitch)
             Scheduler.schedulePreTickTask(1) {
+                lastRoute = System.currentTimeMillis()
                 SecretUtils.batSpawnRegistered = true
                 tpSetter(tpTarget, room)
                 aotvTarget = tpTarget

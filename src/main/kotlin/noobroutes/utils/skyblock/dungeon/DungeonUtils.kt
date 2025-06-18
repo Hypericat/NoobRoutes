@@ -241,7 +241,7 @@ object DungeonUtils {
                 Vec2(-pos.zCoord, pos.xCoord)
             }
             Rotations.NONE -> {
-                devMessage("no rotation??????")
+                //devMessage("no rotation??????")
                 Vec2(pos.xCoord, pos.zCoord)
             }
         }

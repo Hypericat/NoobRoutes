@@ -10,6 +10,7 @@ import noobroutes.features.dungeon.autoroute.AutoRoute.pearlClipColor
 import noobroutes.features.dungeon.autoroute.AutoRoute.silent
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.clipDistance
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.pearlSoundRegistered
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.Scheduler
@@ -73,9 +74,10 @@ class PearlClip(
         pearlSoundRegistered = true
 
         if (!silent) mc.thePlayer.rotationPitch = 90f
-        //PlayerUtils.forceUnSneak()
+
         Scheduler.schedulePreTickTask {
-            PlayerUtils.airClick()
+            lastRoute = System.currentTimeMillis()
+            AutoRouteUtils.rightClick()
         }
     }
 

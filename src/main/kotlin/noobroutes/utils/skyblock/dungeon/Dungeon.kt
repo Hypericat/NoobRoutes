@@ -10,6 +10,7 @@ import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.postAndCatch
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.tiles.Puzzle
+import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.skyblock.dungeon.tiles.Tile
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.dungeon.tiles.Unknown
@@ -25,9 +26,7 @@ object Dungeon {
     @SubscribeEvent
     fun onRoomEnter(event: RoomEnterEvent) {
         devMessage("${event.room?.name}, ${event.room?.rotation}")
-        event.room?.roomComponents?.forEach {
-            devMessage("${it.first.x}, 70, ${it.first.z}")
-        }
+        if (event.room?.rotation == Rotations.NONE) event.room.updateRotation()
         //devMessage("${event.room?.mainRoom?.x}, ${event.room?.mainRoom?.z}")
     }
 

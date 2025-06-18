@@ -11,6 +11,7 @@ import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.silent
 import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.thrown
 import noobroutes.features.dungeon.autobloodrush.BloodRushRoute
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
 import noobroutes.utils.*
 import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.json.JsonUtils.addProperty
@@ -147,6 +148,7 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
         if (mc.thePlayer.isSneaking || !mc.thePlayer.heldItem.displayName.contains("pearl", true)) {
             AutoRouteUtils.setRotation(yaw + offset, pitch)
             Scheduler.schedulePreTickTask {
+                lastRoute = System.currentTimeMillis()
                 AutoBloodRush.autoBrUnsneakRegistered = true
             }
             return

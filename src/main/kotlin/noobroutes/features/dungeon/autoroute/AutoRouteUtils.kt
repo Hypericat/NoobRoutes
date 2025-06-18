@@ -66,6 +66,7 @@ object AutoRouteUtils {
             if (!mc.thePlayer.isSneaking || state == SwapManager.SwapState.SWAPPED) {
                 setRotation(yaw + offset, pitch)
                 Scheduler.schedulePreTickTask {
+                    lastRoute = System.currentTimeMillis()
                     ether()
                 }
                 return@schedulePreMotionUpdateTask
@@ -77,6 +78,17 @@ object AutoRouteUtils {
     var pearlSoundRegistered = false
     var sneakRegistered = false
     var unsneakRegistered = false
+    var rightClickRegistered = false
+
+    fun rightClick(){
+        rightClickRegistered = true
+    }
+
+    fun unsneak(){
+        unsneakRegistered = true
+        aotvTarget = null
+        PlayerUtils.unSneak()
+    }
 
     fun ether() {
         sneakRegistered = true
@@ -137,6 +149,14 @@ object AutoRouteUtils {
         PlayerUtils.airClick()
         aotvTarget?.let { Zpew.doZeroPingAotv(it) }
         unsneakRegistered = false
+        PlayerUtils.resyncSneak()
+    }
+
+    @SubscribeEvent
+    fun rightClickExecute(event: RenderWorldLastEvent) {
+        if (!rightClickRegistered) return
+        PlayerUtils.airClick()
+        rightClickRegistered = false
         PlayerUtils.resyncSneak()
     }
 

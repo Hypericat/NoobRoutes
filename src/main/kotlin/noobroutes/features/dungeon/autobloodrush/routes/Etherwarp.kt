@@ -8,6 +8,7 @@ import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.silent
 import noobroutes.features.dungeon.autobloodrush.BloodRushRoute
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.ether
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.RotationUtils.setAngles
@@ -52,6 +53,7 @@ class Etherwarp(pos: Vec3, var target: Vec3) : BloodRushRoute(name = "Etherwarp"
         if (!mc.thePlayer.isSneaking || mc.thePlayer.heldItem.skyblockID != "ASPECT_OF_THE_VOID") {
             AutoRouteUtils.setRotation(angles.first + offset, angles.second)
             Scheduler.schedulePreTickTask {
+                lastRoute = System.currentTimeMillis()
                 ether()
             }
             return

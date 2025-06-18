@@ -87,7 +87,6 @@ object SecretUtils {
             !isBlock(event.packet.position, Blocks.chest, Blocks.trapped_chest, Blocks.lever, Blocks.skull)
         ) return
 
-
         devMessage("clicked ${getBlockAt(event.packet.position).unlocalizedName}")
         Scheduler.schedulePreTickTask(3) {
             secretCount++

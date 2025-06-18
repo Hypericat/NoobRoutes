@@ -5,6 +5,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRoute.depth
+import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
 import noobroutes.features.dungeon.autoroute.Node
 import noobroutes.utils.*
 import noobroutes.utils.json.JsonUtils.addProperty
@@ -61,6 +62,7 @@ class Boom(
             SwapManager.SwapState.SWAPPED -> {
                 AutoRoute.delay = System.currentTimeMillis() + 200
                 Scheduler.schedulePreTickTask {
+                    lastRoute = System.currentTimeMillis()
                     if (!isAir(pos)) {
                         AuraManager.auraBlock(pos, true)
                     }
