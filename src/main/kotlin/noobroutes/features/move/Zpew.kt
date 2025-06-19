@@ -10,18 +10,19 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.utils.*
 import noobroutes.utils.Utils.ID
+import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import kotlin.math.floor
@@ -82,6 +83,8 @@ object Zpew : Module(
 
         return recentFails.size < MAXFAILSPERFAILPERIOD
     }
+
+
 
     fun holdingTeleportItem(): Boolean {
         val held = mc.thePlayer.heldItem
@@ -198,7 +201,6 @@ object Zpew : Module(
     @SubscribeEvent
     fun onC08(event: PacketEvent.Send) {
         if (mc.thePlayer == null || event.packet !is C08PacketPlayerBlockPlacement) return
-
         val dir = event.packet.placedBlockDirection
         if (dir != 255) return
         val info = getTeleportInfo() ?: return
@@ -214,7 +216,7 @@ object Zpew : Module(
             doZeroPingEtherWarp(info.distance)
             return
         }
-        if (AutoRoute.routing) return
+        if (RouteUtils.routing) return
         val prediction = predictTeleport(info.distance) ?: return
         doZeroPingAotv(prediction.toBlockPos())
     }

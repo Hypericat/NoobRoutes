@@ -8,13 +8,9 @@ import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.getDoorSpots
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.getRoomDoors
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.oneByOneDoors
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.oneByOneSpots
 import noobroutes.features.misc.EWPathfinderModule
 import noobroutes.features.render.FreeCam
+import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
@@ -24,6 +20,9 @@ import noobroutes.utils.add
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.dungeon.DoorPositions
+import noobroutes.utils.skyblock.dungeon.DoorPositions.oneByOneDoors
+import noobroutes.utils.skyblock.dungeon.DoorPositions.oneByOneSpots
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 
@@ -37,6 +36,7 @@ object AutoPath: Module(
     category = Category.MOVE,
     description = "Automatically PathFinds to doors"
 ) {
+    /*
 
     private val resetPos by BooleanSetting("Align to node", true, false, "Moves the player to the center of the node after pathing.")
     private val useAltKeys by BooleanSetting("Use Alt Key", true, false, "Use Alt Key to select door")
@@ -72,8 +72,8 @@ object AutoPath: Module(
     }
 
     private fun getColor(pos: BlockPos) : Color {
-        if (AutoBloodRush.isWitherDoor(pos)) return Color.GRAY
-        if (AutoBloodRush.isBloodDoor(pos)) return Color.RED
+        if (DoorPositions.isWitherDoor(pos)) return Color.GRAY
+        if (DoorPositions.isBloodDoor(pos)) return Color.RED
         return doorNumberColor
     }
 
@@ -130,4 +130,6 @@ object AutoPath: Module(
     fun shouldCancelKey(keyCode: Int) : Boolean {
         return this.enabled && useAltKeys && altKey.key != Keyboard.KEY_NONE && Keyboard.isKeyDown(altKey.key) && validKeys!!.contains(keyCode)
     }
+
+     */
 }

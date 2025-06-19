@@ -12,8 +12,6 @@ import noobroutes.commands.*
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
 import noobroutes.features.ModuleManager
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils
-import noobroutes.features.dungeon.autoroute.SecretUtils
 import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.move.AutoPath
 import noobroutes.font.MinecraftFont
@@ -23,6 +21,8 @@ import noobroutes.utils.clock.Executor
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.RenderUtils2D
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.routes.RouteUtils
+import noobroutes.utils.routes.SecretUtils
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
@@ -43,7 +43,7 @@ class NoobRoutes {
             throw java.lang.RuntimeException(e)
         }
 
-        AutoPath.onInitKeys()
+        //AutoPath.onInitKeys()
 
         listOf(
             NoobRoutesCommand(),
@@ -82,7 +82,7 @@ class NoobRoutes {
             RotationUtils,
             BossEventDispatcher,
             SecretUtils,
-            AutoRouteUtils,
+            RouteUtils,
             Dungeon,
             DungeonUtils
         ).forEach {

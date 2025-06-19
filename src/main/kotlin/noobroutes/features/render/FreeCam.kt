@@ -95,10 +95,10 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         val xImpulse = ((freeCamPosition.yaw.xPart * input.moveForward.sign) + (if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe.sign).xPart)) * (if (input.sneak) 0.3 else 1.0)
         val zImpulse = ((freeCamPosition.yaw.zPart * input.moveForward.sign) + (if (input.moveStrafe == 0f) 0.0 else (freeCamPosition.yaw + -90 * input.moveStrafe.sign).zPart)) * (if (input.sneak) 0.3 else 1.0)
 
-        val dragFactor = if (instantSlow && input.moveStrafe == 0f && input.moveForward == 0f) 0.0 else 0.4.pow(deltaTime * 20.0)
-        val xSpeed = speedVector.xCoord * dragFactor + xImpulse * deltaTime * scrollWheelMultiplier
+        val dragFactor = if (instantSlow && input.moveStrafe == 0f && input.moveForward == 0f) 0.0 else 0.3.pow(deltaTime * 20.0)
+        val xSpeed = speedVector.xCoord * dragFactor + xImpulse * 4 * deltaTime * scrollWheelMultiplier
         val ySpeed = yImpulse * deltaTime * scrollWheelMultiplier * 50
-        val zSpeed = speedVector.zCoord * dragFactor + zImpulse * deltaTime * scrollWheelMultiplier
+        val zSpeed = speedVector.zCoord * dragFactor + zImpulse * 4 * deltaTime * scrollWheelMultiplier
         speedVector = Vec3(xSpeed, ySpeed, zSpeed)
         oldPos = pos
         pos = pos.add(speedVector)

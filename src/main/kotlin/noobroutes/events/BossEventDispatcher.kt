@@ -26,8 +26,7 @@ object BossEventDispatcher {
     private inline val inBossCheck: Boolean
         get() = LocationUtils.currentDungeon?.inBoss == true
 
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
+    fun reset(){
         inBoss = false
         inF7Boss = false
         lastInBoss = false
@@ -36,12 +35,12 @@ object BossEventDispatcher {
     }
 
     @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        reset()
+    }
+    @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {
-        inBoss = false
-        inF7Boss = false
-        lastInBoss = false
-        currentBossPhase = Phase.Unknown
-        currentTerminalPhase = TerminalPhase.Unknown
+        reset()
     }
 
     @SubscribeEvent

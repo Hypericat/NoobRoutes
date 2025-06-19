@@ -233,7 +233,7 @@ object AutoP3: Module (
         }
         when(args[1].lowercase()) {
             "relativepos" , "relpos", "rel" -> {
-                val blockPos = DungeonUtils.currentRoom?.getRelativeCoords(mc.objectMouseOver.blockPos ?: return devMessage("1")) ?: return devMessage("2")
+                val blockPos = DungeonUtils.currentRoom?.getRelativeCoords(mc.objectMouseOver.blockPos ?: return devMessage("1")) ?: return devMessage("Not in a room")
                 GuiScreen.setClipboardString("BlockPos(${blockPos.x}, ${blockPos.y}, ${blockPos.z})")
                 modMessage(blockPos)
             }

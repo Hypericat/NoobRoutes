@@ -11,8 +11,6 @@ import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.dungeon.MapLobotomizer
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
-import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.puzzle.IceFill
 import noobroutes.features.dungeon.puzzle.TicTacToe
 import noobroutes.features.dungeon.puzzle.WaterBoard
@@ -25,6 +23,8 @@ import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.render.FreeCam
 import noobroutes.features.render.RotationVisualizer
 import noobroutes.features.render.Trail
+import noobroutes.features.routes.AutoRoute
+import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.hud.HudElement
@@ -95,8 +95,7 @@ object ModuleManager {
         BlinkRelic,
         IceFill,
         MapLobotomizer,
-        FreeCam,
-        AutoBloodRush
+        FreeCam
     )
 
     init {

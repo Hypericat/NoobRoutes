@@ -75,9 +75,9 @@ object RotationUtils {
     }
 
 
-    fun setAngles(yaw: Float, pitch: Float) {
-        mc.thePlayer.rotationYaw = yaw
-        mc.thePlayer.rotationPitch = pitch.coerceIn(-90f, 90f)
+    fun setAngles(yaw: Float?, pitch: Float?) {
+        yaw?.let { mc.thePlayer.rotationYaw = yaw }
+        pitch?.let { mc.thePlayer.rotationPitch = pitch.coerceIn(-90f, 90f) }
     }
 
 

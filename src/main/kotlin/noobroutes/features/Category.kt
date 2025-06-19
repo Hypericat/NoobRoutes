@@ -5,5 +5,6 @@ enum class Category {
     FLOOR7,
     MOVE,
     MISC,
-    DUNGEON
+    DUNGEON,
+    ROUTES
 }

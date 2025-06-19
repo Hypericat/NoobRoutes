@@ -1,4 +1,4 @@
-package noobroutes.features.dungeon.autoroute
+package noobroutes.utils.routes
 
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.passive.EntityBat
@@ -9,15 +9,15 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.mc
-import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
-import noobroutes.features.dungeon.autoroute.AutoRoute.delay
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils.aotv
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils.aotvTarget
+import noobroutes.features.routes.AutoRoute
+import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.utils.*
 import noobroutes.utils.Utils.getEntitiesOfType
 import noobroutes.utils.Utils.isEnd
+import noobroutes.utils.routes.RouteUtils.aotv
+import noobroutes.utils.routes.RouteUtils.aotvTarget
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
@@ -45,7 +45,7 @@ object SecretUtils {
 
 
     var secretCount = 0
-    var awaitingNode: Node? = null
+    var awaitingAutorouteNode: AutorouteNode? = null
     var canSendC08 = true
     var batSpawnRegistered = false
     @SubscribeEvent
@@ -62,13 +62,9 @@ object SecretUtils {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent){
         if (event.isEnd) return
-        if (awaitingNode != null && secretCount >= 0) {
-            val room = DungeonUtils.currentRoom ?: return
-            awaitingNode?.tick(room)
-            Scheduler.schedulePreMotionUpdateTask {
-                awaitingNode?.motion((it as MotionUpdateEvent.Pre), room)
-                awaitingNode = null
-            }
+        if (awaitingAutorouteNode != null && secretCount >= 0) {
+            awaitingAutorouteNode?.run()
+            awaitingAutorouteNode = null
         }
     }
 
@@ -106,7 +102,7 @@ object SecretUtils {
 
     @SubscribeEvent
     fun onBat(event: ClientTickEvent) {
-        if (event.isEnd || System.currentTimeMillis() - delay < 200) return
+        if (event.isEnd || AutoRoute.canRoute) return
         if (!batSpawnRegistered) return
         val bats = mc.theWorld.getEntitiesOfType<EntityBat>()
         for (bat in bats) {

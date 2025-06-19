@@ -17,6 +17,7 @@ import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.render.FreeCam
+import noobroutes.features.routes.AutoRoute
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
@@ -38,6 +39,7 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
     val editModeToggle by KeybindSetting("Edit Mode Bind", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress { editMode = !editMode }
     val placeCooldown by NumberSetting("Place Cooldown", min = 0, max = 1000, default = 150,  description = "Cooldown between placing blocks in edit mode", unit = "ms")
     data class Block(val pos: BlockPos, val state: IBlockState)
+
 
     var pendingBlocks = mutableSetOf<Block>()
     var blocks:  MutableMap<String, MutableSet<Block>> = mutableMapOf()

@@ -1,4 +1,4 @@
-package noobroutes.features.move
+package noobroutes.features.routes
 
 import net.minecraft.block.BlockColored
 import net.minecraft.client.Minecraft
@@ -11,21 +11,18 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import noobroutes.events.impl.MotionUpdateEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.autoroute.AutoRoute
-import noobroutes.features.dungeon.autoroute.AutoRoute.lastRoute
-import noobroutes.features.dungeon.autoroute.DynNode
+import noobroutes.features.routes.nodes.DynamicNode
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.utils.IBlockStateUtils.setProperty
-import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.containsOneOf
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
+import noobroutes.utils.routes.RouteUtils.lastRoute
 import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
@@ -36,20 +33,31 @@ import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 
-object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp Routes.", category = Category.MOVE) {
+object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp Routes.", category = Category.ROUTES) {
     val silent by BooleanSetting("Silent", default = true, description = "Server side rotations")
     val renderRoutes by BooleanSetting("Render Routes", default = false, description = "Renders nodes")
-    val renderIndex by BooleanSetting("Render Index", description = "Render index above node, useful for editing").withDependency { this.renderRoutes }
+    val renderIndex by BooleanSetting(
+        "Render Index",
+        description = "Render index above node, useful for editing"
+    ).withDependency { this.renderRoutes }
     val depth by BooleanSetting("Depth", default = true, description = "Render Rings Through Walls").withDependency { renderRoutes }
-    val fullBlock by BooleanSetting("Place Full Blocks", default = true, description = "Make the blocks under the nodes full blocks.")
+    val fullBlock by BooleanSetting(
+        "Place Full Blocks",
+        default = true,
+        description = "Make the blocks under the nodes full blocks."
+    )
 
-    val dynColor by ColorSetting("Dyn Node Color", default = Color.BLUE, description = "Color of dynamic nodes").withDependency { this.renderRoutes }
+    val dynColor by ColorSetting(
+        "Dyn Node Color",
+        default = Color.Companion.BLUE,
+        description = "Color of dynamic nodes"
+    ).withDependency { this.renderRoutes }
     val editMode by BooleanSetting("Edit Mode", description = "Prevents nodes from triggering")
     val extraDebug by BooleanSetting("Warn Missing Item", description = "Get ts out of my face", default = true)
 
 
-    private var nodes : MutableList<DynNode> = mutableListOf();
-    private var deletedNodes : MutableList<DynNode> = mutableListOf();
+    private var nodes : MutableList<DynamicNode> = mutableListOf();
+    private var deletedNodes : MutableList<DynamicNode> = mutableListOf();
 
     @Synchronized
     @SubscribeEvent
@@ -61,36 +69,26 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
         }
         if (renderIndex) {
             nodes.forEachIndexed { index, node ->
-                node.drawIndex(index)
+                node.renderIndex(index)
             }
         }
     }
 
     fun isInNode() : Boolean {
         return nodes.any {
-            it.pos.distanceToPlayerSq <= 0.25
+            it.isInNode(Minecraft.getMinecraft().thePlayer.positionVector)
         }
     }
 
 
     @Synchronized
-    private fun inNodes(): MutableList<DynNode> {
-        val inNodes = mutableListOf<DynNode>()
-        nodes.forEach { node ->
-            val inNode = node.pos.distanceToPlayerSq <= 0.25
-            if (inNode && !node.triggered) {
-                node.triggered = true
-                inNodes.add(node)
-            } else if (!inNode && node.triggered) {
-                node.reset()
-            }
-        }
-        return inNodes
+    private fun inNodes(): MutableList<DynamicNode> {
+        return nodes.filter { it.updateNodeState() }.toMutableList()
     }
 
 
     @Synchronized
-    fun addNode(node: DynNode) {
+    fun addNode(node: DynamicNode) {
         if (Minecraft.getMinecraft().theWorld != null && fullBlock) {
             node.setPrevState(Minecraft.getMinecraft().theWorld.getBlockState(node.getBlockPos().subtract(Vec3i(0, 1, 0))))
 
@@ -110,7 +108,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTick(event: ClientTickEvent) {
+    fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.isEnd || mc.thePlayer == null || editMode || PlayerUtils.movementKeysPressed) return
 
         if (!AutoRoute.canRoute) return
@@ -118,12 +116,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
         val node = inNodes().firstOrNull() ?: return
 
         lastRoute = System.currentTimeMillis()
-
-         if (!node.tick()) return // Could not get correct item
-
-        Scheduler.schedulePreMotionUpdateTask {
-            node.motion((it as MotionUpdateEvent.Pre))
-        }
+        node.run()
 
         if (node.singleUse) removeNode(node)
     }
@@ -136,8 +129,6 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
 
     @Synchronized
     fun handleDynamicRouteCommand(args: Array<out String>) {
-        val chain = args.containsOneOf("chain", ignoreCase = true)
-
         when (args[0].lowercase()) {
             "restore" -> {
                 modMessage("Restoring node!")
@@ -148,13 +139,9 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
             "delete", "remove", "begone", "eradicate", "flaccid" -> {
                 val node = getNode(args) ?: return
                 removeNode(node)
-                modMessage("Removed ${deletedNodes.last().name}")
+                modMessage("Removed ${deletedNodes.last().getType().name}")
             }
 
-            "edit" -> {
-                val node = getNode(args) ?: return
-                node.chain = chain
-            }
             "clear" -> {
                 while (nodes.isNotEmpty()) {
                     removeNode(nodes.first())
@@ -180,7 +167,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
                             return
                         }
                         modMessage("Adding node!")
-                        addNode(DynNode(playerCoords, raytrace))
+                        addNode(DynamicNode(playerCoords, raytrace))
                     }
 
                     else -> {
@@ -192,7 +179,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     }
 
     @Synchronized
-    private fun removeNode(node: DynNode) {
+    private fun removeNode(node: DynamicNode) {
         deletedNodes.add(node)
         nodes.remove(node)
 
@@ -205,49 +192,34 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     @SubscribeEvent
     fun onKeyInput(event: MouseEvent) {
         if (event.button == 1 && event.buttonstate && System.currentTimeMillis() - lastRoute < 150) {
-            val nodes = nodes.filter { node ->
-                if (node.chain) (
-                        abs(PlayerUtils.posX - node.pos.xCoord) < 0.001 &&
-                                abs(PlayerUtils.posZ - node.pos.zCoord) < 0.001 &&
-                                PlayerUtils.posY >= node.pos.yCoord - 0.01 && PlayerUtils.posY <= node.pos.yCoord + 0.5
-                        ) else node.pos.distanceToPlayer <= 0.5
-            }
-            if (nodes.isNotEmpty()) event.isCanceled = true
+            if (isInNode()) event.isCanceled = true
         }
+
         if (event.button == 0 && event.buttonstate) {
             nodes.forEach { it.reset() }
-            if (nodes.firstOrNull { node ->
-                    (if (node.chain) (
-                            abs(PlayerUtils.posX - node.pos.xCoord) < 0.001 &&
-                                    abs(PlayerUtils.posZ - node.pos.zCoord) < 0.001 &&
-                                    PlayerUtils.posY >= node.pos.yCoord - 0.01 && PlayerUtils.posY <= node.pos.yCoord + 0.5
-                            ) else if (node.name == "Pearl") (
-                            node.pos.distanceToPlayer2D <= 0.5
-                            )
-                    else node.pos.distanceToPlayer <= 0.5)
-                } != null) event.isCanceled = true
+            if (isInNode()) event.isCanceled = true
         }
     }
 
     @Synchronized
-    private fun getNode(args : Array<out String>): DynNode? {
+    private fun getNode(args : Array<out String>): DynamicNode? {
+        if (nodes.isEmpty() || Minecraft.getMinecraft().thePlayer == null) return null
+
         if (args.size > 1) {
             val index = args[1].toIntOrNull()?.absoluteValue
             if (index == null) {
                 modMessage("Provide a number for index")
                 return null
             }
-            if (nodes.isEmpty() || index !in nodes.indices) {
+
+            if (index >= nodes.size) {
                 modMessage("No node with index: $index")
                 return null
             }
+
             return nodes[index]
         }
-        if (nodes.isEmpty()) return null
 
-        val node = nodes.minByOrNull {
-            it.pos.distanceToPlayerSq
-        }!!
-        return node
+        return nodes.minByOrNull { it.getDistanceSq(Minecraft.getMinecraft().thePlayer.positionVector) }
     }
 }

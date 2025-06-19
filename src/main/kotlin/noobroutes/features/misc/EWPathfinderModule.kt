@@ -8,9 +8,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.autoroute.DynNode
-import noobroutes.features.move.DynamicRoute
+import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.render.ClickGUIModule
+import noobroutes.features.routes.nodes.DynamicNode
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
@@ -22,7 +22,6 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer.drawBox
 import noobroutes.utils.skyblock.EtherWarpHelper.centerCoords
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.abs
 import kotlin.math.floor
@@ -90,7 +89,7 @@ object EWPathfinderModule : Module(
                     continue
                 }
 
-                DynamicRoute.addNode(DynNode(nodeVec3, targetVec3, singleUse = singleUse))
+                DynamicRoute.addNode(DynamicNode(nodeVec3, targetVec3, singleUse = singleUse))
             }
             lastNode = node
             node = node.parent
