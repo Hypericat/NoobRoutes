@@ -16,6 +16,7 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.render.FreeCam
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
@@ -39,6 +40,7 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
     val placeCooldown by NumberSetting("Place Cooldown", min = 0, max = 1000, default = 150,  description = "Cooldown between placing blocks in edit mode", unit = "ms")
     data class Block(val pos: BlockPos, val state: IBlockState)
 
+
     var pendingBlocks = mutableSetOf<Block>()
     var blocks:  MutableMap<String, MutableSet<Block>> = mutableMapOf()
     var selectedBlockState: IBlockState = IBlockStateUtils.airIBlockState
@@ -47,6 +49,7 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onMouse(event: ClickEvent.All) {
+        AutoRoute.silent
         if (!editMode) return
         val mouseOver = if (FreeCam.enabled) FreeCam.looking else mc.objectMouseOver ?: return
         val target = mouseOver?.hitBlock() ?: return

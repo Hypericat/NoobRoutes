@@ -15,6 +15,7 @@ import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.oneByOneDoors
 import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.oneByOneSpots
 import noobroutes.features.misc.EWPathfinderModule
 import noobroutes.features.render.FreeCam
+import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting

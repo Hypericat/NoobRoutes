@@ -1,4 +1,4 @@
-package noobroutes.features.dungeon.autoroute
+package noobroutes.utils.routes
 
 import com.google.gson.JsonArray
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
@@ -11,23 +11,26 @@ import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
-import noobroutes.features.dungeon.autoroute.nodes.*
 import noobroutes.features.move.Zpew
+import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.utils.*
 import noobroutes.utils.AutoP3Utils.walking
-import noobroutes.utils.RotationUtils.offset
+import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
+import org.lwjgl.input.Keyboard
 
-object AutoRouteUtils {
+object RouteUtils {
 
     /**
      * Call inside a ClientTickEvent (start)
@@ -46,7 +49,6 @@ object AutoRouteUtils {
     }
 
     fun etherwarp(yaw: Float, pitch: Float, silent: Boolean = false){
-        PlayerUtils.stopVelocity()
         val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.UNKNOWN) return
         if (state == SwapManager.SwapState.TOO_FAST) {
@@ -54,24 +56,25 @@ object AutoRouteUtils {
             return
         }
 
-        if (!silent) RotationUtils.setAngles(yaw, pitch)
+        PlayerUtils.stopVelocity()
+        setRotation(yaw, pitch, silent)
         walking = false
-        PlayerUtils.sneak()
+        PlayerUtils.unSneak()
         lastRoute = System.currentTimeMillis()
-        Scheduler.schedulePreMotionUpdateTask {
-            val event = it as MotionUpdateEvent.Pre
-            setRotation(yaw, pitch)
-            //event.yaw = yaw
-            //event.pitch = pitch
-            if (!mc.thePlayer.isSneaking || state == SwapManager.SwapState.SWAPPED) {
-                setRotation(yaw + offset, pitch)
-                Scheduler.schedulePreTickTask {
-                    lastRoute = System.currentTimeMillis()
-                    ether()
-                }
-                return@schedulePreMotionUpdateTask
-            }
-            ether()
+        ether()
+    }
+
+    var lastSneakState = false
+    @SubscribeEvent
+    fun lastSneakState(event: RenderWorldLastEvent) {
+        lastSneakState = mc.thePlayer.isSneaking
+    }
+
+    @SubscribeEvent
+    fun onKeyInputEvent(event: InputEvent.KeyInputEvent){
+        val key = Keyboard.getEventKey()
+        if (key == mc.gameSettings.keyBindSneak.keyCode && !routing) {
+            PlayerUtils.setSneak(lastSneakState)
         }
     }
 
@@ -175,7 +178,8 @@ object AutoRouteUtils {
         rotatingPitch = null
         rotatingYaw = null
     }
-    fun setRotation(yaw: Float?, pitch: Float?) {
+    fun setRotation(yaw: Float?, pitch: Float?, silent: Boolean) {
+        if (!silent) RotationUtils.setAngles(yaw, pitch)
         rotating = true
         rotatingPitch = pitch
         rotatingYaw = yaw
@@ -191,29 +195,42 @@ object AutoRouteUtils {
             resetRotation()
             return
         }
-
         if (rotating) {
             rotatingYaw?.let {
-                event.yaw = it + offset
+                event.yaw = it
             }
             rotatingPitch?.let {
-                event.pitch = it + offset
+                event.pitch = it.coerceIn(-90f, 90f)
             }
         }
     }
 
     var lastRoute = 0L
+    inline val routing get() = System.currentTimeMillis() - lastRoute > 51
 
-    inline val canResetRotation get() = System.currentTimeMillis() - lastRoute > 51
+    var pearls = 0
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun pearl(event: TickEvent.ClientTickEvent){
+        if (event.isEnd || pearls < 1) return
+        if (PlayerUtils.movementKeysPressed) {
+            pearls = 0
+            return
+        }
+        pearls--
+        lastRoute = System.currentTimeMillis()
+        unsneak()
+    }
+
+
 
     @SubscribeEvent
     fun onMouse(event: MouseEvent){
-        if ((event.dx != 0 || event.dy != 0) && canResetRotation) resetRotation()
+        if ((event.dx != 0 || event.dy != 0) && routing) resetRotation()
     }
 
-    fun meowConverter(file: Map<String, JsonArray>): MutableMap<String, MutableList<Node>> {
+    fun meowConverter(file: Map<String, JsonArray>): MutableMap<String, MutableList<AutorouteNode>> {
         devMessage("meowing")
-        val routeMap = mutableMapOf<String, MutableList<Node>>()
+        val routeMap = mutableMapOf<String, MutableList<AutorouteNode>>()
         val routes = file["Routes"] ?: return mutableMapOf()
         routes.forEach {
             val route = it.asJsonObject

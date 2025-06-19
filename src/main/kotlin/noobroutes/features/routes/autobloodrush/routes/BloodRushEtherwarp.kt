@@ -1,18 +1,13 @@
-package noobroutes.features.dungeon.autobloodrush.routes
+package noobroutes.features.routes.autobloodrush.routes
 
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
-import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.silent
 import noobroutes.features.dungeon.autobloodrush.BloodRushRoute
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.ether
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
 import noobroutes.utils.RotationUtils
-import noobroutes.utils.RotationUtils.offset
-import noobroutes.utils.RotationUtils.setAngles
-import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asVec3
@@ -20,12 +15,11 @@ import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.skyblock.skyblockID
 
-class Etherwarp(pos: Vec3, var target: Vec3) : BloodRushRoute(name = "Etherwarp", pos) {
+class BloodRushEtherwarp(pos: Vec3, var target: Vec3) : BloodRushRoute(name = "Etherwarp", pos) {
     companion object {
-        fun loadFromJsonObject(jsonObject: JsonObject): Etherwarp {
-            return Etherwarp(
+        fun loadFromJsonObject(jsonObject: JsonObject): BloodRushEtherwarp {
+            return BloodRushEtherwarp(
                 jsonObject.get("pos").asVec3,
                 jsonObject.get("target").asVec3
             )
@@ -41,25 +35,13 @@ class Etherwarp(pos: Vec3, var target: Vec3) : BloodRushRoute(name = "Etherwarp"
             modMessage("Tried to 0 tick swap gg")
             return
         }
-        if (!silent) setAngles(angles.first, angles.second)
         stopWalk()
-        PlayerUtils.sneak()
-    }
-
-    override fun runMotion(room: UniqueRoom, event: MotionUpdateEvent.Pre) {
-        val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target), true)
-        event.yaw = angles.first
-        event.pitch = angles.second
-        if (!mc.thePlayer.isSneaking || mc.thePlayer.heldItem.skyblockID != "ASPECT_OF_THE_VOID") {
-            AutoRouteUtils.setRotation(angles.first + offset, angles.second)
-            Scheduler.schedulePreTickTask {
-                lastRoute = System.currentTimeMillis()
-                ether()
-            }
-            return
-        }
+        PlayerUtils.unSneak()
+        AutoRouteUtils.setRotation(angles.first, angles.second, silent)
         ether()
     }
+
+
 
     override fun getAsJsonObject(): JsonObject {
         val obj = JsonObject()

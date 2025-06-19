@@ -1,4 +1,4 @@
-package noobroutes.features.dungeon.autobloodrush
+package noobroutes.features.routes.autobloodrush
 
 
 import com.google.gson.JsonObject
@@ -49,7 +49,6 @@ abstract class BloodRushRoute(val name: String, var pos: Vec3) {
     }
 
     abstract fun runTick(room: UniqueRoom)
-    abstract fun runMotion(room: UniqueRoom, event: MotionUpdateEvent.Pre)
     abstract fun getAsJsonObject(): JsonObject
 
 

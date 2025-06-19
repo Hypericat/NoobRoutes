@@ -1,4 +1,4 @@
-package noobroutes.features.dungeon.autoroute
+package noobroutes.utils.routes
 
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.passive.EntityBat
@@ -9,12 +9,12 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.mc
-import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.dungeon.autoroute.AutoRoute.delay
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.aotv
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.aotvTarget
+import noobroutes.features.routes.autoroute.AutorouteNodeOLD
 import noobroutes.utils.*
 import noobroutes.utils.Utils.getEntitiesOfType
 import noobroutes.utils.Utils.isEnd
@@ -45,7 +45,7 @@ object SecretUtils {
 
 
     var secretCount = 0
-    var awaitingNode: Node? = null
+    var awaitingAutorouteNode: AutorouteNodeOLD? = null
     var canSendC08 = true
     var batSpawnRegistered = false
     @SubscribeEvent
@@ -62,13 +62,10 @@ object SecretUtils {
     @SubscribeEvent
     fun onTick(event: ClientTickEvent){
         if (event.isEnd) return
-        if (awaitingNode != null && secretCount >= 0) {
+        if (awaitingAutorouteNode != null && secretCount >= 0) {
             val room = DungeonUtils.currentRoom ?: return
-            awaitingNode?.tick(room)
-            Scheduler.schedulePreMotionUpdateTask {
-                awaitingNode?.motion((it as MotionUpdateEvent.Pre), room)
-                awaitingNode = null
-            }
+            awaitingAutorouteNode?.tick(room)
+            awaitingAutorouteNode = null
         }
     }
 

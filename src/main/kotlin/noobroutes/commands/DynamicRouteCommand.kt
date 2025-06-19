@@ -3,7 +3,7 @@ package noobroutes.commands
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import noobroutes.features.dungeon.autoroute.AutoRoute
-import noobroutes.features.move.DynamicRoute
+import noobroutes.features.routes.DynamicRoute
 import noobroutes.utils.skyblock.modMessage
 
 class DynamicRouteCommand: CommandBase() {

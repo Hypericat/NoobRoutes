@@ -1,4 +1,4 @@
-package noobroutes.features.dungeon.autobloodrush
+package noobroutes.features.routes.autobloodrush
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -13,23 +13,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.config.DataManager
-import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.dungeon.autobloodrush.routes.BloodRushEtherwarp
 import noobroutes.features.dungeon.autobloodrush.routes.DoorRoute
-import noobroutes.features.dungeon.autobloodrush.routes.Etherwarp
 import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils.resetRotation
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.serverSneak
 import noobroutes.features.misc.EWPathfinderModule
 import noobroutes.features.misc.EWPathfinderModule.centerAngle
 import noobroutes.features.misc.EWPathfinderModule.findCenteredVector
 import noobroutes.features.misc.EWPathfinderModule.getEtherPosFromOrigin
-import noobroutes.features.move.DynamicRoute
+import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
@@ -43,14 +41,27 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
-import noobroutes.utils.skyblock.dungeon.Dungeon
+import noobroutes.utils.skyblock.dungeon.DoorPositions.blockList
+import noobroutes.utils.skyblock.dungeon.DoorPositions.fourByOneDoors
+import noobroutes.utils.skyblock.dungeon.DoorPositions.fourByOneSpots
+import noobroutes.utils.skyblock.dungeon.DoorPositions.lShapedDoors
+import noobroutes.utils.skyblock.dungeon.DoorPositions.lShapedSpots
+import noobroutes.utils.skyblock.dungeon.DoorPositions.oneByOneDoors
+import noobroutes.utils.skyblock.dungeon.DoorPositions.oneByOneSpots
+import noobroutes.utils.skyblock.dungeon.DoorPositions.threeByOneDoors
+import noobroutes.utils.skyblock.dungeon.DoorPositions.threeByOneSpots
+import noobroutes.utils.skyblock.dungeon.DoorPositions.twoByOneDoors
+import noobroutes.utils.skyblock.dungeon.DoorPositions.twoByOneSpots
+import noobroutes.utils.skyblock.dungeon.DoorPositions.twoByTwoDoors
+import noobroutes.utils.skyblock.dungeon.DoorPositions.twoByTwoSpots
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Room
+import noobroutes.utils.skyblock.dungeon.ScanUtils
 import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import kotlin.math.floor
+
 
 object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for bloodrushing", category = Category.DUNGEON) {
 
@@ -81,137 +92,14 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
     data class Door(val pos: BlockPos, val rotation: Rotations)
 
-    val oneByOneDoors = listOf(
-        BlockPos(0, 69, 16),
-        BlockPos(-16, 69, 0),
-        BlockPos(0, 69, -16),
-        BlockPos(16, 69, 0)
-    )
-    val twoByOneDoors = listOf(
-        BlockPos(-32, 69, 0),
-        BlockPos(-16, 69, -16),
-        BlockPos(16, 69, -16),
-        BlockPos(32, 69, 0),
-        BlockPos(16, 69, 16),
-        BlockPos(-16, 69, 16)
-    )
-
-    val threeByOneDoors = listOf(
-        BlockPos(48, 69, 0),
-        BlockPos(32, 69, 16),
-        BlockPos(0, 69, 16),
-        BlockPos(-32, 69, 16),
-        BlockPos(-48, 69, 0),
-        BlockPos(-32, 69, -16),
-        BlockPos(0, 69, -16),
-        BlockPos(32, 69, -16)
-    )
-
-    val fourByOneDoors = listOf(
-        BlockPos(-64, 69, 0),
-        BlockPos(-48, 69, -16),
-        BlockPos(-16, 69, -16),
-        BlockPos(16, 69, -16),
-        BlockPos(48, 69, -16),
-        BlockPos(64, 69, 0),
-        BlockPos(48, 69, 16),
-        BlockPos(16, 69, 16),
-        BlockPos(-16, 69, 16),
-        BlockPos(-48, 69, 16),
-    )
-    val lShapedDoors = listOf(
-        BlockPos(32, 69, -16),
-        BlockPos(32, 69, 16),
-        BlockPos(16, 69, 32),
-        BlockPos(0, 69, 16),
-        BlockPos(-16, 69, 0),
-        BlockPos(-32, 69, -16),
-        BlockPos(-16, 69, -32),
-        BlockPos(16, 69, -32)
-    )
-
-    val twoByTwoDoors = listOf(
-        BlockPos(32, 69, -16),
-        BlockPos(32, 69, 16),
-        BlockPos(16, 69, 32),
-        BlockPos(-16, 69, 32),
-        BlockPos(-32, 69, 16),
-        BlockPos(-32, 69, -16),
-        BlockPos(-16, 69, -32),
-        BlockPos(16, 69, -32),
-    )
-
-    val threeByOneSpots = mapOf(
-        0 to Pair(BlockPos(46, 68, -1), BlockPos(46, 68, 1)),
-        1 to Pair(BlockPos(33, 68, 14), BlockPos(31, 68, 14)),
-        2 to Pair(BlockPos(1, 68, 14), BlockPos(-1, 68, 14)),
-        3 to Pair(BlockPos(-31, 68, 14), BlockPos(-33, 68, 14)),
-        4 to Pair(BlockPos(-46, 68, 1), BlockPos(-46, 68, -1)),
-        5 to Pair(BlockPos(-33, 68, -14), BlockPos(-31, 68, -14)),
-        6 to Pair(BlockPos(-1, 68, -14), BlockPos(1, 68, -14)),
-        7 to Pair(BlockPos(31, 68, -14), BlockPos(33, 68, -14)),
-    )
-
-    val lShapedSpots = mapOf(
-        0 to Pair(BlockPos(30, 68, -17), BlockPos(30, 68, -15)),
-        1 to Pair(BlockPos(30, 68, 15), BlockPos(30, 68, 17)),
-        2 to Pair(BlockPos(17, 68, 30), BlockPos(15, 68, 30)),
-        3 to Pair(BlockPos(2, 68, 17), BlockPos(2, 68, 15)),
-        4 to Pair(BlockPos(-15, 68, -2), BlockPos(-17, 68, -2)),
-        5 to Pair(BlockPos(-30, 68, -15), BlockPos(-30, 68, -17)),
-        6 to Pair(BlockPos(-17, 68, -30), BlockPos(-15, 68, -30)),
-        7 to Pair(BlockPos(15, 68, -30), BlockPos(17, 68, -30))
-    )
-
-    val fourByOneSpots = mapOf(
-        0 to Pair(BlockPos(-62, 68, 1), BlockPos(-62, 68, -1)),
-        1 to Pair(BlockPos(-49, 68, -14), BlockPos(-47, 68, -14)),
-        2 to Pair(BlockPos(-17, 68, -14), BlockPos(-15, 68, -14)),
-        3 to Pair(BlockPos(15, 68, -14), BlockPos(17, 68, -14)),
-        4 to Pair(BlockPos(47, 68, -14), BlockPos(49, 68, -14)),
-        5 to Pair(BlockPos(62, 68, -1), BlockPos(62, 68, 1)),
-        6 to Pair(BlockPos(49, 68, 14), BlockPos(47, 68, 14)),
-        7 to Pair(BlockPos(17, 68, 14), BlockPos(15, 68, 14)),
-        8 to Pair(BlockPos(-15, 68, 14), BlockPos(-17, 68, 14)),
-        9 to Pair(BlockPos(-47, 68, 14), BlockPos(-49, 68, 14))
-    )
-
-    val oneByOneSpots = mapOf(
-        0 to Pair(BlockPos(1, 68, 14), BlockPos(-1, 68, 14)),
-        1 to Pair(BlockPos(-14, 68, 1), BlockPos(-14, 68, -1)),
-        2 to Pair(BlockPos(-1, 68, -14), BlockPos(1, 68, -14)),
-        3 to Pair(BlockPos(14, 68, -1), BlockPos(14, 68, 1))
-    )
-
-    val twoByOneSpots = mapOf(
-        0 to Pair(BlockPos(-30, 68, 1), BlockPos(-30, 68, -1)),
-        1 to Pair(BlockPos(-17, 68, -14), BlockPos(-15, 68, -14)),
-        2 to Pair(BlockPos(15, 68, -14), BlockPos(17, 68, -14)),
-        3 to Pair(BlockPos(30, 68, -1), BlockPos(30, 68, 1)),
-        4 to Pair(BlockPos(17, 68, 14), BlockPos(15, 68, 14)),
-        5 to Pair(BlockPos(-15, 68, 14), BlockPos(-17, 68, 14))
-    )
-
-    val twoByTwoSpots = mapOf(
-        0 to Pair(BlockPos(30, 68, -17), BlockPos(30, 68, -15)),
-        1 to Pair(BlockPos(30, 68, 15), BlockPos(30, 68, 17)),
-        2 to Pair(BlockPos(17, 68, 30), BlockPos(15, 68, 30)),
-        3 to Pair(BlockPos(-15, 68, 30), BlockPos(-17, 68, 30)),
-        4 to Pair(BlockPos(-30, 68, 17), BlockPos(-30, 68, 15)),
-        5 to Pair(BlockPos(-30, 68, -15), BlockPos(-30, 68, -17)),
-        6 to Pair(BlockPos(-17, 68, -30), BlockPos(-15, 68, -30)),
-        7 to Pair(BlockPos(15, 68, -30), BlockPos(17, 68, -30))
-    )
-
-
     var activeRoutes: MutableMap<String, String> = mutableMapOf()
     var currentDoor: Door? = null
     val doors = mutableListOf<Door>()
-    var fairyRoom: Room? = null
-
 
     fun scanForDoors() {
+        devMessage("scanning")
         val nextRoom = getNextRoom() ?: return
+        devMessage(nextRoom.name)
         val nextDoor = findRoomDoors(nextRoom) ?: return
         doors.add(nextDoor)
         if (isBlock(nextDoor.pos, Blocks.stained_hardened_clay)) {
@@ -246,7 +134,8 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 }
             }
         } ?: return null
-        return Dungeon.Info.uniqueRooms.firstOrNull { room -> room.roomComponents.any { it.first.x == corePos.x && it.first.z == corePos.z }}
+        devMessage(corePos)
+        return ScanUtils.getUniqueRoomFromPos(BlockPos(corePos.x, 70, corePos.z))
     }
 
     val room1x2Names = hashSetOf(
@@ -265,7 +154,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         "Bridges",
         "Pressure Plates"
     )
-
     val room1x3Names = hashSetOf(
         "Diagonal",
         "Red Blue",
@@ -275,7 +163,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         "Deathmite",
         "Gravel"
     )
-
     val room1x4Names = hashSetOf(
         "Hallway",
         "Mossy",
@@ -284,7 +171,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         "Quartz Knight",
         "Waterfall"
     )
-
     val room2x2Names = hashSetOf(
         "Stairs",
         "Buttons",
@@ -296,7 +182,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         "Rails",
         "Mines"
     )
-
     val roomLShapedNames = hashSetOf(
         "Dino Site",
         "Withermancer",
@@ -436,15 +321,10 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
 
     @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {
-        /*started = false
-        activeRoutes.clear()
-        currentDoor = null
-        doors.clear()*/
         started = false
         activeRoutes.clear()
         currentDoor = null
         doors.clear()
-        fairyRoom = null
         routeTo = null
         waiting = false
         routeName = ""
@@ -460,13 +340,8 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     var routeTo : BlockPos? = null
     var waiting = false
     private var bloodNext = false
-    private var customRoom: UniqueRoom? = null
 
-    @SubscribeEvent
-    fun setRoom(event: RoomEnterEvent) {
-        customRoom = event.room
-        devMessage(customRoom?.name)
-    }
+
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -475,47 +350,14 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             scanForDoors()
             if (currentDoor == null) devMessage(doors)
         }
-        if (event.isEnd) return
-        if (!editMode && pathfind) {
-            val room = customRoom ?: return
-            if (routeTo == mc.thePlayer.positionVector.subtract(0.0,1.0,0.0).toBlockPos()) {
-                if (waiting) return
-                val doorNode = DoorRoute(routeTo!!.toVec3(0.5, 1.0, 0.5))
-                lastRoute = System.currentTimeMillis()
-                doorNode.runTick(room)
-                Scheduler.schedulePreMotionUpdateTask {
-                    doorNode.runMotion(room, it as MotionUpdateEvent.Pre)
-                }
-                waiting = true
-                //if (bloodNext) DynamicRoute.clearRoute()
-                Scheduler.schedulePreTickTask(2) { routeTo = null }
-                return
-            }
-            val door = getOtherDoor(room) ?: return
-            val index = getDoorIndex(room, door) ?: return
-            val spot = getDoorSpots(room)[index]?.second ?: return
-            val realSpot = room.getRealCoords(spot)
-            val closestDoor = getClosestDoorToPlayer(room) ?: return
-            val closestIndex = getDoorIndex(room, closestDoor)
-            val closestSpot = getDoorSpots(room)[closestIndex]?.first ?: return
-            val closestRealSpot = room.getRealCoords(closestSpot)
-            if (closestRealSpot == mc.thePlayer.positionVector.subtract(0.0,1.0,0.0).toBlockPos() && routeTo == null) {
-                EWPathfinderModule.execute(realSpot, true)
-                if (isBlock(door.pos, Blocks.stained_hardened_clay)) bloodNext = true
-                routeTo = realSpot
-                waiting = false
-            }
-        }
-        if ((activeRoutes.isEmpty() && !editMode) || !PlayerUtils.canSendC08) return
+
+        if (event.isEnd || (activeRoutes.isEmpty() && !editMode) || !PlayerUtils.canSendC08) return
         val room = DungeonUtils.currentRoom ?: return
         if (!activeRoutes.any { it.key == room.name } && !editMode) return
         val key = if (editMode) routeName else activeRoutes[room.name]!!
         val node = routes.getOrPut(room.name) {mutableMapOf()}.getOrPut(key) {mutableListOf()}.firstOrNull { it.inNode(room) } ?: return
         lastRoute = System.currentTimeMillis()
         node.runTick(room)
-        Scheduler.schedulePreMotionUpdateTask {
-            node.runMotion(room, it as MotionUpdateEvent.Pre)
-        }
     }
 
     @SubscribeEvent
@@ -534,8 +376,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 Renderer.drawBlock(it.second.first, Color.RED)
                 Renderer.drawBlock(it.second.second, Color.BLUE)
             }
-
-
         }
         if (routeName == "" && editMode) return
         val key = if (editMode) routeName else activeRoutes[room.name] ?: return
@@ -578,7 +418,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                         for (routeElement in routeArray.asJsonArray) {
                             val routeObj = routeElement.asJsonObject
                             if (routeObj.get("name").asString == "Etherwarp") {
-                                routeItems.add(Etherwarp.loadFromJsonObject(routeObj))
+                                routeItems.add(BloodRushEtherwarp.loadFromJsonObject(routeObj))
                             } else {
                                 routeItems.add(DoorRoute.loadFromJsonObject(routeObj))
                             }
@@ -610,7 +450,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
         }
         DataManager.saveDataToFile("autobloodroutes", jsonObj)
     }
-
 
     val routeRegex = Regex("\\d+>\\d+")
     var routeName = ""
@@ -661,7 +500,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                     }
                     val target = currentRoom.getRelativeCoords(raytrace)
                     routes.getOrPut(currentRoom.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.add(
-                        Etherwarp(playerCoords, target)
+                        BloodRushEtherwarp(playerCoords, target)
                     )
                     saveFile()
                     return
@@ -734,93 +573,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
     data class ExpectedS08(val x: Double, val z: Double, val dir: Int)
     lateinit var clipS08: ExpectedS08
 
-
-
-    val blockList = mapOf(
-        "minecraft:cobblestone_wall" to listOf(
-            BlockPos(2, 0, 2),
-            BlockPos(2, 2, 2),
-            BlockPos(2, 0, -2),
-            BlockPos(2, 2, -2),
-            BlockPos(-2, 0, 2),
-            BlockPos(-2, 2, 2),
-            BlockPos(-2, 0, -2),
-            BlockPos(-2, 2, -2)
-        ),
-        "minecraft:iron_bars" to listOf(
-            BlockPos(2, 1, 2),
-            BlockPos(2, 1, -2),
-            BlockPos(-2, 1, 2),
-            BlockPos(-2, 1, -2)
-        ),
-        "minecraft:stone_brick_stairs" to listOf(
-            BlockPos(2, 3, 2),
-            BlockPos(2, 3, 1),
-            BlockPos(2, 3, -1),
-            BlockPos(2, 3, -2),
-            BlockPos(-2, 3, 2),
-            BlockPos(-2, 3, 1),
-            BlockPos(-2, 3, -1),
-            BlockPos(-2, 3, -2),
-        ),
-        "minecraft:stonebrick" to listOf(
-            BlockPos(2, 4, 2),
-            BlockPos(2, 4, 1),
-            BlockPos(2, 4, 0),
-            BlockPos(2, 4, -1),
-            BlockPos(2, 4, -2),
-            BlockPos(1, 0, 2),
-            BlockPos(1, 1, 2),
-            BlockPos(1, 2, 2),
-            BlockPos(1, 3, 2),
-            BlockPos(1, 4, 2),
-            BlockPos(1, 4, 1),
-            BlockPos(1, 4, 0),
-            BlockPos(1, 4, -1),
-            BlockPos(1, 0, -2),
-            BlockPos(1, 1, -2),
-            BlockPos(1, 2, -2),
-            BlockPos(1, 3, -2),
-            BlockPos(1, 4, -2),
-            BlockPos(0, 0, 2),
-            BlockPos(0, 1, 2),
-            BlockPos(0, 2, 2),
-            BlockPos(0, 3, 2),
-            BlockPos(0, 4, 2),
-            BlockPos(0, 4, 1),
-            BlockPos(0, 4, 0),
-            BlockPos(0, 4, -1),
-            BlockPos(0, 0, -2),
-            BlockPos(0, 1, -2),
-            BlockPos(0, 2, -2),
-            BlockPos(0, 3, -2),
-            BlockPos(0, 4, -2),
-            BlockPos(-1, 0, 2),
-            BlockPos(-1, 1, 2),
-            BlockPos(-1, 2, 2),
-            BlockPos(-1, 3, 2),
-            BlockPos(-1, 4, 2),
-            BlockPos(-1, 4, 1),
-            BlockPos(-1, 4, 0),
-            BlockPos(-1, 4, -1),
-            BlockPos(-1, 0, -2),
-            BlockPos(-1, 1, -2),
-            BlockPos(-1, 2, -2),
-            BlockPos(-1, 3, -2),
-            BlockPos(-1, 4, -2),
-            BlockPos(-2, 4, 2),
-            BlockPos(-2, 4, 1),
-            BlockPos(-2, 4, 0),
-            BlockPos(-2, 4, -1),
-            BlockPos(-2, 4, -2),
-        ),
-        "minecraft:stone_slab" to listOf(
-            BlockPos(2, 3, 0),
-            BlockPos(-2, 3, 0)
-        )
-    )
-
-
     fun placeWitherDoor(pos: BlockPos, rotations: Rotations){
         val rotation = when (rotations) {
             Rotations.WEST -> Rotations.NORTH
@@ -829,8 +581,6 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
             Rotations.SOUTH -> Rotations.EAST
             Rotations.NONE -> return devMessage("error with door rotation")
         }
-
-        
         val list = blockList.toList()
         val placeList = mutableListOf<Pair<String, List<BlockPos>>>()
         list.forEach { (key, value) ->
@@ -934,7 +684,7 @@ object AutoBloodRush : Module("Auto Blood Rush", description = "Autoroutes for b
                 }
 
                 routes.getOrPut(currentRoom.name) {mutableMapOf()}.getOrPut(routeName) {mutableListOf()}.add(
-                    Etherwarp(currentRoom.getRelativeCoords(nodeVec3), currentRoom.getRelativeCoords(targetVec3))
+                    BloodRushEtherwarp(currentRoom.getRelativeCoords(nodeVec3), currentRoom.getRelativeCoords(targetVec3))
                 )
             }
             lastNode = node

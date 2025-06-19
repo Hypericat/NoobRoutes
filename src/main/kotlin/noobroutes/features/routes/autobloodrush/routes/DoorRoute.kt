@@ -1,4 +1,4 @@
-package noobroutes.features.dungeon.autobloodrush.routes
+package noobroutes.features.routes.autobloodrush.routes
 
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
@@ -12,6 +12,7 @@ import noobroutes.features.dungeon.autobloodrush.AutoBloodRush.thrown
 import noobroutes.features.dungeon.autobloodrush.BloodRushRoute
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
+import noobroutes.features.routes.autobloodrush.BloodRushRoute
 import noobroutes.utils.*
 import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.json.JsonUtils.addProperty
@@ -32,23 +33,17 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
 
     var cancelMotion = false
     override fun runTick(room: UniqueRoom) {
-        if (System.currentTimeMillis() - thrown < 10000)  {
-            cancelMotion = true
-            return modMessage("doing shit")
-        }
+        if (System.currentTimeMillis() - thrown < 10000) return modMessage("doing shit")
+
         val x = PlayerUtils.posX
         val y = PlayerUtils.posY
         val z = PlayerUtils.posZ
-        if (y != 69.0 || x > 0 || z > 0 || x < -200 || z < -200) {
-            cancelMotion = true
-            return
-        }
+        if (y != 69.0 || x > 0 || z > 0 || x < -200 || z < -200) return
+
         val xDec = (x + 200) % 1
         val zDec = (z + 200) % 1
-        if (xDec != 0.5 || zDec != 0.5) {
-            cancelMotion = true
-            return
-        }
+        if (xDec != 0.5 || zDec != 0.5) return
+
         val dir = getDir()
 
         val isOpen = isAir(AutoBloodRush.getClosestDoorToPlayer(room)?.pos ?: return)
@@ -65,18 +60,14 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
             val dx = if (dir == 0) 1 else if (dir == 1) -1 else 0
             val dz = if (dir == 2) 1 else if (dir == 3) -1 else 0
             AutoRouteUtils.etherwarpToVec3(mc.thePlayer.positionVector.add(dx * 4.0, 0.0, dz * 4.0), silent)
-            cancelMotion = true
             return
         }
-        PlayerUtils.unSneak()
         val state = SwapManager.swapFromName("pearl")
         if (state == SwapManager.SwapState.UNKNOWN) {
-            cancelMotion = true
             return
         }
         if (state == SwapManager.SwapState.TOO_FAST) {
             modMessage("Tried to 0 tick swap gg")
-            cancelMotion = true
             return
         }
 
@@ -86,7 +77,6 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
             2 -> 101.8f
             3 -> -81.9f
             else -> {
-                cancelMotion = true
                 return
             }
         }
@@ -96,13 +86,13 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
             2 -> 66.9f
             3 -> 67.6f
             else -> {
-                cancelMotion = true
                 return
             }
         }
-        if (!silent) RotationUtils.setAngles(yaw, pitch)
+        PlayerUtils.sneak()
+        AutoRouteUtils.setRotation(yaw, pitch, silent)
         thrown = System.currentTimeMillis()
-        devMessage(yaw)
+        AutoBloodRush.autoBrUnsneakRegistered = true
         val expectedX = x + if (dir == 3) 1 else if (dir == 2) -1 else 0
         val expectedZ = z + if (dir == 0) 1 else if (dir == 1) -1 else 0
         clipS08 = ExpectedS08(expectedX, expectedZ, dir)
@@ -120,41 +110,8 @@ class DoorRoute(pos: Vec3) : BloodRushRoute("Door", pos) {
             else -> 69420
         }
     }
+//lastRoute = System.currentTimeMillis()
 
-    override fun runMotion(
-        room: UniqueRoom,
-        event: MotionUpdateEvent.Pre
-    ) {
-        if (cancelMotion) {
-            cancelMotion = false
-            return
-        }
-        val dir = getDir()
-        val yaw = when (dir) {
-            0 -> 14.8f
-            1 -> -167.6f
-            2 -> 101.8f
-            3 -> -81.9f
-            else -> return
-        }
-        val pitch = when (dir) {
-            0 -> 65.6f
-            1 -> 67.2f
-            2 -> 66.9f
-            3 -> 67.6f
-            else -> return
-        }
-        AutoRouteUtils.setRotation(yaw, pitch)
-        if (mc.thePlayer.isSneaking || !mc.thePlayer.heldItem.displayName.contains("pearl", true)) {
-            AutoRouteUtils.setRotation(yaw + offset, pitch)
-            Scheduler.schedulePreTickTask {
-                lastRoute = System.currentTimeMillis()
-                AutoBloodRush.autoBrUnsneakRegistered = true
-            }
-            return
-        }
-        AutoBloodRush.autoBrUnsneakRegistered = true
-    }
 
     override fun getAsJsonObject(): JsonObject {
         val obj = JsonObject()

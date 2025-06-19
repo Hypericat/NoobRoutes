@@ -1,4 +1,4 @@
-package noobroutes.features.dungeon.autoroute
+package noobroutes.features.routes
 
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
@@ -6,25 +6,21 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
-import noobroutes.Core.mc
-import noobroutes.events.impl.MotionUpdateEvent
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils.ether
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils.lastRoute
-import noobroutes.features.move.DynamicRoute
-import noobroutes.utils.*
-import noobroutes.utils.AutoP3Utils.walking
-import noobroutes.utils.RotationUtils.offset
-import noobroutes.utils.RotationUtils.setAngles
+import noobroutes.utils.routes.RouteUtils
+import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.RotationUtils
+import noobroutes.utils.SwapManager
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
+import noobroutes.utils.add
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.skyblock.skyblockID
+import noobroutes.utils.toBlockPos
 import kotlin.math.absoluteValue
 
-class DynNode(
+class DynamicNode(
     var pos: Vec3 = Vec3(0.0, 0.0, 0.0),
     var target: Vec3 = Vec3(0.0, 0.0, 0.0),
     val name: String = "DynNode",
@@ -54,41 +50,26 @@ class DynNode(
     }
 
 
-    fun tick() : Boolean {
+    fun tick() {
         val angles = RotationUtils.getYawAndPitch(target, true)
         var state = SwapManager.swapFromSBId(DynamicRoute.extraDebug, "ASPECT_OF_THE_VOID")
-        if (state == SwapManager.SwapState.UNKNOWN && Minecraft.getMinecraft().isSingleplayer) state = SwapManager.swapFromId(Item.getIdFromItem(Items.diamond_shovel))
-        if (state == SwapManager.SwapState.UNKNOWN) return false
+        if (state == SwapManager.SwapState.UNKNOWN && Minecraft.getMinecraft().isSingleplayer) state = SwapManager.swapFromId(
+            Item.getIdFromItem(Items.diamond_shovel))
+        if (state == SwapManager.SwapState.UNKNOWN) return
         if (state == SwapManager.SwapState.TOO_FAST) {
             modMessage("Tried to 0 tick swap gg")
-            return false
-        }
-        if (!DynamicRoute.silent) setAngles(angles.first, angles.second)
-        stopWalk()
-        PlayerUtils.sneak()
-        return true
-    }
-
-
-    fun motion(event: MotionUpdateEvent.Pre) {
-        val angles = RotationUtils.getYawAndPitch(target, true)
-        //event.yaw = angles.first
-        //event.pitch = angles.second
-        lastRoute = System.currentTimeMillis()
-        AutoRouteUtils.setRotation(angles.first, angles.second)
-        if (!mc.thePlayer.isSneaking || mc.thePlayer.heldItem.skyblockID != "ASPECT_OF_THE_VOID") {
-            AutoRouteUtils.setRotation(angles.first + offset, angles.second)
-            Scheduler.schedulePreTickTask {
-                lastRoute = System.currentTimeMillis()
-                ether()
-            }
             return
         }
+        lastRoute = System.currentTimeMillis()
+        RouteUtils.setRotation(angles.first,angles.second, silent)
+        stopWalk()
+        PlayerUtils.unSneak()
         ether()
     }
 
+
     fun stopWalk(){
-        walking = false
+        AutoP3Utils.walking = false
         PlayerUtils.unPressKeys()
     }
 

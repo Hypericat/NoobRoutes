@@ -25,6 +25,7 @@ import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.render.FreeCam
 import noobroutes.features.render.RotationVisualizer
 import noobroutes.features.render.Trail
+import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.hud.HudElement

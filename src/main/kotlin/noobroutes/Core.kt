@@ -6,9 +6,9 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.config.Config
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
-import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.floor7.autop3.AutoP3
+import noobroutes.features.routes.AutoRoute
+import noobroutes.features.routes.autobloodrush.AutoBloodRush
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.util.shader.RoundedRect

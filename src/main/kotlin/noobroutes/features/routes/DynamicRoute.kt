@@ -1,4 +1,4 @@
-package noobroutes.features.move
+package noobroutes.features.routes
 
 import net.minecraft.block.BlockColored
 import net.minecraft.client.Minecraft
@@ -11,18 +11,14 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import noobroutes.events.impl.MotionUpdateEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.autoroute.AutoRoute
-import noobroutes.features.dungeon.autoroute.AutoRoute.lastRoute
-import noobroutes.features.dungeon.autoroute.DynNode
+import noobroutes.utils.routes.RouteUtils.lastRoute
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.utils.IBlockStateUtils.setProperty
-import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.containsOneOf
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
@@ -36,20 +32,31 @@ import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 
-object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp Routes.", category = Category.MOVE) {
+object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp Routes.", category = Category.ROUTES) {
     val silent by BooleanSetting("Silent", default = true, description = "Server side rotations")
     val renderRoutes by BooleanSetting("Render Routes", default = false, description = "Renders nodes")
-    val renderIndex by BooleanSetting("Render Index", description = "Render index above node, useful for editing").withDependency { this.renderRoutes }
+    val renderIndex by BooleanSetting(
+        "Render Index",
+        description = "Render index above node, useful for editing"
+    ).withDependency { this.renderRoutes }
     val depth by BooleanSetting("Depth", default = true, description = "Render Rings Through Walls").withDependency { renderRoutes }
-    val fullBlock by BooleanSetting("Place Full Blocks", default = true, description = "Make the blocks under the nodes full blocks.")
+    val fullBlock by BooleanSetting(
+        "Place Full Blocks",
+        default = true,
+        description = "Make the blocks under the nodes full blocks."
+    )
 
-    val dynColor by ColorSetting("Dyn Node Color", default = Color.BLUE, description = "Color of dynamic nodes").withDependency { this.renderRoutes }
+    val dynColor by ColorSetting(
+        "Dyn Node Color",
+        default = Color.Companion.BLUE,
+        description = "Color of dynamic nodes"
+    ).withDependency { this.renderRoutes }
     val editMode by BooleanSetting("Edit Mode", description = "Prevents nodes from triggering")
     val extraDebug by BooleanSetting("Warn Missing Item", description = "Get ts out of my face", default = true)
 
 
-    private var nodes : MutableList<DynNode> = mutableListOf();
-    private var deletedNodes : MutableList<DynNode> = mutableListOf();
+    private var nodes : MutableList<DynamicNode> = mutableListOf();
+    private var deletedNodes : MutableList<DynamicNode> = mutableListOf();
 
     @Synchronized
     @SubscribeEvent
@@ -74,8 +81,8 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
 
 
     @Synchronized
-    private fun inNodes(): MutableList<DynNode> {
-        val inNodes = mutableListOf<DynNode>()
+    private fun inNodes(): MutableList<DynamicNode> {
+        val inNodes = mutableListOf<DynamicNode>()
         nodes.forEach { node ->
             val inNode = node.pos.distanceToPlayerSq <= 0.25
             if (inNode && !node.triggered) {
@@ -90,9 +97,16 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
 
 
     @Synchronized
-    fun addNode(node: DynNode) {
+    fun addNode(node: DynamicNode) {
         if (Minecraft.getMinecraft().theWorld != null && fullBlock) {
-            node.setPrevState(Minecraft.getMinecraft().theWorld.getBlockState(node.getBlockPos().subtract(Vec3i(0, 1, 0))))
+            node.setPrevState(
+                Minecraft.getMinecraft().theWorld.getBlockState(node.getBlockPos().subtract(
+                    Vec3i(
+                        0,
+                        1,
+                        0
+                    )
+                )))
 
             Minecraft.getMinecraft().theWorld?.setBlockState(
                 node.getBlockPos().subtract(Vec3i(0, 1, 0)),
@@ -110,7 +124,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTick(event: ClientTickEvent) {
+    fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.isEnd || mc.thePlayer == null || editMode || PlayerUtils.movementKeysPressed) return
 
         if (!AutoRoute.canRoute) return
@@ -118,12 +132,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
         val node = inNodes().firstOrNull() ?: return
 
         lastRoute = System.currentTimeMillis()
-
-         if (!node.tick()) return // Could not get correct item
-
-        Scheduler.schedulePreMotionUpdateTask {
-            node.motion((it as MotionUpdateEvent.Pre))
-        }
+        node.tick()
 
         if (node.singleUse) removeNode(node)
     }
@@ -180,7 +189,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
                             return
                         }
                         modMessage("Adding node!")
-                        addNode(DynNode(playerCoords, raytrace))
+                        addNode(DynamicNode(playerCoords, raytrace))
                     }
 
                     else -> {
@@ -192,7 +201,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     }
 
     @Synchronized
-    private fun removeNode(node: DynNode) {
+    private fun removeNode(node: DynamicNode) {
         deletedNodes.add(node)
         nodes.remove(node)
 
@@ -230,7 +239,7 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
     }
 
     @Synchronized
-    private fun getNode(args : Array<out String>): DynNode? {
+    private fun getNode(args : Array<out String>): DynamicNode? {
         if (args.size > 1) {
             val index = args[1].toIntOrNull()?.absoluteValue
             if (index == null) {
