@@ -11,9 +11,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.logger
 import noobroutes.Core.mc
+import noobroutes.events.BossEventDispatcher
 import noobroutes.events.BossEventDispatcher.inF7Boss
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.Phase
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3.depth
 import noobroutes.features.floor7.autop3.AutoP3.renderStyle
@@ -50,27 +52,6 @@ object AutoP3Utils {
         mc.gameSettings.keyBindBack
     )
 
-    val tickSpeeds = mapOf(
-        0 to 1.403,
-        1 to 3.08,
-        2 to 1.99,
-        3 to 1.84,
-        4 to 1.7,
-        5 to 1.58,
-        6 to 1.47,
-        7 to 1.37,
-        8 to 1.28,
-        9 to 1.2,
-        10 to 1.12,
-        11 to 1.05,
-        12 to 1.0,
-        13 to 0.95,
-    )
-
-    private var xSpeed = 0.0
-    private var zSpeed = 0.0
-
-
     fun unPressKeys(stop: Boolean = true) {
         Keyboard.enableRepeatEvents(false)
         keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
@@ -93,13 +74,15 @@ object AutoP3Utils {
 
     fun startWalk(dir: Float) {
         direction = dir
-        xSpeed = mc.thePlayer.motionX
-        zSpeed = mc.thePlayer.motionZ
         walking = true
     }
 
     @SubscribeEvent
     fun onUnload(event: WorldEvent.Unload) {
+        stopShit()
+    }
+
+    fun stopShit() {
         walking = false
         motioning = false
         testing = false
@@ -107,44 +90,42 @@ object AutoP3Utils {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onS08(event: PacketEvent.Receive) {
-        if (event.packet !is S08PacketPlayerPosLook) return
-        walking = false
-        motioning = false
-        testing = false
+        if (event.packet is S08PacketPlayerPosLook) stopShit()
     }
 
     private var lastSpeed = 0.0
     var scale = 1f
 
-    var drag = 0.9063338661881611
-    var push = 0.036901383361851
+    private const val DRAG = 0.9063338661881611
+    private const val PUSH = 0.036901383361851
+    private const val TICK1 = 3.08
+    private const val TICK2 = 1.99
 
     @SubscribeEvent
     fun motion(event: ClientTickEvent) {
         if (!motioning || event.phase != TickEvent.Phase.START) return
-        if (motionTicks == 0) {
-            setSpeed(1.4)
-            modMessage("walk")
-        }
-        if (motionTicks == 1) {
-            if (mc.thePlayer.onGround) {
-                mc.thePlayer.jump()
-                setSpeed(AutoP3.tick1 * scale)
+        when (motionTicks) {
+            0 -> setSpeed(1.4)
+            1 -> {
+                if (mc.thePlayer.onGround) {
+                    mc.thePlayer.jump()
+                    setSpeed(TICK1 * scale)
+                }
+                else {
+                    motioning = false
+                    modMessage("help im midair")
+                    return
+                }
             }
-            else {
-                motioning = false
-                modMessage("help im midair")
-                return
+            2 -> {
+                setSpeed(TICK2 * scale)
+                lastSpeed = AutoP3.tick2
             }
-        }
-        else if (motionTicks == 2) {
-            setSpeed(AutoP3.tick2 * scale)
-            lastSpeed = AutoP3.tick2
-        }
-        else {
-            lastSpeed *= drag
-            lastSpeed += push
-            setSpeed(lastSpeed * scale)
+            else -> {
+                lastSpeed *= DRAG
+                lastSpeed += PUSH
+                setSpeed(lastSpeed * scale)
+            }
         }
         if (motionTicks > 1 && mc.thePlayer.onGround) {
             startWalk(direction)
@@ -157,7 +138,7 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun noTurn(event: MotionUpdateEvent.Pre) {
-        if (!AutoP3.noRotate || !inF7Boss) {
+        if (!AutoP3.noRotate || BossEventDispatcher.currentBossPhase != Phase.P3) {
             lastLook = Pair(event.yaw, event.pitch)
         }
         else {
@@ -203,8 +184,8 @@ object AutoP3Utils {
     var airTicks = 0
     var jumping = false
 
-    var jump1 = 2
-    var jump2 = 1.25
+    private const val JUMP_SPEED = 6.0075
+    private const val SPRINT_MULTIPLIER = 1.3
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun movement(event: ClientTickEvent) {
@@ -217,16 +198,13 @@ object AutoP3Utils {
         }
 
         if (mc.thePlayer.isInWater || mc.thePlayer.isInLava || !walking) return
-
-        val sprintMultiplier = 1.3
         val speed = mc.thePlayer.aiMoveSpeed.toDouble()
 
         if (airTicks < 1) {
             var speedMultiplier = 2.806
             if (jumping) {
                 jumping = false
-                speedMultiplier += jump1
-                speedMultiplier *= jump2
+                speedMultiplier = JUMP_SPEED
             }
             mc.thePlayer.motionX = Utils.xPart(direction) * speed * speedMultiplier
             mc.thePlayer.motionZ = Utils.zPart(direction) * speed * speedMultiplier
@@ -234,9 +212,9 @@ object AutoP3Utils {
         }
 
         val movementFactor = if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0 && !AutoP3.walkFix)) {
-            speed * sprintMultiplier
+            speed * SPRINT_MULTIPLIER
         } else {
-            0.02 * sprintMultiplier
+            0.02 * SPRINT_MULTIPLIER
         }
         mc.thePlayer.motionX += movementFactor * Utils.xPart(direction)
         mc.thePlayer.motionZ += movementFactor * Utils.zPart(direction)
@@ -247,7 +225,7 @@ object AutoP3Utils {
     }
 
     fun ringCheckY(ring: Ring): Boolean {
-        return (ring.coords.yCoord <= mc.thePlayer.posY && ring.coords.yCoord + 1 > mc.thePlayer.posY && ring !is BlinkRing) || (ring.coords.yCoord == mc.thePlayer.posY)
+        return (ring.coords.yCoord <= mc.thePlayer.posY && ring.coords.yCoord + 1 > mc.thePlayer.posY && ring !is BlinkRing && !ring.center) || (ring.coords.yCoord == mc.thePlayer.posY)
     }
 
     @SubscribeEvent
@@ -258,6 +236,7 @@ object AutoP3Utils {
         if (!Keyboard.getEventKeyState()) return
         walking = false
         motioning = false
+        testing = false
     }
 
     val ringColors = mapOf(
@@ -276,7 +255,6 @@ object AutoP3Utils {
     )
 
     fun renderRing(ring: Ring) {
-        if (AutoP3.onlyCenter && ring !is BlinkRing && !ring.center) return
         if (AutoP3.cgyMode) {
             Renderer.drawCylinder(ring.coords, 0.5, 0.5, -0.01, 24, 1, 90, 0, 0, ringColors.getOrDefault(ring.type, Color(255, 0, 255)), depth = depth)
             return

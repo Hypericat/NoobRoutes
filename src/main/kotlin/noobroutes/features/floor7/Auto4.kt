@@ -13,6 +13,7 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.floor7.autop3.Blink
+import noobroutes.features.floor7.autop3.Blink.rotSkip
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
@@ -63,11 +64,15 @@ object Auto4: Module(
             mc.thePlayer.rotationPitch = rotation.second
         }
         if (Blink.cancelled >= 1) {
+            rotSkip = true
             PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
             Blink.cancelled--
             PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
         }
-        else Scheduler.scheduleLowestPreTickTask(1) { PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem)) }
+        else Scheduler.scheduleLowestPreTickTask(1) {
+            rotSkip = true
+            PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+        }
         shotBlocks.add(block)
     }
 

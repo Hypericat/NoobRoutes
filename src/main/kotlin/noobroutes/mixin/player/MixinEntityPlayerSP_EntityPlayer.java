@@ -3,16 +3,20 @@ package noobroutes.mixin.player;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import noobroutes.events.BossEventDispatcher;
 import noobroutes.events.impl.MotionUpdateEvent;
 import noobroutes.features.dungeon.autoroute.AutoRouteUtils;
+import noobroutes.features.floor7.autop3.AutoP3;
 import noobroutes.features.misc.NoDebuff;
+import noobroutes.utils.AutoP3Utils;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -23,6 +27,9 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 @Mixin(value = {EntityPlayerSP.class})
 public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
     @Shadow private int positionUpdateTicks;
+
+    @Shadow public abstract boolean attackEntityFrom(DamageSource source, float amount);
+
     private double oldPosX;
     private double oldPosY;
     private double oldPosZ;

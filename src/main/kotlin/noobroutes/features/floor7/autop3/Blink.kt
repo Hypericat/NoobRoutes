@@ -33,7 +33,6 @@ object Blink{
     var cancelled = 0
     var blinksInstance = 0
     var rotate: Float? = null
-    private var awaitingRotation = false
     private var c03AfterS08 = 0
     var lastBlink = System.currentTimeMillis()
     var lastBlinkRing: Ring? = null
@@ -53,13 +52,10 @@ object Blink{
                 modMessage("cleared waypoints. If u want to delete blinks just use /noob delete")
             }
             "more" -> {
-                try {
-                    val amount = args[2].toInt()
-                    blinksInstance -= amount
-                    modMessage("u now have ${AutoP3.maxBlinks - blinksInstance} packets left on this instance")
-                } catch (e: Exception) {
-                    modMessage("need length amount to remove")
-                }
+                if (args.size < 3) return modMessage("need how many packets to remove")
+                val amount = args[2].toIntOrNull() ?: return modMessage("need how many packets to remove")
+                blinksInstance -= amount
+                modMessage("u now have ${AutoP3.maxBlinks - blinksInstance} packets left on this instance")
             }
             else -> modMessage("not an option")
         }
@@ -68,30 +64,18 @@ object Blink{
     @SubscribeEvent
     fun onC03(event: PacketEvent.Send) {
         if (event.packet is C04PacketPlayerPosition) lastSentC03 = event.packet
-        else if (event.packet is C06PacketPlayerPosLook) lastSentC03 =
-           C04PacketPlayerPosition(
-                event.packet.positionX,
-                event.packet.positionY,
-                event.packet.positionZ,
-                event.packet.isOnGround
-            )
+        else if (event.packet is C06PacketPlayerPosLook) lastSentC03 = C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)
     }
 
     @SubscribeEvent
-    fun worldLoad(event: WorldEvent.Load) {
-        blinksInstance = 0
-        cancelled = 0
-        SecretGuideIntegration.setSecretGuideAura(true)
-        BossEventDispatcher.inF7Boss = false
-        AutoP3.customBlinkLengthToggle = false
-    }
+    fun worldLoad(event: WorldEvent.Load) { resetShit() }
 
     @SubscribeEvent
-    fun worldUnLoad(event: WorldEvent.Unload) {
+    fun worldUnLoad(event: WorldEvent.Unload) { resetShit() }
+
+    fun resetShit() {
         blinksInstance = 0
         cancelled = 0
-        SecretGuideIntegration.setSecretGuideAura(true)
-        BossEventDispatcher.inF7Boss = false
         AutoP3.customBlinkLengthToggle = false
     }
 
@@ -111,17 +95,16 @@ object Blink{
         )
     }
     private var lastMovementedC03: C04PacketPlayerPosition? = null
+
     @SubscribeEvent
     fun renderMovement(event: RenderWorldLastEvent) {
-        if(!BossEventDispatcher.inF7Boss) return
-        if (movementPackets.isEmpty() || lastMovementedC03 == null) return
-        if (!AutoP3.mode) return
+        if(!BossEventDispatcher.inF7Boss || movementPackets.isEmpty() || lastMovementedC03 == null || !AutoP3.mode) return
         val firstPacket = movementPackets.first()
         val beforeFirst = lastMovementedC03 ?: return
         val xDiff = firstPacket.positionX - beforeFirst.positionX
         val yDiff = firstPacket.positionY - beforeFirst.positionY
         val zDiff = firstPacket.positionZ - beforeFirst.positionZ
-        val timeAlong = (System.currentTimeMillis() - lastC03) / 50.0
+        val timeAlong = event.partialTicks
         val xPos = beforeFirst.positionX + xDiff * timeAlong
         val yPos = beforeFirst.positionY + yDiff * timeAlong
         val zPos = beforeFirst.positionZ + zDiff * timeAlong
@@ -137,6 +120,7 @@ object Blink{
     }
 
     private var lastC03 = System.currentTimeMillis()
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onLastC03(event: PacketEvent.Send) {
         if (event.packet is C03PacketPlayer) lastC03 = System.currentTimeMillis()
@@ -144,7 +128,7 @@ object Blink{
 
     @SubscribeEvent
     fun blinkWaypoints(event: RenderWorldLastEvent) {
-        if(!BossEventDispatcher.inF7Boss) return
+        if (!BossEventDispatcher.inF7Boss) return
         blinkStarts.forEach {
             Renderer.drawCylinder(it.coords.add(
                 Vec3(
@@ -154,12 +138,13 @@ object Blink{
                 )
             ), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.Companion.WHITE, depth = true)
             if (AutoP3.editMode) return
-            if (AutoP3Utils.distanceToRingSq(it.coords) < 0.25 && mc.thePlayer.posY == it.coords.yCoord && !it.triggered) {
+            if (AutoP3Utils.distanceToRingSq(it.coords) < 0.25 && mc.thePlayer.posY == it.coords.yCoord) {
+                if (it.triggered) return@forEach
                 recordedPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
                 startRecording(it)
                 it.triggered = true
             }
-            else if(AutoP3Utils.distanceToRingSq(it.coords) > 0.25 || mc.thePlayer.posY != it.coords.yCoord) it.triggered = false
+            else it.triggered = false
         }
     }
 
@@ -198,42 +183,16 @@ object Blink{
     }
 
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun recorder(event: PacketEvent.Send) {
         if (!recording || event.packet !is C03PacketPlayer) return
         if (event.isCanceled) return
         modMessage("recording ${recordedPackets.size}")
-        if (event.packet is C04PacketPlayerPosition) {
-            if (recordedPackets.last() == C04PacketPlayerPosition(
-                    event.packet.positionX,
-                    event.packet.positionY,
-                    event.packet.positionZ,
-                    event.packet.isOnGround
-                )
-            ) return
-            recordedPackets.add(event.packet)
-        }
-        else if (event.packet is C06PacketPlayerPosLook) {
-            if (recordedPackets.last() == C04PacketPlayerPosition(
-                    event.packet.positionX,
-                    event.packet.positionY,
-                    event.packet.positionZ,
-                    event.packet.isOnGround
-                )
-            ) return
-            recordedPackets.add(
-                C04PacketPlayerPosition(
-                    event.packet.positionX,
-                    event.packet.positionY,
-                    event.packet.positionZ,
-                    event.packet.isOnGround
-                )
-            )
-        }
+        if (!event.packet.isMoving) return
+        recordedPackets.add(C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround))
         if (recordedPackets.size == getRecordingGoalLength(lastWaypoint)) {
             modMessage("finished recording")
             recording = false
-
             AutoP3.actuallyAddRing(BlinkRing(
                 lastWaypoint.coords,
                 lastWaypoint.yaw,
@@ -256,66 +215,29 @@ object Blink{
         return if (AutoP3.customBlinkLengthToggle) AutoP3.customBlinkLength else waypoint.length
     }
 
-    @SubscribeEvent
-    fun s08(event: PacketEvent.Receive) {
-        if (!BossEventDispatcher.inF7Boss) return
-        if (event.packet is S08PacketPlayerPosLook) c03AfterS08 = 2
-    }
-
     var rotSkip = false
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun canceller(event: PacketEvent.Send) {
-
-        if(!BossEventDispatcher.inF7Boss) return
-
-        if (event.packet !is C03PacketPlayer) return
-
+        if(!BossEventDispatcher.inF7Boss || event.packet !is C03PacketPlayer) return
         if (rotSkip) {
             rotSkip = false
             return
         }
-
         if (skip) return
-        if (awaitingRotation) {
-            awaitingRotation = false
-            return
-        }
         if (rotate != null) {
-            if (event.packet is C03PacketPlayer.C04PacketPlayerPosition || event.packet is C03PacketPlayer.C06PacketPlayerPosLook) {
-                event.isCanceled = true
-                awaitingRotation = true
-                PacketUtils.sendPacket(
-                    C03PacketPlayer.C06PacketPlayerPosLook(
-                        event.packet.positionX,
-                        event.packet.positionY,
-                        event.packet.positionZ,
-                        rotate!!,
-                        0F,
-                        event.packet.isOnGround
-                    )
-                )
+            event.isCanceled
+            rotate = null
+            if (event.packet.isMoving) {
+                PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.positionX,event.packet.positionY,event.packet.positionZ,rotate!!,0F,event.packet.isOnGround))
             }
             else {
-                event.isCanceled = true
-                awaitingRotation = true
                 PacketUtils.sendPacket(C03PacketPlayer.C05PacketPlayerLook(rotate!!, 0F, event.packet.isOnGround))
             }
-            rotate = null
-            if(cancelled > 0) cancelled--
-            return
-        }
-        if (c03AfterS08 > 0) {
-            c03AfterS08--
             if (cancelled > 0) cancelled--
             return
         }
-        if (event.packet.isMoving ||
-            movementPackets.isNotEmpty() ||
-            (mc.thePlayer.getDistanceSq(63.5, 127.0, 35.5) < 1.25 && event.packet is C03PacketPlayer.C05PacketPlayerLook) ||
-            System.currentTimeMillis() - lastBlink < 100 //listen if it works it works
-            //gay - wadey
-        ) {
+        if (event.packet.isMoving || movementPackets.isNotEmpty() || System.currentTimeMillis() - lastBlink < 100) {
             if (cancelled > 0) cancelled--
             return
         }
