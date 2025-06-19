@@ -8,9 +8,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.autoroute.DynamicNode
 import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.render.ClickGUIModule
+import noobroutes.features.routes.nodes.DynamicNode
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting

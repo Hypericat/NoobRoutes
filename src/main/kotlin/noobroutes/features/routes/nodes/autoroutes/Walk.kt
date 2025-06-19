@@ -8,15 +8,12 @@ import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.AutoP3Utils.startWalk
 import noobroutes.utils.Scheduler
-import noobroutes.utils.Utils.containsOneOf
-import noobroutes.utils.json.JsonUtils.asBlockPos
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.round
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeYaw
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 
@@ -29,7 +26,7 @@ class Walk(
     stop: Boolean = false,
     chain: Boolean = false,
     reset: Boolean = false,
-) : NodeLoader, AutorouteNode(
+) : AutorouteNode(
     pos,
     awaitSecrets,
     delay,
@@ -38,41 +35,44 @@ class Walk(
     chain,
     reset
 ) {
+    companion object : NodeLoader {
+        override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
+            val pos = obj.get("position").asVec3
+            val center = obj.has("center")
+            val chain = obj.has("chain")
+            val reset = obj.has("reset")
+            val stop = obj.has("stop")
+            val awaitSecrets = obj.get("secrets")?.asInt ?: 0
+            val delay = obj.get("delay")?.asLong ?: 0L
+            val yaw = obj.get("yaw").asFloat
+            return Walk(pos, yaw, awaitSecrets, delay, center, stop, chain, reset)
+        }
+
+        override fun generateFromArgs(
+            args: Array<out String>,
+            room: UniqueRoom
+        ): AutorouteNode? {
+            val generalNodeArgs = getGeneralNodeArgs(room, args)
+            return Walk(
+                generalNodeArgs.pos,
+                room.getRelativeYaw(mc.thePlayer.rotationYaw.round(14).toFloat()),
+                generalNodeArgs.awaitSecrets,
+                generalNodeArgs.delay,
+                generalNodeArgs.center,
+                generalNodeArgs.stop,
+                generalNodeArgs.chain,
+                generalNodeArgs.reset
+            )
+        }
+    }
+
+
     override val priority: Int = 4
-
-
     override fun nodeAddInfo(obj: JsonObject) {
         obj.addProperty("yaw", yaw)
     }
 
-    override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
-        val pos = obj.get("position").asVec3
-        val center = obj.has("center")
-        val chain = obj.has("chain")
-        val reset = obj.has("reset")
-        val stop = obj.has("stop")
-        val awaitSecrets = obj.get("secrets")?.asInt ?: 0
-        val delay = obj.get("delay")?.asLong ?: 0L
-        val yaw = obj.get("yaw").asFloat
-        return Walk(pos, yaw, awaitSecrets, delay, center, stop, chain, reset)
-    }
 
-    override fun generateFromArgs(
-        args: Array<out String>,
-        room: UniqueRoom
-    ): AutorouteNode? {
-        val generalNodeArgs = getGeneralNodeArgs(room, args)
-        return Walk(
-            generalNodeArgs.pos,
-            room.getRelativeYaw(mc.thePlayer.rotationYaw.round(14).toFloat()),
-            generalNodeArgs.awaitSecrets,
-            generalNodeArgs.delay,
-            generalNodeArgs.center,
-            generalNodeArgs.stop,
-            generalNodeArgs.chain,
-            generalNodeArgs.reset
-        )
-    }
 
     override fun updateTick() {
         val room = currentRoom ?: return

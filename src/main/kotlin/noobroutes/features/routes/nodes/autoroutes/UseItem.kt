@@ -8,13 +8,11 @@ import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.SwapManager
-import noobroutes.utils.Utils.containsOneOf
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeYaw
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
@@ -30,7 +28,7 @@ class UseItem(
     stop: Boolean = false,
     chain: Boolean = false,
     reset: Boolean = false,
-) : NodeLoader, AutorouteNode(
+) : AutorouteNode(
     pos,
     awaitSecrets,
     delay,
@@ -39,52 +37,56 @@ class UseItem(
     chain,
     reset
 ) {
+    companion object : NodeLoader {
+        override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
+            val pos = obj.get("position").asVec3
+            val yaw = obj.get("yaw").asFloat
+            val pitch = obj.get("pitch").asFloat
+            val awaitSecrets = obj.get("secrets")?.asInt ?: 0
+            val delay = obj.get("delay")?.asLong ?: 0L
+            val center = obj.has("center")
+            val stop = obj.has("stop")
+            val chain = obj.has("chain")
+            val reset = obj.has("reset")
+            val itemName = obj.get("itemName").asString
+            return UseItem(pos, itemName, yaw, pitch, awaitSecrets, delay, center, stop, chain, reset)
+        }
+
+        override fun generateFromArgs(
+            args: Array<out String>,
+            room: UniqueRoom
+        ): AutorouteNode? {
+            if (args.size < 3) {
+                modMessage("Need Item Name")
+                return null
+            }
+            val generalNodeArgs = getGeneralNodeArgs(room, args)
+            val name = args[2].toString()
+            val yaw = room.getRelativeYaw(mc.thePlayer.rotationYaw)
+            val pitch = mc.thePlayer.rotationPitch
+            return UseItem(
+                generalNodeArgs.pos,
+                name,
+                yaw,
+                pitch,
+                generalNodeArgs.awaitSecrets,
+                generalNodeArgs.delay,
+                generalNodeArgs.center,
+                generalNodeArgs.stop,
+                generalNodeArgs.chain,
+                generalNodeArgs.reset
+            )
+        }
+    }
+
     override val priority: Int = 5
-
-
     override fun nodeAddInfo(obj: JsonObject) {
         obj.addProperty("itemName", itemName)
+        obj.addProperty("yaw", yaw)
+        obj.addProperty("pitch", pitch)
     }
 
-    override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
-        val pos = obj.get("position").asVec3
-        val yaw = obj.get("yaw").asFloat
-        val pitch = obj.get("pitch").asFloat
-        val awaitSecrets = obj.get("secrets")?.asInt ?: 0
-        val delay = obj.get("delay")?.asLong ?: 0L
-        val center = obj.has("center")
-        val stop = obj.has("stop")
-        val chain = obj.has("chain")
-        val reset = obj.has("reset")
-        val itemName = obj.get("itemName").asString
-        return UseItem(pos, itemName, yaw, pitch, awaitSecrets, delay, center, stop, chain, reset)
-    }
 
-    override fun generateFromArgs(
-        args: Array<out String>,
-        room: UniqueRoom
-    ): AutorouteNode? {
-        if (args.size < 3) {
-            modMessage("Need Item Name")
-            return null
-        }
-        val generalNodeArgs = getGeneralNodeArgs(room, args)
-        val name = args[2].toString()
-        val yaw = room.getRelativeYaw(mc.thePlayer.rotationYaw)
-        val pitch = mc.thePlayer.rotationPitch
-        return UseItem(
-            generalNodeArgs.pos,
-            name,
-            yaw,
-            pitch,
-            generalNodeArgs.awaitSecrets,
-            generalNodeArgs.delay,
-            generalNodeArgs.center,
-            generalNodeArgs.stop,
-            generalNodeArgs.chain,
-            generalNodeArgs.reset
-        )
-    }
 
     override fun updateTick() {
         val room = currentRoom ?: return
@@ -115,6 +117,6 @@ class UseItem(
     }
 
     override fun getType(): NodeType {
-        NodeType.USE_ITEM
+        return NodeType.USE_ITEM
     }
 }

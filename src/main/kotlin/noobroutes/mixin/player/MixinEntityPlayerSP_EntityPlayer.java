@@ -6,7 +6,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import noobroutes.events.BossEventDispatcher;
 import noobroutes.events.impl.MotionUpdateEvent;
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils;
 import noobroutes.features.misc.NoDebuff;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,12 +37,6 @@ public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
 
 
 
-
-    //@Inject(method = "isSneaking", at = @At("HEAD"), cancellable = true)
-    public void setSneak(CallbackInfoReturnable<Boolean> cir) {
-        AutoRouteUtils.INSTANCE.testFunction();
-        if (AutoRouteUtils.INSTANCE.getSneak()) cir.setReturnValue(!this.isPlayerSleeping());
-    }
 
     @Inject(method = "onUpdate",
             at = @At(

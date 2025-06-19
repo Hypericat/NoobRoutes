@@ -36,7 +36,7 @@ public class MixinKeybinding {
 
     @Inject(method = "isPressed", at = @At("HEAD"), cancellable = true)
     private void isPressed(CallbackInfoReturnable<Boolean> cir) {
-        if (AutoPath.INSTANCE.shouldCancelKey(keyCode))  {
+        if (/*AutoPath.INSTANCE.shouldCancelKey(keyCode)*/ false)  {
             cir.setReturnValue(false);
             this.pressed = false;
             this.pressTime = 0;

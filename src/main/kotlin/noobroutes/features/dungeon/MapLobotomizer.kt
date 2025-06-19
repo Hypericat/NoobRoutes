@@ -16,8 +16,8 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.autoroute.AutoRoute
 import noobroutes.features.render.FreeCam
+import noobroutes.features.routes.AutoRoute
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
@@ -49,7 +49,6 @@ object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme 
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onMouse(event: ClickEvent.All) {
-        AutoRoute.silent
         if (!editMode) return
         val mouseOver = if (FreeCam.enabled) FreeCam.looking else mc.objectMouseOver ?: return
         val target = mouseOver?.hitBlock() ?: return

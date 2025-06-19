@@ -84,10 +84,7 @@ object Zpew : Module(
         return recentFails.size < MAXFAILSPERFAILPERIOD
     }
 
-    @SubscribeEvent
-    fun onWorldUnload(event: WorldEvent.Unload){
-        recentlySentC06s.clear()
-    }
+
 
     fun holdingTeleportItem(): Boolean {
         val held = mc.thePlayer.heldItem
@@ -204,7 +201,6 @@ object Zpew : Module(
     @SubscribeEvent
     fun onC08(event: PacketEvent.Send) {
         if (mc.thePlayer == null || event.packet !is C08PacketPlayerBlockPlacement) return
-
         val dir = event.packet.placedBlockDirection
         if (dir != 255) return
         val info = getTeleportInfo() ?: return

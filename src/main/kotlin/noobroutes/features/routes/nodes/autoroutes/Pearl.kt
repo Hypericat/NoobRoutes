@@ -28,7 +28,7 @@ class Pearl(
     stop: Boolean = false,
     chain: Boolean = false,
     reset: Boolean = false
-) : NodeLoader, AutorouteNode(
+) :  AutorouteNode(
     pos,
     awaitSecrets,
     delay,
@@ -37,6 +37,53 @@ class Pearl(
     chain,
     reset
 ) {
+
+    companion object : NodeLoader {
+        override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
+            val pos = obj.get("position").asVec3
+            val count = obj.get("count").asInt
+            val yaw = obj.get("yaw").asFloat
+            val pitch = obj.get("pitch").asFloat
+            val awaitSecrets = obj.get("secrets")?.asInt ?: 0
+            val delay = obj.get("delay")?.asLong ?: 0L
+            val center = obj.has("center")
+            val stop = obj.has("stop")
+            val chain = obj.has("chain")
+            val reset = obj.has("reset")
+            return Pearl(pos, count, yaw, pitch, awaitSecrets, delay, center, stop, chain, reset)
+        }
+
+        override fun generateFromArgs(
+            args: Array<out String>,
+            room: UniqueRoom
+        ): AutorouteNode? {
+            if (args.size < 3) {
+                modMessage("Pearl Count")
+                return null
+            }
+            val generalNodeArgs = getGeneralNodeArgs(room, args)
+            val count = args[2].toIntOrNull()
+            if (count == null) {
+                modMessage("Input a number")
+                return null
+            }
+            val yaw = room.getRelativeYaw(mc.thePlayer.rotationYaw)
+            val pitch = mc.thePlayer.rotationPitch
+            return Pearl(
+                generalNodeArgs.pos,
+                count,
+                yaw,
+                pitch,
+                generalNodeArgs.awaitSecrets,
+                generalNodeArgs.delay,
+                generalNodeArgs.center,
+                generalNodeArgs.stop,
+                generalNodeArgs.chain,
+                generalNodeArgs.reset
+            )
+        }
+    }
+
     override val priority: Int = 3
 
 
@@ -46,49 +93,7 @@ class Pearl(
         obj.addProperty("count", count)
     }
 
-    override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
-        val pos = obj.get("position").asVec3
-        val count = obj.get("count").asInt
-        val yaw = obj.get("yaw").asFloat
-        val pitch = obj.get("pitch").asFloat
-        val awaitSecrets = obj.get("secrets")?.asInt ?: 0
-        val delay = obj.get("delay")?.asLong ?: 0L
-        val center = obj.has("center")
-        val stop = obj.has("stop")
-        val chain = obj.has("chain")
-        val reset = obj.has("reset")
-        return Pearl(pos, count, yaw, pitch, awaitSecrets, delay, center, stop, chain, reset)
-    }
 
-    override fun generateFromArgs(
-        args: Array<out String>,
-        room: UniqueRoom
-    ): AutorouteNode? {
-        if (args.size < 3) {
-            modMessage("Pearl Count")
-            return null
-        }
-        val generalNodeArgs = getGeneralNodeArgs(room, args)
-        val count = args[2].toIntOrNull()
-        if (count == null) {
-            modMessage("Input a number")
-            return null
-        }
-        val yaw = room.getRelativeYaw(mc.thePlayer.rotationYaw)
-        val pitch = mc.thePlayer.rotationPitch
-        return Pearl(
-            generalNodeArgs.pos,
-            count,
-            yaw,
-            pitch,
-            generalNodeArgs.awaitSecrets,
-            generalNodeArgs.delay,
-            generalNodeArgs.center,
-            generalNodeArgs.stop,
-            generalNodeArgs.chain,
-            generalNodeArgs.reset
-        )
-    }
 
     override fun updateTick() {
         val room = currentRoom ?: return

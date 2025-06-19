@@ -6,29 +6,26 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.routes.AutoRoute
-import noobroutes.utils.routes.RouteUtils
-import noobroutes.utils.routes.SecretUtils
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
+import noobroutes.utils.*
 import noobroutes.utils.RotationUtils.offset
-import noobroutes.utils.Scheduler
-import noobroutes.utils.SwapManager
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
-import noobroutes.utils.add
-import noobroutes.utils.floor
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asBlockPos
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.routes.RouteUtils
+import noobroutes.utils.routes.SecretUtils
+import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.toVec3
 import kotlin.math.absoluteValue
 
 class Bat(
@@ -43,7 +40,7 @@ class Bat(
     chain: Boolean = false,
     reset: Boolean = false
 
-) : NodeLoader, AutorouteNode(
+) : AutorouteNode(
     pos,
     awaitSecrets,
     delay,
@@ -54,7 +51,28 @@ class Bat(
 ) {
     override val priority: Int = 4
 
+    companion object : NodeLoader {
+        override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
+            val pos = obj.get("position").asVec3
+            val target = obj.get("target")?.asBlockPos
+            val yaw = obj.get("yaw").asFloat
+            val pitch = obj.get("pitch").asFloat
+            val awaitSecrets = obj.get("secrets")?.asInt ?: 0
+            val delay = obj.get("delay")?.asLong ?: 0L
+            val center = obj.has("center")
+            val stop = obj.has("stop")
+            val chain = obj.has("chain")
+            val reset = obj.has("reset")
+            return Bat(pos, target, yaw, pitch, awaitSecrets, delay, center, stop, chain, reset)
+        }
 
+        override fun generateFromArgs(
+            args: Array<out String>,
+            room: UniqueRoom
+        ): AutorouteNode? {
+            return null
+        }
+    }
 
     override fun nodeAddInfo(obj: JsonObject) {
         target?.let { obj.addProperty("target", it) }
@@ -62,23 +80,7 @@ class Bat(
         obj.addProperty("pitch", pitch)
     }
 
-    companion object {
 
-    }
-
-    override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
-        val pos = obj.get("position").asVec3
-        val target = obj.get("target")?.asBlockPos
-        val yaw = obj.get("yaw").asFloat
-        val pitch = obj.get("pitch").asFloat
-        val awaitSecrets = obj.get("secrets")?.asInt ?: 0
-        val delay = obj.get("delay")?.asLong ?: 0L
-        val center = obj.has("center")
-        val stop = obj.has("stop")
-        val chain = obj.has("chain")
-        val reset = obj.has("reset")
-        return Bat(pos, target, yaw, pitch, awaitSecrets, delay, center, stop, chain, reset)
-    }
 
     override fun updateTick() {
         val room = currentRoom ?: return
@@ -88,7 +90,7 @@ class Bat(
 
     override fun run() {
         val room = currentRoom ?: return
-        val state = SwapManager.swapFromSBId("HYPERION", "ASTRAEA", "VALKYRIE", "SCYLLA", "NECRON_BLADE")
+        val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(267) else SwapManager.swapFromSBId("HYPERION", "ASTRAEA", "VALKYRIE", "SCYLLA", "NECRON_BLADE")
         stopWalk()
         if (state == SwapManager.SwapState.TOO_FAST) {
             modMessage("Tried to 0 tick swap gg")

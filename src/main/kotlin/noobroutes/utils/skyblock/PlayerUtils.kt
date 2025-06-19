@@ -118,9 +118,12 @@ object PlayerUtils {
     inline val Vec3.distanceToPlayer get() = mc.thePlayer.positionVector.distanceTo(this)
     inline val BlockPos.distanceToPlayer get() = mc.thePlayer.positionVector.distanceTo(Vec3(this))
     inline val BlockPos.distanceToPlayerSq get() = mc.thePlayer.positionVector.squareDistanceTo(Vec3(this))
+    var lastSetSneakState = false
+
 
     fun setSneak(state: Boolean){
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, state)
+        lastSetSneakState = state
     }
 
     fun resyncSneak(){
@@ -129,10 +132,12 @@ object PlayerUtils {
 
     fun unSneak(){
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, false)
+        lastSetSneakState = false
     }
 
     fun sneak(){
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.keyCode, true)
+        lastSetSneakState = true
     }
 
     fun getBlockPlayerIsLookingAt(distance: Double = 5.0): Block? {

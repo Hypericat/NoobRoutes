@@ -19,16 +19,25 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.move.Zpew
 import noobroutes.features.routes.nodes.AutorouteNode
+import noobroutes.features.routes.nodes.autoroutes.Aotv
+import noobroutes.features.routes.nodes.autoroutes.Bat
+import noobroutes.features.routes.nodes.autoroutes.Etherwarp
+import noobroutes.features.routes.nodes.autoroutes.Pearl
+import noobroutes.features.routes.nodes.autoroutes.PearlClip
+import noobroutes.features.routes.nodes.autoroutes.UseItem
+import noobroutes.features.routes.nodes.autoroutes.Walk
 import noobroutes.utils.*
 import noobroutes.utils.AutoP3Utils.walking
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
+import kotlin.collections.filter
 
 object RouteUtils {
 
@@ -64,17 +73,13 @@ object RouteUtils {
         ether()
     }
 
-    var lastSneakState = false
-    @SubscribeEvent
-    fun lastSneakState(event: RenderWorldLastEvent) {
-        lastSneakState = mc.thePlayer.isSneaking
-    }
+
 
     @SubscribeEvent
     fun onKeyInputEvent(event: InputEvent.KeyInputEvent){
         val key = Keyboard.getEventKey()
-        if (key == mc.gameSettings.keyBindSneak.keyCode && !routing) {
-            PlayerUtils.setSneak(lastSneakState)
+        if (key == mc.gameSettings.keyBindSneak.keyCode && routing) {
+            PlayerUtils.setSneak(PlayerUtils.lastSetSneakState)
         }
     }
 
@@ -206,7 +211,7 @@ object RouteUtils {
     }
 
     var lastRoute = 0L
-    inline val routing get() = System.currentTimeMillis() - lastRoute > 51
+    inline val routing get() = System.currentTimeMillis() - lastRoute < 51
 
     var pearls = 0
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -225,7 +230,10 @@ object RouteUtils {
 
     @SubscribeEvent
     fun onMouse(event: MouseEvent){
-        if ((event.dx != 0 || event.dy != 0) && routing) resetRotation()
+        if (event.button == 1 && event.buttonstate && routing) {
+            event.isCanceled = true
+        }
+        if ((event.dx != 0 || event.dy != 0) && !routing) resetRotation()
     }
 
     fun meowConverter(file: Map<String, JsonArray>): MutableMap<String, MutableList<AutorouteNode>> {
@@ -251,7 +259,6 @@ object RouteUtils {
                             coords,
                             target,
                             await,
-                            false,
                             delay,
                             false,
                             false,
@@ -261,25 +268,7 @@ object RouteUtils {
                     )
                 }
                 "aotv" -> {
-                    val yaw = data.get("yaw").asFloat
-                    val pitch = data.get("pitch").asFloat
-                    val aotv = Aotv(
-                        coords,
-                        null,
-                        yaw,
-                        pitch,
-                        await,
-                        false,
-                        delay,
-                        false,
-                        false,
-                        false,
-                        false
-                    )
-
-                    routeMap[room]?.add(
-                        aotv
-                    )
+                    return@forEach
                 }
                 "bat" -> {
                     val yaw = data.get("yaw").asFloat
@@ -291,7 +280,6 @@ object RouteUtils {
                             yaw,
                             pitch,
                             await,
-                            false,
                             delay,
                             false,
                             false,
@@ -307,7 +295,6 @@ object RouteUtils {
                             coords,
                             distance - 1,
                             await,
-                            false,
                             delay,
                             false,
                             false,
@@ -322,12 +309,12 @@ object RouteUtils {
                     val pitch = data.get("pitch").asFloat
                     if (name == "pearl") {
                         routeMap[room]?.add(
-                            Pearl(coords,
+                            Pearl(
+                                coords,
                                 1,
                                 yaw,
                                 pitch,
                                 await,
-                                false,
                                 delay,
                                 false,
                                 false,
@@ -344,7 +331,6 @@ object RouteUtils {
                                 yaw,
                                 pitch,
                                 await,
-                                false,
                                 delay,
                                 false,
                                 false,
@@ -358,15 +344,14 @@ object RouteUtils {
                     val yaw = data.get("yaw").asFloat
                     routeMap[room]?.add(
                         Walk(
-                        coords,
-                        yaw,
-                        await,
-                        false,
-                        delay,
-                        false,
-                        false,
-                        false,
-                        false
+                            coords,
+                            yaw,
+                            await,
+                            delay,
+                            false,
+                            false,
+                            false,
+                            false
                         )
                     )
                 }

@@ -1,12 +1,13 @@
 package noobroutes.features.routes.nodes
 
+import com.google.gson.JsonObject
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.util.Vec3
 import noobroutes.features.routes.DynamicRoute
-import noobroutes.utils.routes.RouteUtils
+import noobroutes.features.routes.nodes.autoroutes.NodeLoader
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.SwapManager
 import noobroutes.utils.Utils.xPart
@@ -14,17 +15,33 @@ import noobroutes.utils.Utils.zPart
 import noobroutes.utils.add
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.absoluteValue
 
 class DynamicNode(
+    pos: Vec3,
     var target: Vec3,
     val singleUse: Boolean = false
 ) : Node(
-
+    pos
 ){
+    companion object : NodeLoader {
+        override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
+            TODO("No saving and loading")
+        }
+
+        override fun generateFromArgs(
+            args: Array<out String>,
+            room: UniqueRoom
+        ): AutorouteNode? {
+            TODO("No saving and loading")
+        }
+
+    }
+
 
     private var prevState: IBlockState? = null;
 
@@ -57,7 +74,6 @@ class DynamicNode(
         return DynamicRoute.silent
     }
 
-
     override fun getType(): NodeType {
         return NodeType.DYNAMIC
     }
@@ -66,12 +82,12 @@ class DynamicNode(
         return DynamicRoute.depth
     }
 
-    override fun getRenderColor(): Color {
-        return DynamicRoute.dynColor
+    override fun getDistanceSq(pos: Vec3): Double {
+        return this.pos.squareDistanceTo(pos)
     }
 
-    override fun isInNode(pos: Vec3) : Boolean {
-        return pos.distanceToPlayerSq <= 0.25
+    override fun getRenderColor(): Color {
+        return DynamicRoute.dynColor
     }
 
     override fun render() {

@@ -2,7 +2,7 @@ package noobroutes.commands
 
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
-import noobroutes.features.dungeon.autobloodrush.AutoBloodRush
+
 import noobroutes.utils.skyblock.modMessage
 
 class AutoBloodRushCommand: CommandBase() {
@@ -16,7 +16,6 @@ class AutoBloodRushCommand: CommandBase() {
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
         if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Set, Clear, Load")
-        AutoBloodRush.handleBloodRushCommand(args)
     }
 
     override fun canCommandSenderUseCommand(sender: ICommandSender?): Boolean {
