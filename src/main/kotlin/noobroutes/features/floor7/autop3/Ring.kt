@@ -4,11 +4,15 @@ import com.google.gson.JsonObject
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.AutoP3.cgyMode
 import noobroutes.features.floor7.autop3.AutoP3.fuckingLook
 import noobroutes.features.floor7.autop3.AutoP3.silentLook
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.SyncData
 import noobroutes.utils.json.syncdata.*
+import kotlin.random.Random
+import kotlin.math.max
+import kotlin.math.min
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
@@ -96,6 +100,13 @@ abstract class Ring(
         }
         if (fuckingLook) {
             mc.thePlayer.rotationYaw = yaw
+        }
+        if (cgyMode) {
+            mc.thePlayer.rotationYaw = yaw
+            val javaRandom = java.util.Random()
+            val gaussian = javaRandom.nextGaussian().toFloat()
+            val scaled = gaussian * (15)
+            mc.thePlayer.rotationPitch = scaled.coerceIn(-45f, 45f) + 10f
         }
         if (center && (mc.thePlayer.onGround || System.currentTimeMillis() - Blink.lastBlink < 100)) {
             mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord)

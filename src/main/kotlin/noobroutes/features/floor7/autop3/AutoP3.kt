@@ -26,10 +26,6 @@ import noobroutes.features.floor7.autop3.rings.*
 import noobroutes.features.misc.SexAura
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
-import noobroutes.pathfinding.GoalXYZ
-import noobroutes.pathfinding.Path
-import noobroutes.pathfinding.PathFinder
-import noobroutes.pathfinding.PathNode
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.*
 import noobroutes.utils.json.JsonUtils.asVec3
@@ -61,6 +57,7 @@ object AutoP3: Module (
         noRotate = !noRotate
         modMessage("can rotate: " + !noRotate)
     }
+    val cgyMode by BooleanSetting("cgy Mode", false, description = "changes some settings to look like cgy")
     val silentLook by BooleanSetting("Silent Look", false, description = "when activating a look ring only rotate serverside (may lead to desync)")
     val fuckingLook by BooleanSetting("Loud Look", false, description = "always look for if u want to make ur autop3 seem mroe legit or smth")
     val renderStyle by SelectorSetting("ring design", "normal", arrayListOf("normal", "simple", "box"), false, description = "how rings should look")
@@ -114,7 +111,7 @@ object AutoP3: Module (
         rings[route]?.forEachIndexed { i, ring ->
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
             AutoP3Utils.renderRing(ring)
-            if (ring !is BlinkRing) return@forEachIndexed
+            if (ring !is BlinkRing || cgyMode) return@forEachIndexed
             val vec3List: List<Vec3> = ring.packets.map { packet -> Vec3(packet.positionX, packet.positionY + 0.01, packet.positionZ) }
             if (showEnd && ring.packets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
             if (showLine) RenderUtils.drawGradient3DLine(vec3List, Color.GREEN, Color.RED, 1F, true)
@@ -236,8 +233,6 @@ object AutoP3: Module (
         }
     }
 
-    data class Shit(val pos: BlockPos, val yaw: Float, val pitch: Float)
-
     private fun testFunctions(args: Array<out String>) {
         if (args.size < 2) {
             modMessage("Test: sgToggle, roomName, relativePos")
@@ -272,36 +267,6 @@ object AutoP3: Module (
                 AutoP3Utils.jump1 = add
                 AutoP3Utils.jump2 = mult
                 modMessage("1 $add 2 $mult")
-            }
-            "ether" -> {
-                if (args.size < 5) return
-                val x = args[2].toIntOrNull() ?: return
-                val y = args[3].toIntOrNull() ?: return
-                val z = args[4].toIntOrNull() ?: return
-
-
-                fun getOrderedPositions(path: Path): MutableList<Shit> {
-                    val shits = mutableListOf<Shit>()
-                    var lastNode: PathNode? = null
-                    var node: PathNode? = path.endNode
-
-                    shits.reverse() // From start to end
-                    return shits
-                }
-
-                val pathFinder = PathFinder(
-                    GoalXYZ(BlockPos(x.toDouble(), y.toDouble(), z.toDouble())),
-                    mc.thePlayer.positionVector.subtract(0.0, 1.0, 0.0).toBlockPos(),
-                    100.0,
-                    false,
-                    1f,
-                    1f,
-                    2f
-                )
-
-
-                val thread = Thread(Runnable { devMessage(getOrderedPositions(pathFinder.calculate())) })
-                thread.start()
             }
             else -> {
                 modMessage("All tests passed")

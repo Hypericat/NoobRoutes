@@ -260,8 +260,27 @@ object AutoP3Utils {
         motioning = false
     }
 
+    val ringColors = mapOf(
+        "Jump" to Color(255, 0, 255),
+        "Stop" to Color(255, 0, 0),
+        "Boom" to Color(0, 255, 255),
+        "HClip" to Color(0, 0, 0),
+        "Walk" to Color(255, 0, 255),
+        "LavaClip" to Color(255, 255, 0),
+        "Blink" to Color(255, 255, 255),
+        "Clamp" to Color(255, 0, 255),
+        "Insta" to Color(0, 0, 0),
+        "Motion" to Color(255, 0, 255),
+        "Speed" to Color(255, 255, 255),
+        "Test" to Color(255, 0, 255),
+    )
+
     fun renderRing(ring: Ring) {
         if (AutoP3.onlyCenter && ring !is BlinkRing && !ring.center) return
+        if (AutoP3.cgyMode) {
+            Renderer.drawCylinder(ring.coords, 0.5, 0.5, -0.01, 24, 1, 90, 0, 0, ringColors.getOrDefault(ring.type, Color(255, 0, 255)), depth = depth)
+            return
+        }
         when (renderStyle) {
             0 -> {
                 Renderer.drawCylinder(ring.coords.add(Vec3(0.0, (0.45 * sin(System.currentTimeMillis().toDouble()/300)) + 0.528 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)

@@ -2,11 +2,13 @@ package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
+import noobroutes.utils.skyblock.modMessage
 
 @RingType("Clamp")
 class ClampRing(
@@ -27,6 +29,7 @@ class ClampRing(
     override fun doRing() {
         AutoP3Utils.unPressKeys()
         super.doRing()
+        if (AutoP3.cgyMode) modMessage("Looking", "§0[§6Yharim§0]§7 ")
         val motionX = mc.thePlayer.motionX
         val motionZ = mc.thePlayer.motionZ
         if (motionX * xPart(yaw) < 0 || motionZ * zPart(yaw) < 0) {

@@ -5,6 +5,7 @@ import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
+import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.utils.Utils.ID
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
@@ -71,7 +72,8 @@ object SwapManager {
                 }
             }
         }
-        modMessage("$name not found.")
+        if (AutoP3.cgyMode && name == "TNT") modMessage("Unable to find Infinityboom TNT in your hotbar", "§0[§6Yharim§0]§7 ")
+        else modMessage("$name not found.")
         return SwapState.UNKNOWN
     }
 

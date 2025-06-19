@@ -88,7 +88,7 @@ class BlinkRing(
         }
         
         if (exceedsBlinkLimit || blinkDisabled) {
-            modMessage("movementing")
+            if (AutoP3.cgyMode) modMessage("Moving", "§0[§6Yharim§0]§7 ")
             movementPackets = packets.toMutableList()
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
@@ -109,12 +109,11 @@ class BlinkRing(
             mc.thePlayer.setVelocity(endXVelo, endYVelo, endZVelo)
             var airTicks = 0
             packets.forEach { if (!it.isOnGround) airTicks++ else airTicks = 0 }
-            Scheduler.schedulePreTickTask {
-                AutoP3Utils.airTicks = airTicks
-                AutoP3Utils.walking = true
-                AutoP3Utils.direction = yaw
-            }
+            AutoP3Utils.airTicks = airTicks
+            AutoP3Utils.direction = yaw
+            AutoP3Utils.walking = true
         }
-        modMessage("§c§l$cancelled§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
+        if (AutoP3.cgyMode) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
+        else modMessage("§c§l$cancelled§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }
 }

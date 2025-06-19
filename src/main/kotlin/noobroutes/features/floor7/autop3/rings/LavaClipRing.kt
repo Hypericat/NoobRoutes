@@ -2,10 +2,12 @@ package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.features.move.LavaClip
 import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.skyblock.modMessage
 
 @RingType("LavaClip")
 class LavaClipRing(
@@ -27,6 +29,7 @@ class LavaClipRing(
     override fun doRing() {
         AutoP3Utils.unPressKeys()
         super.doRing()
+        if (AutoP3.cgyMode) modMessage("Vclipping", "§0[§6Yharim§0]§7 ")
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
         LavaClip.ringClip = length

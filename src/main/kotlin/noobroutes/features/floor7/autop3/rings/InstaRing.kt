@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
@@ -36,6 +37,7 @@ class InstaRing(
             modMessage("must be still before insta")
             return
         }
+        if (AutoP3.cgyMode) modMessage("Hclipping", "§0[§6Yharim§0]§7 ")
         AutoP3Utils.unPressKeys()
         super.doRing()
         direction = yaw
