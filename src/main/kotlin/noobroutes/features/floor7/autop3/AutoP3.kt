@@ -62,9 +62,9 @@ object AutoP3: Module (
     }
     val cgyMode by BooleanSetting("cgy Mode", false, description = "changes some settings to look like cgy")
     val silentLook by BooleanSetting("Silent Look", false, description = "when activating a look ring only rotate serverside (may lead to desync)")
-    val fuckingLook by BooleanSetting("Loud Look", false, description = "always look for if u want to make ur autop3 seem mroe legit or smth")
+    val fuckingLook by BooleanSetting("Loud Look", false, description = "always look for if u want to make ur autop3 seem more legit or smth")
     val renderStyle by SelectorSetting("ring design", "normal", arrayListOf("normal", "simple", "box"), false, description = "how rings should look")
-    val walkFix by BooleanSetting("walk fix", false, description = "always look for if u want to make ur autop3 seem mroe legit or smth")
+    val walkFix by BooleanSetting("walk fix", false, description = "no edge boost")
     private val blinkShit by DropdownSetting(name = "Blink Settings")
     val speedRings by BooleanSetting(name = "Speed Rings", description = "Toggles the use of tickshift rings").withDependency { blinkShit }
     val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink").withDependency { blinkShit }
@@ -122,7 +122,7 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun tickRing(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.END) return
+        if (event.phase != TickEvent.Phase.END || mc.thePlayer == null) return
         if(!inF7Boss || mc.thePlayer.isSneaking || editMode || mc.thePlayer.capabilities.walkSpeed < 0.5) return
         rings[route]?.forEach {ring ->
             val inRing = AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)
@@ -181,8 +181,6 @@ object AutoP3: Module (
         awaitingLeap.clear()
         awaitingTerm.clear()
         awaitingLeft.clear()
-
-
     }
 
     @SubscribeEvent

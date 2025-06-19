@@ -43,10 +43,10 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
         val extendedSlots = WoolColor.entries.joinToString("") { if (it.isExtended) it.ordinal.toString() else "" }.takeIf { it.length == 3 } ?: return
 
         patternIdentifier = when {
-            getBlockAt(getRealCoords(14, 77, 27)) == Blocks.hardened_clay -> 0 // right block == clay
-            getBlockAt(getRealCoords(16, 78, 27)) == Blocks.emerald_block -> 1 // left block == emerald
-            getBlockAt(getRealCoords(14, 78, 27)) == Blocks.diamond_block -> 2 // right block == diamond
-            getBlockAt(getRealCoords(14, 78, 27)) == Blocks.quartz_block  -> 3 // right block == quartz
+            getBlockAt(getRealCoords(1, 77, -12)) == Blocks.hardened_clay -> 0 // right block == clay
+            getBlockAt(getRealCoords(-1, 78, -12)) == Blocks.emerald_block -> 1 // left block == emerald
+            getBlockAt(getRealCoords(1, 78, -12)) == Blocks.diamond_block -> 2 // right block == diamond
+            getBlockAt(getRealCoords(1, 78, -12)) == Blocks.quartz_block  -> 3 // right block == quartz
             else -> return@with modMessage("§cFailed to get Water Board pattern. Was the puzzle already started?")
         }
 
@@ -69,11 +69,11 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
         }
     }
 
-    private var awaitingS08 = false
+    private var lastSpot = Vec3(0.0,0.0,0.0)
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || awaitingS08 || didChest) return
+        if (event.phase != TickEvent.Phase.START || didChest) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board" || mc.thePlayer.posY != 59.0) return
         val room = DungeonUtils.currentRoom ?: return
         val solutionList = solutions
@@ -93,11 +93,10 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
         }
         val etherwarpBlock = room.getRealCoords(0, 58, expectedZRelative)
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != etherwarpBlock) {
-            if (System.currentTimeMillis() - c08Delay < 200) return
-            val realSpot = Vec3(etherwarpBlock.x + 0.5, etherwarpBlock.y + 1.1, etherwarpBlock.z + 0.5)
-            AutoRouteUtils.etherwarpToVec3(realSpot, true)
-            awaitingS08 = true
-            Scheduler.schedulePreTickTask { awaitingS08 = false }
+            if (System.currentTimeMillis() - c08Delay < 200 || mc.thePlayer.positionVector == lastSpot) return
+            val realSpot = Vec3(etherwarpBlock.x + 0.5, etherwarpBlock.y + 1.03, etherwarpBlock.z + 0.5)
+            AutoRouteUtils.etherwarpToVec3(realSpot, false)
+            lastSpot = mc.thePlayer.positionVector
             return
         }
 
@@ -117,11 +116,10 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
         val room = DungeonUtils.currentRoom ?: return
         val aboveChest = room.getRealCoords(0, 58, -7)
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != aboveChest) {
-            if (System.currentTimeMillis() - c08Delay < 200) return
+            if (System.currentTimeMillis() - c08Delay < 200 || mc.thePlayer.positionVector == lastSpot) return
             val realSpot = Vec3(aboveChest.x + 0.5, aboveChest.y + 1.1, aboveChest.z + 0.5)
             AutoRouteUtils.etherwarpToVec3(realSpot)
-            awaitingS08 = true
-            Scheduler.schedulePreTickTask { awaitingS08 = false }
+            lastSpot = mc.thePlayer.positionVector
             return
         }
         val chest = room.getRealCoords(BlockPos(0 ,56, -7))

@@ -36,6 +36,15 @@ object BossEventDispatcher {
     }
 
     @SubscribeEvent
+    fun onWorldUnload(event: WorldEvent.Unload) {
+        inBoss = false
+        inF7Boss = false
+        lastInBoss = false
+        currentBossPhase = Phase.Unknown
+        currentTerminalPhase = TerminalPhase.Unknown
+    }
+
+    @SubscribeEvent
     fun onClientTick(event: ClientTickEvent){
         if (!DungeonUtils.inDungeons) return
         val iB = inBossCheck
