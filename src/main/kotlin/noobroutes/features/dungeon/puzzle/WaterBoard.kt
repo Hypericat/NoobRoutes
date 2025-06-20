@@ -12,8 +12,9 @@ import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.dungeon.autoroute.AutoRouteUtils
 import noobroutes.utils.*
+import noobroutes.utils.routes.RouteUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.modMessage
@@ -95,7 +96,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != etherwarpBlock) {
             if (System.currentTimeMillis() - c08Delay < 200 || mc.thePlayer.positionVector == lastSpot) return
             val realSpot = Vec3(etherwarpBlock.x + 0.5, etherwarpBlock.y + 1.03, etherwarpBlock.z + 0.5)
-            AutoRouteUtils.etherwarpToVec3(realSpot, false)
+            RouteUtils.etherwarpToVec3(realSpot, false)
             lastSpot = mc.thePlayer.positionVector
             return
         }
@@ -118,7 +119,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != aboveChest) {
             if (System.currentTimeMillis() - c08Delay < 200 || mc.thePlayer.positionVector == lastSpot) return
             val realSpot = Vec3(aboveChest.x + 0.5, aboveChest.y + 1.1, aboveChest.z + 0.5)
-            AutoRouteUtils.etherwarpToVec3(realSpot)
+            RouteUtils.etherwarpToVec3(realSpot)
             lastSpot = mc.thePlayer.positionVector
             return
         }
