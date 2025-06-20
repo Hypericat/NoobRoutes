@@ -19,6 +19,7 @@ import noobroutes.events.impl.Phase
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3.depth
 import noobroutes.features.floor7.autop3.AutoP3.renderStyle
+import noobroutes.features.floor7.autop3.AutoP3.walkFix
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.features.floor7.autop3.rings.BlinkRing
@@ -182,8 +183,8 @@ object AutoP3Utils {
             return
         }
 
-        val movementFactor = if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0 && !AutoP3.walkFix)) {
-            speed * SPRINT_MULTIPLIER
+        val movementFactor = if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0 && AutoP3.walkFix != 0)) {
+            speed * if (walkFix == 2) SPRINT_MULTIPLIER else 1.0
         } else {
             0.02 * SPRINT_MULTIPLIER
         }

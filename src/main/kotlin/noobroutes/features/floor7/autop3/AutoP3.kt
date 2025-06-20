@@ -62,7 +62,7 @@ object AutoP3: Module (
     val silentLook by BooleanSetting("Silent Look", false, description = "when activating a look ring only rotate serverside (may lead to desync)")
     val fuckingLook by BooleanSetting("Loud Look", false, description = "always look for if u want to make ur autop3 seem more legit or smth")
     val renderStyle by SelectorSetting("ring design", "normal", arrayListOf("normal", "simple", "box"), false, description = "how rings should look")
-    val walkFix by BooleanSetting("walk fix", false, description = "no edge boost")
+    val walkFix by SelectorSetting("walk boost", "none", arrayListOf("none", "normal", "big"), false, description = "boost of an edge")
     private val blinkShit by DropdownSetting(name = "Blink Settings")
     val speedRings by BooleanSetting(name = "Speed Rings", description = "Toggles the use of tickshift rings").withDependency { blinkShit }
     val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink").withDependency { blinkShit }
@@ -114,16 +114,20 @@ object AutoP3: Module (
             val inRing = AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)
 
             if (inRing && !ring.triggered) {
-                ring.triggered = ring !is BlinkRing
+                ring.triggered = true
                 ring.doRingArgs()
-                if (ring.left || ring.leap || ring.term) doAwait(ring)
+                if (ring.left || ring.leap || ring.term) {
+                    doAwait(ring)
+                    return@forEach
+                }
                 if (ring is LavaClipRing) {
                     if (System.currentTimeMillis() - lastLavaClip > 1000) {
                         ring.run()
                         lastLavaClip = System.currentTimeMillis()
                     }
                 }
-                else ring.run()
+                else if (ring !is BlinkRing) ring.run()
+                else activatedBlinks.add(ring)
             }
 
             else if (!inRing) {
@@ -461,7 +465,7 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun doTriggeredBlink(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || activatedBlinks.isEmpty()) return
+        if (event.phase != TickEvent.Phase.START) return
         activatedBlinks.forEach {
             if (AutoP3Utils.distanceToRingSq(it.coords) < 0.25 && AutoP3Utils.ringCheckY(it)) it.run()
             else activatedBlinks.remove(it)
@@ -471,18 +475,14 @@ object AutoP3: Module (
     private fun deleteNormalRing(args: Array<out String>) {
         if (rings[route].isNullOrEmpty()) return
         if (args.size >= 2) {
-            try {
-                if ((args[1].toInt()) <= (rings[route]?.size?.minus(1) ?: return modMessage("Error Deleting Ring"))) {
-                    deletedRings.add(rings[route]?.get(args[1].toInt())!!)
-                    rings[route]?.removeAt(args[1].toInt())
-                    modMessage("Removed Ring ${args[1].toInt()}")
-                    saveRings()
-                    return
-                } else {
-                    modMessage("Invalid Index")
-                    return
-                }
-            } catch (e: NumberFormatException) {
+            val selectedIndex = args[1].toIntOrNull() ?: return modMessage("Invalid Index")
+            if (selectedIndex < rings[route]!!.size) {
+                deletedRings.add(rings[route]!![selectedIndex])
+                rings[route]!!.removeAt(selectedIndex)
+                modMessage("Removed Ring $selectedIndex")
+                saveRings()
+                return
+            } else {
                 modMessage("Invalid Index")
                 return
             }
