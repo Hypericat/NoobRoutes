@@ -104,15 +104,15 @@ class Boom(
             val angles = RotationUtils.getYawAndPitch(pos.toVec3().add(0.5, 0.5, 0.5))
             RotationUtils.setAngles(angles.first, angles.second)
         }
-
         if (state == SwapManager.SwapState.SWAPPED) {
-            AutoRoute.delay = System.currentTimeMillis() + 350
+            AutoRoute.delay = System.currentTimeMillis() + 200
             Scheduler.schedulePreTickTask {
                 RouteUtils.lastRoute = System.currentTimeMillis()
                 if (!isAir(pos)) {
                     AuraManager.auraBlock(pos, true)
                 }
             }
+            return
         }
         AutoRoute.delay = System.currentTimeMillis() + 150
         if (!isAir(pos)) {
