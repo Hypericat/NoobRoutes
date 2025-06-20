@@ -87,6 +87,7 @@ object AutoP3: Module (
 
     val ringRegistry = AutoP3Utils.discoverRings("noobroutes.features.floor7.autop3.rings")
 
+    private var lastLavaClip = System.currentTimeMillis()
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
@@ -116,6 +117,12 @@ object AutoP3: Module (
                 ring.triggered = ring !is BlinkRing
                 ring.doRingArgs()
                 if (ring.left || ring.leap || ring.term) doAwait(ring)
+                if (ring is LavaClipRing) {
+                    if (System.currentTimeMillis() - lastLavaClip > 1000) {
+                        ring.run()
+                        lastLavaClip = System.currentTimeMillis()
+                    }
+                }
                 else ring.run()
             }
 
