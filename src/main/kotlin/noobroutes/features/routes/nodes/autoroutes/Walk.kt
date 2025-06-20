@@ -76,7 +76,6 @@ class Walk(
 
     override fun updateTick() {
         val room = currentRoom ?: return
-
         PlayerUtils.unSneak()
         val yaw = room.getRealYaw(yaw)
         if (!isSilent()) mc.thePlayer.rotationYaw = yaw

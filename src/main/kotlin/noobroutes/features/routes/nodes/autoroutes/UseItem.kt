@@ -90,7 +90,6 @@ class UseItem(
 
     override fun updateTick() {
         val room = currentRoom ?: return
-
         PlayerUtils.unSneak()
         RouteUtils.setRotation(room.getRealYaw(yaw), pitch + RotationUtils.offset, isSilent())
     }
