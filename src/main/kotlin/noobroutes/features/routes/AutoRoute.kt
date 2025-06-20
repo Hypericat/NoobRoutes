@@ -249,7 +249,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             node.secretTriggered = false
             SecretUtils.secretCount = 0
             node.run()
-            if (node.getType() == NodeType.BOOM) {
+            if (node.getType() == NodeType.BOOM && nodesToRun.size > 1) {
                 nodesToRun[1].updateTick()
             }
             nodesToRun.remove(node)
