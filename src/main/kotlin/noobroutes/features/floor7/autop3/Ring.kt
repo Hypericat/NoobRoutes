@@ -47,7 +47,7 @@ abstract class Ring(
         return obj
     }
 
-    internal open fun addPrimitiveRingData(obj: JsonObject){
+    protected open fun addPrimitiveRingData(obj: JsonObject){
         internalRingData.forEach { it.writeTo(obj) }
     }
 
@@ -101,6 +101,7 @@ abstract class Ring(
         if (fuckingLook) {
             mc.thePlayer.rotationYaw = yaw
         }
+
         if (cgyMode) {
             mc.thePlayer.rotationYaw = yaw
             val javaRandom = java.util.Random()
@@ -108,6 +109,7 @@ abstract class Ring(
             val scaled = gaussian * (15)
             mc.thePlayer.rotationPitch = scaled.coerceIn(-45f, 45f) + 10f
         }
+
         if (center && (mc.thePlayer.onGround || System.currentTimeMillis() - Blink.lastBlink < 100)) {
             mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord)
             Blink.rotSkip = true

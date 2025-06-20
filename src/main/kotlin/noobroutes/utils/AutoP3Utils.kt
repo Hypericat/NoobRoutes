@@ -119,7 +119,7 @@ object AutoP3Utils {
             }
             2 -> {
                 setSpeed(TICK2 * scale)
-                lastSpeed = AutoP3.tick2
+                lastSpeed = TICK2
             }
             else -> {
                 lastSpeed *= DRAG
@@ -145,35 +145,6 @@ object AutoP3Utils {
             event.yaw = lastLook.first
             event.pitch = lastLook.second
         }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun doTest(event: ClientTickEvent) {
-        if (!testing || event.phase != TickEvent.Phase.START) return
-        when (testTicks) {
-            0 -> { setSpeed(AutoP3.tick0) }
-            1 -> {
-                if (mc.thePlayer.onGround) mc.thePlayer.jump()
-                setSpeed(AutoP3.tick1)
-            }
-            2 -> { setSpeed(AutoP3.tick2) }
-            3 -> { setSpeed(AutoP3.tick3) }
-            4 -> { setSpeed(AutoP3.tick4) }
-            5 -> { setSpeed(AutoP3.tick5) }
-            6 -> { setSpeed(AutoP3.tick6) }
-            7 -> { setSpeed(AutoP3.tick7) }
-            8 -> { setSpeed(AutoP3.tick8) }
-            9 -> { setSpeed(AutoP3.tick9) }
-            10 -> { setSpeed(AutoP3.tick10) }
-            11 -> { setSpeed(AutoP3.tick11) }
-            12 -> { setSpeed(AutoP3.tick12) }
-            13 -> { setSpeed(AutoP3.tick13) }
-            14 -> { setSpeed(AutoP3.tick14) }
-            15 -> { setSpeed(AutoP3.tick15) }
-            else -> testing = false
-        }
-        testTicks++
-
     }
 
     private fun setSpeed(speed: Double) {
