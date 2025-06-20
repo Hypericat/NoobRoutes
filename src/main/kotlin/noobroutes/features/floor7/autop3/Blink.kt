@@ -229,8 +229,9 @@ object Blink{
             event.isCanceled
             val rotateTo = rotate!!
             rotate = null
+            rotSkip = true
             if (event.packet.isMoving) {
-                PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.positionX,event.packet.positionY,event.packet.positionZ,rotateTo,0F,event.packet.isOnGround))
+                PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.positionX, event.packet.positionY, event.packet.positionZ, rotateTo, 0F, event.packet.isOnGround))
             }
             else {
                 PacketUtils.sendPacket(C03PacketPlayer.C05PacketPlayerLook(rotateTo, 0F, event.packet.isOnGround))
