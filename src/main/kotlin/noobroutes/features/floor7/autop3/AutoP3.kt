@@ -4,9 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S18PacketEntityTeleport
-import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -53,7 +51,7 @@ object AutoP3: Module (
     private val route by StringSetting("Route", "", description = "Route to use")
     val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
     val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
-    val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
+    private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
     val fasterMotion by BooleanSetting("faster motion", false, description = "doesnt stop before the jump for motion")
     var noRotate by BooleanSetting("no rotate", false, description = "forces the player to be unable to change where they look in boss. Pretty much only way to gurantee working motion rings")
     private val noRotateKey by KeybindSetting("toggle no rotate", Keyboard.KEY_NONE, "toggles no rotate setting").onPress {
@@ -64,56 +62,43 @@ object AutoP3: Module (
     val silentLook by BooleanSetting("Silent Look", false, description = "when activating a look ring only rotate serverside (may lead to desync)")
     val fuckingLook by BooleanSetting("Loud Look", false, description = "always look for if u want to make ur autop3 seem more legit or smth")
     val renderStyle by SelectorSetting("ring design", "normal", arrayListOf("normal", "simple", "box"), false, description = "how rings should look")
-    val walkFix by BooleanSetting("walk fix", false, description = "no edge boost")
+    val walkFix by SelectorSetting("walk boost", "none", arrayListOf("none", "normal", "big"), false, description = "boost of an edge")
     private val blinkShit by DropdownSetting(name = "Blink Settings")
     val speedRings by BooleanSetting(name = "Speed Rings", description = "Toggles the use of tickshift rings").withDependency { blinkShit }
     val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink").withDependency { blinkShit }
     val mode by DualSetting(name = "movement mode", description = "how movement should look", default = false, left = "Motion", right = "Packet").withDependency { blinkShit }
     val maxBlinks by NumberSetting(name = "max blinks per instance", description = "too much blink on an instance bans apparently", min = 100, max = 300, default = 120).withDependency { blinkShit }
-    val showEnd by BooleanSetting("Render End", default = true, description = "renders waypoint where blink ends").withDependency { blinkShit }
-    val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes").withDependency { blinkShit }
+    private val showEnd by BooleanSetting("Render End", default = true, description = "renders waypoint where blink ends").withDependency { blinkShit }
+    private val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes").withDependency { blinkShit }
     val moveHud by HudSetting("Move Hud", HudElement(100f, 50f, false, settingName = "Move Hud")).withDependency { blinkShit }
     var customBlinkLengthToggle by BooleanSetting("blink length", default = true, description = "allows for changing the blink length of waypoints").withDependency { blinkShit }
     val customBlinkLength by NumberSetting(name = "length", description = "well how long for the blink to be", min = 1, max = 40, default = 24).withDependency { blinkShit && customBlinkLengthToggle }
     val timerSpeed by NumberSetting(name = "sped ring speed", description = "how much faster it goes (100 means 100x speed) also need tick check for high speeds", min = 2f, max = 100f, default = 10f).withDependency { blinkShit }
-    private val testShit by DropdownSetting(name = "test ring")
-    val tick0 by NumberSetting(name = "0", description = "tick 0 speed", min = 1.4, max = 1.5, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick1 by NumberSetting(name = "1", description = "tick 1 speed", min = 3.0, max = 3.1, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick2 by NumberSetting(name = "2", description = "tick 2 speed", min = 1.95, max = 2.1, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick3 by NumberSetting(name = "3", description = "tick 3 speed", min = 1.8, max = 1.9, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick4 by NumberSetting(name = "4", description = "tick 4 speed", min = 1.65, max = 1.75, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick5 by NumberSetting(name = "5", description = "tick 5 speed", min = 1.55, max = 1.65, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick6 by NumberSetting(name = "6", description = "tick 6 speed", min = 1.4, max = 1.55, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick7 by NumberSetting(name = "7", description = "tick 7 speed", min = 1.3, max = 1.45, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick8 by NumberSetting(name = "8", description = "tick 8 speed", min = 1.2, max = 1.35, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick9 by NumberSetting(name = "9", description = "tick 9 speed", min = 1.15, max = 1.3, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick10 by NumberSetting(name = "10", description = "tick 10 speed", min = 1.05, max = 1.15, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick11 by NumberSetting(name = "11", description = "tick 11 speed", min = 0.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick12 by NumberSetting(name = "12", description = "tick 12 speed", min = 0.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick13 by NumberSetting(name = "13", description = "tick 13 speed", min = 0.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick14 by NumberSetting(name = "14", description = "tick 14 speed", min = 0.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
-    val tick15 by NumberSetting(name = "15", description = "tick 15 speed", min = 0.0, max = 1.1, default = 1.0, increment = 0.01).withDependency { testShit }
-
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     private var leapedIDs = mutableSetOf<Int>()
     private val deletedRings  = mutableListOf<Ring>()
-    var spedFor = 0
     private var awaitingLeap = mutableSetOf<Ring>()
     private var awaitingTerm = mutableSetOf<Ring>()
     private var awaitingLeft = mutableSetOf<Ring>()
     private var activatedBlinks = mutableSetOf<BlinkRing>()
 
+    var spedFor = 0
+
     val ringRegistry = AutoP3Utils.discoverRings("noobroutes.features.floor7.autop3.rings")
 
+    private var lastLavaClip = System.currentTimeMillis()
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         if (!inF7Boss) return
         rings[route]?.forEachIndexed { i, ring ->
+
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
+
             AutoP3Utils.renderRing(ring)
-            if (ring !is BlinkRing || cgyMode) return@forEachIndexed
+            if (cgyMode || ring !is BlinkRing) return@forEachIndexed
+
             val vec3List: List<Vec3> = ring.packets.map { packet -> Vec3(packet.positionX, packet.positionY + 0.01, packet.positionZ) }
             if (showEnd && ring.packets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
             if (showLine) RenderUtils.drawGradient3DLine(vec3List, Color.GREEN, Color.RED, 1F, true)
@@ -124,15 +109,27 @@ object AutoP3: Module (
     fun tickRing(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.END || mc.thePlayer == null) return
         if(!inF7Boss || mc.thePlayer.isSneaking || editMode || mc.thePlayer.capabilities.walkSpeed < 0.5) return
+
         rings[route]?.forEach {ring ->
             val inRing = AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)
+
             if (inRing && !ring.triggered) {
-                val isAwait = ring.left || ring.leap || ring.term
-                ring.triggered = ring !is BlinkRing
+                ring.triggered = true
                 ring.doRingArgs()
-                if (isAwait) doAwait(ring)
-                else ring.run()
+                if (ring.left || ring.leap || ring.term) {
+                    doAwait(ring)
+                    return@forEach
+                }
+                if (ring is LavaClipRing) {
+                    if (System.currentTimeMillis() - lastLavaClip > 1000) {
+                        ring.run()
+                        lastLavaClip = System.currentTimeMillis()
+                    }
+                }
+                else if (ring !is BlinkRing) ring.run()
+                else activatedBlinks.add(ring)
             }
+
             else if (!inRing) {
                 ring.triggered = false
                 if (ring.leap) awaitingLeap.remove(ring)
@@ -163,21 +160,25 @@ object AutoP3: Module (
     @SubscribeEvent
     fun awaitingOpen(event: TermOpenEvent) {
         awaitingTerm.forEach {
-            if (it is BlinkRing) activatedBlinks.add(it)
+            if (it is BlinkRing)
+                activatedBlinks.add(it)
             else it.run()
         }
     }
 
     @SubscribeEvent
     fun awaitingLeft(event: InputEvent.MouseInputEvent) {
-        val isLeft = Mouse.getEventButton() == 0
-        if (!isLeft || !Mouse.getEventButtonState()) return
+        if (Mouse.getEventButton() != 0 || !Mouse.getEventButtonState()) return
+
         awaitingLeap.addAll(awaitingTerm) //retard protection (no duplicates)
         awaitingLeap.addAll(awaitingLeft)
+
         awaitingLeap.forEach {
-            if (it is BlinkRing) activatedBlinks.add(it)
+            if (it is BlinkRing)
+                activatedBlinks.add(it)
             else it.run()
         }
+
         awaitingLeap.clear()
         awaitingTerm.clear()
         awaitingLeft.clear()
@@ -188,23 +189,29 @@ object AutoP3: Module (
         if (awaitingLeap.isEmpty() || event.packet !is S18PacketEntityTeleport) return
         val entity  = mc.theWorld.getEntityByID(event.packet.entityId)
         if (entity !is EntityPlayer) return
-        val x = event.packet.x/32.0 //don't fucking ask why its like this
-        val y = event.packet.y/32.0
-        val z = event.packet.z/32.0
-        if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistanceSq(x,y,z) < 5) leapedIDs.add(event.packet.entityId)
+
+        val x = event.packet.x shr 5 //don't fucking ask why its like this
+        val y = event.packet.y shr 5
+        val z = event.packet.z shr 5
+
+        if (mc.theWorld.getEntityByID(event.packet.entityId) is EntityPlayer && mc.thePlayer.getDistanceSq(x.toDouble(), y.toDouble(), z.toDouble()) < 5) leapedIDs.add(event.packet.entityId)
         if (leapedIDs.size == leapPlayers()) {
             modMessage("everyone leaped")
+
             awaitingLeap.forEach {
                 if (it is BlinkRing) activatedBlinks.add(it)
                 else it.run()
             }
+
         }
     }
 
     fun leapPlayers(): Int {
-        return if (mc.thePlayer.getDistanceSq(2.5, 109.0, 102.5) < 100) 3 //ee3 spot (core)
-        else if (mc.thePlayer.posY >= 120) 1 //premine leap
-        else 4
+        return when {
+            mc.thePlayer.getDistanceSq(2.5, 109.0, 102.5) < 100 -> 3 //ee3
+            mc.thePlayer.posY >= 120 -> 1 //core
+            else -> 4
+        }
     }
 
     fun handleNoobCommand(args: Array<out String>?) {
@@ -431,19 +438,6 @@ object AutoP3: Module (
                     walk
                 ))
             }
-            "test" -> {
-                modMessage("test added")
-                actuallyAddRing(TestRing(
-                    coords,
-                    mc.thePlayer.rotationYaw,
-                    term,
-                    leap,
-                    left,
-                    center,
-                    rotate
-                )
-                )
-            }
             "insta" -> {
                 modMessage("insta added")
                 actuallyAddRing(InstaRing(
@@ -471,7 +465,7 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun doTriggeredBlink(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || activatedBlinks.isEmpty()) return
+        if (event.phase != TickEvent.Phase.START) return
         activatedBlinks.forEach {
             if (AutoP3Utils.distanceToRingSq(it.coords) < 0.25 && AutoP3Utils.ringCheckY(it)) it.run()
             else activatedBlinks.remove(it)
@@ -481,18 +475,14 @@ object AutoP3: Module (
     private fun deleteNormalRing(args: Array<out String>) {
         if (rings[route].isNullOrEmpty()) return
         if (args.size >= 2) {
-            try {
-                if ((args[1].toInt()) <= (rings[route]?.size?.minus(1) ?: return modMessage("Error Deleting Ring"))) {
-                    deletedRings.add(rings[route]?.get(args[1].toInt())!!)
-                    rings[route]?.removeAt(args[1].toInt())
-                    modMessage("Removed Ring ${args[1].toInt()}")
-                    saveRings()
-                    return
-                } else {
-                    modMessage("Invalid Index")
-                    return
-                }
-            } catch (e: NumberFormatException) {
+            val selectedIndex = args[1].toIntOrNull() ?: return modMessage("Invalid Index")
+            if (selectedIndex < rings[route]!!.size) {
+                deletedRings.add(rings[route]!![selectedIndex])
+                rings[route]!!.removeAt(selectedIndex)
+                modMessage("Removed Ring $selectedIndex")
+                saveRings()
+                return
+            } else {
                 modMessage("Invalid Index")
                 return
             }
@@ -507,7 +497,7 @@ object AutoP3: Module (
         saveRings()
     }
 
-    fun saveRings(){
+    fun saveRings() {
         try {
             val outObj = JsonObject()
             for ((routeName, rings) in rings) {

@@ -53,6 +53,7 @@ import kotlin.math.ceil
 object AutoRoute : Module("Autoroute", description = "Ak47 modified", category = Category.ROUTES) {
     val silent by BooleanSetting("Silent", default = true, description = "Server side rotations")
     val decrease by BooleanSetting("Reduce Pearlclip", default = false, description = "When creating PearlClips it decreases the distance input by 1")
+
     val renderRoutes by BooleanSetting("Render Routes", default = false, description = "Renders nodes")
     val renderIndex by BooleanSetting("Render Index", description = "Render index above node, useful for editing").withDependency { renderRoutes }
     val edgeRoutes by BooleanSetting("Edging", default = false, description = "Edges nodes :)").withDependency { renderRoutes }
@@ -178,8 +179,8 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }?.toMutableList() ?: mutableListOf()
     }
     var delay = 0L
-
-    val canRoute get() = (System.currentTimeMillis() - delay >= 0) && PlayerUtils.canSendC08 && RouteUtils.pearls < 1
+    private val isDelayed get()= System.currentTimeMillis() - delay < 0
+    val canRoute get() = PlayerUtils.canSendC08 && RouteUtils.pearls < 1
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -190,6 +191,10 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             return
         }
         if (!canRoute || nodes[room.name] == null || editMode) return
+        if (isDelayed){
+            RouteUtils.lastRoute = System.currentTimeMillis()
+            return
+        }
 
         val inNodes = inNodes(room)
         if (inNodes.isNotEmpty()) {
@@ -207,7 +212,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         if (DynamicRoute.enabled && !DynamicRoute.editMode && DynamicRoute.isInNode()) return
 
         nodesToRun.firstOrNull()?.let { node ->
-            devMessage(node.awaitSecrets)
+
             RouteUtils.lastRoute = System.currentTimeMillis()
             if (node.reset && !node.resetTriggered) {
                 SecretUtils.secretCount = 0
@@ -220,8 +225,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             }
 
             if (!node.secretTriggered) {
-                if (SecretUtils.secretCount >= 0) SecretUtils.secretCount - node.awaitSecrets else SecretUtils.secretCount = -node.awaitSecrets
+                if (SecretUtils.secretCount >= 0) SecretUtils.secretCount -= node.awaitSecrets else SecretUtils.secretCount = -node.awaitSecrets
                 node.secretTriggered = true
+                devMessage("secret trigger: ${SecretUtils.secretCount}")
             }
             if (SecretUtils.secretCount < 0) {
                 devMessage("awaiting")
@@ -243,6 +249,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             node.secretTriggered = false
             SecretUtils.secretCount = 0
             node.run()
+            if (node.getType() == NodeType.BOOM && nodesToRun.size > 1) {
+                nodesToRun[1].updateTick()
+            }
             nodesToRun.remove(node)
         }
     }

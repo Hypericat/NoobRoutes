@@ -18,7 +18,7 @@ import noobroutes.utils.skyblock.unformattedName
  */
 object SwapManager {
     var lastSwap = 0L
-    inline val recentlySwapped get() = System.currentTimeMillis() - lastSwap < 50L
+    inline val recentlySwapped get() = System.currentTimeMillis() - lastSwap < 48L
 
 
 
@@ -59,6 +59,7 @@ object SwapManager {
             if (itemName != null) {
                 if (itemName.contains(name, ignoreCase = true)) {
                     if (mc.thePlayer.inventory.currentItem != i) {
+                        if (System.currentTimeMillis() - lastSwap < 50L) devMessage("old 0 tick swap")
                         if (recentlySwapped) {
                             modMessage("yo somethings wrong $itemName")
                             return SwapState.TOO_FAST
@@ -96,6 +97,7 @@ object SwapManager {
             if (itemName != null) {
                 if (skyblockID.any { it == itemName }) {
                     if (mc.thePlayer.inventory.currentItem != i) {
+                        if (System.currentTimeMillis() - lastSwap < 50L) devMessage("old 0 tick swap")
                         if (recentlySwapped) {
                             modMessage("yo somethings wrong $itemName")
                             return SwapState.TOO_FAST

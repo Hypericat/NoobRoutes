@@ -1,5 +1,6 @@
 package noobroutes.features.misc
 
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.BossEvent
 import noobroutes.events.impl.RoomEnterEvent
@@ -7,6 +8,7 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.SecretGuideIntegration
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
 
 object SecretGuideManager : Module(
     "Secret Guide Manager",
@@ -28,6 +30,11 @@ object SecretGuideManager : Module(
     }
 
     @SubscribeEvent
+    fun onWorldUnload(event: WorldEvent.Unload) {
+        secretGuideBoolean?.let { SecretGuideIntegration.setSecretGuideAura(it) }
+    }
+
+    @SubscribeEvent
     fun onBossEnd(event: BossEvent.BossFinish) {
         if (!onBoss) return
         secretGuideBoolean?.let { SecretGuideIntegration.setSecretGuideAura(it) }
@@ -36,7 +43,7 @@ object SecretGuideManager : Module(
 
     @SubscribeEvent
     fun onRoom(event: RoomEnterEvent) {
-        if (lastRoom == "Water Board" && inWaterBoard) {
+        if (lastRoom == "Water Board" && inWaterBoard && DungeonUtils.currentRoomName != "Water Board") {
             secretGuideBoolean?.let { SecretGuideIntegration.setSecretGuideAura(it) }
             secretGuideBoolean = null
         }

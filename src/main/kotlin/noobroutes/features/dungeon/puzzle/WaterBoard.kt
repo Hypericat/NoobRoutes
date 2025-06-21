@@ -96,7 +96,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != etherwarpBlock) {
             if (System.currentTimeMillis() - c08Delay < 200 || mc.thePlayer.positionVector == lastSpot) return
             val realSpot = Vec3(etherwarpBlock.x + 0.5, etherwarpBlock.y + 1.03, etherwarpBlock.z + 0.5)
-            RouteUtils.etherwarpToVec3(realSpot, false)
+            AutoP3Utils.startWalk(RotationUtils.getYawAndPitch(realSpot).first)
             lastSpot = mc.thePlayer.positionVector
             return
         }

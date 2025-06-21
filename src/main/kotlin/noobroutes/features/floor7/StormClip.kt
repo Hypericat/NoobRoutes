@@ -9,6 +9,7 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
 
 object StormClip: Module(
@@ -23,7 +24,8 @@ object StormClip: Module(
 
     @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
-        if (event.packet !is S08PacketPlayerPosLook || has ) return
+        if (event.packet !is S08PacketPlayerPosLook || has) return
+        devMessage("so8 pos: x: ${event.packet.x}, y: ${event.packet.y}, z: ${event.packet.z}")
         if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) {
             event.isCanceled = true
             PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
