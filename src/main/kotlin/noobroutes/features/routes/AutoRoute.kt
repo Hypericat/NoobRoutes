@@ -64,20 +64,20 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     val drawPearlCountText by BooleanSetting("Draw Pearl Count", default = true, description = "Renders the pearl count above the Pearl node").withDependency { renderRoutes && drawSettings }
     private val colorSettings by DropdownSetting("Colors").withDependency { renderRoutes }
     val etherwarpColor by ColorSetting("Etherwarp", default = Color.Companion.GREEN, description = "Color of Etherwarp nodes").withDependency { renderRoutes && colorSettings }
-    val walkColor by ColorSetting("Walk", default = Color.Companion.GREEN, description = "Color of Walk nodes").withDependency { renderRoutes && colorSettings }
-    val pearlClipColor by ColorSetting("Pearlclip", default = Color.Companion.GREEN, description = "Color of Pearlclip nodes").withDependency { renderRoutes && colorSettings }
-    val aotvColor by ColorSetting("Aotv", default = Color.Companion.GREEN, description = "Color of Aotv nodes").withDependency { renderRoutes && colorSettings }
-    val boomColor by ColorSetting("Boom", default = Color.Companion.GREEN, description = "Color of Boom nodes").withDependency { renderRoutes && colorSettings }
-    val batColor by ColorSetting("Bat", default = Color.Companion.GREEN, description = "Color of Bat nodes").withDependency { renderRoutes && colorSettings }
-    val pearlColor by ColorSetting("Pearl", default = Color.Companion.GREEN, description = "Color of Pearl nodes").withDependency { renderRoutes && colorSettings }
-    val useItemColor by ColorSetting("Use Item", default = Color.Companion.GREEN, description = "Color of Use Item nodes").withDependency { renderRoutes && colorSettings }
+    val walkColor by ColorSetting("Walk", default = Color.GREEN, description = "Color of Walk nodes").withDependency { renderRoutes && colorSettings }
+    val pearlClipColor by ColorSetting("Pearlclip", default = Color.GREEN, description = "Color of Pearlclip nodes").withDependency { renderRoutes && colorSettings }
+    val aotvColor by ColorSetting("Aotv", default = Color.GREEN, description = "Color of Aotv nodes").withDependency { renderRoutes && colorSettings }
+    val boomColor by ColorSetting("Boom", default = Color.GREEN, description = "Color of Boom nodes").withDependency { renderRoutes && colorSettings }
+    val batColor by ColorSetting("Bat", default = Color.GREEN, description = "Color of Bat nodes").withDependency { renderRoutes && colorSettings }
+    val pearlColor by ColorSetting("Pearl", default = Color.GREEN, description = "Color of Pearl nodes").withDependency { renderRoutes && colorSettings }
+    val useItemColor by ColorSetting("Use Item", default = Color.GREEN, description = "Color of Use Item nodes").withDependency { renderRoutes && colorSettings }
     private var editMode by BooleanSetting("Edit Mode", description = "Prevents nodes from triggering")
     val editModeBind by KeybindSetting("Edit Mode Toggle", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress { editMode = !editMode }
     val placewarp by KeybindSetting("warp", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress {
         handleAutoRouteCommand(arrayOf("add", "ew"))
     }
 
-    val roomReplacement
+    private val roomReplacement
         get() = UniqueRoom(0, 0, Room(0, 0, RoomData(LocationUtils.currentArea.name, RoomType.NORMAL, listOf(), 0, 0))).apply { rotation =
             Rotations.NORTH
         }
@@ -138,7 +138,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
 
     }
 
-    fun saveFile() {
+    private fun saveFile() {
         val jsonObj = JsonObject()
         nodes.forEach { route ->
             val nodeArray = JsonArray().apply {
@@ -298,22 +298,22 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                 }
                 when (args[1].lowercase()) {
                     "warp", "etherwarp", "etherwarp_target", "etherwarptarget", "ether", "ew" -> {
-                        addNode(room, NodeType.ETHERWARP.loader.generateFromArgs(args, room) ?: return)
+                        addNode(room, NodeType.ETHERWARP.loader?.generateFromArgs(args, room) ?: return)
                     }
                     "boom", "tnt" -> {
-                        addNode(room, NodeType.BOOM.loader.generateFromArgs(args, room) ?: return)
+                        addNode(room, NodeType.BOOM.loader?.generateFromArgs(args, room) ?: return)
                     }
                     "walk" -> {
-                        addNode(room, NodeType.WALK.loader.generateFromArgs(args, room) ?: return)
+                        addNode(room, NodeType.WALK.loader?.generateFromArgs(args, room) ?: return)
                     }
                     "pearlclip", "clip" -> {
-                        addNode(room, NodeType.PEARL_CLIP.loader.generateFromArgs(args, room) ?: return)
+                        addNode(room, NodeType.PEARL_CLIP.loader?.generateFromArgs(args, room) ?: return)
                     }
                     "pearl" -> {
-                        addNode(room, NodeType.PEARL.loader.generateFromArgs(args, room) ?: return)
+                        addNode(room, NodeType.PEARL.loader?.generateFromArgs(args, room) ?: return)
                     }
                     "useitem" -> {
-                        addNode(room, NodeType.USE_ITEM.loader.generateFromArgs(args, room) ?: return)
+                        addNode(room, NodeType.USE_ITEM.loader?.generateFromArgs(args, room) ?: return)
                     }
 
                     "aotv", "teleport", "hype", "bat" -> {

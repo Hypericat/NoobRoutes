@@ -28,19 +28,6 @@ class DynamicNode(
 ) : Node(
     pos
 ){
-    companion object : NodeLoader {
-        override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
-            TODO("No saving and loading")
-        }
-
-        override fun generateFromArgs(
-            args: Array<out String>,
-            room: UniqueRoom
-        ): AutorouteNode? {
-            TODO("No saving and loading")
-        }
-
-    }
 
 
     private var prevState: IBlockState? = null;
