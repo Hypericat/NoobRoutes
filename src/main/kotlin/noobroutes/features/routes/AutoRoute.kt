@@ -53,7 +53,7 @@ import kotlin.math.ceil
 object AutoRoute : Module("Autoroute", description = "Ak47 modified", category = Category.ROUTES) {
     val silent by BooleanSetting("Silent", default = true, description = "Server side rotations")
     val decrease by BooleanSetting("Reduce Pearlclip", default = false, description = "When creating PearlClips it decreases the distance input by 1")
-
+    val brokeMode by BooleanSetting("Broke Mode", description = "Makes hype nodes use spirit scepter then swap to aotv")
     val renderRoutes by BooleanSetting("Render Routes", default = false, description = "Renders nodes")
     val renderIndex by BooleanSetting("Render Index", description = "Render index above node, useful for editing").withDependency { renderRoutes }
     val edgeRoutes by BooleanSetting("Edging", default = false, description = "Edges nodes :)").withDependency { renderRoutes }
@@ -179,7 +179,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }?.toMutableList() ?: mutableListOf()
     }
     var delay = 0L
-    private val isDelayed get()= System.currentTimeMillis() - delay < 0
+    private val isDelayed get() = System.currentTimeMillis() - delay < 0
     val canRoute get() = PlayerUtils.canSendC08 && RouteUtils.pearls < 1
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -255,9 +255,6 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
             nodesToRun.remove(node)
         }
     }
-
-
-
 
     fun center(){
         if (Core.mc.thePlayer.posZ < 0 || Core.mc.thePlayer.posZ > 0) Core.mc.thePlayer.setPosition(

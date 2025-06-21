@@ -18,7 +18,7 @@ import noobroutes.utils.skyblock.unformattedName
  */
 object SwapManager {
     var lastSwap = 0L
-    inline val recentlySwapped get() = System.currentTimeMillis() - lastSwap < 48L
+    inline val recentlySwapped get() = System.currentTimeMillis() - lastSwap < 50L
 
 
 

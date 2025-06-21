@@ -57,9 +57,13 @@ class PearlClip(
                 modMessage("Need Distance")
                 return null
             }
-            val distance = args[2].toIntOrNull()?.absoluteValue
+            val distance = args[2].toIntOrNull()?.absoluteValue?.minus(if (AutoRoute.decrease) 1 else 0)
             if (distance == null) {
                 modMessage("Provide a Number thanks")
+                return null
+            }
+            if (distance < 1) {
+                modMessage("Invalid Number, has to be greater than 0")
                 return null
             }
             val generalNodeArgs = getGeneralNodeArgs(room, args)
