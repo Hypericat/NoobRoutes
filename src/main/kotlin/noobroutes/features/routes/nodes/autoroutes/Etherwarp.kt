@@ -46,15 +46,18 @@ class Etherwarp(
 
     companion object : NodeLoader{
         override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
-            val pos = obj.get("position").asVec3
-            val center = obj.has("center")
-            val chain = obj.has("chain")
-            val reset = obj.has("reset")
-            val stop = obj.has("stop")
-            val awaitSecrets = obj.get("secrets")?.asInt ?: 0
-            val delay = obj.get("delay")?.asLong ?: 0L
+            val general =  getGeneralNodeArgsFromObj(obj)
             val target = obj.get("target").asVec3
-            return Etherwarp(pos, target, awaitSecrets, delay, center, stop, chain, reset)
+            return Etherwarp(
+                general.pos,
+                target,
+                general.awaitSecrets,
+                general.delay,
+                general.center,
+                general.stop,
+                general.chain,
+                general.reset
+            )
         }
 
         override fun generateFromArgs(args: Array<out String>, room: UniqueRoom): AutorouteNode? {

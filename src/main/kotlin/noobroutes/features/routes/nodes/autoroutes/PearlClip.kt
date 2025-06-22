@@ -39,14 +39,17 @@ class PearlClip(
     companion object : NodeLoader {
         override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
             val distance = obj.get("distance").asInt
-            val pos = obj.get("position").asVec3
-            val awaitSecrets = obj.get("secrets")?.asInt ?: 0
-            val delay = obj.get("delay")?.asLong ?: 0L
-            val center = obj.has("center")
-            val stop = obj.has("stop")
-            val chain = obj.has("chain")
-            val reset = obj.has("reset")
-            return PearlClip(pos, distance, awaitSecrets, delay, center, stop, chain, reset)
+            val general = getGeneralNodeArgsFromObj(obj)
+            return PearlClip(
+                general.pos,
+                distance,
+                general.awaitSecrets,
+                general.delay,
+                general.center,
+                general.stop,
+                general.chain,
+                general.reset
+            )
         }
 
         override fun generateFromArgs(

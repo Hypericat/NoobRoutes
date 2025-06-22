@@ -12,6 +12,8 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.Renderer
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -67,9 +69,9 @@ object PlayerUtils {
      *
      * @author Odtheking, Bonsai
      */
-    fun alert(title: String, time: Int = 20, color: noobroutes.utils.render.Color = _root_ide_package_.noobroutes.utils.render.Color.WHITE, playSound: Boolean = true, displayText: Boolean = true) {
+    fun alert(title: String, time: Int = 20, color: Color = Color.WHITE, playSound: Boolean = true, displayText: Boolean = true) {
         if (playSound) playLoudSound("note.pling", 100f, 1f)
-        if (displayText) _root_ide_package_.noobroutes.utils.render.Renderer.displayTitle(title , time, color = color)
+        if (displayText) Renderer.displayTitle(title , time, color = color)
     }
 
     inline val posX get() = mc.thePlayer?.posX ?: 0.0

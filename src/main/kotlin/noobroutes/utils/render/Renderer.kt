@@ -13,6 +13,7 @@ import noobroutes.Core.mc
 import noobroutes.ui.clickgui.util.ColorUtil.multiplyAlpha
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.utils.addVec
+import noobroutes.utils.fastEyeHeight
 import noobroutes.utils.getBlockAt
 import noobroutes.utils.render.RenderUtils.outlineBounds
 import noobroutes.utils.render.RenderUtils.renderVec
@@ -127,7 +128,7 @@ object Renderer {
      * @param depth     Indicates whether to draw with depth (default is false).
      */
     fun drawTracer(goal: Vec3, color: Color, lineWidth: Float = 3f, depth: Boolean = false) {
-        RenderUtils.drawLines(listOf(mc.thePlayer.renderVec.addVec(y = _root_ide_package_.noobroutes.utils.fastEyeHeight()), goal), color, lineWidth, depth)
+        RenderUtils.drawLines(listOf(mc.thePlayer.renderVec.addVec(y = fastEyeHeight()), goal), color, lineWidth, depth)
     }
 
     /**
@@ -154,7 +155,7 @@ object Renderer {
         )
 
         val alpha = if (noFade) 1f else min(1f, max(0f, dist.toFloat()) / 60f)
-        if (beacon) _root_ide_package_.noobroutes.utils.render.RenderUtils.drawBeaconBeam(
+        if (beacon) RenderUtils.drawBeaconBeam(
             vec3,
             color.withAlpha(alpha),
             depth = true

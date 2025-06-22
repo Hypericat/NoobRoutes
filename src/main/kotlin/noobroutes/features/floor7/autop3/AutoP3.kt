@@ -4,7 +4,10 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.entity.player.EntityPlayer
+import noobroutes.ui.editUI.EditUI
+import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S18PacketEntityTeleport
+import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -33,12 +36,16 @@ import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
+import kotlin.math.absoluteValue
+import kotlin.text.toIntOrNull
 
 
 @Suppress("Unused")
@@ -142,8 +149,7 @@ object AutoP3: Module (
 
     fun doAwait(ring: Ring) {
         AutoP3Utils.unPressKeys()
-        mc.thePlayer.motionX = 0.0
-        mc.thePlayer.motionZ = 0.0
+        PlayerUtils.stopVelocity()
         if (ring.leap) awaitingLeap.add(ring)
         if (ring.term) awaitingTerm.add(ring)
         if (ring.left) awaitingLeft.add(ring)
@@ -220,6 +226,14 @@ object AutoP3: Module (
             "add","create" -> addNormalRing(args)
             "delete","remove" -> deleteNormalRing(args)
             "blink" -> Blink.blinkCommand(args)
+            "edit" -> {
+                val ring = if (args.size >= 2) {
+                    val selectedIndex = args[1].toIntOrNull() ?: return modMessage("Invalid Index")
+                    getRingByIndex(selectedIndex)
+                } else getClosestRing(null)
+                if (ring == null) return modMessage("No rings found")
+                EditUI.openUI(ring)
+            }
             "start" -> {
                 inF7Boss = true
                 BossEventDispatcher.currentBossPhase = Phase.P3
@@ -283,7 +297,7 @@ object AutoP3: Module (
                 modMessage("added walk")
                 actuallyAddRing(WalkRing(
                     coords,
-                    mc.thePlayer.rotationYaw,
+                    MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
                     term,
                     leap,
                     left,
@@ -297,7 +311,7 @@ object AutoP3: Module (
                 modMessage("added hclip")
                 actuallyAddRing(HClipRing(
                     coords,
-                    mc.thePlayer.rotationYaw,
+                    MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
                     term,
                     leap,
                     left,
@@ -311,7 +325,7 @@ object AutoP3: Module (
                 modMessage("added stop")
                 actuallyAddRing(StopRing(
                     coords,
-                    mc.thePlayer.rotationYaw,
+                    MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
                     term,
                     leap,
                     left,
@@ -333,7 +347,7 @@ object AutoP3: Module (
                 modMessage("motion added")
                 actuallyAddRing(MotionRing(
                     coords,
-                    mc.thePlayer.rotationYaw,
+                    MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
                     term,
                     leap,
                     left,
@@ -349,7 +363,7 @@ object AutoP3: Module (
                 val endY = args[2].toDoubleOrNull() ?: return modMessage("need a length arg (positive number)")
                 actuallyAddRing(LavaClipRing(
                     coords,
-                    mc.thePlayer.rotationYaw,
+                    MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
                     term,
                     leap,
                     left,
@@ -368,7 +382,7 @@ object AutoP3: Module (
                 modMessage("added boom")
                 actuallyAddRing(BoomRing(
                     coords,
-                    mc.thePlayer.rotationYaw,
+                    MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
                     term,
                     leap,
                     left,
@@ -381,7 +395,7 @@ object AutoP3: Module (
                 modMessage("jump added")
                 actuallyAddRing(JumpRing(
                     coords,
-                    mc.thePlayer.rotationYaw,
+                    MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
                     term,
                     leap,
                     left,
@@ -397,7 +411,7 @@ object AutoP3: Module (
                 modMessage("speed added")
                 actuallyAddRing(SpedRing(
                     coords,
-                    mc.thePlayer.rotationYaw,
+                    MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
                     term,
                     leap,
                     left,
@@ -413,7 +427,7 @@ object AutoP3: Module (
                 if (length < 1) return modMessage("need a number greater than 0")
                 val waypoint = BlinkWaypoint(
                     coords,
-                    mc.thePlayer.rotationYaw,
+                    MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
                     term,
                     leap,
                     left,
@@ -429,7 +443,7 @@ object AutoP3: Module (
                 modMessage("clamp added")
                 actuallyAddRing(ClampRing(
                     coords,
-                    mc.thePlayer.rotationYaw,
+                    MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
                     term,
                     leap,
                     left,
@@ -442,7 +456,7 @@ object AutoP3: Module (
                 modMessage("insta added")
                 actuallyAddRing(InstaRing(
                     coords,
-                    mc.thePlayer.rotationYaw,
+                    MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
                     term,
                     leap,
                     left,
@@ -472,28 +486,35 @@ object AutoP3: Module (
         }
     }
 
+    private fun getClosestRing(distance: Double?): Ring? {
+        if (rings[route].isNullOrEmpty()) return null
+        val playerEyeVec = mc.thePlayer.positionVector.add(Vec3(0.0, mc.thePlayer.eyeHeight.toDouble(),0.0))
+        val ring = rings[route]?.minByOrNull {
+            it.coords.squareDistanceTo(playerEyeVec)
+        } ?: return null
+        return if (distance != null && ring.coords.distanceTo(playerEyeVec) > distance) null else ring
+    }
+
+    private fun getRingByIndex(index: Int): Ring? {
+        if (rings[route].isNullOrEmpty()) return null
+        if (index > rings[route]!!.size - 1) return null
+        return rings[route]!![index]
+    }
+
+
     private fun deleteNormalRing(args: Array<out String>) {
         if (rings[route].isNullOrEmpty()) return
-        if (args.size >= 2) {
-            val selectedIndex = args[1].toIntOrNull() ?: return modMessage("Invalid Index")
-            if (selectedIndex < rings[route]!!.size) {
-                deletedRings.add(rings[route]!![selectedIndex])
-                rings[route]!!.removeAt(selectedIndex)
-                modMessage("Removed Ring $selectedIndex")
-                saveRings()
-                return
-            } else {
-                modMessage("Invalid Index")
-                return
-            }
-        }
 
-        val playerEyeVec = mc.thePlayer.positionVector.add(Vec3(0.0, mc.thePlayer.eyeHeight.toDouble(),0.0))
-        val deleteList = rings[route]?.sortedBy{it.coords.squareDistanceTo(playerEyeVec)}
-        if (deleteList?.get(0)?.coords?.squareDistanceTo(playerEyeVec)!! > 9) return
-        deletedRings.add(deleteList[0])
-        rings[route]?.remove(deleteList[0])
-        modMessage("deleted a ring")
+        val ring = if (args.size >= 2) {
+            val selectedIndex = args[1].toIntOrNull() ?: return modMessage("Invalid Index")
+            getRingByIndex(selectedIndex)
+        } else getClosestRing(3.0)
+
+        if (ring == null) return modMessage("No rings found")
+
+        deletedRings.add(ring)
+        rings[route]?.remove(ring)
+        modMessage("deleted a ${ring.type}")
         saveRings()
     }
 
@@ -528,7 +549,7 @@ object AutoP3: Module (
                     val ringClass = ringRegistry[ringType]
                     val instance: Ring = ringClass?.java?.getDeclaredConstructor()?.newInstance() ?: return@forEach
                     instance.coords = ring.get("coords").asVec3
-                    instance.yaw = ring.get("yaw")?.asFloat ?: 0f
+                    instance.yaw = MathHelper.wrapAngleTo180_float(ring.get("yaw")?.asFloat ?: 0f)
                     instance.term = ring.get("term")?.asBoolean == true
                     instance.leap = ring.get("leap")?.asBoolean == true
                     instance.center = ring.get("center")?.asBoolean == true

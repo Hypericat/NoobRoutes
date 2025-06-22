@@ -3,10 +3,15 @@ package noobroutes
 import kotlinx.coroutines.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraftforge.client.event.GuiOpenEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.config.Config
+import noobroutes.events.impl.GuiEvent
 import noobroutes.features.floor7.autop3.AutoP3
+import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.routes.AutoRoute
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
@@ -29,8 +34,6 @@ object Core {
 
     fun init() {
         MinecraftFont.init()
-
-
     }
 
     fun postInit() {
@@ -49,9 +52,30 @@ object Core {
         RoundedRect.initShaders()
 
     }
+    var lastChatVisibility: EntityPlayer.EnumChatVisibility? = null
+
+
+    @SubscribeEvent
+    fun onWorldUnload(event: WorldEvent.Unload) {
+        lastChatVisibility?.let { mc.gameSettings.chatVisibility = it }
+        lastChatVisibility = null
+    }
+
+    @SubscribeEvent
+    fun onGuiClose(event: GuiOpenEvent){
+        if (event.gui == null) {
+            lastChatVisibility?.let { mc.gameSettings.chatVisibility = it }
+            lastChatVisibility = null
+        }
+    }
+
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (display == null) return
+        lastChatVisibility = mc.gameSettings.chatVisibility
+        if (ClickGUIModule.hideChat) {
+            mc.gameSettings.chatVisibility = EntityPlayer.EnumChatVisibility.HIDDEN
+        }
         mc.displayGuiScreen(display)
         display = null
     }

@@ -40,17 +40,23 @@ class Pearl(
 
     companion object : NodeLoader {
         override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
-            val pos = obj.get("position").asVec3
             val count = obj.get("count").asInt
             val yaw = obj.get("yaw").asFloat
             val pitch = obj.get("pitch").asFloat
-            val awaitSecrets = obj.get("secrets")?.asInt ?: 0
-            val delay = obj.get("delay")?.asLong ?: 0L
-            val center = obj.has("center")
-            val stop = obj.has("stop")
-            val chain = obj.has("chain")
-            val reset = obj.has("reset")
-            return Pearl(pos, count, yaw, pitch, awaitSecrets, delay, center, stop, chain, reset)
+            val general = getGeneralNodeArgsFromObj(obj)
+
+            return Pearl(
+                general.pos,
+                count,
+                yaw,
+                pitch,
+                general.awaitSecrets,
+                general.delay,
+                general.center,
+                general.stop,
+                general.chain,
+                general.reset
+            )
         }
 
         override fun generateFromArgs(

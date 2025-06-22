@@ -19,6 +19,7 @@ object  ClickGUIModule: Module(
     category = Category.RENDER,
     description = "Allows you to customize the GUI."
 ) {
+    val hideChat by BooleanSetting("Hide Chat in GUIs", description = "Hides the minecraft chat in any NoobRoutes gui", default = false)
     val blur by BooleanSetting(
         "Blur",
         true,

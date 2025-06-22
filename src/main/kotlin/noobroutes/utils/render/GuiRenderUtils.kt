@@ -110,7 +110,7 @@ fun circle(x: Number, y: Number, radius: Number, color: Color, borderColor: Colo
     }
 }
 
-fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = MinecraftFont.REGULAR, align: TextAlign = _root_ide_package_.noobroutes.utils.render.TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false) {
+fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = MinecraftFont.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false) {
     MinecraftFont.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
 }
 
@@ -118,7 +118,7 @@ fun mcText(text: String, x: Number, y: Number, scale: Number, color: Color, shad
     RenderUtils.drawText("$text§r", x.toFloat(), y.toFloat(), scale.toDouble(), color, shadow, center)
 }
 
-fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = MinecraftFont.REGULAR, align: TextAlign = _root_ide_package_.noobroutes.utils.render.TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false): Float {
+fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = MinecraftFont.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false): Float {
     text(text, x, y, color, size, type, align, verticalAlign, shadow)
     return getTextWidth(text, size).toFloat()
 }
@@ -215,7 +215,7 @@ fun drawDynamicTexture(dynamicTexture: DynamicTexture, x: Number, y: Number, w: 
 
     dynamicTexture.updateDynamicTexture()
     GlStateManager.bindTexture(dynamicTexture.glTextureId)
-    _root_ide_package_.noobroutes.utils.render.RenderUtils.drawTexturedModalRect(
+    RenderUtils.drawTexturedModalRect(
         x.toInt(),
         y.toInt(),
         w.toInt(),

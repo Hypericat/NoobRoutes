@@ -38,15 +38,18 @@ class Boom(
 ) {
     companion object : NodeLoader {
         override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
-            val pos = obj.get("position").asVec3
-            val center = obj.has("center")
-            val chain = obj.has("chain")
-            val reset = obj.has("reset")
-            val stop = obj.has("stop")
-            val awaitSecrets = obj.get("secrets")?.asInt ?: 0
-            val delay = obj.get("delay")?.asLong ?: 0L
+            val general = getGeneralNodeArgsFromObj(obj)
             val target = obj.get("target").asBlockPos
-            return Boom(pos, target, awaitSecrets, delay, center, stop, chain, reset)
+            return Boom(
+                general.pos,
+                target,
+                general.awaitSecrets,
+                general.delay,
+                general.center,
+                general.stop,
+                general.chain,
+                general.reset
+            )
         }
 
         override fun generateFromArgs(

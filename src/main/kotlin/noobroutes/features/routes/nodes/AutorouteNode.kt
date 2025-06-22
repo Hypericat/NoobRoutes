@@ -6,6 +6,7 @@ import noobroutes.features.routes.AutoRoute
 import noobroutes.features.routes.nodes.autoroutes.NodeLoader
 import noobroutes.utils.Utils.containsOneOf
 import noobroutes.utils.json.JsonUtils.addProperty
+import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
@@ -33,6 +34,17 @@ abstract class AutorouteNode(
     var resetTriggered = false
 
     companion object {
+        fun getGeneralNodeArgsFromObj(obj: JsonObject): GeneralNodeArgs {
+            val pos = obj.get("position").asVec3
+            val awaitSecrets = obj.get("secrets")?.asInt ?: 0
+            val delay = obj.get("delay")?.asLong ?: 0L
+            val center = obj.has("center")
+            val stop = obj.has("stop")
+            val chain = obj.has("chain")
+            val reset = obj.has("reset")
+            return GeneralNodeArgs(pos, awaitSecrets, delay, center, stop, chain, reset)
+        }
+
         fun getGeneralNodeArgs(room: UniqueRoom, args: Array<out String>): GeneralNodeArgs{
             val playerCoords = room.getRelativeCoords(
                 kotlin.math.floor(PlayerUtils.posX) + 0.5,

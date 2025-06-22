@@ -46,8 +46,6 @@ object ClickGUI : Screen() {
         for (category in Category.entries) {
             panels.add(Panel(category))
         }
-
-
     }
 
     override fun draw() {

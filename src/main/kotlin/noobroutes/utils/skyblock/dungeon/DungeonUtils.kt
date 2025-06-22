@@ -149,7 +149,7 @@ object DungeonUtils {
             val (_, name, clazz, clazzLevel) = tablistRegex.find(displayName)?.destructured ?: continue
 
             previousTeammates.find { it.name == name }?.let { player -> player.isDead = clazz == "DEAD" } ?:
-            previousTeammates.add(DungeonPlayer(name, DungeonClass.entries.find { it.name == clazz } ?: continue, clazzLvl = _root_ide_package_.noobroutes.utils.romanToInt(
+            previousTeammates.add(DungeonPlayer(name, DungeonClass.entries.find { it.name == clazz } ?: continue, clazzLvl = romanToInt(
                 clazzLevel
             ), mc.netHandler?.getPlayerInfo(name)?.locationSkin ?: continue, mc.theWorld?.getPlayerEntityByName(name), false))
         }

@@ -2,6 +2,7 @@ package noobroutes.utils.clock
 
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.utils.profile
 
 /**
  * Class that allows repeating execution of code while being dynamic.
@@ -17,7 +18,7 @@ open class Executor(val delay: () -> Long, private val profileName: String = "Un
     open fun run(): Boolean {
         if (shouldFinish) return true
             if (clock.hasTimePassed(delay(), true)) {
-                _root_ide_package_.noobroutes.utils.profile(profileName) {
+                profile(profileName) {
                     runCatching {
                         func()
                     }
@@ -66,7 +67,7 @@ open class Executor(val delay: () -> Long, private val profileName: String = "Un
 
         @SubscribeEvent
         fun onRender(event: RenderWorldLastEvent) {
-            _root_ide_package_.noobroutes.utils.profile("Executors") {
+            profile("Executors") {
                 executors.removeAll {
                     if (!it.shouldRun()) return@removeAll false
                     else it.run()
