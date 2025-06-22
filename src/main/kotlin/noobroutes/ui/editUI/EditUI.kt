@@ -108,6 +108,8 @@ object EditUI : Screen() {
     var ringY = 0.0
     var backgroundHeight = 490f
 
+
+    //hyper if you want to complain about this function go ahead and recode this ui. I cannot be asked.
     fun openUI(ring: Ring) {
         this.ring = ring
         ring.renderYawVector = true
@@ -320,7 +322,6 @@ object EditUI : Screen() {
         Core.display = EditUI
     }
 
-    //270f
     val elements = mutableListOf<Element<*>>()
 
 

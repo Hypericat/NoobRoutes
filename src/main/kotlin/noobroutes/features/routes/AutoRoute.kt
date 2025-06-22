@@ -24,6 +24,7 @@ import noobroutes.features.settings.impl.DropdownSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isEnd
+import noobroutes.utils.Utils.isStart
 import noobroutes.utils.coerceMax
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.floor
@@ -183,8 +184,8 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     val canRoute get() = PlayerUtils.canSendC08 && RouteUtils.pearls < 1
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.isEnd || mc.thePlayer == null) return
+    fun onTick(event: TickEvent.PlayerTickEvent) {
+        if (event.isStart || mc.thePlayer == null) return
         val room = DungeonUtils.currentRoom ?: roomReplacement
         if (PlayerUtils.movementKeysPressed) {
             nodesToRun.clear()
