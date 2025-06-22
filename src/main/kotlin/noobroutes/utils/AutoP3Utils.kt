@@ -226,23 +226,7 @@ object AutoP3Utils {
         "Test" to Color(255, 0, 255),
     )
 
-    fun renderRing(ring: Ring) {
-        if (AutoP3.cgyMode) {
-            Renderer.drawCylinder(ring.coords, 0.5, 0.5, -0.01, 24, 1, 90, 0, 0, ringColors.getOrDefault(ring.type, Color(255, 0, 255)), depth = depth)
-            return
-        }
-        when (renderStyle) {
-            0 -> {
-                Renderer.drawCylinder(ring.coords.add(Vec3(0.0, (0.45 * sin(System.currentTimeMillis().toDouble()/300)) + 0.528 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
-                Renderer.drawCylinder(ring.coords.add(Vec3(0.0, (-0.45 * sin(System.currentTimeMillis().toDouble()/300)) + 0.528 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
-                Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.503, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
-                Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.DARK_GRAY, depth = depth)
-                Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 1.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.DARK_GRAY, depth = depth)
-            }
-            1 -> Renderer.drawCylinder(ring.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
-            2 -> RenderUtils.drawOutlinedAABB(ring.coords.subtract(0.5, 0.0, 0.5).toAABB(), Color.GREEN, thickness = 3, depth = depth)
-        }
-    }
+
 
     fun setGameSpeed(speed: Float) {
         val accessor = mc as TimerFieldAccessor

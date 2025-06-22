@@ -19,6 +19,7 @@ import noobroutes.utils.render.getTextWidth
 import noobroutes.utils.render.rectangleOutline
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
+import noobroutes.utils.round
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 
@@ -34,9 +35,9 @@ class ElementSlider(
     x: Float,
     y: Float,
     val w: Float,
-    val h: Float
+    val h: Float,
+    val round: Int
 ) : Element<Double>(x, y) {
-    override val elementSize: EditUIElementSize = EditUIElementSize.DOUBLE
 
 
     private var listeningText = false
@@ -59,7 +60,7 @@ class ElementSlider(
     private val colorAnim = ColorAnimation(100)
 
     /** Used to make slider smoother and not jittery (doesn't change value.) */
-    private var sliderPercentage: Float = ((valueDouble - min) / (max - min)).toFloat().coerceAtMost(1f)
+    private var sliderPercentage: Float = ((valueDouble.round(round).toDouble() - min) / (max - min)).toFloat().coerceAtMost(1f)
 
     private inline val color: Color
         get() = clickGUIColor.brighter(1 + handler.percent() / 200f)
@@ -67,9 +68,9 @@ class ElementSlider(
 
     private fun getDisplay(): String {
         if (listeningText) {
-            return listeningTextField.ifEmpty { " " }
+            return "${listeningTextField.ifEmpty { " " }}${unit}"
         }
-        return "${valueDouble}${unit}"
+        return "${valueDouble.round(round)}${unit}"
     }
 
     override fun draw() {
@@ -110,7 +111,7 @@ class ElementSlider(
         text(name, x + TEXTOFFSET, y + 17.75f, textColor, 20f)
         text(
             getDisplay(),
-            x + w - TEXTOFFSET - 22,
+            x + w - TEXTOFFSET - 22 - textWidth,
             y + 15.75f,
             textColor.darkerIf(isHoveredBox),
             16f
@@ -129,7 +130,7 @@ class ElementSlider(
                     textUnlisten()
                 } else {
                     listeningText = true
-                    listeningTextField = valueDouble.toString()
+                    listeningTextField = valueDouble.round(round).toString()
                 }
             }
             listeningText -> {
@@ -146,7 +147,7 @@ class ElementSlider(
     }
 
     fun updateSlider() {
-        sliderPercentage = ((valueDouble - min) / (max - min)).toFloat().coerceAtMost(1f)
+        sliderPercentage = ((valueDouble.round(round).toDouble() - min) / (max - min)).toFloat().coerceAtMost(1f)
     }
 
 
@@ -156,7 +157,7 @@ class ElementSlider(
             val double = input.toDoubleOrNull()
             if (double == null) {
                 modMessage("Invalid Number! Defaulting to previous value")
-                valueDouble
+                valueDouble.round(round).toDouble()
             } else double
         }
         setter(newValue)
@@ -225,7 +226,7 @@ class ElementSlider(
                 Keyboard.KEY_LEFT -> -increment
                 else -> return
             }
-            setter(amount + valueDouble)
+            setter(amount + valueDouble.round(round).toDouble())
             return
         }
     }

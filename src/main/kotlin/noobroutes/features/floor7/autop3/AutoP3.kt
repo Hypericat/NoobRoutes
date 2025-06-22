@@ -103,7 +103,7 @@ object AutoP3: Module (
 
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
 
-            AutoP3Utils.renderRing(ring)
+            ring.renderRing()
             if (cgyMode || ring !is BlinkRing) return@forEachIndexed
 
             val vec3List: List<Vec3> = ring.packets.map { packet -> Vec3(packet.positionX, packet.positionY + 0.01, packet.positionZ) }
@@ -359,8 +359,8 @@ object AutoP3: Module (
                 )
             }
             "lava" -> {
-                if (args.size < 3) return modMessage("need a length arg (positive number)")
-                val endY = args[2].toDoubleOrNull() ?: return modMessage("need a length arg (positive number)")
+                if (args.size < 3) return modMessage("need a length arg")
+                val endY = args[2].toDoubleOrNull()?.absoluteValue ?: return modMessage("need a length arg")
                 actuallyAddRing(LavaClipRing(
                     coords,
                     MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),

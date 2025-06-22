@@ -6,7 +6,6 @@ abstract class Element<T>(
     var x: Float,
     var y: Float
 ) {
-    abstract val elementSize: EditUIElementSize
     abstract val setter: (T) -> Unit
     abstract val getter: () -> T
 

@@ -10,6 +10,11 @@ class MutableVec3(var x: Double, var y: Double, var z: Double) {
     constructor(vec3: Vec3) : this(vec3.xCoord, vec3.yCoord, vec3.zCoord)
     constructor(blockPos: BlockPos) : this(blockPos.x, blockPos.y, blockPos.z)
     constructor(vec3i: Vec3i) : this(vec3i.x, vec3i.y, vec3i.z)
+    val xCoord get() = x
+    val yCoord get() = y
+    val zCoord get() = z
+
+
     constructor(x: Number, y: Number, z: Number) : this(
         x.toDouble(), y.toDouble(), z.toDouble()
     )
@@ -85,7 +90,33 @@ class MutableVec3(var x: Double, var y: Double, var z: Double) {
         return subtract(vec3.xCoord, vec3.yCoord, vec3.zCoord, mutate)
     }
 
+    fun distanceTo(vec: Vec3): Double {
+        val d0 = vec.xCoord - this.x
+        val d1 = vec.yCoord - this.y
+        val d2 = vec.zCoord - this.z
+        return MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2).toDouble()
+    }
 
+    fun squareDistanceTo(vec: Vec3): Double {
+        val d0 = vec.xCoord - this.x
+        val d1 = vec.yCoord - this.y
+        val d2 = vec.zCoord - this.z
+        return d0 * d0 + d1 * d1 + d2 * d2
+    }
+
+    fun distanceTo(vec: MutableVec3): Double {
+        val d0 = vec.x - this.x
+        val d1 = vec.y - this.y
+        val d2 = vec.z - this.z
+        return MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2).toDouble()
+    }
+
+    fun squareDistanceTo(vec: MutableVec3): Double {
+        val d0 = vec.x - this.x
+        val d1 = vec.y - this.y
+        val d2 = vec.z - this.z
+        return d0 * d0 + d1 * d1 + d2 * d2
+    }
 
 
 }
