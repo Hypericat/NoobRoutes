@@ -49,7 +49,7 @@ object LavaClip: Module(
         if (clipDistance == null) return
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         val resolution = ScaledResolution(mc)
-        text("Lava CLipping ${clipDistance.toInt()}", resolution.scaledWidth / 2, resolution.scaledHeight / 2.5, Color.RED, 13, align = TextAlign.Middle)
+        text("Lava Clipping ${clipDistance.toInt()}", resolution.scaledWidth / 2, resolution.scaledHeight / 2.5, Color.RED, 13, align = TextAlign.Middle)
     }
 
     @SubscribeEvent

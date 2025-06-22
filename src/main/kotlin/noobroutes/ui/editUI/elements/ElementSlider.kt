@@ -10,6 +10,7 @@ import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
 import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
+import noobroutes.ui.editUI.EditUI
 import noobroutes.ui.editUI.EditUIElementSize
 import noobroutes.ui.editUI.Element
 import noobroutes.ui.util.MouseUtils.isAreaHovered
@@ -46,12 +47,12 @@ class ElementSlider(
 
     //55
     private val isHovered: Boolean
-        get() = isAreaHovered(x, y + 21.5f, w - 15f, 33.5f)
+        get() = isAreaHovered(EditUI.originX + x, EditUI.originY +y + 21.5f, w - 15f, 33.5f)
 
     private val isHoveredBox: Boolean
         get() = isAreaHovered(
-            x + w - TEXTOFFSET - 30 - getTextWidth(getDisplay(), 16f),
-            y + 5f,
+            EditUI.originX + x + w - TEXTOFFSET - 30 - getTextWidth(getDisplay(), 16f),
+            EditUI.originY + y + 5f,
             16f + getTextWidth(getDisplay(), 16f),
             21.5f
         )
@@ -73,7 +74,7 @@ class ElementSlider(
         return "${valueDouble.round(round)}${unit}"
     }
 
-    override fun draw() {
+    override fun draw(x: Float, y: Float) {
         handler.handle(x, y + 21.5f, w - 15f, 33.5f)
         val textWidth = getTextWidth(getDisplay(), 16f)
 
@@ -101,9 +102,9 @@ class ElementSlider(
         )
 
         if (listening) {
-            sliderPercentage = ((mouseX - (x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f)
+            sliderPercentage = ((mouseX + 10.6f - (x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f)
             val diff = max - min
-            val newVal = min + ((mouseX - (x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f) * diff
+            val newVal = min + ((mouseX + 10.6f - (x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f) * diff
             setter(newVal)
         }
         //roundedRectangle(x + w - 4, y, 2, h, clickGUIColor.brighter(1.6f), 0f, edgeSoftness = 0)
@@ -166,11 +167,17 @@ class ElementSlider(
     }
 
     private fun handleText(input: String): String {
-        return input.filterIndexed { index, c ->
-            c.isDigit() || (c == '.' && input.indexOf('.') == index)
+        val cleaned = buildString {
+            input.forEachIndexed { index, char ->
+                when {
+                    char.isDigit() -> append(char)
+                    char == '-' && index == 0 && !contains('-') -> append(char)
+                    char == '.' && !contains('.') -> append(char)
+                }
+            }
         }
+        return cleaned
     }
-
 
     private var listeningTextField: String = ""
 
@@ -220,7 +227,7 @@ class ElementSlider(
                 }
             }
         }
-        if (isHovered) {
+        if (isHovered || isHoveredBox) {
             val amount = when (keyCode) {
                 Keyboard.KEY_RIGHT -> increment
                 Keyboard.KEY_LEFT -> -increment
@@ -255,6 +262,7 @@ class ElementSlider(
         Keyboard.KEY_NUMPAD6,
         Keyboard.KEY_NUMPAD7,
         Keyboard.KEY_NUMPAD8,
-        Keyboard.KEY_NUMPAD9
+        Keyboard.KEY_NUMPAD9,
+        Keyboard.KEY_MINUS
     )
 }

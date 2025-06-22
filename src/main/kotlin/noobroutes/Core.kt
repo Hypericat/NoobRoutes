@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.client.event.GuiOpenEvent
+import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -53,12 +54,13 @@ object Core {
 
     }
     var lastChatVisibility: EntityPlayer.EnumChatVisibility? = null
-
+    var inUI = false
 
     @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {
         lastChatVisibility?.let { mc.gameSettings.chatVisibility = it }
         lastChatVisibility = null
+        inUI = false
     }
 
     @SubscribeEvent
@@ -66,6 +68,14 @@ object Core {
         if (event.gui == null) {
             lastChatVisibility?.let { mc.gameSettings.chatVisibility = it }
             lastChatVisibility = null
+            inUI = false
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderHUD(event: RenderGameOverlayEvent.Pre) {
+        if (inUI && event.type == RenderGameOverlayEvent.ElementType.HOTBAR) {
+            event.isCanceled = true
         }
     }
 
@@ -73,6 +83,7 @@ object Core {
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (display == null) return
         lastChatVisibility = mc.gameSettings.chatVisibility
+        inUI = true
         if (ClickGUIModule.hideChat) {
             mc.gameSettings.chatVisibility = EntityPlayer.EnumChatVisibility.HIDDEN
         }

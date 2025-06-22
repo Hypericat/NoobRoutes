@@ -5,6 +5,7 @@ import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.features.ModuleManager
 import noobroutes.features.settings.Saving
+import noobroutes.ui.editUI.EditUI
 import java.io.File
 
 /**
@@ -34,6 +35,12 @@ object Config {
                 val jsonArray = parser.parse(this).asJsonArray ?: return
                 for (modules in jsonArray) {
                     val moduleObj = modules?.asJsonObject ?: continue
+                    if (moduleObj.get("name").asString == "Edit GUI") {
+                        EditUI.originX = moduleObj.get("x").asFloat
+                        EditUI.originY = moduleObj.get("y").asFloat
+                    }
+
+
                     val module = ModuleManager.getModuleByName(moduleObj.get("name").asString) ?: continue
                     if (moduleObj.get("enabled").asBoolean != module.enabled) module.toggle()
 
@@ -43,6 +50,7 @@ object Config {
                         if (setting is Saving) setting.read(settingObj.first().value)
                     }
                 }
+
             }
         } catch (e: Exception) {
             println("Error loading config.\n${e.message}")
@@ -69,6 +77,11 @@ object Config {
                         })
                     })
                 }
+                add(JsonObject().apply {
+                    addProperty("name", "Edit GUI")
+                    addProperty("x", EditUI.originX)
+                    addProperty("y", EditUI.originY)
+                })
             }
             configFile.bufferedWriter().use { it.write(gson.toJson(jsonArray)) }
         } catch (e: Exception) {

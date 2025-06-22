@@ -15,6 +15,7 @@ import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
 import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
+import noobroutes.ui.editUI.EditUI
 import noobroutes.ui.editUI.EditUIElementSize
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.render.*
@@ -35,10 +36,10 @@ class ElementCheckBox(
     val yChange = 12
 
     val isHovered: Boolean
-        get() = if (!ClickGUIModule.switchType) isAreaHovered(x + width - 30f - xChange, y + 15f - 8, 21f + xChange, 24f + yChange)
-        else isAreaHovered(x + width - 56f - xChange, y + 14f - 8, 47f + xChange, 20f + yChange)
+        get() = if (!ClickGUIModule.switchType) isAreaHovered(EditUI.originX + x + width - 30f - xChange, EditUI.originY + y + 15f - 8, 21f + xChange, 24f + yChange)
+        else isAreaHovered(EditUI.originX + x + width - 56f - xChange, EditUI.originY + y + 14f - 8, 47f + xChange, 20f + yChange)
 
-    override fun draw() {
+    override fun draw(x: Float, y: Float) {
         text(name, x + TEXTOFFSET, y + height / 2f, textColor, 20f, MinecraftFont.REGULAR)
 
         val color = colorAnim.get(
