@@ -17,6 +17,85 @@ import noobroutes.ui.editUI.elements.ElementSlider
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.render.*
 
+
+
+/*
+    Yes, I know the code is shit. No, I am not going to fix it.
+    Ui's are such a pain in the ass that I cannot be bothered to improve the code.
+    Even, if I easily improve it, if it works, it works.
+
+    Fuck
+    U
+    I
+    s
+
+    They are the bane of my existence.
+
+    Here is some copy and pasted chatGPT:
+
+    Why UIs Are a Pain to Make
+
+        User Interfaces (UIs) are essential. They are the bridge between complex systems and human beings,
+    turning raw logic and data into tangible, interactive experiences. Yet, despite their importance — or perhaps because of it — building UIs
+    is a notoriously frustrating, tedious, and error-prone process. Whether you’re working in Java Swing, HTML/CSS,
+    or some janky custom GUI framework for a Minecraft mod, making UIs often feels less like engineering
+    and more like pixel-wrangling purgatory. Here’s why.
+
+    1. Design is Subjective, But Code is Not
+        In back-end programming, code either works or it doesn’t.
+    A function returns the right value, or it doesn't.
+    But in UI development, perfection is subjective.
+    Is that button the right size? Does that spacing feel right?
+    Is the color accessible enough? Design is fuzzy, nuanced, and deeply human — but you’re stuck expressing
+    it through brittle, rigid code. That mismatch breeds frustration. You’re constantly second-guessing pixel values,
+    trying to match mockups, and tweaking things for hours to move a label five pixels to the left.
+
+    2. You’re Fighting the Framework
+        It doesn't matter if it’s React, Flutter, JavaFX, Forge's scaled resolution mess,
+    or some HTML canvas hack — every UI framework has quirks. Layout systems break under edge cases.
+    Responsiveness is an afterthought. And good luck mixing dynamic behavior with nested, animated,
+    or interactive elements without descending into spaghetti. The higher-level the abstraction,
+    the more you’re at the mercy of magic state handling and performance trade-offs. The lower-level the framework,
+    the more you’re reinventing wheels — and dealing with input events, bounding boxes, and redrawing by hand.
+
+    3. State Management is a Nightmare
+        UIs are inherently stateful. Every interaction — hovering, clicking, typing — can change what
+    the user sees or does. Managing that state is hard. What’s visible? What’s enabled?
+    What if an element should animate in? How do you prevent race conditions or stale renders?
+    And don’t even bring up “reactive programming” unless you enjoy debugging a chain of cascading updates and ghost states.
+
+    4. Testing is Basically Manual QA
+        Back-end code can be unit-tested. Front-end code? Good luck.
+    Most UI testing is either brittle (pixel-diff screenshots, anyone?), slow (Selenium-level slow),
+    or incomplete (did you test dragging that modal while resizing the window?).
+    So you end up spending hours manually clicking around to make sure that one CSS change didn’t break the tooltip
+    on hover inside a nested scroll container inside a tab.
+
+    5. Everyone Has an Opinion
+        Unlike infrastructure code that lives deep in the bowels of the system, UIs are visible.
+    To everyone. That means everyone has feedback: designers, product managers, users, your dog.
+    You’ll be told to change the font, adjust the padding, animate the button, make it pop more,
+    or align it to an imaginary axis. And none of it’s wrong — but implementing that feedback
+    in a fragile UI codebase is an exercise in pain.
+
+    6. Cross-Device and Resolution Hell
+        UIs don’t run in a vacuum. They have to scale across devices, resolutions, aspect ratios,
+    DPI settings, and accessibility modes. That beautiful centered layout you made?
+    Now it’s overflowing on ultra-wide screens, broken on mobile, and blurry on high-DPI monitors.
+    Minecraft mod UIs are especially cursed: you have to deal with scaled resolutions, mouse coordinates
+    that don’t map to your draw area, and GUI elements that behave differently depending on internal states you have zero control over.
+
+    Conclusion
+        UIs are deceptively difficult. They look simple on the surface,
+    but underneath lies a tangled mess of layout constraints,
+    event handlers, visual glitches, and state transitions — all
+    made worse by subjective design requirements and platform inconsistencies.
+    It’s not that UI developers are bad at their jobs; it’s that the job itself is unreasonably hard.
+    So next time your GUI lags, buttons misalign, or scrollbars vanish for no reason,
+    don’t blame the dev. Blame the UI gods. They’re cruel and they never sleep.
+ */
+
+
 object EditUI : Screen() {
 
     var ring: Ring? = null
