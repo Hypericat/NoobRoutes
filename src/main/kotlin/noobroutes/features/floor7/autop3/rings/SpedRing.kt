@@ -41,6 +41,6 @@ class SpedRing(
         AutoP3Utils.setGameSpeed(timerSpeed)
         spedFor = length
         if (AutoP3.cgyMode) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
-        else modMessage("§c§l$cancelled§r§f c04s available, used §c${spedFor}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
+        else modMessage("§c§l${cancelled - length}§r§f c04s available, used §c${length}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }
 }

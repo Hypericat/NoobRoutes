@@ -1,6 +1,5 @@
 package noobroutes.ui.editUI
 
-import javafx.scene.text.TextAlignment
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.entity.player.EntityPlayer
