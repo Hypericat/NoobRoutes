@@ -6,11 +6,13 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import noobroutes.events.impl.BlockChangeEvent;
+import noobroutes.features.dungeon.FunnyMapExtras;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static noobroutes.utils.UtilsKt.postAndCatch;
@@ -27,5 +29,10 @@ public abstract class MixinChunk {
         IBlockState oldState = getBlockState(pos);
         if (oldState != state)
             if (postAndCatch(new BlockChangeEvent(pos, oldState, state, this.worldObj))) cir.setReturnValue(oldState);
+    }
+
+    @Inject(method = "fillChunk", at = @At("TAIL"))
+    private void onFillChunk(byte[] p_177439_1_, int p_177439_2_, boolean p_177439_3_, CallbackInfo ci) {
+        FunnyMapExtras.INSTANCE.onChunkLoad((Chunk) (Object) this);
     }
 }

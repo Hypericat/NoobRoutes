@@ -24,10 +24,8 @@ fun getBlockIdAt(blockPos: BlockPos): Int? {
 }
 
 fun setBlock(blockPos: BlockPos, blockState: IBlockState){
-    val world = mc.theWorld
-    devMessage(blockPos)
-    world.setBlockState(blockPos, blockState)
-    world.markBlockForUpdate(blockPos)
+    mc.theWorld.setBlockState(blockPos, blockState)
+    mc.theWorld.markBlockForUpdate(blockPos)
 }
 
 inline val TileEntitySkull.skullTexture get() =

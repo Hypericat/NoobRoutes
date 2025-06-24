@@ -31,9 +31,9 @@ object ScanUtils {
     }
 
     fun getRoomCentre(posX: Int, posZ: Int): Pair<Int, Int> {
-        val roomX = ((posX - DungeonScan.startX) / 32f).roundToInt()
-        val roomZ = ((posZ - DungeonScan.startZ) / 32f).roundToInt()
-        return Pair(roomX * 32 + DungeonScan.startX, roomZ * 32 + DungeonScan.startZ)
+        val roomX = ((posX - startX) / 32f).roundToInt()
+        val roomZ = ((posZ - startZ) / 32f).roundToInt()
+        return Pair(roomX * 32 + startX, roomZ * 32 + startZ)
     }
 
     fun getRealCoordsFromRoomCoords(vec2: Vec2i): Vec2i {
@@ -51,8 +51,8 @@ object ScanUtils {
     }
 
     fun getRoomFromPos(pos: BlockPos): Room? {
-        val x = ((pos.x - DungeonScan.startX + 15) shr 5)
-        val z = ((pos.z - DungeonScan.startZ + 15) shr 5)
+        val x = ((pos.x - startX + 15) shr 5)
+        val z = ((pos.z - startZ + 15) shr 5)
         val room = Dungeon.Info.dungeonList.getOrNull(x * 2 + z * 22)
         return room as? Room
     }

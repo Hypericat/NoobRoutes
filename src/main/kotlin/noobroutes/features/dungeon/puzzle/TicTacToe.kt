@@ -56,7 +56,6 @@ object TicTacToe : Module(
         execute(50) {
             if (currentRoomName != "Tic Tac Toe") destroyExecutor()
             solveBoard()
-
         }
     }
     @SubscribeEvent
