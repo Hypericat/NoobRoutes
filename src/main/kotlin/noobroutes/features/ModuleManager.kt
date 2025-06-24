@@ -10,7 +10,7 @@ import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
-import noobroutes.features.dungeon.MapLobotomizer
+import noobroutes.features.dungeon.FunnyMapExtras
 import noobroutes.features.dungeon.puzzle.IceFill
 import noobroutes.features.dungeon.puzzle.TicTacToe
 import noobroutes.features.dungeon.puzzle.WaterBoard
@@ -88,13 +88,13 @@ object ModuleManager {
         //EtherwarpTest,
         Doorless,
         SecretGuideManager,
-        //AutoRoute,
+        AutoRoute,
         Penis,
         RotationVisualizer,
         CrystalAura,
         BlinkRelic,
         IceFill,
-        MapLobotomizer,
+        FunnyMapExtras,
         FreeCam
     )
 

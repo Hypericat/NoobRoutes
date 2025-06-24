@@ -17,7 +17,6 @@ import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.render.FreeCam
-import noobroutes.features.routes.AutoRoute
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
@@ -34,7 +33,7 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import org.lwjgl.input.Keyboard
 
 
-object MapLobotomizer : Module("Map Lobotomizer", description = "It is just fme but way less laggy.", category = Category.DUNGEON) {
+object FunnyMapExtras : Module("Fme", description = "It is just fme but way less laggy.", category = Category.DUNGEON) {
     var editMode by BooleanSetting("Edit Mode", description = "Allows you to edit blocks")
     val editModeToggle by KeybindSetting("Edit Mode Bind", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress { editMode = !editMode }
     val placeCooldown by NumberSetting("Place Cooldown", min = 0, max = 1000, default = 150,  description = "Cooldown between placing blocks in edit mode", unit = "ms")
