@@ -202,10 +202,11 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun onKeyInput(event: InputEvent.KeyInputEvent) {
-        if (!walking && !motioning) return
         val keyCode = Keyboard.getEventKey()
-        if (keyCode != Keyboard.KEY_W && keyCode != Keyboard.KEY_A && keyCode != Keyboard.KEY_S && keyCode != Keyboard.KEY_D ) return
+        if (!keyBindings.map { it.keyCode }.contains(keyCode)) return
         if (!Keyboard.getEventKeyState()) return
+
+        AutoP3.isAligned = false
         walking = false
         motioning = false
         testing = false

@@ -60,7 +60,6 @@ object AutoP3: Module (
     val editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions")
     val depth by BooleanSetting("Depth Check", true, description = "Makes rings render through walls")
     private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes")
-    val fasterMotion by BooleanSetting("faster motion", false, description = "doesnt stop before the jump for motion")
     var noRotate by BooleanSetting("no rotate", false, description = "forces the player to be unable to change where they look in boss. Pretty much only way to gurantee working motion rings")
     private val noRotateKey by KeybindSetting("toggle no rotate", Keyboard.KEY_NONE, "toggles no rotate setting").onPress {
         noRotate = !noRotate
@@ -68,9 +67,9 @@ object AutoP3: Module (
     }
     val cgyMode by BooleanSetting("cgy Mode", false, description = "changes some settings to look like cgy")
     val silentLook by BooleanSetting("Silent Look", false, description = "when activating a look ring only rotate serverside (may lead to desync)")
-    val fuckingLook by BooleanSetting("Loud Look", false, description = "always look for if u want to make ur autop3 seem more legit or smth")
     val renderStyle by SelectorSetting("ring design", "normal", arrayListOf("normal", "simple", "box"), false, description = "how rings should look")
     val walkFix by SelectorSetting("walk boost", "none", arrayListOf("none", "normal", "big"), false, description = "boost of an edge")
+    private val alignedOnly by BooleanSetting("aligned only", false, description = "only lets u use ring that align or while aligned")
     private val blinkShit by DropdownSetting(name = "Blink Settings")
     val speedRings by BooleanSetting(name = "Speed Rings", description = "Toggles the use of tickshift rings").withDependency { blinkShit }
     val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink").withDependency { blinkShit }
@@ -81,7 +80,6 @@ object AutoP3: Module (
     val moveHud by HudSetting("Move Hud", HudElement(100f, 50f, false, settingName = "Move Hud")).withDependency { blinkShit }
     var customBlinkLengthToggle by BooleanSetting("blink length", default = true, description = "allows for changing the blink length of waypoints").withDependency { blinkShit }
     val customBlinkLength by NumberSetting(name = "length", description = "well how long for the blink to be", min = 1, max = 40, default = 24).withDependency { blinkShit && customBlinkLengthToggle }
-    val timerSpeed by NumberSetting(name = "sped ring speed", description = "how much faster it goes (100 means 100x speed) also need tick check for high speeds", min = 2f, max = 100f, default = 10f).withDependency { blinkShit }
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     private var leapedIDs = mutableSetOf<Int>()
@@ -96,11 +94,14 @@ object AutoP3: Module (
     val ringRegistry = AutoP3Utils.discoverRings("noobroutes.features.floor7.autop3.rings")
 
     private var lastLavaClip = System.currentTimeMillis()
+    var isAligned = false
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         if (!inF7Boss) return
         rings[route]?.forEachIndexed { i, ring ->
+
+            if (alignedOnly && !isAligned && !ring.center && ring !is BlinkRing) return@forEachIndexed
 
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
 
@@ -118,10 +119,22 @@ object AutoP3: Module (
         if (event.phase != TickEvent.Phase.END || mc.thePlayer == null) return
         if(!inF7Boss || mc.thePlayer.isSneaking || editMode || mc.thePlayer.capabilities.walkSpeed < 0.5) return
 
+        val bb = mc.thePlayer.entityBoundingBox
+
+        val collidesX = mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb.offset(0.001, 0.0, 0.0)).isNotEmpty() ||
+                mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb.offset(-0.001, 0.0, 0.0)).isNotEmpty()
+
+        val collidesZ = mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb.offset(0.0, 0.0, 0.001)).isNotEmpty() ||
+                mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb.offset(0.0, 0.0, -0.001)).isNotEmpty()
+
+        if (collidesX && collidesZ) { isAligned = true }
+
         rings[route]?.forEach {ring ->
             val inRing = AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)
 
-            if (inRing && !ring.triggered) {
+            if (inRing) {
+                if (ring.triggered) return@forEach
+                if (alignedOnly && !isAligned && !ring.center && ring !is BlinkRing) return@forEach
                 ring.triggered = true
                 ring.doRingArgs()
                 if (ring.left || ring.leap || ring.term) {
@@ -137,8 +150,7 @@ object AutoP3: Module (
                 else if (ring !is BlinkRing) ring.run()
                 else activatedBlinks.add(ring)
             }
-
-            else if (!inRing) {
+            else {
                 ring.triggered = false
                 if (ring.leap) awaitingLeap.remove(ring)
                 if (ring.term) awaitingTerm.remove(ring)

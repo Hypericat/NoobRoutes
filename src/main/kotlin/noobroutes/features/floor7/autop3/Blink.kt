@@ -16,6 +16,7 @@ import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
+import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.SecretGuideIntegration
@@ -23,6 +24,7 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.text
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.sin
 
@@ -172,6 +174,7 @@ object Blink{
             mc.thePlayer.motionY = endY
             mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)
             lastBlink = System.currentTimeMillis()
+            AutoP3.isAligned = true
         }
         lastMovementedC03 = movementPackets.removeFirst()
     }

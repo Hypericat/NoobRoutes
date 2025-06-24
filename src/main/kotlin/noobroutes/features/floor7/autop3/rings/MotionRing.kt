@@ -33,7 +33,7 @@ class MotionRing(
         AutoP3Utils.direction = yaw
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
-        AutoP3Utils.motionTicks = if (AutoP3.fasterMotion && !center && !far) 1 else 0
+        AutoP3Utils.motionTicks = 1
         AutoP3Utils.scale = scale
         AutoP3Utils.motioning = true
     }

@@ -104,6 +104,7 @@ class BlinkRing(
         packets.forEach { PacketUtils.sendPacket(it) }
         val lastPacket = packets.last()
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
+        AutoP3.isAligned = true
         if (!walk) mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
         else {
             mc.thePlayer.setVelocity(endXVelo, endYVelo, endZVelo)

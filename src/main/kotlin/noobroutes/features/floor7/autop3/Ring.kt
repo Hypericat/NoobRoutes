@@ -6,7 +6,6 @@ import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.AutoP3.cgyMode
 import noobroutes.features.floor7.autop3.AutoP3.depth
-import noobroutes.features.floor7.autop3.AutoP3.fuckingLook
 import noobroutes.features.floor7.autop3.AutoP3.renderStyle
 import noobroutes.features.floor7.autop3.AutoP3.silentLook
 import noobroutes.utils.AutoP3Utils.ringColors
@@ -22,9 +21,6 @@ import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.toAABB
-import kotlin.random.Random
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.sin
 
 @Target(AnnotationTarget.CLASS)
@@ -135,9 +131,6 @@ abstract class Ring(
             if (!silentLook) mc.thePlayer.rotationYaw = yaw
             Blink.rotate = yaw
         }
-        if (fuckingLook) {
-            mc.thePlayer.rotationYaw = yaw
-        }
 
         if (cgyMode) {
             mc.thePlayer.rotationYaw = yaw
@@ -150,6 +143,7 @@ abstract class Ring(
         if (center && (mc.thePlayer.onGround || System.currentTimeMillis() - Blink.lastBlink < 100)) {
             mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord)
             Blink.rotSkip = true
+            AutoP3.isAligned = true
         }
     }
 
