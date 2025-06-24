@@ -95,7 +95,8 @@ object ModuleManager {
         BlinkRelic,
         IceFill,
         FunnyMapExtras,
-        FreeCam
+        FreeCam,
+        BHop
     )
 
     init {
