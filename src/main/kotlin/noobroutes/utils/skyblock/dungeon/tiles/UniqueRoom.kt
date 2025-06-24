@@ -7,6 +7,7 @@ import noobroutes.Core.mc
 import noobroutes.utils.Vec2i
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.getBlockIdAt
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.Dungeon
 
 
@@ -21,21 +22,7 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
     var clayPos: BlockPos = BlockPos(0, 0, 0)
 
     val roomComponents get() = tiles.filter { !it.first.isSeparator }
-
-
-    init {
-        if (room.data.name == "Unknown") {
-            name = "Unknown_${arrX}_${arrY}"
-        } else {
-            name = room.data.name
-            init(arrX, arrY, room)
-        }
-        room.uniqueRoom = this
-        Dungeon.Info.uniqueRooms.add(this)
-    }
-
-
-
+    val roomShape: RoomShape
 
     fun init(arrX: Int, arrY: Int, room: Room) {
         when (room.data.type) {
@@ -128,9 +115,27 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
             return
         }
 
+        if (roomShape == RoomShape.oneByFour) {
+            rotation = Rotations.entries.dropLast(1).find { rotation ->
+                roomComponents.any { component ->
+                    BlockPos(component.first.x + rotation.oneByFour.x, roomHeight,component.first.z + rotation.oneByFour.z).let { blockPos ->
+                        getBlockIdAt(blockPos) == 159
+                    }.also { isCorrect ->
+                        if (isCorrect) clayPos = BlockPos(
+                            component.first.x + rotation.normal.x,
+                            roomHeight,
+                            component.first.z + rotation.normal.z
+                        )
+                    }
+                }
+            } ?: return //rotation not found
+            devMessage(rotation)
+        }
+
+
         rotation = Rotations.entries.dropLast(1).find { rotation ->
             roomComponents.any { component ->
-                BlockPos(component.first.x + rotation.x, roomHeight, component.first.z + rotation.z).let { blockPos ->
+                BlockPos(component.first.x + rotation.normal.x, roomHeight, component.first.z + rotation.normal.z).let { blockPos ->
                     getBlockIdAt(blockPos) == 159 && (roomComponents.size == 1 || EnumFacing.HORIZONTALS.all { facing ->
                         getBlockIdAt(
                             blockPos.add(
@@ -143,11 +148,85 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
                 }
             }
         } ?: return // Rotation isn't found if we can't find the clay block
-        //devMessage(rotation)
     }
 
 
+    private val room1x2Names = listOf(
+        "Gold",
+        "Skull",
+        "Archway",
+        "Grass Ruin",
+        "Redstone Warrior",
+        "Balcony",
+        "Grand Library",
+        "Mage",
+        "Crypt",
+        "Doors",
+        "Pedestal",
+        "Purple Flags",
+        "Bridges",
+        "Pressure Plates"
+    )
+    private val room1x3Names = listOf(
+        "Diagonal",
+        "Red Blue",
+        "Wizard",
+        "Slime",
+        "Catwalk",
+        "Deathmite",
+        "Gravel"
+    )
+    private val room1x4Names = listOf(
+        "Hallway",
+        "Mossy",
+        "Pit",
+        "Pipes",
+        "Quartz Knight",
+        "Waterfall"
+    )
+    private val room2x2Names = listOf(
+        "Stairs",
+        "Buttons",
+        "Museum",
+        "Atlas",
+        "Supertall",
+        "Flags",
+        "Cathedral",
+        "Rails",
+        "Mines"
+    )
+    private val roomLShapedNames = listOf(
+        "Dino Site",
+        "Withermancer",
+        "Chambers",
+        "Market",
+        "Lava Ravine",
+        "Melon",
+        "Well",
+        "Layers",
+        "Spider",
+        "Pirate",
+        "Altar"
+    )
 
+    init {
+        if (room.data.name == "Unknown") {
+            name = "Unknown_${arrX}_${arrY}"
+        } else {
+            name = room.data.name
+            init(arrX, arrY, room)
+        }
+        room.uniqueRoom = this
+        Dungeon.Info.uniqueRooms.add(this)
+        roomShape = when (name) {
+            in room1x4Names -> RoomShape.oneByFour
+            in room1x3Names -> RoomShape.oneByThree
+            in room1x2Names -> RoomShape.oneByTwo
+            in roomLShapedNames -> RoomShape.lShaped
+            in room2x2Names -> RoomShape.twoByTwo
+            else -> RoomShape.oneByOne
+        }
+    }
 
 
 }

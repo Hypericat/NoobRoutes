@@ -1,11 +1,6 @@
 package noobroutes.utils.skyblock.dungeon
 
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonIOException
-import com.google.gson.JsonSyntaxException
+import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import net.minecraft.block.Block
 import net.minecraft.util.BlockPos
@@ -20,8 +15,8 @@ import noobroutes.utils.skyblock.dungeon.tiles.RoomType
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import java.io.FileNotFoundException
 import java.lang.reflect.Type
-import kotlin.collections.orEmpty
 import kotlin.math.roundToInt
+
 
 object ScanUtils {
 
@@ -46,12 +41,13 @@ object ScanUtils {
     }
 
     fun getRoomComponents(name: String): List<Room> {
-        return Dungeon.Info.dungeonList.filter {(it as? Room)?.data?.name == name && !it.isSeparator}.map { it as Room }
+        return Dungeon.Info.dungeonList.filter { (it as? Room)?.data?.name == name && !it.isSeparator }
+            .map { it as Room }
     }
-    
+
     fun getUniqueRoomFromPos(pos: BlockPos): UniqueRoom? {
         val roomPos = getRoomFromPos(pos)
-        return Dungeon.Info.uniqueRooms.firstOrNull {it.name == roomPos?.data?.name}
+        return Dungeon.Info.uniqueRooms.firstOrNull { it.name == roomPos?.data?.name }
     }
 
     fun getRoomFromPos(pos: BlockPos): Room? {
@@ -84,7 +80,8 @@ object ScanUtils {
                     RoomDataDeserializer()
                 )
                 .create().fromJson(
-                    (ScanUtils::class.java.getResourceAsStream("/rooms.json") ?: throw FileNotFoundException()).bufferedReader(),
+                    (ScanUtils::class.java.getResourceAsStream("/rooms.json")
+                        ?: throw FileNotFoundException()).bufferedReader(),
                     object : TypeToken<Set<RoomData>>() {}.type
                 )
         } catch (e: Exception) {
@@ -131,4 +128,6 @@ object ScanUtils {
         }
         return sb.toString().hashCode()
     }
+
+
 }
