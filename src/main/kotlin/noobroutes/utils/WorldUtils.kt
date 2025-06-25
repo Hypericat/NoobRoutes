@@ -25,7 +25,6 @@ fun getBlockIdAt(blockPos: BlockPos): Int? {
 }
 
 fun setBlock(blockPos: BlockPos, blockState: IBlockState){
-
     mc.theWorld.setBlockState(blockPos, blockState)
     mc.theWorld.markBlockForUpdate(blockPos)
 }

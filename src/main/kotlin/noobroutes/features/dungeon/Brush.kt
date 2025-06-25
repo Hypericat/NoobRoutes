@@ -36,6 +36,7 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import org.lwjgl.input.Keyboard
+import kotlin.math.sign
 
 
 object Brush : Module("Brush", description = "It is just fme but way less laggy.", category = Category.DUNGEON) {
@@ -50,36 +51,28 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
     }
     val placeCooldown by NumberSetting("Place Cooldown", min = 0, max = 1000, default = 150,  description = "Cooldown between placing blocks in edit mode", unit = "ms")
 
-    var savedChunks = hashMapOf<Long, HashMap<BlockPos, IBlockState>>()
+    var savedChunks = hashMapOf<Pair<Int, Int>, HashMap<BlockPos, IBlockState>>()
     var blockConfig: MutableMap<String, MutableList<Pair<IBlockState, BlockPos>>> = mutableMapOf()
 
     var selectedBlockState: IBlockState = IBlockStateUtils.airIBlockState
     private var lastPlace = System.currentTimeMillis()
 
 
-    private fun calculateChunkHash(chunk: Chunk) : Long {
-        return calculateChunkHash(chunk.xPosition, chunk.zPosition);
+    private fun calculateChunkHash(chunk: Chunk) : Pair<Int, Int> {
+        return Pair(chunk.xPosition, chunk.zPosition)
     }
 
 
-    private fun calculateChunkHash(x: Int, z: Int) : Long {
-        return x.toLong() or(z.toLong() shl 32)
+    private fun calculateChunkHash(x: Int, z: Int) : Pair<Int, Int> {
+        return Pair(x, z)
     }
 
     fun onChunkLoad(chunk: Chunk) {
-        //logger.info("Chunk Pos : "   + chunk.xPosition * 16  + " : " + chunk.zPosition * 16)
-
+        if (!enabled) return
         val blocks = savedChunks.get(calculateChunkHash(chunk));
         if (blocks == null) return
 
         blocks.forEach { (pos, state) ->
-            val chunkAtPos = mc.theWorld.getChunkFromBlockCoords(pos)
-            logger.info("Position : $pos")
-            logger.info("Chunk Pos : "   + chunk.xPosition * 16  + " : " + chunk.zPosition * 16)
-            logger.info("chunk:${chunk.isLoaded}, chunkAtPos:${chunkAtPos.isLoaded}, areEqual:${chunk.xPosition == chunkAtPos.xPosition && chunkAtPos.zPosition == chunk.zPosition}")
-            if (!chunkAtPos.isLoaded) {
-                return@forEach
-            }
             setBlock(pos, state)
         }
     }
@@ -117,7 +110,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
 
             if (removed) {
                 runOnMCThread {
-                    val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 28)
+                    val hash = Pair(pos.x shr 4, pos.z shr 4)
                     savedChunks.getOrElse(hash) { null }?.remove(pos) ?: return@runOnMCThread
                     setBlock(pos, IBlockStateUtils.airIBlockState);
                 }
@@ -126,7 +119,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
 
             blockList.add(Pair(IBlockStateUtils.airIBlockState, pos))
             runOnMCThread {
-                val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 28)
+                val hash = Pair(pos.x shr 4, pos.z shr 4)
                 savedChunks.getOrPut(hash) { hashMapOf()}.put(pos, IBlockStateUtils.airIBlockState)
                 setBlock(pos, IBlockStateUtils.airIBlockState);
             }
@@ -142,7 +135,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
 
             blockList.add(Pair(selectedBlockState, pos))
             runOnMCThread {
-                val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 28)
+                val hash = Pair(pos.x shr 4, pos.z shr 4)
                 savedChunks.getOrPut(hash) { hashMapOf()}.put(pos, selectedBlockState)
                 setBlock(pos, selectedBlockState);
             }
@@ -177,7 +170,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
                 //  Optimization over normal calculateChunkHash, the x is calculated the same way.
                 //  For the z, instead of shifting right by 4 and shifting left by 16
                 //  we and it with the bit mask (zeroes the bottom 4 bits) and shift it by only 12
-                val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 28)
+                val hash = calculateChunkHash(pos.x shr 4, pos.z shr 4)
 
                 savedChunks.getOrPut(hash) { hashMapOf()}.put(pos, state)
             }
@@ -189,7 +182,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
         runOnMCThread {
             val pos = room?.getRealCoords(pair.second) ?: pair.second
 
-            val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 28)
+            val hash = Pair(pos.x shr 4, pos.z shr 4)
             savedChunks.getOrPut(hash) { hashMapOf()}.put(pos, pair.first)
             setBlock(pos, pair.first);
         }
@@ -199,7 +192,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
         runOnMCThread {
             val pos = room?.getRealCoords(target) ?: target
 
-            val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 28)
+            val hash = Pair(pos.x shr 4, pos.z shr 4)
 
             savedChunks.getOrElse(hash) { null }?.remove(pos) ?: return@runOnMCThread
             setBlock(pos, IBlockStateUtils.airIBlockState);

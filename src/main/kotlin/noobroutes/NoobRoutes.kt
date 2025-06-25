@@ -55,7 +55,7 @@ class NoobRoutes {
             AutoRouteCommand(),
             DynamicRouteCommand(),
             YawPitchCommand(),
-            AutoBloodRushCommand()
+            BrushCommand()
         ).forEach {
             ClientCommandHandler.instance.registerCommand(it)
         }
