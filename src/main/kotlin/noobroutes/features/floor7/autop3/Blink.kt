@@ -11,6 +11,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.PacketEvent
@@ -20,6 +21,7 @@ import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.SecretGuideIntegration
+import noobroutes.utils.Utils.isStart
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.render.TextAlign
@@ -220,6 +222,18 @@ object Blink{
 
     var rotSkip = false
 
+    var toReset = AutoP3.resetInterval
+
+    @SubscribeEvent
+    fun resetter(event: TickEvent.ClientTickEvent) {
+        if (!event.isStart || !BossEventDispatcher.inF7Boss) return
+        if (toReset <= 0) {
+            cancelled -= AutoP3.resetAmount.coerceAtMost(cancelled)
+            toReset = AutoP3.resetInterval
+        }
+        toReset--
+    }
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun canceller(event: PacketEvent.Send) {
         if(!BossEventDispatcher.inF7Boss || event.packet !is C03PacketPlayer) return
@@ -239,14 +253,10 @@ object Blink{
             else {
                 PacketUtils.sendPacket(C03PacketPlayer.C05PacketPlayerLook(rotateTo, 0F, event.packet.isOnGround))
             }
-            if (cancelled > 0) cancelled--
             return
         }
-        if (event.packet.isMoving || movementPackets.isNotEmpty() || System.currentTimeMillis() - lastBlink < 100) {
-            if (cancelled > 0) cancelled--
-            return
-        }
+        if (event.packet.isMoving || movementPackets.isNotEmpty() || System.currentTimeMillis() - lastBlink < 100) { return }
         event.isCanceled = true
-        if (AutoP3.spedFor == 0) cancelled++
+        if (AutoP3.spedFor == 0 && cancelled < 400) cancelled++
     }
 }

@@ -6,6 +6,7 @@ import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.AutoP3
+import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.floor7.autop3.Blink.blinksInstance
 import noobroutes.features.floor7.autop3.Blink.cancelled
 import noobroutes.features.floor7.autop3.Blink.endY
@@ -110,6 +111,7 @@ class BlinkRing(
             mc.thePlayer.setVelocity(endXVelo, endYVelo, endZVelo)
             var airTicks = 0
             packets.forEach { if (!it.isOnGround) airTicks++ else airTicks = 0 }
+            Blink.cancelled -= packets.size
             AutoP3Utils.airTicks = airTicks
             AutoP3Utils.direction = yaw
             AutoP3Utils.walking = true

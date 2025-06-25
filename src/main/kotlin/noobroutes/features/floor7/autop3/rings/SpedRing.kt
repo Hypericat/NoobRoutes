@@ -4,6 +4,7 @@ import net.minecraft.util.Vec3
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3.spedFor
 import noobroutes.features.floor7.autop3.AutoP3.speedRings
+import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.floor7.autop3.Blink.blinksInstance
 import noobroutes.features.floor7.autop3.Blink.cancelled
 import noobroutes.features.floor7.autop3.Ring
@@ -39,6 +40,7 @@ class SpedRing(
         blinksInstance += length
         AutoP3Utils.setGameSpeed(100f)
         spedFor = length
+        Blink.cancelled -= length
         if (AutoP3.cgyMode) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
         else modMessage("§c§l${cancelled - length}§r§f c04s available, used §c${length}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }

@@ -5,7 +5,6 @@ import com.google.gson.JsonObject
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.entity.player.EntityPlayer
 import noobroutes.ui.editUI.EditUI
-import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
@@ -15,7 +14,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import noobroutes.Core
 import noobroutes.Core.logger
 import noobroutes.config.DataManager
 import noobroutes.events.BossEventDispatcher
@@ -25,7 +23,6 @@ import noobroutes.events.impl.Phase
 import noobroutes.events.impl.TermOpenEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.floor7.autop3.AutoP3.awaitingLeap
 import noobroutes.features.floor7.autop3.Blink.blinkStarts
 import noobroutes.features.floor7.autop3.rings.*
 import noobroutes.features.misc.SexAura
@@ -38,7 +35,6 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
@@ -75,6 +71,8 @@ object AutoP3: Module (
     val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink").withDependency { blinkShit }
     val mode by DualSetting(name = "movement mode", description = "how movement should look", default = false, left = "Motion", right = "Packet").withDependency { blinkShit }
     val maxBlinks by NumberSetting(name = "max blinks per instance", description = "too much blink on an instance bans apparently", min = 100, max = 300, default = 120).withDependency { blinkShit }
+    val resetInterval by NumberSetting(name = "clear intervall", description = "delete packets periodically", min = 1, max = 300, default = 200, unit = "t").withDependency { blinkShit }
+    val resetAmount by NumberSetting(name = "clear amount", description = "delete packets periodically", min = 1, max = 400, default = 50).withDependency { blinkShit }
     private val showEnd by BooleanSetting("Render End", default = true, description = "renders waypoint where blink ends").withDependency { blinkShit }
     private val showLine by BooleanSetting("Render Line", default = true, description = "renders line where blink goes").withDependency { blinkShit }
     val moveHud by HudSetting("Move Hud", HudElement(100f, 50f, false, settingName = "Move Hud")).withDependency { blinkShit }
