@@ -9,6 +9,7 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.tileentity.TileEntitySkull
 import net.minecraft.util.*
+import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.utils.skyblock.devMessage
 
@@ -24,6 +25,7 @@ fun getBlockIdAt(blockPos: BlockPos): Int? {
 }
 
 fun setBlock(blockPos: BlockPos, blockState: IBlockState){
+
     mc.theWorld.setBlockState(blockPos, blockState)
     mc.theWorld.markBlockForUpdate(blockPos)
 }

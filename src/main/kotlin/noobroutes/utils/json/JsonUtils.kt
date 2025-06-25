@@ -1,5 +1,6 @@
 package noobroutes.utils.json
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import net.minecraft.util.BlockPos
@@ -7,6 +8,30 @@ import net.minecraft.util.Vec3
 import noobroutes.utils.MutableVec3
 
 object JsonUtils {
+
+    fun JsonArray.add(blockPos: BlockPos) {
+        this.add(JsonObject().apply {
+            addProperty("x", blockPos.x)
+            addProperty("y", blockPos.y)
+            addProperty("z", blockPos.z)
+        })
+    }
+    fun JsonArray.add(vec3: Vec3) {
+        this.add(JsonObject().apply {
+            addProperty("x", vec3.xCoord)
+            addProperty("y", vec3.yCoord)
+            addProperty("z", vec3.zCoord)
+        })
+    }
+    fun JsonArray.add(mutableVec3: MutableVec3) {
+        this.add(JsonObject().apply {
+            addProperty("x", mutableVec3.x)
+            addProperty("y", mutableVec3.y)
+            addProperty("z", mutableVec3.z)
+        })
+    }
+
+
     fun JsonObject.addProperty(property: String, blockPos: BlockPos) {
         this.add(property, JsonObject().apply {
             addProperty("x", blockPos.x)

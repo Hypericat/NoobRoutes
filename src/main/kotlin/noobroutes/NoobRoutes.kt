@@ -7,13 +7,13 @@ import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent
 import noobroutes.Core.mc
 import noobroutes.commands.*
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
 import noobroutes.features.ModuleManager
 import noobroutes.features.floor7.autop3.Blink
-import noobroutes.features.move.AutoPath
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.*
@@ -90,6 +90,7 @@ class NoobRoutes {
         }
         MinecraftFont.init()
     }
+
     @Mod.EventHandler
     fun postInit(event: FMLPostInitializationEvent) {
         Core.postInit()
@@ -101,6 +102,10 @@ class NoobRoutes {
         Core.loadComplete()
         ModuleManager.addModules()
 
+    }
+    @Mod.EventHandler
+    fun something(event: FMLServerStoppedEvent) {
+        Core.onFMLServerStopped()
     }
 
     

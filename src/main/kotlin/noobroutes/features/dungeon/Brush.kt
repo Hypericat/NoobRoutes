@@ -1,13 +1,20 @@
 package noobroutes.features.dungeon
 
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
+import net.minecraft.util.ResourceLocation
 import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core
+import noobroutes.Core.logger
+import noobroutes.config.DataManager
 import noobroutes.events.impl.ClickEvent
 import noobroutes.events.impl.LocationChangeEvent
 import noobroutes.events.impl.RoomEnterEvent
@@ -19,6 +26,8 @@ import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.IBlockStateUtils
 import noobroutes.utils.getBlockStateAt
+import noobroutes.utils.json.JsonUtils.add
+import noobroutes.utils.json.JsonUtils.asBlockPos
 import noobroutes.utils.runOnMCThread
 import noobroutes.utils.setBlock
 import noobroutes.utils.skyblock.LocationUtils
@@ -29,14 +38,17 @@ import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import org.lwjgl.input.Keyboard
 
 
-object FunnyMapExtras : Module("Fme", description = "It is just fme but way less laggy.", category = Category.DUNGEON) {
-
+object Brush : Module("Brush", description = "It is just fme but way less laggy.", category = Category.DUNGEON) {
     const val BIT_MASK = 0xFFF0
 
     var editMode by BooleanSetting("Edit Mode", description = "Allows you to edit blocks")
-    val editModeToggle by KeybindSetting("Edit Mode Bind", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress { editMode = !editMode }
+    val editModeToggle by KeybindSetting("Edit Mode Bind", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress {
+        editMode = !editMode
+        if (!editMode) {
+            saveConfig()
+        }
+    }
     val placeCooldown by NumberSetting("Place Cooldown", min = 0, max = 1000, default = 150,  description = "Cooldown between placing blocks in edit mode", unit = "ms")
-
 
     var savedChunks = hashMapOf<Long, HashMap<BlockPos, IBlockState>>()
     var blockConfig: MutableMap<String, MutableList<Pair<IBlockState, BlockPos>>> = mutableMapOf()
@@ -44,27 +56,43 @@ object FunnyMapExtras : Module("Fme", description = "It is just fme but way less
     var selectedBlockState: IBlockState = IBlockStateUtils.airIBlockState
     private var lastPlace = System.currentTimeMillis()
 
+
     private fun calculateChunkHash(chunk: Chunk) : Long {
         return calculateChunkHash(chunk.xPosition, chunk.zPosition);
     }
 
+
     private fun calculateChunkHash(x: Int, z: Int) : Long {
-        return x.toLong() or(z.toLong() shl 16)
+        return x.toLong() or(z.toLong() shl 32)
     }
 
     fun onChunkLoad(chunk: Chunk) {
+        //logger.info("Chunk Pos : "   + chunk.xPosition * 16  + " : " + chunk.zPosition * 16)
+
         val blocks = savedChunks.get(calculateChunkHash(chunk));
         if (blocks == null) return
 
-        if (chunk.isLoaded) blocks.forEach { (pos, state) -> setBlock(pos, state) }
-
-
+        blocks.forEach { (pos, state) ->
+            val chunkAtPos = mc.theWorld.getChunkFromBlockCoords(pos)
+            logger.info("Position : $pos")
+            logger.info("Chunk Pos : "   + chunk.xPosition * 16  + " : " + chunk.zPosition * 16)
+            logger.info("chunk:${chunk.isLoaded}, chunkAtPos:${chunkAtPos.isLoaded}, areEqual:${chunk.xPosition == chunkAtPos.xPosition && chunkAtPos.zPosition == chunk.zPosition}")
+            if (!chunkAtPos.isLoaded) {
+                return@forEach
+            }
+            setBlock(pos, state)
+        }
     }
 
     @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {
         savedChunks.clear()
+        if (editMode) {
+            editMode = false
+            saveConfig()
+        }
     }
+
 
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -89,7 +117,7 @@ object FunnyMapExtras : Module("Fme", description = "It is just fme but way less
 
             if (removed) {
                 runOnMCThread {
-                    val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 12)
+                    val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 28)
                     savedChunks.getOrElse(hash) { null }?.remove(pos) ?: return@runOnMCThread
                     setBlock(pos, IBlockStateUtils.airIBlockState);
                 }
@@ -98,7 +126,7 @@ object FunnyMapExtras : Module("Fme", description = "It is just fme but way less
 
             blockList.add(Pair(IBlockStateUtils.airIBlockState, pos))
             runOnMCThread {
-                val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 12)
+                val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 28)
                 savedChunks.getOrPut(hash) { hashMapOf()}.put(pos, IBlockStateUtils.airIBlockState)
                 setBlock(pos, IBlockStateUtils.airIBlockState);
             }
@@ -114,7 +142,7 @@ object FunnyMapExtras : Module("Fme", description = "It is just fme but way less
 
             blockList.add(Pair(selectedBlockState, pos))
             runOnMCThread {
-                val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 12)
+                val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 28)
                 savedChunks.getOrPut(hash) { hashMapOf()}.put(pos, selectedBlockState)
                 setBlock(pos, selectedBlockState);
             }
@@ -139,6 +167,8 @@ object FunnyMapExtras : Module("Fme", description = "It is just fme but way less
 
 
 
+
+
     private fun registerChunkBlocks(room: UniqueRoom?, positions: List<Pair<IBlockState, BlockPos>>) {
         runOnMCThread {
             positions.forEach { (state, localPos) ->
@@ -147,7 +177,7 @@ object FunnyMapExtras : Module("Fme", description = "It is just fme but way less
                 //  Optimization over normal calculateChunkHash, the x is calculated the same way.
                 //  For the z, instead of shifting right by 4 and shifting left by 16
                 //  we and it with the bit mask (zeroes the bottom 4 bits) and shift it by only 12
-                val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 12)
+                val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 28)
 
                 savedChunks.getOrPut(hash) { hashMapOf()}.put(pos, state)
             }
@@ -159,7 +189,7 @@ object FunnyMapExtras : Module("Fme", description = "It is just fme but way less
         runOnMCThread {
             val pos = room?.getRealCoords(pair.second) ?: pair.second
 
-            val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 12)
+            val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 28)
             savedChunks.getOrPut(hash) { hashMapOf()}.put(pos, pair.first)
             setBlock(pos, pair.first);
         }
@@ -169,7 +199,7 @@ object FunnyMapExtras : Module("Fme", description = "It is just fme but way less
         runOnMCThread {
             val pos = room?.getRealCoords(target) ?: target
 
-            val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 12)
+            val hash = (pos.x shr 4).toLong() or ((pos.z and BIT_MASK).toLong() shl 28)
 
             savedChunks.getOrElse(hash) { null }?.remove(pos) ?: return@runOnMCThread
             setBlock(pos, IBlockStateUtils.airIBlockState);
@@ -194,4 +224,57 @@ object FunnyMapExtras : Module("Fme", description = "It is just fme but way less
         }
         return location.displayName
     }
+
+
+
+    fun loadConfig() {
+        val file = DataManager.loadDataFromFileObjectOfObjects("editedblocks")
+        blockConfig.clear()
+        savedChunks.clear()
+        for ((area, blocks) in file) {
+            logger.info(area)
+            val blockList = mutableListOf<Pair<IBlockState, BlockPos>>()
+            val areaObject = blocks.asJsonObject
+
+            for ((key, jsonArray) in areaObject.entrySet()) {
+                val (blockId, metaString) = key.split(";")
+                logger.info("$blockId;$metaString")
+                val meta = metaString.toIntOrNull() ?: continue
+                val block = Block.blockRegistry.getObject(ResourceLocation(blockId)) ?: continue
+                val state = block.getStateFromMeta(meta)
+
+                for (posElement in jsonArray.asJsonArray) {
+                    blockList.add(state to posElement.asBlockPos)
+                }
+            }
+            blockConfig[area] = blockList
+        }
+    }
+
+    fun saveConfig() {
+        val root = JsonObject()
+
+        for ((area, blocks) in blockConfig) {
+            val areaObject = JsonObject()
+
+            val blockSudoMap = mutableMapOf<String, MutableList<BlockPos>>()
+            for ((state, pos) in blocks) {
+                val block = state.block
+                val registryName = Block.blockRegistry.getNameForObject(block)
+                val meta = block.getMetaFromState(state)
+                val key = "$registryName;$meta"
+                blockSudoMap.getOrPut(key) { ArrayList() }.add(pos)
+            }
+            blockSudoMap.forEach { meta, list ->
+                val array = JsonArray()
+                list.forEach {
+                    array.add(it)
+                }
+                areaObject.add(meta, array)
+            }
+            root.add(area, areaObject)
+        }
+        DataManager.saveDataToFile("editedblocks", root)
+    }
+
 }

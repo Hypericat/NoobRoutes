@@ -6,7 +6,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import noobroutes.events.impl.BlockChangeEvent;
-import noobroutes.features.dungeon.FunnyMapExtras;
+import noobroutes.features.dungeon.Brush;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,6 +33,6 @@ public abstract class MixinChunk {
 
     @Inject(method = "fillChunk", at = @At("TAIL"))
     private void onFillChunk(byte[] p_177439_1_, int p_177439_2_, boolean p_177439_3_, CallbackInfo ci) {
-        FunnyMapExtras.INSTANCE.onChunkLoad((Chunk) (Object) this);
+        Brush.INSTANCE.onChunkLoad((Chunk) (Object) this);
     }
 }

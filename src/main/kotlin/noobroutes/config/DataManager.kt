@@ -43,6 +43,38 @@ object DataManager {
         }
     }
 
+    fun loadDataFromFileObjectOfObjects(fileName: String): Map<String, JsonObject> {
+        val path = File(mc.mcDataDir, "config/noobroutes/$fileName.json")
+        return try {
+            path.bufferedReader().use { reader ->
+                val jsonContent = reader.readText()
+                val jsonObject = gson.fromJson(jsonContent, JsonObject::class.java)
+                val jsonArrays = mutableMapOf<String, JsonObject>()
+                for ((key, value) in jsonObject.entrySet()) {
+                    logger.info(value.isJsonArray)
+                    if (value.isJsonObject) {
+                        jsonArrays[key] = value.asJsonObject
+                    }
+                }
+                jsonArrays
+            }
+        } catch (e: java.nio.file.NoSuchFileException) {
+            logger.info("File not found: ${path.path}")
+            mutableMapOf()
+        } catch (e: IOException) {
+            e.printStackTrace()
+            mutableMapOf()
+        } catch (e: JsonSyntaxException) {
+            logger.info("Invalid JSON syntax in file: ${path.path}")
+            mutableMapOf()
+        } catch (e: Exception) {
+            logger.info("Error loading data from file: ${path.path}")
+            e.printStackTrace()
+            mutableMapOf()
+        }
+    }
+
+
     fun loadDataFromFileObject(fileName: String): Map<String, JsonArray> {
         val path = File(mc.mcDataDir, "config/noobroutes/$fileName.json")
         return try {
@@ -51,6 +83,7 @@ object DataManager {
                 val jsonObject = gson.fromJson(jsonContent, JsonObject::class.java)
                 val jsonArrays = mutableMapOf<String, JsonArray>()
                 for ((key, value) in jsonObject.entrySet()) {
+                    logger.info(value.isJsonArray)
                     if (value.isJsonArray) {
                         jsonArrays[key] = value.asJsonArray
                     }
