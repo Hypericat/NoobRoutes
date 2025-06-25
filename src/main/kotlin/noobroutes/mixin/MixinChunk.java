@@ -6,7 +6,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import noobroutes.events.impl.BlockChangeEvent;
-import noobroutes.features.dungeon.Brush;
+import noobroutes.features.dungeon.brush.Brush;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

@@ -2,6 +2,7 @@ package noobroutes.utils
 
 import net.minecraft.block.Block
 import net.minecraft.block.properties.IProperty
+import net.minecraft.block.properties.PropertyDirection
 import net.minecraft.block.state.BlockState
 import net.minecraft.block.state.IBlockState
 import noobroutes.utils.skyblock.devMessage
@@ -32,4 +33,19 @@ object IBlockStateUtils {
         return this.withProperty(typedProperty, value as Comparable<Any>)
     }
 
+    /**
+     * Set a property by its string value; if the value is invalid, returns the original state.
+     */
+    fun <T : Comparable<T>> withProperty(
+        state: IBlockState,
+        property: IProperty<T>,
+        valueString: String
+    ): IBlockState {
+
+        val value = property.allowedValues
+            .firstOrNull { property.getName(it) == valueString }
+            ?: return state
+
+        return state.withProperty(property, value)
+    }
 }

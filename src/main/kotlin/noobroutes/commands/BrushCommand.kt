@@ -2,9 +2,10 @@ package noobroutes.commands
 
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
-import noobroutes.Core.display
-import noobroutes.features.dungeon.Brush
-import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.Core.logger
+import noobroutes.features.dungeon.brush.Brush
+import noobroutes.features.dungeon.brush.FMEBlockDeserializer
+import noobroutes.features.dungeon.brush.FmeConfigLoader
 
 import noobroutes.utils.skyblock.modMessage
 
@@ -31,6 +32,11 @@ class BrushCommand: CommandBase() {
             }
             "load", "l" -> {
                 Brush.loadConfig()
+            }
+            "fml" -> {
+                FmeConfigLoader.loadConfig()
+                logger.info("config:${FmeConfigLoader.config}")
+                logger.info("floorConfig:${FmeConfigLoader.floorsConfig}")
             }
         }
     }

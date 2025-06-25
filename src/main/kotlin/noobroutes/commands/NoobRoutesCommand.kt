@@ -3,10 +3,7 @@ package noobroutes.commands
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import noobroutes.Core.display
-import noobroutes.features.dungeon.Brush
 import noobroutes.ui.clickgui.ClickGUI
-import noobroutes.utils.skyblock.modMessage
-import org.apache.logging.log4j.LogManager
 
 class NoobRoutesCommand : CommandBase() {
     override fun getCommandName(): String {

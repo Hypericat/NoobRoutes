@@ -1,8 +1,10 @@
-package noobroutes.features.dungeon
+package noobroutes.features.dungeon.brush
 
-
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.BlockPos
@@ -13,7 +15,6 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core
-import noobroutes.Core.logger
 import noobroutes.config.DataManager
 import noobroutes.events.impl.ClickEvent
 import noobroutes.events.impl.LocationChangeEvent
@@ -36,8 +37,7 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import org.lwjgl.input.Keyboard
-import kotlin.math.sign
-
+import kotlin.collections.iterator
 
 object Brush : Module("Brush", description = "It is just fme but way less laggy.", category = Category.DUNGEON) {
     const val BIT_MASK = 0xFFF0
@@ -49,7 +49,14 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             saveConfig()
         }
     }
-    val placeCooldown by NumberSetting("Place Cooldown", min = 0, max = 1000, default = 150,  description = "Cooldown between placing blocks in edit mode", unit = "ms")
+    val placeCooldown by NumberSetting(
+        "Place Cooldown",
+        min = 0,
+        max = 1000,
+        default = 150,
+        description = "Cooldown between placing blocks in edit mode",
+        unit = "ms"
+    )
 
     var savedChunks = hashMapOf<Pair<Int, Int>, HashMap<BlockPos, IBlockState>>()
     var blockConfig: MutableMap<String, MutableList<Pair<IBlockState, BlockPos>>> = mutableMapOf()
@@ -120,7 +127,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             blockList.add(Pair(IBlockStateUtils.airIBlockState, pos))
             runOnMCThread {
                 val hash = Pair(pos.x shr 4, pos.z shr 4)
-                savedChunks.getOrPut(hash) { hashMapOf()}.put(pos, IBlockStateUtils.airIBlockState)
+                savedChunks.getOrPut(hash) { hashMapOf() }.put(pos, IBlockStateUtils.airIBlockState)
                 setBlock(pos, IBlockStateUtils.airIBlockState);
             }
             return;
@@ -136,7 +143,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             blockList.add(Pair(selectedBlockState, pos))
             runOnMCThread {
                 val hash = Pair(pos.x shr 4, pos.z shr 4)
-                savedChunks.getOrPut(hash) { hashMapOf()}.put(pos, selectedBlockState)
+                savedChunks.getOrPut(hash) { hashMapOf() }.put(pos, selectedBlockState)
                 setBlock(pos, selectedBlockState);
             }
         }
@@ -172,7 +179,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
                 //  we and it with the bit mask (zeroes the bottom 4 bits) and shift it by only 12
                 val hash = calculateChunkHash(pos.x shr 4, pos.z shr 4)
 
-                savedChunks.getOrPut(hash) { hashMapOf()}.put(pos, state)
+                savedChunks.getOrPut(hash) { hashMapOf() }.put(pos, state)
             }
         }
     }
@@ -183,7 +190,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             val pos = room?.getRealCoords(pair.second) ?: pair.second
 
             val hash = Pair(pos.x shr 4, pos.z shr 4)
-            savedChunks.getOrPut(hash) { hashMapOf()}.put(pos, pair.first)
+            savedChunks.getOrPut(hash) { hashMapOf() }.put(pos, pair.first)
             setBlock(pos, pair.first);
         }
     }
@@ -225,13 +232,13 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
         blockConfig.clear()
         savedChunks.clear()
         for ((area, blocks) in file) {
-            logger.info(area)
+            Core.logger.info(area)
             val blockList = mutableListOf<Pair<IBlockState, BlockPos>>()
             val areaObject = blocks.asJsonObject
 
             for ((key, jsonArray) in areaObject.entrySet()) {
                 val (blockId, metaString) = key.split(";")
-                logger.info("$blockId;$metaString")
+                Core.logger.info("$blockId;$metaString")
                 val meta = metaString.toIntOrNull() ?: continue
                 val block = Block.blockRegistry.getObject(ResourceLocation(blockId)) ?: continue
                 val state = block.getStateFromMeta(meta)
@@ -270,4 +277,5 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
         DataManager.saveDataToFile("editedblocks", root)
     }
 
-}
+
+    }

@@ -3,7 +3,7 @@ package noobroutes.mixin;
 import net.minecraft.client.Minecraft;
 import noobroutes.events.impl.ClickEvent;
 import noobroutes.events.impl.InputEvent;
-import noobroutes.features.dungeon.Brush;
+import noobroutes.features.dungeon.brush.Brush;
 import noobroutes.features.render.FreeCam;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
