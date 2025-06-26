@@ -7,16 +7,16 @@ object ColorUtil {
 
     inline val clickGUIColor: Color
         get() = ClickGUIModule.color
-    val buttonColorAlpha = 0.35f
-    val moduleButtonColorAlpha = 0.42f
-    val elementBackgroundAlpha = 0.43f
-    val titlePanelColorAlpha = 0.6f
+    const val BUTTON_COLOR_ALPHA = 0.35f
+    const val MODULE_BUTTON_COLOR_ALPHA = 0.42f
+    const val ELEMENT_BACKGROUND_ALPHA = 0.43f
+    const val TITLE_PANEL_COLOR_ALPHA = 0.6f
 
 
-    val buttonColor = Color(28, 28, 28, buttonColorAlpha)
-    val moduleButtonColor = Color(26, 26, 26, moduleButtonColorAlpha)
-    val elementBackground = Color(0,0,0, elementBackgroundAlpha)
-    val titlePanelColor: Color = Color(12, 12, 12, titlePanelColorAlpha)
+    val buttonColor = Color(28, 28, 28, BUTTON_COLOR_ALPHA)
+    val moduleButtonColor = Color(26, 26, 26, MODULE_BUTTON_COLOR_ALPHA)
+    val elementBackground = Color(0,0,0, ELEMENT_BACKGROUND_ALPHA)
+    val titlePanelColor: Color = Color(12, 12, 12, TITLE_PANEL_COLOR_ALPHA)
 
     val textColor = Color(239, 239, 239)
 

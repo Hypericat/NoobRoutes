@@ -5,20 +5,17 @@ import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.animations.impl.ColorAnimation
 import noobroutes.ui.clickgui.animations.impl.LinearAnimation
-
 import noobroutes.ui.clickgui.util.ColorUtil.brighter
 import noobroutes.ui.clickgui.util.ColorUtil.brighterIf
 import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
 import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
 import noobroutes.ui.clickgui.util.ColorUtil.darker
 import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
-import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
 import noobroutes.ui.clickgui.util.ColorUtil.textColor
-import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.editUI.EditUI
+import noobroutes.ui.editUI.Element
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.render.*
-import noobroutes.ui.editUI.Element
 
 class ElementCheckBox(
     x: Float,

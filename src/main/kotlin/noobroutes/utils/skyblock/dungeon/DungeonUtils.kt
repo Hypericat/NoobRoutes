@@ -273,7 +273,7 @@ object DungeonUtils {
     }
 
     fun UniqueRoom.getRelativeCoords(pos: BlockPos) = getRelativeCoords(Vec3(pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5)).toBlockPos()
-    fun UniqueRoom.getRealCoords(pos: BlockPos) = getRealCoords(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
+    fun UniqueRoom.getRealCoords(pos: BlockPos) = getRealCoords(Vec3(pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5)).toBlockPos()
     fun UniqueRoom.getRelativeCoords(x: Int, y: Int, z: Int) = getRelativeCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
     fun UniqueRoom.getRealCoords(x: Int, y: Int, z: Int) = getRealCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()
 

@@ -1,16 +1,10 @@
 package noobroutes.ui.blockgui
 
-import net.minecraft.block.Block
-import noobroutes.ui.blockgui.BlockGui.isResetHovered
-import noobroutes.ui.blockgui.blockselector.BlockElement
-
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.render.Color
-import noobroutes.utils.render.resetScissor
 import noobroutes.utils.render.roundedRectangle
-import noobroutes.utils.render.scissor
 import kotlin.math.floor
 
 object BlockEditor {

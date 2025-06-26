@@ -5,7 +5,6 @@ import net.minecraft.command.ICommandSender
 import noobroutes.Core
 import noobroutes.Core.logger
 import noobroutes.features.dungeon.brush.Brush
-import noobroutes.features.dungeon.brush.FmeConfigLoader
 import noobroutes.ui.blockgui.BlockGui
 
 import noobroutes.utils.skyblock.modMessage
@@ -23,20 +22,16 @@ class BrushCommand: CommandBase() {
         if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Set, Clear, Load, LoadFunnyMap")
         when (args[0].lowercase()) {
             "em", "e", "edit" -> {
-                toggleEditMode()
+                Brush.toggleEditMode()
             }
             "bg", "g", "gui" -> {
                 Core.display = BlockGui
             }
-            "b", "block" -> {
-
-            }
             "load", "l" -> {
                 Brush.loadConfig()
+                modMessage("Loaded Config")
             }
-            "loadfunnymap" -> {
-                FmeConfigLoader.loadConfig()
-            }
+            else -> modMessage("Usages: Edit, Gui, Load, LoadFME")
         }
     }
 
@@ -46,12 +41,6 @@ class BrushCommand: CommandBase() {
     override fun getCommandAliases(): List<String> {
         return listOf("br")
     }
-    private fun toggleEditMode(){
-        Brush.editMode = !Brush.editMode
-        if (!Brush.editMode) {
-            Brush.saveConfig()
-        }
-        modMessage("Toggled Edit Mode ${if (Brush.editMode) "§l§aOn" else "§l§cOff"}")
-    }
+
 
 }

@@ -1,7 +1,5 @@
 package noobroutes.ui.blockgui
 
-import net.minecraft.util.BlockPos
-
 abstract class Element<T>(
     val x: Float,
     val y: Float

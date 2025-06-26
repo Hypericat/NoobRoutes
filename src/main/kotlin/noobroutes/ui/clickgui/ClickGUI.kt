@@ -15,8 +15,8 @@ import noobroutes.ui.clickgui.ClickGUI.draw
 import noobroutes.ui.clickgui.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.elements.menu.ElementColor
 import noobroutes.ui.clickgui.util.ColorUtil
+import noobroutes.ui.clickgui.util.ColorUtil.MODULE_BUTTON_COLOR_ALPHA
 import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
-import noobroutes.ui.clickgui.util.ColorUtil.moduleButtonColorAlpha
 import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.clickgui.util.HoverHandler
@@ -54,7 +54,7 @@ object ClickGUI : Screen() {
         if (anim.isAnimating()) {
             //translate(0f, floor(anim.get(-10f, 0f, !open)))
             val alpha = anim.get(0.7f, 1f, !open)
-            ColorUtil.moduleButtonColor.alpha = alpha * moduleButtonColorAlpha
+            ColorUtil.moduleButtonColor.alpha = alpha * MODULE_BUTTON_COLOR_ALPHA
             ColorUtil.clickGUIColor.alpha = alpha
             Color.WHITE.alpha = alpha
         }

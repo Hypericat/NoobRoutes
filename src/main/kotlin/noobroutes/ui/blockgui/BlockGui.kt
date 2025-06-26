@@ -3,28 +3,17 @@ package noobroutes.ui.blockgui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
-import net.minecraft.util.Vec3
-import noobroutes.Core
 import noobroutes.config.Config
 import noobroutes.features.floor7.autop3.AutoP3
-import noobroutes.features.floor7.autop3.Ring
-import noobroutes.features.floor7.autop3.rings.*
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.ui.Screen
 import noobroutes.ui.blockgui.blockselector.BlockSelector
 import noobroutes.ui.blockgui.blockselector.BlockSelector.scrollOffset
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
-import noobroutes.ui.editUI.elements.ElementCheckBox
-import noobroutes.ui.editUI.elements.ElementSlider
-import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.isAreaHovered
-import noobroutes.ui.util.MouseUtils.mouseX
-import noobroutes.ui.util.MouseUtils.mouseY
 import noobroutes.utils.render.*
-import kotlin.math.floor
 import kotlin.math.sign
 
 

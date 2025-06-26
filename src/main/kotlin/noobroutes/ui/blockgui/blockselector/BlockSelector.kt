@@ -3,8 +3,6 @@ package noobroutes.ui.blockgui.blockselector
 import net.minecraft.block.Block
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import noobroutes.ui.blockgui.BlockGui.isResetHovered
-
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.isAreaHovered
@@ -25,11 +23,21 @@ object BlockSelector {
     init {
         for (block in Block.blockRegistry) {
             val item = ItemStack(Item.getItemFromBlock(block) ?: continue)
-
-
-            blockList.add(BlockElement(item))
+            blockList.add(BlockElement(0, 0, item, block))
         }
     }
+/*
+    fun smoothScrollOffset() {
+        val height = 510 * customPlayerInstances.size
+        val currentTop = 70f - scrollOffset
+        val desiredBottom = 600f - height
+        val targetTop = currentTop.coerceIn(desiredBottom, 30f)
+        val targetScrollOffset = 30f - targetTop
+        val smoothingFactor = 0.05f
+        scrollOffset += (targetScrollOffset - scrollOffset) * smoothingFactor
+    }
+
+ */
 
     var x2 = 0f
     var y2 = 0f
@@ -41,7 +49,7 @@ object BlockSelector {
             dragging = true
         }
 
-        if (isAreaHovered(originX, originY, WIDTH, HEIGHT)) {
+        if (isAreaHovered(originX, originY + 70f, WIDTH, HEIGHT)) {
             blockList.forEach { it.mouseClicked() }
         }
     }
@@ -63,14 +71,16 @@ object BlockSelector {
             0, 20f, 20f, 0f, 0f, 0f
         )
         roundedRectangle(originX, originY, WIDTH, HEIGHT, ColorUtil.buttonColor, radius = 20)
-        val s = scissor(originX, originY + 50, WIDTH, HEIGHT - 100)
+        val s = scissor(originX, originY + 70, WIDTH, HEIGHT - 100)
         for (block in blockList) {
-            currentX++
             if (currentX >= 10) {
                 currentY++
                 currentX = 0
             }
-            block.draw(currentX, currentY)
+            block.x = currentX
+            block.y = currentY
+            block.draw()
+            currentX++
         }
         resetScissor(s)
     }

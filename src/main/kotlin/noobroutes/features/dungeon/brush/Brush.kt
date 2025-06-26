@@ -1,20 +1,16 @@
 package noobroutes.features.dungeon.brush
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.google.gson.reflect.TypeToken
 import net.minecraft.block.Block
+import net.minecraft.block.properties.IProperty
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
-import net.minecraft.util.ResourceLocation
 import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import noobroutes.Core
 import noobroutes.config.DataManager
 import noobroutes.events.impl.ClickEvent
 import noobroutes.events.impl.LocationChangeEvent
@@ -37,18 +33,15 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
+import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
-import kotlin.collections.iterator
 
-object Brush : Module("Brush", description = "It is just fme but way less laggy.", category = Category.DUNGEON) {
+object Brush : Module("Brush", description = "It is just fme but way less laggy. Works with FME floor config, but not the room config.", category = Category.DUNGEON) {
     const val BIT_MASK = 0xFFF0
 
     var editMode by BooleanSetting("Edit Mode", description = "Allows you to edit blocks")
     val editModeToggle by KeybindSetting("Edit Mode Bind", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress {
-        editMode = !editMode
-        if (!editMode) {
-            saveConfig()
-        }
+        toggleEditMode()
     }
     val placeCooldown by NumberSetting(
         "Place Cooldown",
@@ -60,7 +53,10 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
     )
 
     var savedChunks = hashMapOf<Pair<Int, Int>, HashMap<BlockPos, IBlockState>>()
-    var blockConfig: MutableMap<String, MutableList<Pair<IBlockState, BlockPos>>> = mutableMapOf()
+    var floorConfig: MutableMap<String, MutableList<Pair<IBlockState, BlockPos>>> = mutableMapOf()
+    var roomConfig: MutableMap<String, MutableList<Pair<IBlockState, BlockPos>>> = mutableMapOf()
+
+
 
     var selectedBlockState: IBlockState = IBlockStateUtils.airIBlockState
     private var lastPlace = System.currentTimeMillis()
@@ -92,7 +88,11 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             saveConfig()
         }
     }
-
+    fun toggleEditMode(){
+        editMode = !editMode
+        saveConfig()
+        modMessage("Toggled Edit Mode ${if (editMode) "§l§aOn" else "§l§cOff"}")
+    }
 
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -105,9 +105,17 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
 
         if (event.type == ClickEvent.ClickType.Middle) {
             selectedBlockState = getBlockStateAt(target)
+            modMessage("Selected block state: §l§a${selectedBlockState.block.unlocalizedName}")
+            return
+        }
+        val blockList = if (room != null) {
+            roomConfig.getOrPut(room.name) { mutableListOf() }
+        } else {
+            floorConfig.getOrPut(getLocation()) { mutableListOf() }
         }
 
-        val blockList = blockConfig.getOrPut(room?.name ?: getLocation()) { mutableListOf() }
+
+
         if (event.type == ClickEvent.ClickType.Left) {
             val pos = room?.getRelativeCoords(target) ?: target
 
@@ -117,18 +125,18 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
 
             if (removed) {
                 runOnMCThread {
-                    val hash = Pair(pos.x shr 4, pos.z shr 4)
-                    savedChunks.getOrElse(hash) { null }?.remove(pos) ?: return@runOnMCThread
-                    setBlock(pos, IBlockStateUtils.airIBlockState);
+                    val hash = Pair(target.x shr 4, target.z shr 4)
+                    savedChunks.getOrElse(hash) { null }?.remove(target) ?: return@runOnMCThread
+                    setBlock(target, IBlockStateUtils.airIBlockState);
                 }
                 return
             }
 
             blockList.add(Pair(IBlockStateUtils.airIBlockState, pos))
             runOnMCThread {
-                val hash = Pair(pos.x shr 4, pos.z shr 4)
-                savedChunks.getOrPut(hash) { hashMapOf() }.put(pos, IBlockStateUtils.airIBlockState)
-                setBlock(pos, IBlockStateUtils.airIBlockState);
+                val hash = Pair(target.x shr 4, target.z shr 4)
+                savedChunks.getOrPut(hash) { hashMapOf() }.put(target, IBlockStateUtils.airIBlockState)
+                setBlock(target, IBlockStateUtils.airIBlockState);
             }
             return;
         }
@@ -140,24 +148,25 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             val offset = target.offset(facing)
             val pos = room?.getRealCoords(offset) ?: offset
             val blockToAdd = Pair(selectedBlockState, pos)
-            if (!blockList.contains(blockToAdd)) {blockList.add(blockToAdd)}
+            blockList.removeAll { it.second.x == blockToAdd.second.x && it.second.y == blockToAdd.second.y && it.second.z == blockToAdd.second.z }
+            blockList.add(blockToAdd)
             runOnMCThread {
-                val hash = Pair(pos.x shr 4, pos.z shr 4)
-                savedChunks.getOrPut(hash) { hashMapOf() }.put(pos, selectedBlockState)
-                setBlock(pos, selectedBlockState);
+                val hash = Pair(offset.x shr 4, offset.z shr 4)
+                savedChunks.getOrPut(hash) { hashMapOf() }.put(offset, selectedBlockState)
+                setBlock(offset, selectedBlockState);
             }
         }
     }
 
     @SubscribeEvent
     fun locationEvent(event: LocationChangeEvent){
-        registerChunkBlocks(null, blockConfig[getLocation()] ?: return)
+        registerChunkBlocks(null, floorConfig[getLocation()] ?: return)
     }
 
     @SubscribeEvent
     fun onRoomEnterEvent(event: RoomEnterEvent){
         if (event.room == null) return
-        val list = blockConfig[event.room.name] ?: return
+        val list = roomConfig[event.room.name] ?: return
 
         registerChunkBlocks(event.room, list)
     }
@@ -175,7 +184,9 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
                 //  For the z, instead of shifting right by 4 and shifting left by 16
                 //  we and it with the bit mask (zeroes the bottom 4 bits) and shift it by only 12
                 val hash = calculateChunkHash(pos.x shr 4, pos.z shr 4)
-
+                if (room != null && mc.theWorld.getChunkFromChunkCoords(pos.x shr 4, pos.z shr 4).isLoaded) {
+                    setBlock(pos, state)
+                }
                 savedChunks.getOrPut(hash) { hashMapOf() }.put(pos, state)
             }
         }
@@ -196,10 +207,10 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
         val location = LocationUtils.currentArea
         return when (location) {
             Island.Dungeon -> {
-                "Floor ${DungeonUtils.floorNumber}"
+                "${DungeonUtils.floorNumber}"
             }
             Island.SinglePlayer -> {
-                "Floor 7"
+                "7"
             }
             else -> location.displayName
         }
@@ -208,40 +219,40 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
 
 
     fun loadConfig() {
-        val file = DataManager.loadDataFromFileObjectOfObjects("editedblocks")
-        blockConfig.clear()
+        val floorConfigFile = DataManager.loadDataFromFileObjectOfObjects("floorConfig")
+        val roomConfigFile = DataManager.loadDataFromFileObjectOfObjects("roomConfig")
+        floorConfig.clear()
+        roomConfig.clear()
         savedChunks.clear()
-        for ((area, blocks) in file) {
+        loadAreaConfig(floorConfigFile, floorConfig)
+        loadAreaConfig(roomConfigFile, roomConfig)
+    }
+
+    private fun loadAreaConfig(configFile: Map<String, JsonObject>, config: MutableMap<String, MutableList<Pair<IBlockState, BlockPos>>>){
+        for ((area, blocks) in configFile) {
             val blockList = mutableListOf<Pair<IBlockState, BlockPos>>()
             val areaObject = blocks.asJsonObject
 
             for ((key, jsonArray) in areaObject.entrySet()) {
-                val (blockId, metaString) = key.split(";")
-                val meta = metaString.toIntOrNull() ?: continue
-                val block = Block.blockRegistry.getObject(ResourceLocation(blockId)) ?: continue
-                val state = block.getStateFromMeta(meta)
+                val state = getBlockState(key)
 
                 for (posElement in jsonArray.asJsonArray) {
                     blockList.add(state to posElement.asBlockPos)
                 }
             }
-            blockConfig[area] = blockList
+            config[area] = blockList
         }
     }
 
-    fun saveConfig() {
+    private fun saveAreaConfig(config: MutableMap<String, MutableList<Pair<IBlockState, BlockPos>>>, name: String) {
         val root = JsonObject()
 
-        for ((area, blocks) in blockConfig) {
+        for ((area, blocks) in config) {
             val areaObject = JsonObject()
 
             val blockSudoMap = mutableMapOf<String, MutableList<BlockPos>>()
             for ((state, pos) in blocks) {
-                val block = state.block
-                val registryName = Block.blockRegistry.getNameForObject(block)
-                val meta = block.getMetaFromState(state)
-                val key = "$registryName;$meta"
-                blockSudoMap.getOrPut(key) { ArrayList() }.add(pos)
+                blockSudoMap.getOrPut(blockStateSerializer(state)) { ArrayList() }.add(pos)
             }
             blockSudoMap.forEach { meta, list ->
                 val array = JsonArray()
@@ -252,6 +263,50 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             }
             root.add(area, areaObject)
         }
-        DataManager.saveDataToFile("editedblocks", root)
+        DataManager.saveDataToFile(name, root)
+    }
+
+
+    fun saveConfig() {
+        saveAreaConfig(floorConfig, "floorConfig")
+        saveAreaConfig(roomConfig, "roomConfig")
+    }
+
+    private fun blockStateSerializer(state: IBlockState): String {
+        val blockName = Block.blockRegistry.getNameForObject(state.block)?.toString() ?: return "minecraft:air"
+        if (state.properties.isEmpty()) return blockName
+        val propString = state.properties.entries.joinToString(",") { (key, value) ->
+            "${key.name}=${key.getName(value)}"
+        }
+        return "$blockName[$propString]"
+    }
+
+    private fun getBlockState(raw: String): IBlockState {
+        val hasArgs = raw.contains("[") && raw.contains("]")
+
+        if (!hasArgs) {
+            val block = Block.getBlockFromName(raw)
+            return block?.defaultState ?: IBlockStateUtils.airIBlockState
+        }
+        val baseName = raw.substringBefore("[")
+        val block = Block.getBlockFromName(baseName)
+        var state: IBlockState = block?.defaultState ?: IBlockStateUtils.airIBlockState
+
+        val inner = raw.substringAfter("[").substringBefore("]")
+        val args = inner.split(",")
+
+        for (arg in args) {
+            val parts = arg.split("=", limit = 2)
+            if (parts.size != 2) continue
+            val key = parts[0]
+            val value = parts[1]
+            val prop = state.propertyNames
+                .firstOrNull { it.name == key } as? IProperty<*>
+                ?: continue
+
+            state = IBlockStateUtils.withProperty(state, prop, value)
+        }
+
+        return state
     }
 }
