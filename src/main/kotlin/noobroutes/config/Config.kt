@@ -5,6 +5,9 @@ import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.features.ModuleManager
 import noobroutes.features.settings.Saving
+import noobroutes.ui.blockgui.BlockEditor
+import noobroutes.ui.blockgui.BlockGui
+import noobroutes.ui.blockgui.blockselector.BlockSelector
 import noobroutes.ui.editUI.EditUI
 import java.io.File
 
@@ -38,6 +41,12 @@ object Config {
                     if (moduleObj.get("name").asString == "Edit GUI") {
                         EditUI.originX = moduleObj.get("x").asFloat
                         EditUI.originY = moduleObj.get("y").asFloat
+                    }
+                    if (moduleObj.get("name").asString == "Block GUI") {
+                        BlockSelector.originX = moduleObj.get("selectorX").asFloat
+                        BlockSelector.originY = moduleObj.get("selectorY").asFloat
+                        BlockEditor.originX = moduleObj.get("editorX").asFloat
+                        BlockEditor.originY = moduleObj.get("editorY").asFloat
                     }
 
 
@@ -81,6 +90,13 @@ object Config {
                     addProperty("name", "Edit GUI")
                     addProperty("x", EditUI.originX)
                     addProperty("y", EditUI.originY)
+                })
+                add(JsonObject().apply {
+                    addProperty("name", "Block GUI")
+                    addProperty("selectorX", BlockSelector.originX)
+                    addProperty("selectorY", BlockSelector.originY)
+                    addProperty("editorX", BlockEditor.originX)
+                    addProperty("editorY", BlockEditor.originY)
                 })
             }
             configFile.bufferedWriter().use { it.write(gson.toJson(jsonArray)) }

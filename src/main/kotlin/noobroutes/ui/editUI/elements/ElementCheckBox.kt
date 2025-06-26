@@ -16,7 +16,6 @@ import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
 import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.editUI.EditUI
-import noobroutes.ui.editUI.EditUIElementSize
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.render.*
 import noobroutes.ui.editUI.Element

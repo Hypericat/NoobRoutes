@@ -212,20 +212,6 @@ fun ItemStack.setLoreWidth(lines: List<String>, width: Int): ItemStack {
     return this
 }
 
-fun ItemStack.drawItem(x: Float = 0f, y: Float = 0f, scale: Float = 1f, z: Float = 200f) {
-    GlStateManager.pushMatrix()
-    scale(scale, scale, 1f)
-    translate(x / scale, y / scale, 0f)
-    Color.Companion.WHITE.bind()
-
-    RenderHelper.enableStandardItemLighting()
-    RenderHelper.enableGUIStandardItemLighting()
-
-    mc.renderItem.zLevel = z
-    mc.renderItem.renderItemIntoGUI(this, 0, 0)
-    RenderHelper.disableStandardItemLighting()
-    GlStateManager.popMatrix()
-}
 
 val ItemStack.skullTexture: String? get() {
     return this.tagCompound

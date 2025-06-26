@@ -3,12 +3,14 @@ package noobroutes.utils.render
 import gg.essential.universal.shader.BlendState
 import gg.essential.universal.shader.UShader
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.client.renderer.entity.RenderManager
 import net.minecraft.client.renderer.texture.TextureUtil
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
+import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
@@ -387,6 +389,20 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
+    fun ItemStack.drawItem(x: Float = 0f, y: Float = 0f, scale: Float = 1f, z: Float = 200f) {
+        GlStateManager.pushMatrix()
+        scale(scale, scale, 1f)
+        translate(x / scale, y / scale, 0f)
+        Color.Companion.WHITE.bind()
+
+        RenderHelper.enableStandardItemLighting()
+        RenderHelper.enableGUIStandardItemLighting()
+
+        mc.renderItem.zLevel = z
+        mc.renderItem.renderItemIntoGUI(this, 0, 0)
+        RenderHelper.disableStandardItemLighting()
+        GlStateManager.popMatrix()
+    }
 
     /**
      * Draws a beacon beam at the specified position.

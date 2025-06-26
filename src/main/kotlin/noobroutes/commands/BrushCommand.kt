@@ -2,10 +2,11 @@ package noobroutes.commands
 
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
+import noobroutes.Core
 import noobroutes.Core.logger
 import noobroutes.features.dungeon.brush.Brush
-import noobroutes.features.dungeon.brush.FMEBlockDeserializer
 import noobroutes.features.dungeon.brush.FmeConfigLoader
+import noobroutes.ui.blockgui.BlockGui
 
 import noobroutes.utils.skyblock.modMessage
 
@@ -19,13 +20,13 @@ class BrushCommand: CommandBase() {
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Set, Clear, Load")
-        when (args[0]) {
+        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Set, Clear, Load, LoadFunnyMap")
+        when (args[0].lowercase()) {
             "em", "e", "edit" -> {
                 toggleEditMode()
             }
-            "g", "gui" -> {
-
+            "bg", "g", "gui" -> {
+                Core.display = BlockGui
             }
             "b", "block" -> {
 
@@ -33,10 +34,8 @@ class BrushCommand: CommandBase() {
             "load", "l" -> {
                 Brush.loadConfig()
             }
-            "fml" -> {
+            "loadfunnymap" -> {
                 FmeConfigLoader.loadConfig()
-                logger.info("config:${FmeConfigLoader.config}")
-                logger.info("floorConfig:${FmeConfigLoader.floorsConfig}")
             }
         }
     }

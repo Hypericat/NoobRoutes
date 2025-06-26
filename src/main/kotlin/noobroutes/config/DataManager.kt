@@ -51,7 +51,6 @@ object DataManager {
                 val jsonObject = gson.fromJson(jsonContent, JsonObject::class.java)
                 val jsonArrays = mutableMapOf<String, JsonObject>()
                 for ((key, value) in jsonObject.entrySet()) {
-                    logger.info(value.isJsonArray)
                     if (value.isJsonObject) {
                         jsonArrays[key] = value.asJsonObject
                     }
@@ -83,7 +82,6 @@ object DataManager {
                 val jsonObject = gson.fromJson(jsonContent, JsonObject::class.java)
                 val jsonArrays = mutableMapOf<String, JsonArray>()
                 for ((key, value) in jsonObject.entrySet()) {
-                    logger.info(value.isJsonArray)
                     if (value.isJsonArray) {
                         jsonArrays[key] = value.asJsonArray
                     }
