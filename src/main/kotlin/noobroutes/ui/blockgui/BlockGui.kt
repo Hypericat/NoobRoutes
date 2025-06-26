@@ -21,8 +21,7 @@ object BlockGui : Screen() {
     val isResetHovered get() = isAreaHovered(mc.displayWidth * 0.5f - 75f, mc.displayHeight * 0.9f - 40f, 150f, 80f)
 
     override fun onScroll(amount: Int) {
-        val actualAmount = amount.sign * 16
-        scrollOffset += actualAmount
+        BlockSelector.onScroll(amount)
     }
 
     override fun initGui() {
@@ -30,6 +29,7 @@ object BlockGui : Screen() {
             mc.entityRenderer.stopUseShader()
             mc.entityRenderer.loadShader(ResourceLocation("shaders/post/blur.json"))
         }
+        BlockSelector.scrollOffset = 78f
     }
 
     override fun keyTyped(typedChar: Char, keyCode: Int) {

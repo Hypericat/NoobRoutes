@@ -2,7 +2,7 @@ package noobroutes.ui.blockgui.blockselector
 
 import net.minecraft.block.Block
 import net.minecraft.item.ItemStack
-import noobroutes.features.dungeon.brush.Brush
+import noobroutes.features.dungeon.Brush
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.darker
 import noobroutes.ui.clickgui.util.ColorUtil.multiplyAlpha

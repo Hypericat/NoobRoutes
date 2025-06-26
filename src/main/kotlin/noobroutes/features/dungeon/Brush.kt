@@ -1,4 +1,4 @@
-package noobroutes.features.dungeon.brush
+package noobroutes.features.dungeon
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -7,6 +7,7 @@ import net.minecraft.block.properties.IProperty
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
+import net.minecraft.util.Vec3
 import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -22,6 +23,9 @@ import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.IBlockStateUtils
+import noobroutes.utils.IBlockStateUtils.withProperty
+import noobroutes.utils.IBlockStateUtils.withRotation
+import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.getBlockStateAt
 import noobroutes.utils.json.JsonUtils.add
 import noobroutes.utils.json.JsonUtils.asBlockPos
@@ -29,15 +33,59 @@ import noobroutes.utils.runOnMCThread
 import noobroutes.utils.setBlock
 import noobroutes.utils.skyblock.Island
 import noobroutes.utils.skyblock.LocationUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
+import kotlin.collections.iterator
 
 object Brush : Module("Brush", description = "It is just fme but way less laggy. Works with FME floor config, but not the room config.", category = Category.DUNGEON) {
-    const val BIT_MASK = 0xFFF0
+
+
+    init {
+        execute(1) {
+            if (!editMode || !mc.gameSettings.keyBindUseItem.isKeyDown || System.currentTimeMillis() - lastPlace < placeCooldown || selectedBlockState == IBlockStateUtils.airIBlockState) return@execute
+            val mouseOver = if (FreeCam.enabled) FreeCam.looking else mc.objectMouseOver ?: return@execute
+            val target = mouseOver?.hitBlock() ?: return@execute
+            val room = DungeonUtils.currentRoom
+            lastPlace = System.currentTimeMillis()
+            val facing = mouseOver.sideHit
+            val offset = target.offset(facing)
+            val pos = room?.getRealCoords(offset) ?: offset
+            val hitVec = mouseOver.hitBlockVec() ?: return@execute
+            val state = selectedBlockState.block.onBlockPlaced(
+                mc.theWorld,
+                offset,
+                facing,
+                hitVec.xCoord.toFloat(),
+                hitVec.yCoord.toFloat(),
+                hitVec.zCoord.toFloat(),
+                selectedBlockState.block.getMetaFromState(selectedBlockState),
+                mc.thePlayer
+            )
+            val blockList = if (room != null) {
+                roomConfig.getOrPut(room.name) { mutableListOf() }
+            } else {
+                floorConfig.getOrPut(getLocation()) { mutableListOf() }
+            }
+
+            val blockToAdd = Pair(state , pos)
+            blockList.removeAll { it.second.x == blockToAdd.second.x && it.second.y == blockToAdd.second.y && it.second.z == blockToAdd.second.z }
+            blockList.add(blockToAdd)
+
+            runOnMCThread {
+                val hash = Pair(offset.x shr 4, offset.z shr 4)
+                savedChunks.getOrPut(hash) { hashMapOf() }.put(offset, state )
+                setBlock(offset, state );
+            }
+        }
+
+    }
+
 
     var editMode by BooleanSetting("Edit Mode", description = "Allows you to edit blocks")
     val editModeToggle by KeybindSetting("Edit Mode Bind", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress {
@@ -81,6 +129,11 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
     }
 
     @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        editMode = false
+    }
+
+    @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {
         savedChunks.clear()
         if (editMode) {
@@ -90,8 +143,8 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
     }
     fun toggleEditMode(){
         editMode = !editMode
-        saveConfig()
-        modMessage("Toggled Edit Mode ${if (editMode) "§l§aOn" else "§l§cOff"}")
+        if (!editMode) saveConfig()
+        modMessage("Toggled Edit Mode: ${if (editMode) "§l§aOn" else "§l§cOff"}")
     }
 
 
@@ -105,7 +158,11 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
 
         if (event.type == ClickEvent.ClickType.Middle) {
             selectedBlockState = getBlockStateAt(target)
-            modMessage("Selected block state: §l§a${selectedBlockState.block.unlocalizedName}")
+            modMessage(
+                "Selected block state: §l§a${
+                    selectedBlockState.block.registryName.removePrefix("minecraft:").capitalizeFirst().replace("_", " ")
+                }"
+            )
             return
         }
         val blockList = if (room != null) {
@@ -141,22 +198,12 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             return;
         }
 
-        if (event.type == ClickEvent.ClickType.Right) {
-            if (System.currentTimeMillis() - lastPlace < placeCooldown || selectedBlockState == IBlockStateUtils.airIBlockState) return
-            lastPlace = System.currentTimeMillis()
-            val facing = mouseOver.sideHit
-            val offset = target.offset(facing)
-            val pos = room?.getRealCoords(offset) ?: offset
-            val blockToAdd = Pair(selectedBlockState, pos)
-            blockList.removeAll { it.second.x == blockToAdd.second.x && it.second.y == blockToAdd.second.y && it.second.z == blockToAdd.second.z }
-            blockList.add(blockToAdd)
-            runOnMCThread {
-                val hash = Pair(offset.x shr 4, offset.z shr 4)
-                savedChunks.getOrPut(hash) { hashMapOf() }.put(offset, selectedBlockState)
-                setBlock(offset, selectedBlockState);
-            }
-        }
+
     }
+
+
+
+
 
     @SubscribeEvent
     fun locationEvent(event: LocationChangeEvent){
@@ -201,6 +248,10 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
 
     private fun MovingObjectPosition.hitBlock(): BlockPos? {
         return if (this.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) this.blockPos else null
+    }
+
+    private fun MovingObjectPosition.hitBlockVec(): Vec3? {
+        return if (this.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) this.hitVec.subtract(this.blockPos.toVec3()) else null
     }
 
     private fun getLocation(): String {
@@ -304,7 +355,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
                 .firstOrNull { it.name == key } as? IProperty<*>
                 ?: continue
 
-            state = IBlockStateUtils.withProperty(state, prop, value)
+            state = state.withProperty(prop, value)
         }
 
         return state

@@ -5,6 +5,7 @@ import net.minecraft.block.properties.IProperty
 import net.minecraft.block.properties.PropertyDirection
 import net.minecraft.block.state.BlockState
 import net.minecraft.block.state.IBlockState
+import net.minecraft.util.EnumFacing
 import noobroutes.utils.skyblock.devMessage
 
 
@@ -36,16 +37,22 @@ object IBlockStateUtils {
     /**
      * Set a property by its string value; if the value is invalid, returns the original state.
      */
-    fun <T : Comparable<T>> withProperty(
-        state: IBlockState,
+    fun <T : Comparable<T>> IBlockState.withProperty(
         property: IProperty<T>,
         valueString: String
     ): IBlockState {
 
         val value = property.allowedValues
             .firstOrNull { property.getName(it) == valueString }
-            ?: return state
+            ?: return this
 
-        return state.withProperty(property, value)
+        return this.withProperty(property, value)
     }
+    fun IBlockState.withRotation(rotation: EnumFacing): IBlockState {
+        val directionProperty = this.properties.keys
+            .firstOrNull { it is PropertyDirection } as? IProperty<*> ?: return this
+        return this.withProperty(directionProperty, rotation.name.lowercase())
+    }
+
+
 }

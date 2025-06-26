@@ -5,6 +5,7 @@ import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.roundedRectangle
+import noobroutes.utils.render.text
 import kotlin.math.floor
 
 object BlockEditor {
@@ -15,6 +16,7 @@ object BlockEditor {
 
     const val WIDTH = 600f
     const val HEIGHT = 600f
+
 
 
     var x2 = 0f
@@ -36,6 +38,7 @@ object BlockEditor {
         }
         roundedRectangle(originX, originY, 600, 70, ColorUtil.titlePanelColor,  ColorUtil.titlePanelColor, Color.TRANSPARENT, 0, 20f, 20f, 0f, 0f, 0f)
         roundedRectangle(originX, originY, 600, HEIGHT, ColorUtil.buttonColor, radius = 20)
+        text("Block State Editor", originX + 20, originY + 37.5, Color.WHITE, size = 30)
     }
 
 }

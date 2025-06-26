@@ -4,7 +4,7 @@ import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import noobroutes.Core
 import noobroutes.Core.logger
-import noobroutes.features.dungeon.brush.Brush
+import noobroutes.features.dungeon.Brush
 import noobroutes.ui.blockgui.BlockGui
 
 import noobroutes.utils.skyblock.modMessage
