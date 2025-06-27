@@ -1,14 +1,11 @@
-package noobroutes.ui.blockgui
+package noobroutes.ui.blockgui.blockeditor
 
-abstract class Element<T>(
-    val x: Float,
-    val y: Float
+abstract class Element(
+    var x: Float,
+    var y: Float
 ) {
-    abstract val setter: (T) -> Unit
-    abstract val getter: () -> T
-
-    abstract fun draw(x: Float, y: Float)
-
+    abstract fun draw()
+    abstract fun getElementHeight(): Float
 
 
     open fun keyTyped(typedChar: Char, keyCode: Int) {}

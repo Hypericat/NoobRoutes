@@ -45,7 +45,7 @@ import kotlin.collections.iterator
 
 object Brush : Module("Brush", description = "It is just fme but way less laggy. Works with FME floor config, but not the room config.", category = Category.DUNGEON) {
 
-
+    var cancelNextRight = false
     init {
         execute(1) {
             if (!editMode || !mc.gameSettings.keyBindUseItem.isKeyDown || System.currentTimeMillis() - lastPlace < placeCooldown || selectedBlockState == IBlockStateUtils.airIBlockState) return@execute
@@ -57,6 +57,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             val offset = target.offset(facing)
             val pos = room?.getRealCoords(offset) ?: offset
             val hitVec = mouseOver.hitBlockVec() ?: return@execute
+            cancelNextRight = true
             val state = selectedBlockState.block.onBlockPlaced(
                 mc.theWorld,
                 offset,
@@ -155,6 +156,11 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
         val target = mouseOver?.hitBlock() ?: return
         val room = DungeonUtils.currentRoom
         event.isCanceled = true
+
+        if (event.type == ClickEvent.ClickType.Right && cancelNextRight) {
+            event.isCanceled = true
+            cancelNextRight = false
+        }
 
         if (event.type == ClickEvent.ClickType.Middle) {
             selectedBlockState = getBlockStateAt(target)

@@ -19,6 +19,7 @@ import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.utils.floor
 import noobroutes.utils.render.*
+import noobroutes.utils.round
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToInt
@@ -53,7 +54,7 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
 
     private fun getDisplay(): String {
         if (listeningText) {
-            return listeningTextField.ifEmpty { " " }
+            return "${listeningTextField.ifEmpty { " " }}${setting.unit}"
         }
         return if (setting.valueDouble - setting.valueDouble.floor() == 0.0) {
             "${(setting.valueInt * 100.0).roundToInt() / 100}${setting.unit}"
@@ -65,9 +66,9 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
     override fun draw() {
         handler.handle(x, y + 21.5f, w - 15f, 33.5f)
 
-
-        roundedRectangle(x + w - TEXTOFFSET - 30, y  + 5f, 32f, 21.5f, buttonColor, 4f, edgeSoftness = 1f)
-        rectangleOutline(x + w - TEXTOFFSET - 30, y  + 5f, 32f, 21.5f, colorAnim.get(buttonColor.darkerIf(isHoveredBox, 0.8f), clickGUIColor.darkerIf(isHoveredBox, 0.8f), !listeningText), 4f, 3f)
+        val textWidth = getTextWidth(getDisplay(), 12f)
+        roundedRectangle(x + w - TEXTOFFSET - 30, y  + 5f, 32f + textWidth, 21.5f, buttonColor, 4f, edgeSoftness = 1f)
+        rectangleOutline(x + w - TEXTOFFSET - 30, y  + 5f, 32f + textWidth, 21.5f, colorAnim.get(buttonColor.darkerIf(isHoveredBox, 0.8f), clickGUIColor.darkerIf(isHoveredBox, 0.8f), !listeningText), 4f, 3f)
 
         if (listening) {
             sliderPercentage = ((mouseX - (x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f)

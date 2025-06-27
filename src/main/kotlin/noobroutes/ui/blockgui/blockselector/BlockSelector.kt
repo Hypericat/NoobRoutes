@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.utils.equalsOneOf
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.resetScissor
 import noobroutes.utils.render.roundedRectangle
@@ -25,6 +26,7 @@ object BlockSelector {
     const val HEIGHT = 600f
     init {
         for (block in Block.blockRegistry) {
+            if (block.registryName.equalsOneOf("minecraft:farmland", "minecraft:lit_furnace")) continue
             val item = ItemStack(Item.getItemFromBlock(block) ?: continue)
             blockList.add(BlockElement(0, 0, item, block))
         }
@@ -36,10 +38,9 @@ object BlockSelector {
     }
     var lastTime = System.currentTimeMillis()
     fun smoothScrollOffset() {
-        val deltaTime = (System.currentTimeMillis() - lastTime) * 0.001f
+        val deltaTime = (System.currentTimeMillis() - lastTime) * 0.005f
         lastTime = System.currentTimeMillis()
-        devMessage(scrollOffset)
-        val target = scrollOffset.coerceIn(-215f, 78f)
+        val target = scrollOffset.coerceIn(-167f, 78f)
         scrollOffset += (target - scrollOffset) * deltaTime
     }
 

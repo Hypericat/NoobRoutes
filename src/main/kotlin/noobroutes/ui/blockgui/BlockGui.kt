@@ -8,8 +8,8 @@ import noobroutes.config.Config
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.ui.Screen
+import noobroutes.ui.blockgui.blockeditor.BlockEditor
 import noobroutes.ui.blockgui.blockselector.BlockSelector
-import noobroutes.ui.blockgui.blockselector.BlockSelector.scrollOffset
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.util.MouseUtils.isAreaHovered
@@ -32,13 +32,15 @@ object BlockGui : Screen() {
         BlockSelector.scrollOffset = 78f
     }
 
-    override fun keyTyped(typedChar: Char, keyCode: Int) {
 
+
+    override fun keyTyped(typedChar: Char, keyCode: Int) {
+        BlockEditor.keyTyped(typedChar, keyCode)
         super.keyTyped(typedChar, keyCode)
     }
 
     override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
-        BlockEditor.dragging = false
+        BlockEditor.mouseReleased()
         BlockSelector.dragging = false
     }
 
@@ -50,7 +52,7 @@ object BlockGui : Screen() {
             BlockEditor.originX = 500f
             BlockEditor.originY = 200f
         }
-        if (BlockEditor.mouseClicked()) return
+        if (BlockEditor.mouseClicked(mouseButton)) return
         BlockSelector.mouseClicked()
     }
 
