@@ -1,6 +1,7 @@
 package noobroutes.ui.blockgui.blockselector
 
 import net.minecraft.block.Block
+import net.minecraft.item.ItemBlock
 import net.minecraft.item.ItemStack
 import noobroutes.features.dungeon.Brush
 import noobroutes.ui.clickgui.util.ColorUtil
@@ -10,7 +11,9 @@ import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.render.RenderUtils.drawItem
 import noobroutes.utils.render.roundedRectangle
 
-class BlockElement(var x: Int, var y: Int, val blockItem: ItemStack, val block: Block) {
+class BlockElement(var x: Int, var y: Int, val blockItem: ItemStack) {
+
+    var block: Block? = Block.getBlockFromItem(blockItem.item)
 
     val isHovered: Boolean get() = isAreaHovered(
         x * 50f + BlockSelector.originX + 45f,
@@ -33,7 +36,7 @@ class BlockElement(var x: Int, var y: Int, val blockItem: ItemStack, val block: 
 
     fun mouseClicked() {
         if (isHovered) {
-            Brush.selectedBlockState = block.defaultState
+            Brush.selectedBlockState = block?.getStateFromMeta(blockItem.metadata) ?: return
         }
     }
 

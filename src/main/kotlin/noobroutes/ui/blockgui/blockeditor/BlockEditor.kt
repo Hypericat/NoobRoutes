@@ -88,9 +88,9 @@ object BlockEditor {
         )
         roundedRectangle(originX, originY, 600, HEIGHT, ColorUtil.buttonColor, radius = 20)
         text(
-            Brush.selectedBlockState.block.registryName.removePrefix("minecraft:").capitalizeFirst().replace("_", " "),
-            BlockDisplay.originX + 20,
-            BlockDisplay.originY + 37.5,
+            Brush.selectedBlockState.block.localizedName,
+            originX + 20,
+            originY + 37.5,
             Color.Companion.WHITE,
             size = 30
         )

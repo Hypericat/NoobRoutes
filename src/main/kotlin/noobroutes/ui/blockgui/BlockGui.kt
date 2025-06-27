@@ -29,7 +29,6 @@ object BlockGui : Screen() {
             mc.entityRenderer.stopUseShader()
             mc.entityRenderer.loadShader(ResourceLocation("shaders/post/blur.json"))
         }
-        BlockSelector.scrollOffset = 78f
     }
 
 

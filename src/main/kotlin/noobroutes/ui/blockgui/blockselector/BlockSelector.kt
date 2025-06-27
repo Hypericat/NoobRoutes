@@ -1,18 +1,19 @@
 package noobroutes.ui.blockgui.blockselector
 
 import net.minecraft.block.Block
-import net.minecraft.item.Item
+import net.minecraft.creativetab.CreativeTabs
+import net.minecraft.init.Blocks
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.isAreaHovered
-import noobroutes.utils.equalsOneOf
+import noobroutes.utils.ceil
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.resetScissor
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.scissor
 import noobroutes.utils.render.text
-import noobroutes.utils.skyblock.devMessage
 import kotlin.math.floor
 import kotlin.math.sign
 
@@ -24,12 +25,34 @@ object BlockSelector {
     val blockList = mutableListOf<BlockElement>()
     const val WIDTH = 600f
     const val HEIGHT = 600f
+    val blockBlackListRegexs = listOf(
+        "skull",
+        "banner",
+        "paint",
+        "frame",
+        "sign",
+        "pot",
+        "bed",
+        "stand",
+        "egg",
+        "head"
+    )
+
+
     init {
-        for (block in Block.blockRegistry) {
-            if (block.registryName.equalsOneOf("minecraft:farmland", "minecraft:lit_furnace")) continue
-            val item = ItemStack(Item.getItemFromBlock(block) ?: continue)
-            blockList.add(BlockElement(0, 0, item, block))
+        val items = mutableListOf<ItemStack>()
+        CreativeTabs.tabBlock.displayAllReleventItems(items)
+        CreativeTabs.tabDecorations.displayAllReleventItems(items)
+        CreativeTabs.tabRedstone.displayAllReleventItems(items)
+        for (item in items) {
+            //if (block.registryName.equalsOneOf("minecraft:farmland", "minecraft:lit_furnace")) continue
+            if (blockList.any {it.blockItem.unlocalizedName == item.unlocalizedName} || blockBlackListRegexs.any { item.displayName.contains(it, true) }) continue
+            blockList.add(BlockElement(0, 0, item))
         }
+        val cakeElement = BlockElement(0, 0, ItemStack(Items.cake))
+        cakeElement.block = Blocks.cake
+        blockList.add(cakeElement)
+        blockList.add(BlockElement(0, 0, ItemStack(Blocks.rail)))
     }
 
     fun onScroll(amount: Int) {
@@ -40,7 +63,7 @@ object BlockSelector {
     fun smoothScrollOffset() {
         val deltaTime = (System.currentTimeMillis() - lastTime) * 0.005f
         lastTime = System.currentTimeMillis()
-        val target = scrollOffset.coerceIn(-167f, 78f)
+        val target = scrollOffset.coerceIn((blockList.size * 0.1f).ceil() * -32f, 78f)
         scrollOffset += (target - scrollOffset) * deltaTime
     }
 

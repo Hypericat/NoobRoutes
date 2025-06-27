@@ -195,13 +195,46 @@ fun Float.floor(): Float {
     return floor(this.toDouble()).toFloat()
 }
 
+
+
+
 /**
- * Floors the current Long number.
- * @return The floored Long number (no change as Long is already an integer).
+ * Ceils the current Long number.
+ * @return The ceiled Long number (no change as Long is already an integer).
  */
 fun Long.floor(): Long {
     return this
 }
+
+
+
+/**
+ * Ceils the current Double number.
+ * @return The ceiled Double number.
+ */
+fun Double.ceil(): Double {
+    return ceil(this)
+}
+
+/**
+ * Ceils the current Float number.
+ * @return The ceiled Float number.
+ */
+fun Float.ceil(): Float {
+    return ceil(this.toDouble()).toFloat()
+}
+
+
+
+
+/**
+ * Floors the current Long number.
+ * @return The floored Long number (no change as Long is already an integer).
+ */
+fun Long.ceil(): Long {
+    return this
+}
+
 
 /**
  * Rounds the current number to the specified number of decimals.
