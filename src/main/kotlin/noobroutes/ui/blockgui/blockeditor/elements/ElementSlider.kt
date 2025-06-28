@@ -34,11 +34,11 @@ class ElementSlider(
     val block: IBlockState
 ) : Element(0f, 0f) {
 
-    val w = 550
-    val h = 104f
+    private val w = 550
+    private val h = 104f
     private var listeningText = false
     private var listening: Boolean = false
-    private val valueDouble: Double get() = block.getValue(property).toDouble()
+    private var valueDouble: Double = block.getValue(property).toDouble()
     private val min: Double = property.allowedValues.min().toDouble()
     private val max: Double = property.allowedValues.max().toDouble()
 
@@ -59,7 +59,7 @@ class ElementSlider(
     private val colorAnim = ColorAnimation(100)
 
     /** Used to make slider smoother and not jittery (doesn't change value.) */
-    private var sliderPercentage: Float = ((valueDouble.roundToInt().toDouble() - min) / (max - min)).toFloat().coerceAtMost(1f)
+    private var sliderPercentage: Float = ((valueDouble - min) / (max - min)).toFloat().coerceAtMost(1f)
 
     private inline val color: Color
         get() = clickGUIColor.brighter(1 + handler.percent() / 200f)
@@ -100,10 +100,11 @@ class ElementSlider(
         )
 
         if (listening) {
-            sliderPercentage = ((mouseX + 10.6f - (originX + x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f)
+            val sliderCalculation = ((mouseX + 10.6f - (originX + x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f)
+            sliderPercentage = sliderCalculation
             val diff = max - min
-            val newVal = min + ((mouseX + 10.6f - (originX + x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f) * diff
-            setter(newVal)
+            val newVal = min + sliderCalculation * diff
+            valueDouble = newVal
         }
         //roundedRectangle(originX + x + w - 4, y + originY, 2, h, clickGUIColor.brighter(1.6f), 0f, edgeSoftness = 0)
 
@@ -147,10 +148,14 @@ class ElementSlider(
 
     override fun mouseReleased() {
         listening = false
+        val sliderCalculation = ((mouseX + 10.6f - (originX + x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f)
+        val diff = max - min
+        val newVal = min + sliderCalculation * diff
+        setter(newVal)
     }
 
-    fun updateSlider() {
-        sliderPercentage = ((valueDouble.roundToInt() - min) / (max - min)).toFloat().coerceAtMost(1f)
+    private fun updateSlider() {
+        sliderPercentage = ((valueDouble - min) / (max - min)).toFloat().coerceAtMost(1f)
     }
 
 
@@ -160,7 +165,7 @@ class ElementSlider(
             val double = input.toDoubleOrNull()
             if (double == null) {
                 modMessage("Invalid Number! Defaulting to previous value")
-                valueDouble.roundToInt().toDouble()
+                valueDouble
             } else double
         }
         setter(newValue)
@@ -239,7 +244,7 @@ class ElementSlider(
             return
         }
     }
-    fun setter(newVal: Double) {
+    private fun setter(newVal: Double) {
         Brush.selectedBlockState = Brush.selectedBlockState.withProperty(property, newVal.roundToInt().coerceIn(min.toInt(), max.toInt()))
     }
 

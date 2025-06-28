@@ -141,7 +141,7 @@ class ElementSlider(
         listening = false
     }
 
-    fun updateSlider() {
+    private fun updateSlider() {
         sliderPercentage = ((valueDouble.round(round).toDouble() - min) / (max - min)).toFloat().coerceAtMost(1f)
     }
 

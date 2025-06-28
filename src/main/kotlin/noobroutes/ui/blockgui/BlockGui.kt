@@ -18,7 +18,7 @@ import kotlin.math.sign
 
 
 object BlockGui : Screen() {
-    val isResetHovered get() = isAreaHovered(mc.displayWidth * 0.5f - 75f, mc.displayHeight * 0.9f - 40f, 150f, 80f)
+    private val isResetHovered get() = isAreaHovered(mc.displayWidth * 0.5f - 75f, mc.displayHeight * 0.9f - 40f, 150f, 80f)
 
     override fun onScroll(amount: Int) {
         BlockSelector.onScroll(amount)

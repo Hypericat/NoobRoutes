@@ -35,7 +35,11 @@ object BlockSelector {
         "bed",
         "stand",
         "egg",
-        "head"
+        "head",
+        " door",
+        "hook",
+        "trapped",
+        "lamp"
     )
 
 
@@ -52,15 +56,30 @@ object BlockSelector {
         val cakeElement = BlockElement(0, 0, ItemStack(Items.cake))
         cakeElement.block = Blocks.cake
         blockList.add(cakeElement)
+
+
+        blockList.add(BlockElement(0, 0, ItemStack(Blocks.redstone_lamp)))
+        val litRedstoneLampElement = BlockElement(0, 0, ItemStack(Blocks.redstone_lamp))
+        litRedstoneLampElement.block = Blocks.lit_redstone_lamp
+        litRedstoneLampElement.displayName = "Lit Redstone Lamp"
+        blockList.add(litRedstoneLampElement)
         blockList.add(BlockElement(0, 0, ItemStack(Blocks.rail)))
+        blockList.add(BlockElement(0, 0, ItemStack(Blocks.barrier)))
+        blockList.add(BlockElement(0, 0, ItemStack(Blocks.beacon)))
+        val lavaElement = BlockElement(0, 0, ItemStack(Items.lava_bucket))
+        lavaElement.block = Blocks.lava
+        blockList.add(lavaElement)
+        val waterElement = BlockElement(0, 0, ItemStack(Items.water_bucket))
+        waterElement.block = Blocks.water
+        blockList.add(waterElement)
     }
 
     fun onScroll(amount: Int) {
-        val actualAmount = amount.sign * 16
+        val actualAmount = amount.sign * 48
         scrollOffset += actualAmount
     }
-    var lastTime = System.currentTimeMillis()
-    fun smoothScrollOffset() {
+    private var lastTime = System.currentTimeMillis()
+    private fun smoothScrollOffset() {
         val deltaTime = (System.currentTimeMillis() - lastTime) * 0.005f
         lastTime = System.currentTimeMillis()
         val target = scrollOffset.coerceIn((blockList.size * 0.1f).ceil() * -32f, 78f)
@@ -69,8 +88,8 @@ object BlockSelector {
 
 
 
-    var x2 = 0f
-    var y2 = 0f
+    private var x2 = 0f
+    private var y2 = 0f
     var dragging = false
     fun mouseClicked() {
         if (isAreaHovered(originX, originY, WIDTH, 70f)) {

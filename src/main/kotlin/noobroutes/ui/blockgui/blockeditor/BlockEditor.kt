@@ -17,6 +17,7 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils.drawItem
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
+import noobroutes.utils.skyblock.devMessage
 import kotlin.math.floor
 
 object BlockEditor {
@@ -25,6 +26,7 @@ object BlockEditor {
 
     const val WIDTH = 600f
     const val HEIGHT = 600f
+    var currentBlockName: String = "None"
     val elements = mutableListOf<Element>()
 
     fun keyTyped(typedChar: Char, keyCode: Int) {
@@ -36,9 +38,9 @@ object BlockEditor {
     }
 
 
-    var x2 = 0f
-    var y2 = 0f
-    var dragging = false
+    private var x2 = 0f
+    private var y2 = 0f
+    private var dragging = false
     fun mouseClicked(mouseButton: Int): Boolean {
         elements.forEach { it.mouseClickedAnywhere(mouseButton) }
         if (MouseUtils.isAreaHovered(originX, originY, WIDTH, 70f)) {
@@ -50,7 +52,7 @@ object BlockEditor {
         elements.forEach { it.mouseClicked() }
         return false
     }
-    var lastBlockState: IBlockState = IBlockStateUtils.airIBlockState
+    private var lastBlockState: IBlockState = IBlockStateUtils.airIBlockState
     fun draw() {
         if (lastBlockState != Brush.selectedBlockState) {
             elements.clear()
@@ -70,7 +72,34 @@ object BlockEditor {
             originX = floor(x2 + MouseUtils.mouseX)
             originY = floor(y2 + MouseUtils.mouseY)
         }
+        drawTop()
+        var currentY = 70f + originY
+        elements.forEach {
+            roundedRectangle(originX, currentY, WIDTH, it.getElementHeight(), ColorUtil.buttonColor)
+            it.x = 30f
+            it.y = currentY
+            it.draw()
+            currentY += it.getElementHeight()
+        }
+        roundedRectangle(
+            originX,
+            currentY,
+            WIDTH,
+            30f,
+            ColorUtil.buttonColor,
+            ColorUtil.buttonColor,
+            Color.TRANSPARENT,
+            0,
+            0,
+            0,
+            20f,
+            20f,
+            0f
+        )
 
+    }
+
+    private fun drawTop(){
         roundedRectangle(
             originX,
             originY,
@@ -78,7 +107,7 @@ object BlockEditor {
             70,
             ColorUtil.titlePanelColor,
             ColorUtil.titlePanelColor,
-            Color.Companion.TRANSPARENT,
+            Color.TRANSPARENT,
             0,
             20f,
             20f,
@@ -86,25 +115,28 @@ object BlockEditor {
             0f,
             0f
         )
-        roundedRectangle(originX, originY, 600, HEIGHT, ColorUtil.buttonColor, radius = 20)
+        roundedRectangle(
+            originX,
+            originY,
+            600,
+            70,
+            ColorUtil.titlePanelColor,
+            ColorUtil.titlePanelColor,
+            Color.TRANSPARENT,
+            0,
+            20f,
+            20f,
+            0f,
+            0f,
+            0f
+        )
         text(
-            Brush.selectedBlockState.block.localizedName,
+            currentBlockName,
             originX + 20,
             originY + 37.5,
             Color.Companion.WHITE,
             size = 30
         )
-
-
-
-        var currentY = 70f
-        elements.forEach {
-            it.x = 30f
-            it.y = currentY
-            it.draw()
-            currentY += it.getElementHeight()
-        }
-
     }
 
 }
