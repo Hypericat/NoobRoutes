@@ -19,34 +19,53 @@ class ElementSelector(private val property: PropertyEnum<*>, val block: IBlockSt
     private val options = mutableListOf<String>()
 
     private val posAnim = EaseInOut(250)
-    private val optionsHovered: MutableList<() -> Boolean> = mutableListOf()
     companion object {
         const val WIDTH = 533f
         const val HEIGHT = 25f
         const val SCALE = 15f
     }
     private inline val xLeftBound get() = BlockEditor.originX + x + TEXTOFFSET
-    private inline val yBound get() = BlockEditor.originY + y + 30f
+    private inline val yBound get() = y + 30f
+
+    private var extended = false
 
     init {
         property.allowedValues.forEach {
             options.add(it.name)
         }
-        options.forEachIndexed { index, _ ->
-            optionsHovered.add {
+
+    }
+
+    fun findHoveredOptions(): List<Boolean> {
+        val hoveredList = mutableListOf<Boolean>()
+        if (extended) {
+            options.forEachIndexed { index, _ ->
+                hoveredList.add(
+                    isAreaHovered(
+                        xLeftBound,
+                        yBound + index * (HEIGHT * 1.1f),
+                        WIDTH,
+                        HEIGHT,
+                    )
+                )
+            }
+        } else {
+            hoveredList.add(
                 isAreaHovered(
                     xLeftBound,
-                    yBound + index * (HEIGHT * 1.1f) + HEIGHT * 0.5f,
+                    yBound,
                     WIDTH,
                     HEIGHT,
                 )
-            }
+            )
         }
+        return hoveredList
     }
 
     override fun draw() {
-        text(name.capitalizeFirst(), xLeftBound, y + BlockEditor.originY + 17.75f, ColorUtil.textColor, 20f)
-        options.forEachIndexed { index, name ->
+        text(name.capitalizeFirst(), xLeftBound, y + 17.75f, ColorUtil.textColor, 20f)
+        val optionsHovered = findHoveredOptions()
+        if (extended) options.forEachIndexed { index, name ->
             roundedRectangle(
                 xLeftBound,
                 yBound + index * (HEIGHT * 1.1f),
@@ -58,7 +77,23 @@ class ElementSelector(private val property: PropertyEnum<*>, val block: IBlockSt
                 name,
                 xLeftBound + (WIDTH * 0.5),
                 HEIGHT * 0.5 + yBound + index * (HEIGHT * 1.1f),
-                ColorUtil.textColor.darkerIf(optionsHovered[index].invoke()),
+                ColorUtil.textColor.darkerIf(optionsHovered[index]),
+                SCALE,
+                align = TextAlign.Middle
+            )
+        } else {
+            roundedRectangle(
+                xLeftBound,
+                yBound,
+                WIDTH,
+                HEIGHT,
+                ColorUtil.buttonColor, radius = 10
+            )
+            text(
+                options.first(),
+                xLeftBound + (WIDTH * 0.5),
+                HEIGHT * 0.5 + yBound,
+                ColorUtil.textColor.darkerIf(optionsHovered.first()),
                 SCALE,
                 align = TextAlign.Middle
             )
@@ -69,6 +104,6 @@ class ElementSelector(private val property: PropertyEnum<*>, val block: IBlockSt
     }
 
     override fun getElementHeight(): Float {
-        return 104f + (options.size - 1) * (HEIGHT * 1.1f)
+        return 104f + if (extended) ((options.size - 1) * (HEIGHT * 1.1f)) else 0f
     }
 }

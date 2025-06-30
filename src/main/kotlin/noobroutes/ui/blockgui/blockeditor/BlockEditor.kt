@@ -24,20 +24,21 @@ object BlockEditor {
     var originX = 500f
     var originY = 200f
 
-    const val WIDTH = 600f
-    const val HEIGHT = 600f
+    private const val WIDTH = 600f
     var currentBlockName: String = "None"
     val elements = mutableListOf<Element>()
 
     fun keyTyped(typedChar: Char, keyCode: Int) {
         elements.forEach { it.keyTyped(typedChar, keyCode) }
     }
-    fun mouseReleased(){
+    fun mouseReleased() {
         dragging = false
         elements.forEach { it.mouseReleased() }
     }
-
-
+    private val blackListedPropertyRegexs = listOf(
+        "color",
+        "variant"
+    )
     private var x2 = 0f
     private var y2 = 0f
     private var dragging = false
@@ -55,18 +56,7 @@ object BlockEditor {
     private var lastBlockState: IBlockState = IBlockStateUtils.airIBlockState
     fun draw() {
         if (lastBlockState != Brush.selectedBlockState) {
-            elements.clear()
-            Brush.selectedBlockState.propertyNames.forEach {
-                when (it) {
-                    is PropertyEnum<*> -> {
-                        elements.add(ElementSelector(it, Brush.selectedBlockState))
-                    }
-                    is PropertyInteger -> {
-                        elements.add(ElementSlider(it.name, it, Brush.selectedBlockState))
-                    }
-                }
-            }
-            lastBlockState = Brush.selectedBlockState
+            handleNewBlockState()
         }
         if (dragging) {
             originX = floor(x2 + MouseUtils.mouseX)
@@ -96,7 +86,6 @@ object BlockEditor {
             20f,
             0f
         )
-
     }
 
     private fun drawTop(){
@@ -134,9 +123,24 @@ object BlockEditor {
             currentBlockName,
             originX + 20,
             originY + 37.5,
-            Color.Companion.WHITE,
+            Color.WHITE,
             size = 30
         )
+    }
+    private fun handleNewBlockState(){
+        elements.clear()
+        Brush.selectedBlockState.propertyNames.forEach { property ->
+            if (blackListedPropertyRegexs.any { it.contains(property.name.toString(), true) }) return@forEach
+            when (property) {
+                is PropertyEnum<*> -> {
+                    elements.add(ElementSelector(property, Brush.selectedBlockState))
+                }
+                is PropertyInteger -> {
+                    elements.add(ElementSlider(property.name, property, Brush.selectedBlockState))
+                }
+            }
+        }
+        lastBlockState = Brush.selectedBlockState
     }
 
 }

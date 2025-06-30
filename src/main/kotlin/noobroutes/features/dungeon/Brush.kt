@@ -24,7 +24,6 @@ import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.IBlockStateUtils
 import noobroutes.utils.IBlockStateUtils.withProperty
-import noobroutes.utils.IBlockStateUtils.withRotation
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.getBlockStateAt
 import noobroutes.utils.json.JsonUtils.add
@@ -33,7 +32,6 @@ import noobroutes.utils.runOnMCThread
 import noobroutes.utils.setBlock
 import noobroutes.utils.skyblock.Island
 import noobroutes.utils.skyblock.LocationUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
@@ -44,49 +42,6 @@ import org.lwjgl.input.Keyboard
 import kotlin.collections.iterator
 
 object Brush : Module("Brush", description = "It is just fme but way less laggy. Works with FME floor config, but not the room config.", category = Category.DUNGEON) {
-
-    var cancelNextRight = false
-    init {
-        execute(1) {
-            if (!editMode || !mc.gameSettings.keyBindUseItem.isKeyDown || System.currentTimeMillis() - lastPlace < placeCooldown || selectedBlockState == IBlockStateUtils.airIBlockState) return@execute
-            val mouseOver = if (FreeCam.enabled) FreeCam.looking else mc.objectMouseOver ?: return@execute
-            val target = mouseOver?.hitBlock() ?: return@execute
-            val room = DungeonUtils.currentRoom
-            lastPlace = System.currentTimeMillis()
-            val facing = mouseOver.sideHit
-            val offset = target.offset(facing)
-            val pos = room?.getRealCoords(offset) ?: offset
-            val hitVec = mouseOver.hitBlockVec() ?: return@execute
-            cancelNextRight = true
-            val state = selectedBlockState.block.onBlockPlaced(
-                mc.theWorld,
-                offset,
-                facing,
-                hitVec.xCoord.toFloat(),
-                hitVec.yCoord.toFloat(),
-                hitVec.zCoord.toFloat(),
-                selectedBlockState.block.getMetaFromState(selectedBlockState),
-                mc.thePlayer
-            )
-            val blockList = if (room != null) {
-                roomConfig.getOrPut(room.name) { mutableListOf() }
-            } else {
-                floorConfig.getOrPut(getLocation()) { mutableListOf() }
-            }
-
-            val blockToAdd = Pair(state , pos)
-            blockList.removeAll { it.second.x == blockToAdd.second.x && it.second.y == blockToAdd.second.y && it.second.z == blockToAdd.second.z }
-            blockList.add(blockToAdd)
-
-            runOnMCThread {
-                val hash = Pair(offset.x shr 4, offset.z shr 4)
-                savedChunks.getOrPut(hash) { hashMapOf() }.put(offset, state )
-                setBlock(offset, state );
-            }
-        }
-
-    }
-
 
     var editMode by BooleanSetting("Edit Mode", description = "Allows you to edit blocks")
     val editModeToggle by KeybindSetting("Edit Mode Bind", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress {
@@ -148,6 +103,9 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
         modMessage("Toggled Edit Mode: ${if (editMode) "§l§aOn" else "§l§cOff"}")
     }
 
+    private inline val canPlaceBlock get() =
+        System.currentTimeMillis() - lastPlace >= placeCooldown &&
+        selectedBlockState != IBlockStateUtils.airIBlockState
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onMouse(event: ClickEvent.All) {
@@ -157,9 +115,37 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
         val room = DungeonUtils.currentRoom
         event.isCanceled = true
 
-        if (event.type == ClickEvent.ClickType.Right && cancelNextRight) {
-            event.isCanceled = true
-            cancelNextRight = false
+        if (event.type == ClickEvent.ClickType.Right && canPlaceBlock) {
+            lastPlace = System.currentTimeMillis()
+            val facing = mouseOver.sideHit
+            val offset = target.offset(facing)
+            val pos = room?.getRealCoords(offset) ?: offset
+            val hitVec = mouseOver.hitBlockVec() ?: return
+            val state = selectedBlockState.block.onBlockPlaced(
+                mc.theWorld,
+                offset,
+                facing,
+                hitVec.xCoord.toFloat(),
+                hitVec.yCoord.toFloat(),
+                hitVec.zCoord.toFloat(),
+                selectedBlockState.block.getMetaFromState(selectedBlockState),
+                mc.thePlayer
+            )
+            val blockList = if (room != null) {
+                roomConfig.getOrPut(room.name) { mutableListOf() }
+            } else {
+                floorConfig.getOrPut(getLocation()) { mutableListOf() }
+            }
+
+            val blockToAdd = Pair(state , pos)
+            blockList.removeAll { it.second.x == blockToAdd.second.x && it.second.y == blockToAdd.second.y && it.second.z == blockToAdd.second.z }
+            blockList.add(blockToAdd)
+
+            runOnMCThread {
+                val hash = Pair(offset.x shr 4, offset.z shr 4)
+                savedChunks.getOrPut(hash) { hashMapOf() }.put(offset, state )
+                setBlock(offset, state );
+            }
         }
 
         if (event.type == ClickEvent.ClickType.Middle) {
@@ -328,6 +314,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
         saveAreaConfig(floorConfig, "floorConfig")
         saveAreaConfig(roomConfig, "roomConfig")
     }
+
 
     private fun blockStateSerializer(state: IBlockState): String {
         val blockName = Block.blockRegistry.getNameForObject(state.block)?.toString() ?: return "minecraft:air"

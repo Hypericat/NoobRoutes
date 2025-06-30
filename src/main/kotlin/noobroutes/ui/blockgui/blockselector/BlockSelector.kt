@@ -1,6 +1,5 @@
 package noobroutes.ui.blockgui.blockselector
 
-import net.minecraft.block.Block
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -22,10 +21,10 @@ object BlockSelector {
     var scrollOffset = 78f
     var originX = 100f
     var originY = 200f
-    val blockList = mutableListOf<BlockElement>()
-    const val WIDTH = 600f
-    const val HEIGHT = 600f
-    val blockBlackListRegexs = listOf(
+    private val blockList = mutableListOf<BlockElement>()
+    private const val WIDTH = 600f
+    private const val HEIGHT = 600f
+    private val blockBlackListRegex = listOf(
         "skull",
         "banner",
         "paint",
@@ -49,27 +48,24 @@ object BlockSelector {
         CreativeTabs.tabDecorations.displayAllReleventItems(items)
         CreativeTabs.tabRedstone.displayAllReleventItems(items)
         for (item in items) {
-            //if (block.registryName.equalsOneOf("minecraft:farmland", "minecraft:lit_furnace")) continue
-            if (blockList.any {it.blockItem.unlocalizedName == item.unlocalizedName} || blockBlackListRegexs.any { item.displayName.contains(it, true) }) continue
-            blockList.add(BlockElement(0, 0, item))
+            if (blockList.any {it.displayName == item.displayName} || blockBlackListRegex.any { item.displayName.contains(it, true) }) continue
+            blockList.add(BlockItemStackElement(0, 0, item))
         }
-        val cakeElement = BlockElement(0, 0, ItemStack(Items.cake))
+        val cakeElement = BlockItemStackElement(0, 0, ItemStack(Items.cake))
         cakeElement.block = Blocks.cake
         blockList.add(cakeElement)
 
 
-        blockList.add(BlockElement(0, 0, ItemStack(Blocks.redstone_lamp)))
-        val litRedstoneLampElement = BlockElement(0, 0, ItemStack(Blocks.redstone_lamp))
-        litRedstoneLampElement.block = Blocks.lit_redstone_lamp
-        litRedstoneLampElement.displayName = "Lit Redstone Lamp"
-        blockList.add(litRedstoneLampElement)
-        blockList.add(BlockElement(0, 0, ItemStack(Blocks.rail)))
-        blockList.add(BlockElement(0, 0, ItemStack(Blocks.barrier)))
-        blockList.add(BlockElement(0, 0, ItemStack(Blocks.beacon)))
-        val lavaElement = BlockElement(0, 0, ItemStack(Items.lava_bucket))
+        blockList.add(BlockItemStackElement(0, 0, ItemStack(Blocks.redstone_lamp)))
+
+        blockList.add(BlockStateElement(0, 0, Blocks.lit_redstone_lamp.defaultState, "Lit Redstone Lamp"))
+        blockList.add(BlockItemStackElement(0, 0, ItemStack(Blocks.rail)))
+        blockList.add(BlockItemStackElement(0, 0, ItemStack(Blocks.barrier)))
+        blockList.add(BlockItemStackElement(0, 0, ItemStack(Blocks.beacon)))
+        val lavaElement = BlockItemStackElement(0, 0, ItemStack(Items.lava_bucket))
         lavaElement.block = Blocks.lava
         blockList.add(lavaElement)
-        val waterElement = BlockElement(0, 0, ItemStack(Items.water_bucket))
+        val waterElement = BlockItemStackElement(0, 0, ItemStack(Items.water_bucket))
         waterElement.block = Blocks.water
         blockList.add(waterElement)
     }

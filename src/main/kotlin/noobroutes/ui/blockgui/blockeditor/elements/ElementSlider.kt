@@ -8,7 +8,6 @@ import net.minecraft.block.state.IBlockState
 import noobroutes.features.dungeon.Brush
 import noobroutes.ui.blockgui.blockeditor.BlockEditor
 import noobroutes.ui.blockgui.blockeditor.BlockEditor.originX
-import noobroutes.ui.blockgui.blockeditor.BlockEditor.originY
 import noobroutes.ui.blockgui.blockeditor.Element
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.animations.impl.ColorAnimation
@@ -45,12 +44,12 @@ class ElementSlider(
 
     //55
     private val isHovered: Boolean
-        get() = isAreaHovered(originX + x, originY + y + 21.5f, w - 15f, 33.5f)
+        get() = isAreaHovered(originX + x,y + 21.5f, w - 15f, 33.5f)
 
     private val isHoveredBox: Boolean
         get() = isAreaHovered(
             originX + x + w - TEXTOFFSET - 30 - getTextWidth(getDisplay(), 16f),
-            originY + y + 5f,
+             + y + 5f,
             16f + getTextWidth(getDisplay(), 16f),
             21.5f
         )
@@ -73,12 +72,12 @@ class ElementSlider(
     }
 
     override fun draw() {
-        handler.handle(originX + x, y + originY + 21.5f, w - 15f, 33.5f)
+        handler.handle(originX + x, y + 21.5f, w - 15f, 33.5f)
         val textWidth = getTextWidth(getDisplay(), 16f)
 
         roundedRectangle(
             originX + x + w - TEXTOFFSET - 30 - textWidth,
-            y + originY,
+            y,
             16f + textWidth,
             26.5f,
             buttonColor,
@@ -87,7 +86,7 @@ class ElementSlider(
         )
         rectangleOutline(
             originX + x + w - TEXTOFFSET - 30 - textWidth,
-            y + originY,
+            y,
             16f + textWidth,
             26.5f,
             colorAnim.get(
@@ -106,20 +105,20 @@ class ElementSlider(
             val newVal = min + sliderCalculation * diff
             valueDouble = newVal
         }
-        //roundedRectangle(originX + x + w - 4, y + originY, 2, h, clickGUIColor.brighter(1.6f), 0f, edgeSoftness = 0)
+        //roundedRectangle(originX + x + w - 4, y + , 2, h, clickGUIColor.brighter(1.6f), 0f, edgeSoftness = 0)
 
-        text(name, originX + x + TEXTOFFSET, y + originY + 17.75f, textColor, 20f)
+        text(name, originX + x + TEXTOFFSET, y + 17.75f, textColor, 20f)
         text(
             getDisplay(),
             originX + x + w - TEXTOFFSET - 22 - textWidth,
-            y + originY + 15.75f,
+            y + 15.75f,
             textColor.darkerIf(isHoveredBox),
             16f
         )
 
         //draw slider
-        roundedRectangle(originX + x + TEXTOFFSET, y + originY + 37f, w - 30f, 7f, sliderBGColor, 3f)
-        roundedRectangle(originX + x + TEXTOFFSET, y + originY + 37f, sliderPercentage * (w - 30f), 7f, color, 3f)
+        roundedRectangle(originX + x + TEXTOFFSET, y + 37f, w - 30f, 7f, sliderBGColor, 3f)
+        roundedRectangle(originX + x + TEXTOFFSET, y + 37f, sliderPercentage * (w - 30f), 7f, color, 3f)
 
     }
 

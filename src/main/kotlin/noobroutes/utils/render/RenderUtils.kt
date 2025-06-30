@@ -2,19 +2,21 @@ package noobroutes.utils.render
 
 import gg.essential.universal.shader.BlendState
 import gg.essential.universal.shader.UShader
+import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType
 import net.minecraft.client.renderer.entity.RenderManager
+import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.client.renderer.texture.TextureUtil
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.client.resources.model.IBakedModel
 import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.MathHelper
-import net.minecraft.util.ResourceLocation
-import net.minecraft.util.Vec3
+import net.minecraft.util.*
+import net.minecraftforge.client.ForgeHooksClient
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -389,11 +391,66 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
+    fun IBlockState.drawBlockTexture(x: Float, y: Float, z: Float = 1f, scale: Float) {
+        drawBlockTexture(x, y, z,this, scale)
+    }
+
+    private fun setupGuiTransform(z: Float) {
+        GlStateManager.translate(0f, 0f, 100.0f + z)
+        GlStateManager.translate(8.0f, 8.0f, 0.0f)
+        GlStateManager.scale(1.0f, 1.0f, -1.0f)
+        GlStateManager.scale(0.5f, 0.5f, 0.5f)
+        GlStateManager.scale(40.0f, 40.0f, 40.0f)
+        GlStateManager.rotate(210.0f, 1.0f, 0.0f, 0.0f)
+        GlStateManager.rotate(-135.0f, 0.0f, 1.0f, 0.0f)
+    }
+
+    private val blockRenderer = mc.blockRendererDispatcher
+    private val textureManager = mc.renderEngine
+    fun drawBlockTexture(x: Float, y: Float, z: Float = 1f, state: IBlockState, scale: Float){
+        val model = blockRenderer.getModelFromBlockState(state, mc.theWorld, BlockPos.ORIGIN)
+
+        GlStateManager.pushMatrix()
+        scale(scale, scale, 1f)
+        translate(x / scale, y / scale, 0f)
+        Color.WHITE.bind()
+
+        textureManager.bindTexture(TextureMap.locationBlocksTexture)
+        textureManager.getTexture(TextureMap.locationBlocksTexture).setBlurMipmap(false, false)
+        GlStateManager.enableRescaleNormal()
+        GlStateManager.enableAlpha()
+        GlStateManager.alphaFunc(516, 0.1f)
+        GlStateManager.enableBlend()
+        GlStateManager.blendFunc(770, 771)
+        Color.WHITE.bind()
+        setupGuiTransform(z)
+        GlStateManager.disableLighting()
+        RenderHelper.disableStandardItemLighting()
+
+
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK)
+        blockRenderer.blockModelRenderer.renderModel(
+            mc.theWorld,
+            model,
+            state,
+            BlockPos.ORIGIN,
+            worldRenderer,
+            false
+        )
+        tessellator.draw()
+        GlStateManager.disableAlpha()
+        GlStateManager.disableRescaleNormal()
+        GlStateManager.disableLighting()
+        GlStateManager.popMatrix()
+        textureManager.bindTexture(TextureMap.locationBlocksTexture)
+        textureManager.getTexture(TextureMap.locationBlocksTexture).restoreLastBlurMipmap()
+    }
+
     fun ItemStack.drawItem(x: Float = 0f, y: Float = 0f, scale: Float = 1f, z: Float = 200f) {
         GlStateManager.pushMatrix()
         scale(scale, scale, 1f)
         translate(x / scale, y / scale, 0f)
-        Color.Companion.WHITE.bind()
+        Color.WHITE.bind()
 
         RenderHelper.enableStandardItemLighting()
         RenderHelper.enableGUIStandardItemLighting()
