@@ -12,7 +12,7 @@ import noobroutes.features.render.ClickGUIModule
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.Screen
 import noobroutes.ui.clickgui.ClickGUI.draw
-import noobroutes.ui.clickgui.animations.impl.EaseInOut
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.elements.menu.ElementColor
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.MODULE_BUTTON_COLOR_ALPHA

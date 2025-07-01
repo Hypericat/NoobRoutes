@@ -7,7 +7,7 @@ import noobroutes.features.Module
 import noobroutes.features.ModuleManager.huds
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.ui.clickgui.animations.impl.EaseInOut
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.hud.EditHUDGui.dragging

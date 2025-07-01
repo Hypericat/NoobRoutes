@@ -6,8 +6,8 @@ import noobroutes.features.settings.impl.HudSetting
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.animations.impl.ColorAnimation
-import noobroutes.ui.clickgui.animations.impl.LinearAnimation
+import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton

@@ -5,7 +5,7 @@ import noobroutes.config.Config
 import noobroutes.features.ModuleManager.huds
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.Screen
-import noobroutes.ui.clickgui.animations.impl.EaseInOut
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils

@@ -7,8 +7,8 @@ import noobroutes.features.settings.impl.*
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.clickgui.Panel
-import noobroutes.ui.clickgui.animations.impl.ColorAnimation
-import noobroutes.ui.clickgui.animations.impl.EaseInOut
+import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.elements.menu.*
 import noobroutes.ui.clickgui.util.ColorUtil.brighter
 import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
@@ -76,7 +76,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
                     is ActionSetting -> ElementAction(this, setting)
                     is DualSetting -> ElementDual(this, setting)
                     is HudSetting -> ElementHud(this, setting)
-                    is noobroutes.features.settings.impl.KeybindSetting -> ElementKeyBind(this, setting)
+                    is KeybindSetting -> ElementKeyBind(this, setting)
                     is DropdownSetting -> ElementDropdown(this, setting)
                     else -> {
                         position--

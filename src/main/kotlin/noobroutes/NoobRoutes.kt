@@ -14,6 +14,7 @@ import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
 import noobroutes.features.ModuleManager
 import noobroutes.features.floor7.autop3.Blink
+import noobroutes.font.CustomFont
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.*
@@ -89,6 +90,7 @@ class NoobRoutes {
             MinecraftForge.EVENT_BUS.register(it)
         }
         MinecraftFont.init()
+        CustomFont.init()
     }
 
     @Mod.EventHandler

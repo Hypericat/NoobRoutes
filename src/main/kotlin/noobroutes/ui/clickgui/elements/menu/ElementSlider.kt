@@ -4,7 +4,7 @@ import noobroutes.Core.logger
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton

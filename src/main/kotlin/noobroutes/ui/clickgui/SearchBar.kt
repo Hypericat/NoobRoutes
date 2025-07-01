@@ -3,7 +3,7 @@ package noobroutes.ui.clickgui
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.mc
 import noobroutes.font.MinecraftFont
-import noobroutes.ui.clickgui.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.clickgui.elements.menu.ElementTextField
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.buttonColor

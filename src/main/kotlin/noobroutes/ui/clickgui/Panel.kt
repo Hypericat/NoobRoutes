@@ -7,7 +7,7 @@ import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.SearchBar.currentSearch
-import noobroutes.ui.clickgui.animations.impl.LinearAnimation
+import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.elements.ModuleButton
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.brighter

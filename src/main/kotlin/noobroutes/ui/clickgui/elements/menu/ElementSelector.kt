@@ -3,7 +3,7 @@ package noobroutes.ui.clickgui.elements.menu
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.animations.impl.EaseInOut
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton

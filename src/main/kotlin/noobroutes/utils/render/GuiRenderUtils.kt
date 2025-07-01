@@ -5,6 +5,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.Core.mc
+import noobroutes.font.FontType
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.shader.RoundedRect
@@ -110,17 +111,17 @@ fun circle(x: Number, y: Number, radius: Number, color: Color, borderColor: Colo
     }
 }
 
-fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = MinecraftFont.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false) {
-    MinecraftFont.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
+fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = MinecraftFont.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = FontType.MINECRAFT) {
+    fontType.font.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
 }
 
 fun mcText(text: String, x: Number, y: Number, scale: Number, color: Color, shadow: Boolean = true, center: Boolean = true) {
     RenderUtils.drawText("$text§r", x.toFloat(), y.toFloat(), scale.toDouble(), color, shadow, center)
 }
 
-fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = MinecraftFont.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false): Float {
-    text(text, x, y, color, size, type, align, verticalAlign, shadow)
-    return getTextWidth(text, size).toFloat()
+fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = MinecraftFont.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = FontType.MINECRAFT): Float {
+    text(text, x, y, color, size, type, align, verticalAlign, shadow, fontType)
+    return getTextWidth(text, size, fontType)
 }
 
 fun mcTextAndWidth(text: String, x: Number, y: Number, scale: Number, color: Color, shadow: Boolean = true, center: Boolean = true): Float {
@@ -130,11 +131,11 @@ fun mcTextAndWidth(text: String, x: Number, y: Number, scale: Number, color: Col
 
 fun getMCTextWidth(text: String) = mc.fontRendererObj.getStringWidth(text)
 
-fun getTextWidth(text: String, size: Float) = MinecraftFont.getTextWidth(text, size) / 8
+fun getTextWidth(text: String, size: Float, fontType: FontType = FontType.MINECRAFT) = fontType.font.getTextWidth(text, size)
 
 fun getMCTextHeight() = mc.fontRendererObj.FONT_HEIGHT
 
-fun getTextHeight(size: Float) = MinecraftFont.getTextHeight(size) / 8
+fun getTextHeight(text: String = "", size: Float, fontType: FontType = FontType.MINECRAFT) = fontType.font.getTextHeight(text, size)
 
 fun translate(x: Number, y: Number, z: Number = 1f) = GlStateManager.translate(x.toDouble(), y.toDouble(), z.toDouble())
 
@@ -152,8 +153,8 @@ fun dropShadow(x: Number, y: Number, w: Number, h: Number, shadowColor: Color, s
     matrix.runLegacyMethod(matrix.get()) {
         RoundedRect.drawDropShadow(
             matrix.get(),
-            (x - shadowSoftness / 2).toFloat(),
-            (y - shadowSoftness / 2).toFloat(),
+            (x - shadowSoftness * 0.5).toFloat(),
+            (y - shadowSoftness * 0.5).toFloat(),
             (w + shadowSoftness).toFloat(),
             (h + shadowSoftness).toFloat(),
             shadowColor,
@@ -200,7 +201,7 @@ fun drawArrow(xpos: Float, ypos: Float, rotation: Float = 90f, scale: Float = 1f
     GlStateManager.scale(scale, scale, 1f)
     GlStateManager.translate(-xpos, -ypos, 0f)
     GlStateManager.color(color.redFloat, color.greenFloat, color.blueFloat, color.alphaFloat)
-    drawDynamicTexture(arrowIcon, xpos - 25 / 2 * scale, ypos - 25 / 2 * scale, 25 * scale, 25 * scale)
+    drawDynamicTexture(arrowIcon, xpos - 25 * 0.5 * scale, ypos - 25 * 0.5 * scale, 25 * scale, 25 * scale)
     GlStateManager.popMatrix()
 }
 
@@ -228,12 +229,12 @@ fun drawDynamicTexture(dynamicTexture: DynamicTexture, x: Number, y: Number, w: 
     GlStateManager.popMatrix()
 }
 
-fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = MinecraftFont.REGULAR, shadow: Boolean = false) {
-    MinecraftFont.wrappedText(text, x, y, w, color, size, type, shadow = shadow)
+fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = MinecraftFont.REGULAR, shadow: Boolean = false, fontType: FontType = FontType.MINECRAFT) {
+    fontType.font.wrappedText(text, x, y, w, color, size, type, shadow = shadow)
 }
 
-fun wrappedTextBounds(text: String, width: Float, size: Float): Pair<Float, Float> {
-    return MinecraftFont.wrappedTextBounds(text, width, size)
+fun wrappedTextBounds(text: String, width: Float, size: Float, fontType: FontType = FontType.MINECRAFT): Pair<Float, Float> {
+    return fontType.font.wrappedTextBounds(text, width, size)
 }
 
 enum class TextAlign {

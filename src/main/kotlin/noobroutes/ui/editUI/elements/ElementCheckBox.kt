@@ -3,8 +3,8 @@ package noobroutes.ui.editUI.elements
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.animations.impl.ColorAnimation
-import noobroutes.ui.clickgui.animations.impl.LinearAnimation
+import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.util.ColorUtil.brighter
 import noobroutes.ui.clickgui.util.ColorUtil.brighterIf
 import noobroutes.ui.clickgui.util.ColorUtil.buttonColor

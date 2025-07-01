@@ -9,8 +9,6 @@ plugins {
     kotlin("jvm") version "2.0.0"
 }
 
-//Constants:
-
 val baseGroup: String by project
 val mcVersion: String by project
 val version: String by project
@@ -18,17 +16,15 @@ val mixinGroup = "$baseGroup.mixin"
 val modid: String by project
 val transformerFile = file("src/main/resources/accesstransformer.cfg")
 
-// Toolchains:
+
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
 }
 
-// Minecraft configuration:
 loom {
     log4jConfigs.from(file("log4j2.xml"))
     launchConfigs {
         "client" {
-            // If you don't want mixins, remove these lines
             property("mixin.debug", "true")
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
         }
@@ -45,14 +41,13 @@ loom {
     }
     forge {
         pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
-        // If you don't want mixins, remove this lines
         mixinConfig("mixins.$modid.json")
         if (transformerFile.exists()) {
             println("Installing access transformer")
             accessTransformer(transformerFile)
         }
     }
-    // If you don't want mixins, remove these lines
+
     mixin {
         defaultRefmapName.set("mixins.$modid.refmap.json")
     }
@@ -86,7 +81,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     //compileOnly("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all")
-    //shadowImpl("gg.essential:loader-launchwrapper:1.1.3")
+    implementation("gg.essential:loader-launchwrapper:1.1.3")
     implementation("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5") {
         exclude(module = "asm")
         exclude(module = "asm-commons")

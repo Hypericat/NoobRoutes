@@ -4,8 +4,8 @@ import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.animations.impl.ColorAnimation
-import noobroutes.ui.clickgui.animations.impl.LinearAnimation
+import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
@@ -20,6 +20,7 @@ import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.render.*
+import noobroutes.utils.skyblock.devMessage
 
 /**
  * Renders all the modules.
@@ -58,6 +59,7 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
                 //render switch
                 roundedRectangle(x + w - 43f, y + 4f, 34f, 20f, buttonColor, 9f)
 
+                if (linearAnimation.isAnimating()) devMessage(linearAnimation.get(34f, 9f, setting.enabled))
                 if (setting.enabled || linearAnimation.isAnimating()) roundedRectangle(x + w - 43f, y + 4f, linearAnimation.get(34f, 9f, setting.enabled), 20f, color, 9f)
 
                 if (isHovered) rectangleOutline(x + w - 43f, y + 4f, 34f, 20f, color.darker(.85f), 9f, 3f)
@@ -66,6 +68,11 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
                 )
             }
         }
+
+    //240 - 43
+    //197
+    //240 - 33
+    //207
 
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (mouseButton == 0 && isHovered) {

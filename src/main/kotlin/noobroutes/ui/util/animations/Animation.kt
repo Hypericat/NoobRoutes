@@ -1,4 +1,4 @@
-package noobroutes.ui.clickgui.animations
+package noobroutes.ui.util.animations
 
 import noobroutes.utils.clock.Clock
 
