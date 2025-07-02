@@ -45,7 +45,10 @@ class SwitchElement(
     override fun draw() {
         drawBackground()
         //GlowShader2D.startDraw()
+
+        GlowShader.startDraw()
         text(name, x + TEXT_OFFSET, y + h * 0.5f, ColorPalette.text, 16f, fontType = FontType.ODIN)
+        GlowShader.endDraw(Color.ORANGE, 6f, 2f)
         //GlowShader2D.stopDraw(Color.ORANGE, 6f, 2f)
         ElementRenderer.drawSwitch(
             x + w * 0.9f,

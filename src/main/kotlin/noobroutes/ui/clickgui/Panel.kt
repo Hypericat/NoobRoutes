@@ -5,7 +5,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.Category
 import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
-import noobroutes.font.MinecraftFont
+import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.SearchBar.currentSearch
 import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.elements.ModuleButton

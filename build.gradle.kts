@@ -82,13 +82,8 @@ dependencies {
 
     //compileOnly("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all")
     implementation("gg.essential:loader-launchwrapper:1.1.3")
-    implementation("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5") {
-        exclude(module = "asm")
-        exclude(module = "asm-commons")
-        exclude(module = "asm-tree")
-        exclude(module = "gson")
-        exclude(module = "vigilance")
-    }
+    compileOnly("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5")
+
     implementation("com.mojang:brigadier:1.2.9")
     minecraft("com.mojang:minecraft:1.8.9")
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")

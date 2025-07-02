@@ -4,7 +4,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.Module
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.*
-import noobroutes.font.MinecraftFont
+import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.clickgui.Panel
 import noobroutes.ui.util.animations.impl.ColorAnimation

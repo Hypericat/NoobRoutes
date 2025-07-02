@@ -1,6 +1,6 @@
 package noobroutes.font
 
-import noobroutes.font.MinecraftFont.REGULAR
+import noobroutes.font.fonts.MinecraftFont.REGULAR
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.TextPos

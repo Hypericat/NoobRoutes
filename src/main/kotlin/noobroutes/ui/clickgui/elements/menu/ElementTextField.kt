@@ -1,7 +1,7 @@
 package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.settings.impl.StringSetting
-import noobroutes.font.MinecraftFont
+import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.clickgui.elements.Element

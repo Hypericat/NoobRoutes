@@ -9,7 +9,7 @@ import noobroutes.Core.display
 import noobroutes.config.Config
 import noobroutes.features.Category
 import noobroutes.features.render.ClickGUIModule
-import noobroutes.font.MinecraftFont
+import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.Screen
 import noobroutes.ui.clickgui.ClickGUI.draw
 import noobroutes.ui.util.animations.impl.EaseInOut

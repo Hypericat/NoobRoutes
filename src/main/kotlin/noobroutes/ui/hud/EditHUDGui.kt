@@ -3,7 +3,7 @@ package noobroutes.ui.hud
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.config.Config
 import noobroutes.features.ModuleManager.huds
-import noobroutes.font.MinecraftFont
+import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.Screen
 import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.util.ColorUtil.textColor

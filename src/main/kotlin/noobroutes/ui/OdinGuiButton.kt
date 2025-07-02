@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.features.render.ClickGUIModule
-import noobroutes.font.MinecraftFont
+import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.util.ColorUtil.darker
 import noobroutes.utils.render.*
 

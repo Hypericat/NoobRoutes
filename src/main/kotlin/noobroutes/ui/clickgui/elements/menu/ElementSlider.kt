@@ -2,7 +2,7 @@ package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.Core.logger
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.font.MinecraftFont
+import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.clickgui.elements.Element
@@ -19,7 +19,6 @@ import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.utils.floor
 import noobroutes.utils.render.*
-import noobroutes.utils.round
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToInt

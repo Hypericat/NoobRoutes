@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.Core.mc
 import noobroutes.font.FontType
-import noobroutes.font.MinecraftFont
+import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.shader.RoundedRect
 import noobroutes.utils.*

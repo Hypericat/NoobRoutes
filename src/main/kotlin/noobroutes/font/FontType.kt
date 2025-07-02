@@ -1,6 +1,9 @@
 package noobroutes.font
 
+import noobroutes.font.fonts.MinecraftFont
+import noobroutes.font.fonts.OdinFont
+
 enum class FontType(val font: Font) {
     MINECRAFT(MinecraftFont),
-    ODIN(CustomFont)
+    ODIN(OdinFont)
 }
