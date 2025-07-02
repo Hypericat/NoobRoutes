@@ -1,5 +1,6 @@
 package noobroutes
 
+import gg.essential.elementa.font.FontRenderer
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
@@ -14,6 +15,7 @@ import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
 import noobroutes.features.ModuleManager
 import noobroutes.features.floor7.autop3.Blink
+import noobroutes.font.FontType
 import noobroutes.font.fonts.OdinFont
 import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
@@ -89,8 +91,11 @@ class NoobRoutes {
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }
-        MinecraftFont.init()
-        OdinFont.init()
+        //this is probably done already by other mods, but it wasn't in the dev env, so I am doing it here
+        FontRenderer.initShaders()
+        FontType.entries.forEach {
+            it.font.init()
+        }
     }
 
     @Mod.EventHandler

@@ -40,6 +40,4 @@ object ElementTestGUI : Screen() {
         super.keyTyped(typedChar, keyCode)
     }
 
-
-
 }

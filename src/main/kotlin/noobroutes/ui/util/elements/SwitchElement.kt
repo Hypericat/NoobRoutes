@@ -47,7 +47,7 @@ class SwitchElement(
         //GlowShader2D.startDraw()
 
         GlowShader.startDraw()
-        text(name, x + TEXT_OFFSET, y + h * 0.5f, ColorPalette.text, 16f, fontType = FontType.ODIN)
+        text(name, x + TEXT_OFFSET, y + h * 0.5f, ColorPalette.text, 16f, fontType = ColorPalette.font)
         GlowShader.endDraw(Color.ORANGE, 6f, 2f)
         //GlowShader2D.stopDraw(Color.ORANGE, 6f, 2f)
         ElementRenderer.drawSwitch(

@@ -17,7 +17,7 @@ object MinecraftFont : Font {
     const val REGULAR = 1
     const val BOLD = 2
 
-    fun init() {
+    override fun init() {
         fontRenderer = mc.fontRendererObj
     }
 

@@ -2,17 +2,14 @@ package noobroutes.font.fonts
 
 import gg.essential.elementa.font.FontRenderer
 import gg.essential.universal.UMatrixStack
-import net.minecraft.client.renderer.GlStateManager
+import noobroutes.font.EssentialFont
 import noobroutes.font.Font
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.TextPos
-import noobroutes.utils.render.translate
 import kotlin.math.max
-import noobroutes.font.EssentialFont
 
-
-object OdinFont : Font {
+object NunitoFont : Font {
     private lateinit var fontRenderer: FontRenderer
 
 
@@ -21,8 +18,8 @@ object OdinFont : Font {
 
     override fun init() {
         fontRenderer = FontRenderer(
-            EssentialFont.fromResource("/assets/fonts/odin/Regular"),
-            EssentialFont.fromResource("/assets/fonts/odin/SemiBold")
+            EssentialFont.fromResource("/assets/fonts/nunito/Regular"),
+            EssentialFont.fromResource("/assets/fonts/nunito/SemiBold")
         )
     }
 

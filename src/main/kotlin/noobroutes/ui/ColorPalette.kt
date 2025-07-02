@@ -1,5 +1,6 @@
 package noobroutes.ui
 
+import noobroutes.font.FontType
 import noobroutes.utils.render.Color
 
 object ColorPalette {
@@ -9,7 +10,8 @@ object ColorPalette {
         val primary: Color,
         val secondary: Color,
         val background: Color,
-        val backgroundSecondary: Color
+        val backgroundSecondary: Color,
+        val font: FontType
     )
     private val defaultPalette = Palette(
         Color(205, 214, 244),
@@ -18,6 +20,7 @@ object ColorPalette {
         Color(95, 95, 222),
         Color(51, 51, 95),
         Color(58, 58, 107),
+        FontType.NUNITO
     )
 
     var currentColorPalette: Palette = defaultPalette
@@ -28,7 +31,7 @@ object ColorPalette {
     inline val secondary get() = currentColorPalette.secondary
     inline val background get() = currentColorPalette.background
     inline val backgroundSecondary get() = currentColorPalette.backgroundSecondary
-
+    inline val font get() = currentColorPalette.font
 
 
 
