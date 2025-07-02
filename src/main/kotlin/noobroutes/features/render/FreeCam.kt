@@ -9,6 +9,7 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
 import noobroutes.events.impl.ClickEvent
@@ -21,6 +22,8 @@ import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
+import noobroutes.utils.skyblock.devMessage
+import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 import kotlin.math.sign
 
@@ -35,7 +38,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     private var speedVector = Vec3(0.0,0.0,0.0)
     private var oldPos = Vec3(0.0,0.0,0.0)
     private var pos = Vec3(0.0,0.0,0.0)
-    private var lastTick = System.currentTimeMillis()
+    private var lastPartialTick = 0f
     private var oldNoClip = false
     private var lookVec: MutableVec3 = MutableVec3(0.0, 0.0, 0.0)
     private var oldCameraType: Int = 0
@@ -45,6 +48,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     private val playerPosition: EntityPosition = EntityPosition(0.0, 0.0, 0.0, 0f, 0f)
     private var renderingEntities = false
     private var scrollWheelMultiplier = 2.0
+    private var lastRenderPos = Vec3(0.0,0.0,0.0)
 
 
     override fun onEnable() {
@@ -80,7 +84,10 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     fun onRenderTick(event: RenderTickEvent){
         if (!event.isStart) return
         val partialTicks = event.renderTickTime
+        lastPartialTick = partialTicks
         val interpPos = oldPos.add(pos.subtract(oldPos).multiply(partialTicks))
+
+        lastRenderPos = interpPos
 
         freeCamPosition.x = interpPos.xCoord
         freeCamPosition.y = interpPos.yCoord
@@ -124,6 +131,13 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     }
 
     @SubscribeEvent
+    fun onKey(event: InputEvent.KeyInputEvent) {
+        val keyCodes = AutoP3Utils.keyBindings.map { it.keyCode }
+        if (!keyCodes.contains(Keyboard.getEventKey())) return
+        if (!keyCodes.any{ Keyboard.isKeyDown(it) }) stopMovement()
+    }
+
+    @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Unload){
         onDisable()
     }
@@ -133,6 +147,13 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     @SubscribeEvent
     fun onClick(event: ClickEvent.All) {
         event.isCanceled = true
+    }
+
+    fun stopMovement() {
+        if (!instantSlow) return
+        speedVector = Vec3(0.0, 0.0, 0.0)
+        oldPos = lastRenderPos
+        pos = lastRenderPos
     }
 
     fun onBeforeRenderWorld(){
