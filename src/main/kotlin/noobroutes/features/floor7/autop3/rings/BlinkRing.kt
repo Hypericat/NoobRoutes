@@ -31,20 +31,12 @@ class BlinkRing(
     center: Boolean = false,
     rotate: Boolean = false,
     var packets: List<C04PacketPlayerPosition> = listOf(),
-    var endYVelo: Double = 0.0,
-    var endXVelo: Double = 0.0,
-    var endZVelo: Double = 0.0,
-    var walk: Boolean = false,
-    var dir: Float = 0f
+    var endYVelo: Double = 0.0
 ) : Ring(coords, yaw, term, leap, left, center, rotate) {
 
 
     init {
         addDouble("endYVelo", {endYVelo}, {endYVelo = it})
-        addBoolean("walk", {walk}, {walk = it})
-        addDouble("endXVelo", {endXVelo}, {endXVelo = it})
-        addDouble("endZVelo", {endZVelo}, {endZVelo = it})
-        addFloat("dir", {dir}, {dir = it})
     }
 
     override fun loadRingData(obj: JsonObject) {
@@ -101,22 +93,14 @@ class BlinkRing(
         }
         
         blinksInstance += packets.size
+        Blink.cancelled -= packets.size
         lastBlink = System.currentTimeMillis()
         lastBlinkRing = this
         packets.forEach { PacketUtils.sendPacket(it) }
         val lastPacket = packets.last()
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
         AutoP3.isAligned = true
-        if (!walk) mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
-        else {
-            mc.thePlayer.setVelocity(endXVelo, endYVelo, endZVelo)
-            var airTicks = 0
-            packets.forEach { if (!it.isOnGround) airTicks++ else airTicks = 0 }
-            Blink.cancelled -= packets.size
-            AutoP3Utils.airTicks = airTicks
-            AutoP3Utils.direction = yaw
-            AutoP3Utils.walking = true
-        }
+        mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
         if (AutoP3.cgyMode) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
         else modMessage("§c§l$cancelled§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }

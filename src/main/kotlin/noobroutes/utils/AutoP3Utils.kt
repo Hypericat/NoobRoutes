@@ -1,6 +1,7 @@
 package noobroutes.utils
 
 import net.minecraft.client.settings.KeyBinding
+import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.Vec3
 import net.minecraftforge.event.world.WorldEvent
@@ -103,8 +104,8 @@ object AutoP3Utils {
     private const val TICK2 = 1.99
 
     @SubscribeEvent
-    fun motion(event: ClientTickEvent) {
-        if (!motioning || event.phase != TickEvent.Phase.START) return
+    fun motion(event: PacketEvent.Send) {
+        if (!motioning || event.packet !is C03PacketPlayer) return
         when (motionTicks) {
             0 -> setSpeed(1.4)
             1 -> {
@@ -153,15 +154,27 @@ object AutoP3Utils {
         mc.thePlayer.motionZ = Utils.zPart(direction) * speed
     }
 
+    var cancelNext = false
+
+    @SubscribeEvent
+    fun onC03(event: PacketEvent.Send) {
+        if (cancelNext && event.packet is C03PacketPlayer) {
+            event.isCanceled = true
+            cancelNext = false
+        }
+    }
+
     var airTicks = 0
     var jumping = false
 
     private const val JUMP_SPEED = 6.0075
     private const val SPRINT_MULTIPLIER = 1.3
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun movement(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
+    var speeding = false
+
+    @SubscribeEvent
+    fun movement(event: PacketEvent.Send) {
+        if (event.packet !is C03PacketPlayer || cancelNext || mc.thePlayer == null) return
 
         if (mc.thePlayer.onGround) {
             airTicks = 0
@@ -172,7 +185,7 @@ object AutoP3Utils {
         if (mc.thePlayer.isInWater || mc.thePlayer.isInLava || !walking) return
         val speed = mc.thePlayer.aiMoveSpeed.toDouble()
 
-        if (airTicks < 1) {
+        if (airTicks == 0) {
             var speedMultiplier = 2.806
             if (jumping) {
                 jumping = false

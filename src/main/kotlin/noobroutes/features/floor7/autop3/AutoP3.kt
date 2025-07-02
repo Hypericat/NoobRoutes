@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.network.play.client.C03PacketPlayer
 import noobroutes.ui.editUI.EditUI
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.MathHelper
@@ -87,8 +88,6 @@ object AutoP3: Module (
     private var awaitingLeft = mutableSetOf<Ring>()
     private var activatedBlinks = mutableSetOf<BlinkRing>()
 
-    var spedFor = 0
-
     val ringRegistry = AutoP3Utils.discoverRings("noobroutes.features.floor7.autop3.rings")
 
     private var lastLavaClip = System.currentTimeMillis()
@@ -113,9 +112,9 @@ object AutoP3: Module (
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun tickRing(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.END || mc.thePlayer == null) return
-        if(!inF7Boss || mc.thePlayer.isSneaking || editMode || mc.thePlayer.capabilities.walkSpeed < 0.5) return
+    fun tickRing(event: PacketEvent.Send) {
+        if (event.packet !is C03PacketPlayer || mc.thePlayer == null) return
+        if(!inF7Boss || mc.thePlayer.isSneaking || editMode ) return //|| mc.thePlayer.capabilities.walkSpeed < 0.5
 
         val bb = mc.thePlayer.entityBoundingBox
 
@@ -165,14 +164,6 @@ object AutoP3: Module (
         if (ring.term) awaitingTerm.add(ring)
         if (ring.left) awaitingLeft.add(ring)
     }
-
-    @SubscribeEvent
-    fun spedTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.END || spedFor == 0) return
-        spedFor--
-        if (spedFor == 0) AutoP3Utils.setGameSpeed(1f)
-    }
-
 
     @SubscribeEvent
     fun awaitingOpen(event: TermOpenEvent) {
@@ -444,8 +435,7 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate,
-                    length,
-                    walk
+                    length
                 )
                 waypoint.triggered = true
                 blinkStarts.add(waypoint)

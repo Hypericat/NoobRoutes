@@ -44,6 +44,6 @@ class InstaRing(
         val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
         mc.thePlayer.motionX = speed * Utils.xPart(direction)
         mc.thePlayer.motionZ = speed * Utils.zPart(direction)
-        if (walk) Scheduler.schedulePreTickTask { walking = true }
+        if (walk) Scheduler.scheduleC03Task { walking = true }
     }
 }

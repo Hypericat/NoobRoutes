@@ -237,19 +237,6 @@ object EditUI : Screen() {
             )
         )
         when (ring) {
-            is BlinkRing -> {
-                elements.add(
-                    ElementCheckBox(
-                        X_ALIGNMENT_RIGHT,
-                        currentY,
-                        250f, 50f,
-                        { ring.walk = it },
-                        { ring.walk },
-                        "Walk"
-                    )
-                )
-            }
-
             is ClampRing -> {
                 elements.add(
                     ElementCheckBox(

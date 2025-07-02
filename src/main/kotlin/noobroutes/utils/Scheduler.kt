@@ -26,6 +26,7 @@ object Scheduler {
     private val scheduledLowS08Tasks = Tasks()
     private val scheduledPlayerLivingUpdateTasks = Tasks()
     private val scheduledC03Tasks = Tasks()
+    private val scheduledLowestC03Tasks = Tasks()
     private val scheduledSoundTasks = Tasks()
 
     private val scheduledPreMotionUpdateTasks = Tasks()
@@ -117,6 +118,12 @@ object Scheduler {
         scheduledC03Tasks.add(Task({ p -> callback(p) }, ticks, priority, cancel))
     }
 
+    @Throws(IndexOutOfBoundsException::class)
+    fun scheduleLowestC03Task( ticks: Int = 0, cancel: Boolean = false, priority: Int = 0, callback: (Any?) -> Unit) {
+        if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
+        scheduledLowestC03Tasks.add(Task({ p -> callback(p) }, ticks, priority, cancel))
+    }
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         when (event.phase) {
@@ -185,6 +192,13 @@ object Scheduler {
         if (event.packet !is C03PacketPlayer) return
         if (scheduledC03Tasks.doTasks(event)) event.isCanceled = true
     }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onLowestC03PacketEvent(event: PacketEvent.Send){
+        if (event.packet !is C03PacketPlayer) return
+        if (scheduledLowestC03Tasks.doTasks(event)) event.isCanceled = true
+    }
+
 
     @SubscribeEvent
     fun motionUpdateEvent(event: MotionUpdateEvent.Pre){

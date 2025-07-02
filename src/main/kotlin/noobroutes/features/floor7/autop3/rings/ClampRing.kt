@@ -30,6 +30,7 @@ class ClampRing(
         AutoP3Utils.unPressKeys()
         super.doRing()
         if (AutoP3.cgyMode) modMessage("Looking", "§0[§6Yharim§0]§7 ")
+        if (walk) AutoP3Utils.startWalk(yaw)
         val motionX = mc.thePlayer.motionX
         val motionZ = mc.thePlayer.motionZ
         if (motionX * xPart(yaw) < 0 || motionZ * zPart(yaw) < 0) {
@@ -42,6 +43,5 @@ class ClampRing(
         val scale = minOf(scaleX, scaleZ)
         mc.thePlayer.motionX = xPart(yaw) * scale
         mc.thePlayer.motionZ = zPart(yaw) * scale
-        if (walk) AutoP3Utils.startWalk(yaw)
     }
 }

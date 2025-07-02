@@ -3,6 +3,7 @@ package noobroutes.features.floor7.autop3.rings
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.AutoP3
+import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
@@ -28,9 +29,7 @@ class WalkRing(
         else {
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
-            Scheduler.schedulePostTickTask { AutoP3Utils.unPressKeys() }
-            Scheduler.schedulePostTickTask(1) { AutoP3Utils.unPressKeys() }
-            Scheduler.schedulePostTickTask(2) { AutoP3Utils.startWalk(yaw) }
+            Scheduler.scheduleC03Task { AutoP3Utils.startWalk(yaw) }
         }
     }
 }

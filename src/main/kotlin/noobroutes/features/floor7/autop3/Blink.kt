@@ -207,11 +207,7 @@ object Blink{
                 lastWaypoint.center,
                 lastWaypoint.rotate,
                 recordedPackets,
-                mc.thePlayer.motionY,
-                mc.thePlayer.motionX,
-                mc.thePlayer.motionZ,
-                lastWaypoint.walk,
-                AutoP3Utils.direction
+                mc.thePlayer.motionY
             ))
         }
     }
@@ -255,8 +251,8 @@ object Blink{
             }
             return
         }
-        if (event.packet.isMoving || movementPackets.isNotEmpty() || System.currentTimeMillis() - lastBlink < 100) { return }
+        if (event.packet.isMoving || movementPackets.isNotEmpty() || System.currentTimeMillis() - lastBlink < 100 || !event.packet.isOnGround) { return }
         event.isCanceled = true
-        if (AutoP3.spedFor == 0 && cancelled < 400) cancelled++
+        if (cancelled < 400) cancelled++
     }
 }

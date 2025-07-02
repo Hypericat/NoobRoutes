@@ -166,7 +166,6 @@ object PlayerUtils {
     fun rePressKeys() {
         AutoP3Utils.keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, Keyboard.isKeyDown(it.keyCode)) }
     }
-
 }
 
 sealed class ClickType {
