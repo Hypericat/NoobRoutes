@@ -1,4 +1,4 @@
-package noobroutes.mixin.render;
+package mixin.render;
 
 
 import net.minecraft.client.renderer.RenderGlobal;

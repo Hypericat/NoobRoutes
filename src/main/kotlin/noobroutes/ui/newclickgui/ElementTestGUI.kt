@@ -7,6 +7,7 @@ object ElementTestGUI : Screen() {
     private val testSwitches = listOf(
         SwitchElement(
             "Test",
+            24f,
             false,
             300f,
             300f,
@@ -15,6 +16,7 @@ object ElementTestGUI : Screen() {
         ),
         SwitchElement(
             "Test1",
+            24f,
             false,
             300f,
             500f,

@@ -16,7 +16,7 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 
 }*/
 
-package noobroutes.mixin;
+package mixin;
 
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.NetworkManager;

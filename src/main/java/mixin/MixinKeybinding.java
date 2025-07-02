@@ -16,7 +16,7 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 
 }*/
 
-package noobroutes.mixin;
+package mixin;
 
 import net.minecraft.client.settings.KeyBinding;
 import noobroutes.features.move.AutoPath;

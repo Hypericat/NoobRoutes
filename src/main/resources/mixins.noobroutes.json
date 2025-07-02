@@ -1,8 +1,24 @@
 {
-  "package": "${basePackage}.mixin",
-  "plugin": "${basePackage}.init.AutoDiscoveryMixinPlugin",
-  "refmap": "mixins.${modid}.refmap.json",
+  "package": "mixin",
+  "refmap": "mixins.noobroutes.refmap.json",
   "minVersion": "0.7",
   "compatibilityLevel": "JAVA_8",
-  "__comment": "You do not need to manually register mixins in this template. Check the auto discovery mixin plugin for more info."
+  "mixins": [
+    "accessors.TimerFieldAccessor",
+    "player.MixinAbstractClientPlayer",
+    "player.MixinEntity",
+    "player.MixinEntityLivingBase",
+    "player.MixinEntityPlayerSP_EntityPlayer",
+    "render.MixinEntityRenderer",
+    "render.MixinItemRenderer",
+    "render.MixinRenderGlobal",
+    "render.MixinRenderManager",
+    "MixinChunk",
+    "MixinEntityLivingBase",
+    "MixinKeybinding",
+    "MixinMinecraft",
+    "MixinModList",
+    "MixinNetworkManager",
+    "MixinWorldClient"
+  ]
 }

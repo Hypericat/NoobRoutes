@@ -41,11 +41,6 @@ object Core {
         File(mc.mcDataDir, "config/noobroutes").takeIf { !it.exists() }?.mkdirs()
     }
 
-    fun onFMLServerStopped() {
-        Brush.saveConfig()
-        Brush.editMode = false
-    }
-
     fun loadComplete() {
         runBlocking(Dispatchers.IO) {
             launch {
@@ -59,8 +54,8 @@ object Core {
         RoundedRect.initShaders()
         Brush.loadConfig()
     }
-    var lastChatVisibility: EntityPlayer.EnumChatVisibility? = null
-    var inUI = false
+    private var lastChatVisibility: EntityPlayer.EnumChatVisibility? = null
+    private var inUI = false
 
     @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {

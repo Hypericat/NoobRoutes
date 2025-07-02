@@ -44,10 +44,10 @@ import kotlin.collections.iterator
 object Brush : Module("Brush", description = "It is just fme but way less laggy. Works with FME floor config, but not the room config.", category = Category.DUNGEON) {
 
     var editMode by BooleanSetting("Edit Mode", description = "Allows you to edit blocks")
-    val editModeToggle by KeybindSetting("Edit Mode Bind", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress {
+    private val editModeToggle by KeybindSetting("Edit Mode Bind", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress {
         toggleEditMode()
     }
-    val placeCooldown by NumberSetting(
+    private val placeCooldown by NumberSetting(
         "Place Cooldown",
         min = 0,
         max = 1000,
@@ -56,9 +56,9 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
         unit = "ms"
     )
 
-    var savedChunks = hashMapOf<Pair<Int, Int>, HashMap<BlockPos, IBlockState>>()
-    var floorConfig: MutableMap<String, MutableList<Pair<IBlockState, BlockPos>>> = mutableMapOf()
-    var roomConfig: MutableMap<String, MutableList<Pair<IBlockState, BlockPos>>> = mutableMapOf()
+    private var savedChunks = hashMapOf<Pair<Int, Int>, HashMap<BlockPos, IBlockState>>()
+    private var floorConfig: MutableMap<String, MutableList<Pair<IBlockState, BlockPos>>> = mutableMapOf()
+    private var roomConfig: MutableMap<String, MutableList<Pair<IBlockState, BlockPos>>> = mutableMapOf()
 
 
 
@@ -189,13 +189,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             }
             return;
         }
-
-
     }
-
-
-
-
 
     @SubscribeEvent
     fun locationEvent(event: LocationChangeEvent){
@@ -209,10 +203,6 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
 
         registerChunkBlocks(event.room, list)
     }
-
-
-
-
 
     private fun registerChunkBlocks(room: UniqueRoom?, positions: List<Pair<IBlockState, BlockPos>>) {
         runOnMCThread {
@@ -247,8 +237,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
     }
 
     private fun getLocation(): String {
-        val location = LocationUtils.currentArea
-        return when (location) {
+        return when (val location = LocationUtils.currentArea) {
             Island.Dungeon -> {
                 "${DungeonUtils.floorNumber}"
             }
@@ -310,11 +299,12 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
     }
 
 
-    fun saveConfig() {
+    private fun saveConfig() {
         saveAreaConfig(floorConfig, "floorConfig")
         saveAreaConfig(roomConfig, "roomConfig")
     }
 
+    //test if you can just do .toString()
 
     private fun blockStateSerializer(state: IBlockState): String {
         val blockName = Block.blockRegistry.getNameForObject(state.block)?.toString() ?: return "minecraft:air"

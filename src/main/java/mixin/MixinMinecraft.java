@@ -1,4 +1,4 @@
-package noobroutes.mixin;
+package mixin;
 
 import net.minecraft.client.Minecraft;
 import noobroutes.events.impl.ClickEvent;

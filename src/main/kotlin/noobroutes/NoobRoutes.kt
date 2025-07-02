@@ -32,22 +32,12 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import java.io.File
 
 
-const val MODID = "noobroutes"
+const val MODID = "@MOD_ID@"
 
 @Mod(modid = MODID, useMetadata = true)
 class NoobRoutes {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
-        try {
-            val resource: net.minecraft.client.resources.IResource = Minecraft.getMinecraft().resourceManager
-                .getResource(net.minecraft.util.ResourceLocation("test:test.txt"))
-            org.apache.commons.io.IOUtils.copy(resource.inputStream, java.lang.System.out)
-        } catch (e: java.io.IOException) {
-            throw java.lang.RuntimeException(e)
-        }
-
-        //AutoPath.onInitKeys()
-
         listOf(
             NoobRoutesCommand(),
             AutoP3Command(),
@@ -110,11 +100,5 @@ class NoobRoutes {
         ModuleManager.addModules()
 
     }
-    @Mod.EventHandler
-    fun something(event: FMLServerStoppedEvent) {
-        Core.onFMLServerStopped()
-    }
-
-    
 
 }

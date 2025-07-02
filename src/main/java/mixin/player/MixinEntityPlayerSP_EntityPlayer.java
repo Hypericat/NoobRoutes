@@ -1,4 +1,4 @@
-package noobroutes.mixin.player;
+package mixin.player;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.entity.EntityPlayerSP;

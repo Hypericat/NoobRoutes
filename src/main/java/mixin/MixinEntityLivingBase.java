@@ -1,4 +1,4 @@
-package noobroutes.mixin;
+package mixin;
 
 
 import net.minecraft.client.entity.EntityPlayerSP;

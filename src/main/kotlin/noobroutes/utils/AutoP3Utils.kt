@@ -12,21 +12,16 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.events.BossEventDispatcher
-import noobroutes.events.BossEventDispatcher.inF7Boss
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.Phase
 import noobroutes.features.floor7.autop3.AutoP3
-import noobroutes.features.floor7.autop3.AutoP3.depth
-import noobroutes.features.floor7.autop3.AutoP3.renderStyle
 import noobroutes.features.floor7.autop3.AutoP3.walkFix
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.features.floor7.autop3.rings.BlinkRing
-import noobroutes.mixin.accessors.TimerFieldAccessor
+import mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.render.Color
-import noobroutes.utils.render.RenderUtils
-import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
@@ -40,7 +35,6 @@ import java.nio.file.Paths
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import kotlin.math.pow
-import kotlin.math.sin
 import kotlin.reflect.KClass
 
 @Suppress("Unused")

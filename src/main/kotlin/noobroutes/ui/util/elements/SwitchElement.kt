@@ -2,6 +2,9 @@ package noobroutes.ui.util.elements
 
 import noobroutes.font.FontType
 import noobroutes.ui.ColorPalette
+import noobroutes.ui.clickgui.util.ColorUtil.brighter
+import noobroutes.ui.clickgui.util.ColorUtil.brighterIf
+import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.ui.util.ElementRenderer
 import noobroutes.ui.util.ElementRenderer.TEXT_OFFSET
@@ -11,54 +14,46 @@ import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.shader.GlowShader
 import noobroutes.ui.util.shader.GlowShader2D
 import noobroutes.utils.render.Color
+import noobroutes.utils.render.getTextHeight
+import noobroutes.utils.render.getTextWidth
 import noobroutes.utils.render.text
 
 class SwitchElement(
     val name: String,
+    val scale: Float,
     initialValue: Boolean,
     x: Float,
     y: Float,
     w: Float,
-    h: Float
+    h: Float,
+
 ) : UiElement<Boolean>(x, y, w, h) {
     override var elementValue: Boolean = initialValue
 
-    private val colorAnimation = ColorAnimation(250)
+    private val colorAnimation = ColorAnimation(150)
     private val linearAnimation = LinearAnimation<Float>(200)
-    //200
-    //50
-    private val xScale = w / 200f
-    private val yScale = h / 50f
 
 
-
-    private inline val isHovered get() = ElementRenderer.isHoveredSwitch(
-        x + w * 0.9f,
-        y + halfHeight,
-        xScale,
-        yScale,
+    private inline val isHovered get() = MouseUtils.isAreaHovered(
+        x + TEXT_OFFSET,
+        y + halfHeight + getTextHeight(name, scale, ColorPalette.font),
+        getTextWidth(name, scale, ColorPalette.font),
+        getTextHeight(name, scale, ColorPalette.font),
     )
 
 
 
 
     override fun draw() {
-        drawBackground()
-        //GlowShader2D.startDraw()
+        val hovered = isHovered
 
-        GlowShader.startDraw()
-        text(name, x + TEXT_OFFSET, y + h * 0.5f, ColorPalette.text, 16f, fontType = ColorPalette.font)
-        GlowShader.endDraw(Color.ORANGE, 6f, 2f)
-        //GlowShader2D.stopDraw(Color.ORANGE, 6f, 2f)
-        ElementRenderer.drawSwitch(
-            x + w * 0.9f,
-            y + halfHeight,
-            xScale,
-            yScale,
-            elementValue,
-            linearAnimation,
-            colorAnimation
-        )
+        val color = colorAnimation.get(
+            ColorPalette.primary,
+            ColorPalette.text,
+            elementValue
+        ).darkerIf(hovered, 0.7f)
+        text(name, x + TEXT_OFFSET, y + h * 0.5f, color, 16f, fontType = ColorPalette.font)
+
     }
 
     override fun mouseLeftClicked() {
