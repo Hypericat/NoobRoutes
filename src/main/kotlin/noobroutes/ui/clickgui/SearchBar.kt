@@ -2,6 +2,7 @@ package noobroutes.ui.clickgui
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.mc
+import noobroutes.font.Font
 import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.clickgui.elements.menu.ElementTextField
@@ -30,8 +31,8 @@ object SearchBar {
             rectangleOutline(-202f, -1f, 404f, 32f, color, 9f,3f)
         }
         if (currentSearch.isEmpty()) {
-            text("Search here...", 0f, 18f, Color.WHITE.withAlpha(0.5f), 18f, MinecraftFont.REGULAR, TextAlign.Middle)
-        } else text(currentSearch, 0f, 12f, Color.WHITE, 18f, MinecraftFont.REGULAR, TextAlign.Middle)
+            text("Search here...", 0f, 18f, Color.WHITE.withAlpha(0.5f), 18f, Font.REGULAR, TextAlign.Middle)
+        } else text(currentSearch, 0f, 12f, Color.WHITE, 18f, Font.REGULAR, TextAlign.Middle)
         translate(-mc.displayWidth / 4f, -mc.displayHeight / 4f + 200f)
         scale(scaleFactor, scaleFactor, 1f)
         GlStateManager.popMatrix()

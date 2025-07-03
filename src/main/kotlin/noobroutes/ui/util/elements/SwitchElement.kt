@@ -1,6 +1,8 @@
 package noobroutes.ui.util.elements
 
+import noobroutes.font.Font
 import noobroutes.font.FontType
+import noobroutes.font.fonts.OdinFont
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.clickgui.util.ColorUtil.brighter
 import noobroutes.ui.clickgui.util.ColorUtil.brighterIf
@@ -52,7 +54,8 @@ class SwitchElement(
             ColorPalette.text,
             elementValue
         ).darkerIf(hovered, 0.7f)
-        text(name, x + TEXT_OFFSET, y + h * 0.5f, color, 16f, fontType = ColorPalette.font)
+
+        text(name, x + TEXT_OFFSET, y + h * 0.5f, color, 16f, fontType = ColorPalette.font, type = Font.BOLD)
 
     }
 

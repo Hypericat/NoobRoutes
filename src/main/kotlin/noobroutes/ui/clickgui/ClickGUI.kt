@@ -9,6 +9,7 @@ import noobroutes.Core.display
 import noobroutes.config.Config
 import noobroutes.features.Category
 import noobroutes.features.render.ClickGUIModule
+import noobroutes.font.Font
 import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.Screen
 import noobroutes.ui.clickgui.ClickGUI.draw
@@ -182,7 +183,7 @@ object ClickGUI : Screen() {
                 x, y, area.first + 7, (area.second + 9) / 1.8,
                 buttonColor.withAlpha((hoverHandler!!.percent() / 100f).coerceIn(0f, 0.8f)), 5f
             )
-            wrappedText(text!!, x + 7f, y + 12f, 300f, textColor, 12f, MinecraftFont.REGULAR)
+            wrappedText(text!!, x + 7f, y + 12f, 300f, textColor, 12f, Font.REGULAR)
             if (hoverHandler!!.percent() == 0) {
                 text = null
                 hoverHandler = null

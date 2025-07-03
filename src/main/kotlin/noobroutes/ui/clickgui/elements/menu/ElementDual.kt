@@ -1,6 +1,7 @@
 package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.settings.impl.DualSetting
+import noobroutes.font.Font
 import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.elements.Element
@@ -44,8 +45,8 @@ class ElementDual(parent: ModuleButton, setting: DualSetting) : Element<DualSett
         val pos = posAnim.get(8f, w / 2, !setting.enabled)
         roundedRectangle(x + pos, y + 3f, w / 2 - 6f, 28f, clickGUIColor.darker(0.8f), 5f)
 
-        text(setting.left, x + w / 4 + 6f, y + 1f + h / 2, Color.WHITE.darkerIf(isLeftHovered), 12f, MinecraftFont.REGULAR, TextAlign.Middle)
-        text(setting.right, x + w * 3 / 4 - 3f,y + 1f + h / 2, Color.WHITE.darkerIf(isRightHovered), 12f, MinecraftFont.REGULAR, TextAlign.Middle)
+        text(setting.left, x + w / 4 + 6f, y + 1f + h / 2, Color.WHITE.darkerIf(isLeftHovered), 12f, Font.REGULAR, TextAlign.Middle)
+        text(setting.right, x + w * 3 / 4 - 3f,y + 1f + h / 2, Color.WHITE.darkerIf(isRightHovered), 12f, Font.REGULAR, TextAlign.Middle)
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {

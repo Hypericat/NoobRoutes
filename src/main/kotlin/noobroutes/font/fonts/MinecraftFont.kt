@@ -14,8 +14,6 @@ object MinecraftFont : Font {
 
     private lateinit var fontRenderer: FontRenderer
 
-    const val REGULAR = 1
-    const val BOLD = 2
 
     override fun init() {
         fontRenderer = mc.fontRendererObj
@@ -39,7 +37,7 @@ object MinecraftFont : Font {
         GlStateManager.translate(drawX.toDouble(), drawY.toDouble(), 0.0)
         GlStateManager.scale(reducedScale, reducedScale, 1.0f)
 
-        val typeText = if (type == BOLD) "§l$text" else text
+        val typeText = if (type == Font.BOLD) "§l$text" else text
         fontRenderer.drawString(typeText, 0, 0, color.rgba)
         GlStateManager.popMatrix()
     }

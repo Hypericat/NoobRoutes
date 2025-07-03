@@ -15,6 +15,7 @@ import noobroutes.utils.clock.Executor.Companion.register
 import noobroutes.utils.render.*
 import org.lwjgl.opengl.Display
 import kotlin.math.sign
+import noobroutes.font.Font
 
 /**
  * Screen that renders all your active Hud's
@@ -61,7 +62,7 @@ object EditHUDGui : Screen() {
             Display.getHeight() * .86f,
             textColor,
             18f,
-            MinecraftFont.REGULAR,
+            Font.REGULAR,
             TextAlign.Middle,
             TextPos.Bottom
         )

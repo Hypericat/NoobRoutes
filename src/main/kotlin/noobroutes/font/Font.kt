@@ -1,6 +1,6 @@
 package noobroutes.font
 
-import noobroutes.font.fonts.MinecraftFont.REGULAR
+
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.TextPos
@@ -14,6 +14,9 @@ interface Font {
     fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = REGULAR, shadow: Boolean = false)
     fun wrappedTextBounds(text: String, width: Float, size: Float): Pair<Float, Float>
     fun init()
+    companion object {
+        const val REGULAR = 1
+        const val BOLD = 2
 
-
+    }
 }

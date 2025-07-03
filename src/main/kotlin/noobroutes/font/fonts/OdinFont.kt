@@ -16,8 +16,6 @@ object OdinFont : Font {
     private lateinit var fontRenderer: FontRenderer
 
 
-    const val REGULAR = 1
-    const val BOLD = 2
 
     override fun init() {
         fontRenderer = FontRenderer(
@@ -40,7 +38,7 @@ object OdinFont : Font {
             TextPos.Bottom -> y - getTextHeight(text, scale)
         }
 
-        val typeText = if (type == BOLD) "§l$text" else text
+        val typeText = if (type == Font.BOLD) "§l$text" else text
 
         fontRenderer.drawString(UMatrixStack.Compat.get(), typeText, color.javaColor, drawX, drawY, 1f, scale, shadow)
     }

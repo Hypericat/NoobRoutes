@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.features.render.ClickGUIModule
+import noobroutes.font.Font
 import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.util.ColorUtil.darker
 import noobroutes.utils.render.*
@@ -31,7 +32,7 @@ class OdinGuiButton(
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         GlStateManager.blendFunc(770, 771)
         roundedRectangle(this.xPosition, this.yPosition, this.width, this.height, ClickGUIModule.color, if (hoverState == 2) Color.WHITE else ClickGUIModule.color.darker(0.3f), Color.BLACK, 2f, 4f, 4f, 4f, 4f, 1f)
-        text(this.displayString, this.xPosition + this.width / 2f, this.yPosition + height / 2f, Color.WHITE, textSize / scaleFactor, MinecraftFont.REGULAR, TextAlign.Middle, TextPos.Middle, true)
+        text(this.displayString, this.xPosition + this.width / 2f, this.yPosition + height / 2f, Color.WHITE, textSize / scaleFactor, Font.REGULAR, TextAlign.Middle, TextPos.Middle, true)
     }
 
 }

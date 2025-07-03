@@ -13,6 +13,7 @@ import noobroutes.utils.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import org.lwjgl.opengl.Display
 import org.lwjgl.opengl.GL11
+import noobroutes.font.Font
 
 val matrix = UMatrixStack.Compat
 val scaleFactor get() = ScaledResolution(mc).scaleFactor.toFloat()
@@ -111,7 +112,7 @@ fun circle(x: Number, y: Number, radius: Number, color: Color, borderColor: Colo
     }
 }
 
-fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = MinecraftFont.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = FontType.MINECRAFT) {
+fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = Font.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = FontType.MINECRAFT) {
     fontType.font.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
 }
 
@@ -119,7 +120,7 @@ fun mcText(text: String, x: Number, y: Number, scale: Number, color: Color, shad
     RenderUtils.drawText("$text§r", x.toFloat(), y.toFloat(), scale.toDouble(), color, shadow, center)
 }
 
-fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = MinecraftFont.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = FontType.MINECRAFT): Float {
+fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = Font.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = FontType.MINECRAFT): Float {
     text(text, x, y, color, size, type, align, verticalAlign, shadow, fontType)
     return getTextWidth(text, size, fontType)
 }
@@ -229,7 +230,7 @@ fun drawDynamicTexture(dynamicTexture: DynamicTexture, x: Number, y: Number, w: 
     GlStateManager.popMatrix()
 }
 
-fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = MinecraftFont.REGULAR, shadow: Boolean = false, fontType: FontType = FontType.MINECRAFT) {
+fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = Font.REGULAR, shadow: Boolean = false, fontType: FontType = FontType.MINECRAFT) {
     fontType.font.wrappedText(text, x, y, w, color, size, type, shadow = shadow)
 }
 

@@ -16,7 +16,7 @@ import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
-
+import noobroutes.font.Font
 /**
  * Renders all the modules.
  *
@@ -54,8 +54,8 @@ class ElementKeyBind(parent: ModuleButton, setting: KeybindSetting) :
             rectangleOutline(x + w - 21 - width, y + 3, width + 12.5f, 22.5f, color, 4f,1.5f)
         }
 
-        text(name,  x + TEXTOFFSET, y + h / 2, textColor, 12f, MinecraftFont.REGULAR)
-        text(value, x + w - 14, y + 8f, textColor, 12f, MinecraftFont.REGULAR, TextAlign.Right, TextPos.Top)
+        text(name,  x + TEXTOFFSET, y + h / 2, textColor, 12f, Font.REGULAR)
+        text(value, x + w - 14, y + 8f, textColor, 12f, Font.REGULAR, TextAlign.Right, TextPos.Top)
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {

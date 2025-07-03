@@ -20,7 +20,7 @@ object ColorPalette {
         Color(95, 95, 222),
         Color(51, 51, 95),
         Color(58, 58, 107),
-        FontType.NUNITO
+        FontType.ODIN
     )
 
     var currentColorPalette: Palette = defaultPalette

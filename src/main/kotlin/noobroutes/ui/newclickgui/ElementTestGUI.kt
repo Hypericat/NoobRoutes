@@ -1,7 +1,10 @@
 package noobroutes.ui.newclickgui
 
+import noobroutes.ui.ColorPalette
 import noobroutes.ui.Screen
+import noobroutes.ui.util.ElementRenderer.TEXT_OFFSET
 import noobroutes.ui.util.elements.SwitchElement
+import noobroutes.utils.render.text
 
 object ElementTestGUI : Screen() {
     private val testSwitches = listOf(
@@ -31,6 +34,7 @@ object ElementTestGUI : Screen() {
         scaleUI()
         testSwitches.forEach { it.draw() }
         resetScale()
+        text("Unscaled Text", 100f, 100f, ColorPalette.text, 8f, fontType = ColorPalette.font)
     }
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {

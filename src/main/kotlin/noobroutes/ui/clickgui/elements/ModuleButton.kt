@@ -19,7 +19,7 @@ import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import kotlin.math.floor
-
+import noobroutes.font.Font
 /**
  * Renders all the modules.
  *
@@ -106,7 +106,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
 
         roundedRectangle(x, y, width, height, moduleButtonColor)
 
-        text(module.name, x + width / 2, y + height / 2, color, 14f, MinecraftFont.REGULAR, TextAlign.Middle)
+        text(module.name, x + width / 2, y + height / 2, color, 14f, Font.REGULAR, TextAlign.Middle)
         val textWidth = getTextWidth(module.name, 18f)
 
         if (textWidth < width - 80) {// too long text, not drawing symbol

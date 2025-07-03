@@ -22,7 +22,7 @@ import noobroutes.utils.render.*
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToInt
-
+import noobroutes.font.Font
 /**
  * Renders all the modules.
  *
@@ -79,8 +79,8 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
         roundedRectangle(x, y, w, h, elementBackground)
         roundedRectangle(x + w - 2, y, 2, h, clickGUIColor, 0f, edgeSoftness = 0)
 
-        text(name, x + TEXTOFFSET, y + h / 2f - 10f, textColor, 12f, MinecraftFont.REGULAR)
-        text(getDisplay(), x + w - TEXTOFFSET, y + h / 2f - 10f, textColor.darkerIf(isHoveredBox), 12f, MinecraftFont.REGULAR, TextAlign.Right)
+        text(name, x + TEXTOFFSET, y + h / 2f - 10f, textColor, 12f, Font.REGULAR)
+        text(getDisplay(), x + w - TEXTOFFSET, y + h / 2f - 10f, textColor.darkerIf(isHoveredBox), 12f, Font.REGULAR, TextAlign.Right)
 
         //draw slider
         roundedRectangle(x + TEXTOFFSET, y + 37f, w - 17f, 7f, sliderBGColor, 3f)

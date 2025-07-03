@@ -2,6 +2,7 @@ package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.font.Font
 import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.util.animations.impl.ColorAnimation
@@ -45,7 +46,7 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
 
         override fun draw() {
             roundedRectangle(x, y, w, h, elementBackground)
-            text(name, x + TEXTOFFSET, y + h / 2f, textColor, 12f, MinecraftFont.REGULAR)
+            text(name, x + TEXTOFFSET, y + h / 2f, textColor, 12f, Font.REGULAR)
 
             hover.handle(x + w - 43f, y + 4f, 34f, 20f)
             val color = colorAnim.get(clickGUIColor.darkerIf(hover.percent() > 0, 0.7f), buttonColor.brighter(1.3f).brighterIf(hover.percent() > 0, 1.3f), setting.enabled)

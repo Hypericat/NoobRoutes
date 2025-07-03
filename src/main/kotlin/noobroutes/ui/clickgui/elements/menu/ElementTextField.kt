@@ -14,6 +14,7 @@ import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
+import noobroutes.font.Font
 
 /**
  * Renders all the modules.
@@ -49,7 +50,7 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
                 rectangleOutline(x + w - 16 - width, y + 3, width + 12.5f, 22.5f, color, 4f,1.5f)
             }
 
-            text(display, x + w - 10, y + 16f, textColor, 12f, MinecraftFont.REGULAR, TextAlign.Right)
+            text(display, x + w - 10, y + 16f, textColor, 12f, Font.REGULAR, TextAlign.Right)
             text(name,  x + TEXTOFFSET, y + h / 2, textColor, 12f)
         } else {
             val width = getTextWidth(display, 12f)
@@ -63,11 +64,11 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
             }
 
             if (display == "") {
-                text(name, x + w / 2f, y + h / 2f, textColor, 12f, MinecraftFont.REGULAR, TextAlign.Middle)
+                text(name, x + w / 2f, y + h / 2f, textColor, 12f, Font.REGULAR, TextAlign.Middle)
             }
             else {
                 roundedRectangle(x + w / 2 - width / 2 - 6, y + 4, width + 12f, 22f, buttonColor, 5f)
-                text(display, x + w / 2f, y + h / 2f, textColor, 12f, MinecraftFont.REGULAR, TextAlign.Middle)
+                text(display, x + w / 2f, y + h / 2f, textColor, 12f, Font.REGULAR, TextAlign.Middle)
             }
         }
 

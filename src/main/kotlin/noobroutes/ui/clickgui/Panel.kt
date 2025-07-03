@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.Category
 import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
+import noobroutes.font.Font
 import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.SearchBar.currentSearch
 import noobroutes.ui.util.animations.impl.LinearAnimation
@@ -103,7 +104,7 @@ class Panel(
 
         }
 
-        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT / 2f, ColorUtil.textColor, 15f, type = MinecraftFont.BOLD, TextAlign.Middle)
+        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT / 2f, ColorUtil.textColor, 15f, type = Font.REGULAR, TextAlign.Middle)
 
         //draw Panel Line
         if (extended && moduleButtons.isNotEmpty()) roundedRectangle(x, y + HEIGHT - 2, WIDTH, 2, ColorUtil.clickGUIColor.brighter(1.65f))
