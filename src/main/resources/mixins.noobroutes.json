@@ -1,5 +1,5 @@
 {
-  "package": "mixin",
+  "package": "noobroutes.mixin",
   "refmap": "mixins.noobroutes.refmap.json",
   "minVersion": "0.7",
   "compatibilityLevel": "JAVA_8",

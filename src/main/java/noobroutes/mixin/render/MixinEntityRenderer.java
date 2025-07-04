@@ -1,4 +1,4 @@
-package mixin.render;
+package noobroutes.mixin.render;
 
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.resources.IResourceManagerReloadListener;

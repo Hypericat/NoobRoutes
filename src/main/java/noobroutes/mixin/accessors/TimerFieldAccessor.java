@@ -1,4 +1,4 @@
-package mixin.accessors;
+package noobroutes.mixin.accessors;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Timer;

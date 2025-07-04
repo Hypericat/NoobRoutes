@@ -1,21 +1,32 @@
 package noobroutes.ui.util
 
+import noobroutes.font.Font
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.clickgui.util.ColorUtil.darker
-import noobroutes.utils.render.Color
+import noobroutes.ui.util.ElementRenderer.TEXT_OFFSET
 import noobroutes.utils.render.roundedRectangle
+import noobroutes.utils.render.text
 
 
-abstract class UiElement<T> (var x: Float, var y: Float, val w: Float, val h: Float) {
-    private val elementValueChangeListeners = mutableListOf<(T) -> Unit>()
-    protected abstract var elementValue: T
+abstract class UiElement(val name: String, var x: Float, var y: Float, val w: Float, val h: Float) {
 
     protected val halfHeight = h * 0.5f
     protected val halfWidth = w * 0.5f
 
-    protected fun drawBackground(){
-        roundedRectangle(x, y, w, h, ColorPalette.background.darker(0.6f), radius = 15f)
+    protected fun drawName(){
+        text(
+            name,
+            x + TEXT_OFFSET,
+            y + h * 0.5f,
+            ColorPalette.text,
+            16f,
+            fontType = ColorPalette.font,
+            type = Font.REGULAR
+        )
+    }
 
+    protected fun drawBackground(){
+        roundedRectangle(x, y, w, h, ColorPalette.backgroundPrimary.darker(0.6f), radius = 15f)
     }
 
     fun changePosition(x: Float, y: Float){
@@ -23,23 +34,10 @@ abstract class UiElement<T> (var x: Float, var y: Float, val w: Float, val h: Fl
         this.y = y
     }
 
-    fun addValueChangeListener(listener: (T) -> Unit){
-        elementValueChangeListeners.add(listener)
-    }
-
     abstract fun draw()
 
-    fun setValue(value: T) {
-        this.elementValue = value
-        for (listener in elementValueChangeListeners) {
-            listener.invoke(elementValue)
-        }
-    }
-    fun getValue(): T {
-        return elementValue
-    }
 
-    open fun mouseLeftClicked() {}
+    open fun mouseClicked(mouseButton: Int) {}
     open fun mouseReleased() {}
     open fun mouseClickedAnywhere() {}
     open fun keyTyped(typedChar: Char, keyCode: Int) {}

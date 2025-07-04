@@ -1,4 +1,4 @@
-package mixin.player;
+package noobroutes.mixin.player;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;

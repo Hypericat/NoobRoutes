@@ -43,14 +43,14 @@ object MinecraftFont : Font {
     }
 
     override fun getTextWidth(text: String, size: Float): Float {
-        return fontRenderer.getStringWidth(text.noControlCodes) * size * 0.125f
+        return fontRenderer.getStringWidth(text.noControlCodes) * size// * 0.125f
     }
 
     private val fontHeight: Int
         get() = fontRenderer.FONT_HEIGHT
 
     override fun getTextHeight(text: String, size: Float): Float {
-        return fontHeight * size * 0.125f
+        return fontHeight * size// * 0.125f
     }
 
     override fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int, shadow: Boolean) {

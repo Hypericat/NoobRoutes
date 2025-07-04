@@ -20,7 +20,7 @@ import noobroutes.features.floor7.autop3.AutoP3.walkFix
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.features.floor7.autop3.rings.BlinkRing
-import mixin.accessors.TimerFieldAccessor
+import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage

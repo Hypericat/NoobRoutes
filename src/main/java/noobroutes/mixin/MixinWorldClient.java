@@ -1,4 +1,4 @@
-package mixin;
+package noobroutes.mixin;
 
 
 import net.minecraft.block.state.IBlockState;
