@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import noobroutes.ui.editUI.EditUI
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.MathHelper
@@ -116,7 +117,7 @@ object AutoP3: Module (
         if (event.packet !is C03PacketPlayer || mc.thePlayer == null) return
         if(!inF7Boss || mc.thePlayer.isSneaking || editMode ) return //|| mc.thePlayer.capabilities.walkSpeed < 0.5
 
-        val bb = mc.thePlayer.entityBoundingBox
+        val bb = mc.thePlayer.entityBoundingBox //cant mc.thePlayer.collided or whatever as i need x AND z collision to align
 
         val collidesX = mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb.offset(0.001, 0.0, 0.0)).isNotEmpty() ||
                 mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb.offset(-0.001, 0.0, 0.0)).isNotEmpty()
@@ -127,11 +128,28 @@ object AutoP3: Module (
         if (collidesX && collidesZ) { isAligned = true }
 
         rings[route]?.forEach {ring ->
-            val inRing = AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)
+            val inRing = AutoP3Utils.distanceToRingSq(ring.coords, mc.thePlayer.positionVector) < 0.25 && AutoP3Utils.ringCheckY(ring)
 
-            if (inRing) {
+            val isAlignRing = ring.center || ring is BlinkRing
+
+            // as player max speed is 1.4 blocks a tick one check in the middle is enough
+            val prevPositionVector = Vec3(mc.thePlayer.prevPosX, mc.thePlayer.prevPosY, mc.thePlayer.prevPosZ)
+            val middlePositionVector = mc.thePlayer.positionVector.add(prevPositionVector).multiply(0.5f)
+            val passedRing = AutoP3Utils.distanceToRingSq(ring.coords, middlePositionVector) < 0.25 && AutoP3Utils.ringCheckY(ring) //no interpolation on y as i use the fact that it doesnt
+
+            if (inRing || (passedRing && isAlignRing)) {
                 if (ring.triggered) return@forEach
-                if (alignedOnly && !isAligned && !ring.center && ring !is BlinkRing) return@forEach
+
+                if (passedRing && !inRing) {
+                    AutoP3Utils.unPressKeys()
+                    PlayerUtils.stopVelocity()
+                    event.isCanceled = true
+                    mc.thePlayer.setPosition(middlePositionVector.xCoord, mc.thePlayer.posY, middlePositionVector.zCoord)
+                    //due to the event/time it doesnt automatically send a c04
+                    PacketUtils.sendPacket(C04PacketPlayerPosition(middlePositionVector.xCoord, mc.thePlayer.posY, middlePositionVector.zCoord, mc.thePlayer.onGround))
+                }
+
+                if (alignedOnly && !isAligned && !isAlignRing) return@forEach
                 ring.triggered = true
                 ring.doRingArgs()
                 if (ring.left || ring.leap || ring.term) {
@@ -482,7 +500,7 @@ object AutoP3: Module (
     fun doTriggeredBlink(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
         activatedBlinks.forEach {
-            if (AutoP3Utils.distanceToRingSq(it.coords) < 0.25 && AutoP3Utils.ringCheckY(it)) it.run()
+            if (AutoP3Utils.distanceToRingSq(it.coords, mc.thePlayer.positionVector) < 0.25 && AutoP3Utils.ringCheckY(it)) it.run()
             else activatedBlinks.remove(it)
         }
     }

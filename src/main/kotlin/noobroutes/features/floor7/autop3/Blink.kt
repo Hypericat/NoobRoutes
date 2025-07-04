@@ -142,7 +142,7 @@ object Blink{
                 )
             ), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.Companion.WHITE, depth = true)
             if (AutoP3.editMode) return
-            if (AutoP3Utils.distanceToRingSq(it.coords) < 0.25 && mc.thePlayer.posY == it.coords.yCoord) {
+            if (AutoP3Utils.distanceToRingSq(it.coords, mc.thePlayer.positionVector) < 0.25 && mc.thePlayer.posY == it.coords.yCoord) {
                 if (it.triggered) return@forEach
                 recordedPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
                 startRecording(it)

@@ -24,6 +24,7 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.toAABB
 import kotlin.math.sin
 
@@ -132,16 +133,16 @@ abstract class Ring(
 
     fun doRingArgs() {
         if (rotate) {
-            if (!silentLook) mc.thePlayer.rotationYaw = yaw
+            if (!silentLook) Scheduler.schedulePostTickTask { mc.thePlayer.rotationYaw = yaw }
             Blink.rotate = yaw
         }
 
         if (cgyMode) {
-            mc.thePlayer.rotationYaw = yaw
+            Scheduler.schedulePostTickTask { mc.thePlayer.rotationYaw = yaw }
             val javaRandom = java.util.Random()
             val gaussian = javaRandom.nextGaussian().toFloat()
             val scaled = gaussian * (15)
-            mc.thePlayer.rotationPitch = scaled.coerceIn(-45f, 45f) + 10f
+            Scheduler.schedulePostTickTask { mc.thePlayer.rotationPitch = scaled.coerceIn(-45f, 45f) + 10f }
         }
 
         if (center && (mc.thePlayer.onGround || System.currentTimeMillis() - Blink.lastBlink < 100)) {
