@@ -23,17 +23,11 @@ import noobroutes.features.render.FreeCam
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.utils.IBlockStateUtils
+import noobroutes.utils.*
 import noobroutes.utils.IBlockStateUtils.withProperty
 import noobroutes.utils.Utils.ID
-import noobroutes.utils.capitalizeFirst
-import noobroutes.utils.getBlockAt
-import noobroutes.utils.getBlockStateAt
-import noobroutes.utils.isBlock
 import noobroutes.utils.json.JsonUtils.add
 import noobroutes.utils.json.JsonUtils.asBlockPos
-import noobroutes.utils.runOnMCThread
-import noobroutes.utils.setBlock
 import noobroutes.utils.skyblock.Island
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
@@ -41,9 +35,9 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
-import kotlin.collections.iterator
+import kotlin.math.max
+import kotlin.math.min
 
 object Brush : Module("Brush", description = "It is just fme but way less laggy. Works with FME floor config, but not the o config.", category = Category.DUNGEON) {
 
@@ -112,13 +106,12 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
 
     private inline val canPlaceBlock get() =
         System.currentTimeMillis() - lastPlace >= placeCooldown &&
-        (getBlockState_Brush() ?: IBlockStateUtils.airIBlockState) != IBlockStateUtils.airIBlockState
+        (getEditingBlockState() ?: IBlockStateUtils.airIBlockState) != IBlockStateUtils.airIBlockState
 
 
     private fun handlePlaceBlock(pos: BlockPos, hitVec: Vec3, facing: EnumFacing, room: UniqueRoom?){
         lastPlace = System.currentTimeMillis()
-
-        val blockState = getBlockState_Brush() ?: return
+        val blockState = getEditingBlockState() ?: return
         val state = blockState.block.onBlockPlaced(
             mc.theWorld,
             pos,
@@ -129,20 +122,21 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             blockState.block.getMetaFromState(blockState),
             mc.thePlayer
         )
-
+        val blockList = getBlockList(room)
         val blockToAdd = Pair(state , room?.getRealCoords(pos) ?: pos)
         blockList.removeAll { it.second.x == blockToAdd.second.x && it.second.y == blockToAdd.second.y && it.second.z == blockToAdd.second.z }
         blockList.add(blockToAdd)
-
-        addBlockToChunk(pos, state)
+        setBlock(pos, state)
+        removeBlockFromChunk(pos)
     }
 
-    fun getBlockState_Brush(): IBlockState? {
-        return if (hotbarPalette) {
-            Block.getBlockFromItem(mc.thePlayer.heldItem.item)?.defaultState
-        } else {
-            selectedBlockState
+    fun getEditingBlockState(): IBlockState? {
+        if (hotbarPalette) {
+            val held = mc.thePlayer.heldItem
+            val block = Block.getBlockFromItem(held.item) ?: return null
+            return block.getStateFromMeta(held.metadata)
         }
+        return selectedBlockState
     }
 
     fun getBlockList(room: UniqueRoom?): MutableList<Pair<IBlockState, BlockPos>>{
@@ -208,12 +202,17 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
         }
     }
 
-    fun addBlockToChunk(target: BlockPos, state: IBlockState){
+    fun addBlockToChunk(target: BlockPos, state: IBlockState) {
         runOnMCThread {
-            val hash = target.x shr 4 to target.z shr 4
-            savedChunks.getOrElse(hash) { null }?.remove(target) ?: return@runOnMCThread
-            setBlock(target, state);
+            val hash = Pair(target.x shr 4, target.z shr 4)
+            savedChunks.getOrPut(hash) { hashMapOf() }.put(target, state)
+            setBlock(target, state );
         }
+    }
+
+    fun removeBlockFromChunk(target: BlockPos){
+        val hash = Pair(target.x shr 4, target.z shr 4)
+        savedChunks.getOrElse(hash) { null }?.remove(target) ?: return
     }
 
 
@@ -271,8 +270,6 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             else -> location.displayName
         }
     }
-
-
 
     fun loadConfig() {
         val floorConfigFile = DataManager.loadDataFromFileObjectOfObjects("floorConfig")
@@ -368,8 +365,8 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
     }
 
     fun getSelectedArea(): HashSet<BlockPos> {
-        val rightPos = rightBlockPos ?: return emptyList()
-        val leftPos = leftBlockPos ?: return emptyList()
+        val rightPos = rightBlockPos ?: return hashSetOf()
+        val leftPos = leftBlockPos ?: return hashSetOf()
         val areaList = hashSetOf<BlockPos>()
         val minX = min(leftPos.x, rightPos.x)
         val minY = min(leftPos.y, rightPos.y)

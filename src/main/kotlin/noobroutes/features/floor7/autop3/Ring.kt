@@ -1,7 +1,6 @@
 package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonObject
-import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
@@ -10,22 +9,17 @@ import noobroutes.features.floor7.autop3.AutoP3.cgyMode
 import noobroutes.features.floor7.autop3.AutoP3.depth
 import noobroutes.features.floor7.autop3.AutoP3.renderStyle
 import noobroutes.features.floor7.autop3.AutoP3.silentLook
+import noobroutes.utils.*
 import noobroutes.utils.AutoP3Utils.ringColors
-import noobroutes.utils.PacketUtils
-import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
-import noobroutes.utils.add
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.SyncData
 import noobroutes.utils.json.syncdata.*
-import noobroutes.utils.multiply
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.toAABB
 import kotlin.math.sin
 
 @Target(AnnotationTarget.CLASS)

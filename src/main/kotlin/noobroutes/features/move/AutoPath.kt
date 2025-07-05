@@ -1,32 +1,7 @@
 package noobroutes.features.move
 
-import net.minecraft.client.Minecraft
-import net.minecraft.util.BlockPos
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.misc.EWPathfinderModule
-import noobroutes.features.render.FreeCam
-import noobroutes.features.routes.DynamicRoute
-import noobroutes.features.settings.Setting.Companion.withDependency
-import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.features.settings.impl.ColorSetting
-import noobroutes.features.settings.impl.KeybindSetting
-import noobroutes.utils.Utils.isEnd
-import noobroutes.utils.add
-import noobroutes.utils.render.Color
-import noobroutes.utils.render.Renderer
-import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DoorPositions
-import noobroutes.utils.skyblock.dungeon.DoorPositions.oneByOneDoors
-import noobroutes.utils.skyblock.dungeon.DoorPositions.oneByOneSpots
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-
-import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 
 

@@ -35,7 +35,7 @@ class BrushCommand: CommandBase() {
             }
             "fill", "f" -> {
                 if (!editMode) return modMessage("Edit Mode Required")
-                val state = Brush.getBlockState_Brush()
+                val state = Brush.getEditingBlockState()
                 if (state == IBlockStateUtils.airIBlockState || state == null) return modMessage("Selected Block State Required")
                 val selectedArea = Brush.getSelectedArea()
                 if (args.size < 2) {

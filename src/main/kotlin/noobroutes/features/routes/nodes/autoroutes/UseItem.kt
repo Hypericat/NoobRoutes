@@ -8,7 +8,6 @@ import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.SwapManager
-import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.PlayerUtils

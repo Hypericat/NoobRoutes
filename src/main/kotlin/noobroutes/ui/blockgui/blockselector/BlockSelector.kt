@@ -8,11 +8,7 @@ import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.ceil
-import noobroutes.utils.render.Color
-import noobroutes.utils.render.resetScissor
-import noobroutes.utils.render.roundedRectangle
-import noobroutes.utils.render.scissor
-import noobroutes.utils.render.text
+import noobroutes.utils.render.*
 import kotlin.math.floor
 import kotlin.math.sign
 

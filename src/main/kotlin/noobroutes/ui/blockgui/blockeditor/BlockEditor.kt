@@ -3,21 +3,15 @@ package noobroutes.ui.blockgui.blockeditor
 import net.minecraft.block.properties.PropertyEnum
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
 import noobroutes.features.dungeon.Brush
-import noobroutes.ui.blockgui.BlockDisplay
 import noobroutes.ui.blockgui.blockeditor.elements.ElementSelector
 import noobroutes.ui.blockgui.blockeditor.elements.ElementSlider
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.MouseUtils
 import noobroutes.utils.IBlockStateUtils
-import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.Color
-import noobroutes.utils.render.RenderUtils.drawItem
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
-import noobroutes.utils.skyblock.devMessage
 import kotlin.math.floor
 
 object BlockEditor {

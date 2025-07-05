@@ -6,7 +6,6 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
-import noobroutes.ui.editUI.EditUI
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
@@ -30,6 +29,7 @@ import noobroutes.features.floor7.autop3.rings.*
 import noobroutes.features.misc.SexAura
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
+import noobroutes.ui.editUI.EditUI
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.*
 import noobroutes.utils.json.JsonUtils.asVec3
@@ -44,7 +44,6 @@ import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import kotlin.math.absoluteValue
-import kotlin.text.toIntOrNull
 
 
 @Suppress("Unused")

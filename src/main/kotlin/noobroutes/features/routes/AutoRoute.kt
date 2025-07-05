@@ -16,7 +16,8 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
-import noobroutes.features.routes.nodes.autoroutes.*
+import noobroutes.features.routes.nodes.autoroutes.Aotv
+import noobroutes.features.routes.nodes.autoroutes.Bat
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
@@ -24,7 +25,6 @@ import noobroutes.features.settings.impl.DropdownSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isEnd
-import noobroutes.utils.Utils.isStart
 import noobroutes.utils.coerceMax
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.floor

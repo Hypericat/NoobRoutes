@@ -10,7 +10,6 @@ import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.*
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asBlockPos
-import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords

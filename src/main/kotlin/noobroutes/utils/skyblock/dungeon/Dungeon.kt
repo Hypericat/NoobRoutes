@@ -5,15 +5,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.RoomEnterEvent
-
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.postAndCatch
 import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.dungeon.tiles.*
 import noobroutes.utils.skyblock.dungeon.tiles.Puzzle
-import noobroutes.utils.skyblock.dungeon.tiles.Rotations
-import noobroutes.utils.skyblock.dungeon.tiles.Tile
-import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
-import noobroutes.utils.skyblock.dungeon.tiles.Unknown
 
 object Dungeon {
     var lastRoom: UniqueRoom? = null

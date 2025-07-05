@@ -6,7 +6,6 @@ import noobroutes.Core.mc
 import noobroutes.features.ModuleManager
 import noobroutes.features.settings.Saving
 import noobroutes.ui.blockgui.blockeditor.BlockEditor
-import noobroutes.ui.blockgui.BlockGui
 import noobroutes.ui.blockgui.blockselector.BlockSelector
 import noobroutes.ui.editUI.EditUI
 import java.io.File
