@@ -71,10 +71,16 @@ class BrushCommand: CommandBase() {
         pos: BlockPos?
     ): MutableList<String?>? {
         return when (args.size) {
-            0 -> {
+            1 -> {
                 mutableListOf("Edit", "Gui", "Load", "Fill", "Clear")
             }
-            1 -> {
+            2 -> {
+                getListOfStringsMatchingLastWord(
+                    args,
+                    Block.blockRegistry.getKeys()
+                )
+            }
+            3 -> {
                 getListOfStringsMatchingLastWord(
                     args,
                     Block.blockRegistry.getKeys()

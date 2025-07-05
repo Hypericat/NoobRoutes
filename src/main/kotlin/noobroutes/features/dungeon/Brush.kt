@@ -30,6 +30,7 @@ import noobroutes.utils.json.JsonUtils.add
 import noobroutes.utils.json.JsonUtils.asBlockPos
 import noobroutes.utils.skyblock.Island
 import noobroutes.utils.skyblock.LocationUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
@@ -157,11 +158,13 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
 
         val axeHeld = mc.thePlayer.heldItem.ID == 271
 
-        if (event.type == ClickEvent.ClickType.Right && canPlaceBlock) {
+        if (event.type == ClickEvent.ClickType.Right) {
             if (axeHeld) {
                 rightBlockPos = target
+                modMessage("Right: $target")
                 return
             }
+            if (!canPlaceBlock) return
 
             val facing = mouseOver.sideHit
             val offset = target.offset(facing)
@@ -184,6 +187,7 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
         if (event.type == ClickEvent.ClickType.Left) {
             if (axeHeld) {
                 leftBlockPos = target
+                modMessage("Left: $target")
                 return
             }
 
@@ -386,14 +390,21 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
 
     fun fill(blocks: HashSet<BlockPos>, state: IBlockState) {
         val room = DungeonUtils.currentRoom
+        devMessage("filling")
         val blockPositionsToRegister = blocks.map { pos ->
             if (isBlockLoaded(pos)) setBlock(pos, state)
             room?.getRelativeCoords(pos) ?: pos
         }
+        val blockList = getBlockList(room)
         val blocksToRegister = mutableListOf<Pair<IBlockState, BlockPos>>()
-        blockPositionsToRegister.forEach {
-            blocksToRegister.add(state to it)
+        blockPositionsToRegister.forEach { pos ->
+            blocksToRegister.add(state to pos)
+            removeBlockFromChunk(pos)
+            val blockToAdd = Pair(state , pos)
+            blockList.removeAll { it.second.x == blockToAdd.second.x && it.second.y == blockToAdd.second.y && it.second.z == blockToAdd.second.z }
+            blockList.add(blockToAdd)
         }
+
         registerChunkBlocks(room, blocksToRegister)
     }
 
@@ -408,8 +419,12 @@ object Brush : Module("Brush", description = "It is just fme but way less laggy.
             room?.getRelativeCoords(pos) ?: pos
         }
         val blocksToRegister = mutableListOf<Pair<IBlockState, BlockPos>>()
-        blockPositionsToRegister.forEach {
-            blocksToRegister.add(state to it)
+        val blockList = getBlockList(room)
+        blockPositionsToRegister.forEach { pos ->
+            blocksToRegister.add(state to pos)
+            val blockToAdd = Pair(state , pos)
+            blockList.removeAll { it.second.x == blockToAdd.second.x && it.second.y == blockToAdd.second.y && it.second.z == blockToAdd.second.z }
+            blockList.add(blockToAdd)
         }
         registerChunkBlocks(room, blocksToRegister)
     }
