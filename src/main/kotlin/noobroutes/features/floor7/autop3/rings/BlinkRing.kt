@@ -19,6 +19,7 @@ import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.skyblock.modMessage
+import kotlin.math.pow
 
 @RingType("Blink")
 class BlinkRing(
@@ -79,11 +80,19 @@ class BlinkRing(
         val notEnoughPackets = cancelled < packets.size
         val exceedsBlinkLimit = blinksInstance + packets.size > AutoP3.maxBlinks
         val blinkDisabled = !AutoP3.blink
+
+        val firstPacket = packets.first()
+        val toFar = mc.thePlayer.getDistanceSq(firstPacket.positionX, firstPacket.positionY, firstPacket.positionZ) > (mc.thePlayer.capabilities.walkSpeed * 2.806).pow(2)
         
         if (!canBlinkNow || (notEnoughPackets && !exceedsBlinkLimit)) {
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
             return
+        }
+
+        if (toFar && cancelled > 0) {
+            PacketUtils.sendPacket(C04PacketPlayerPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord, mc.thePlayer.onGround))
+            cancelled--
         }
         
         if (exceedsBlinkLimit || blinkDisabled) {

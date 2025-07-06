@@ -165,7 +165,10 @@ abstract class Ring(
 
         if (center && (mc.thePlayer.onGround || System.currentTimeMillis() - Blink.lastBlink < 100)) {
             mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord)
-            PacketUtils.sendPacket(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, mc.thePlayer.onGround))
+            if (Blink.cancelled > 0) {
+                PacketUtils.sendPacket(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, mc.thePlayer.onGround))
+                Blink.cancelled--
+            }
             AutoP3.isAligned = true
         }
     }
