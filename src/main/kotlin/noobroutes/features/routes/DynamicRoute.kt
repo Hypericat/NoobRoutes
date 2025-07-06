@@ -19,17 +19,12 @@ import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.utils.IBlockStateUtils.setProperty
-import noobroutes.utils.Utils.containsOneOf
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 import noobroutes.utils.routes.RouteUtils.lastRoute
 import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
-import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer2D
-import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.modMessage
-import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 

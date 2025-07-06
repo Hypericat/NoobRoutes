@@ -14,7 +14,6 @@ import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.render.*
-import kotlin.math.sign
 
 
 object BlockGui : Screen() {

@@ -1,12 +1,9 @@
 package noobroutes.ui.blockgui.blockeditor.elements
 
 
-import jline.console.internal.ConsoleRunner.property
-import net.minecraft.block.properties.PropertyEnum
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
-import noobroutes.features.dungeon.Brush
-import noobroutes.ui.blockgui.blockeditor.BlockEditor
+import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.ui.blockgui.blockeditor.BlockEditor.originX
 import noobroutes.ui.blockgui.blockeditor.Element
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
@@ -20,8 +17,6 @@ import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.utils.render.*
-import noobroutes.utils.round
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToInt
@@ -244,7 +239,7 @@ class ElementSlider(
         }
     }
     private fun setter(newVal: Double) {
-        Brush.selectedBlockState = Brush.selectedBlockState.withProperty(property, newVal.roundToInt().coerceIn(min.toInt(), max.toInt()))
+        BrushModule.selectedBlockState = BrushModule.selectedBlockState.withProperty(property, newVal.roundToInt().coerceIn(min.toInt(), max.toInt()))
     }
 
 

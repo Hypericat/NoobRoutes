@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
-import noobroutes.features.dungeon.Brush;
+import noobroutes.features.dungeon.brush.BrushModule;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,8 +30,8 @@ public abstract class MixinWorldClient extends World {
         int j = pos.getY();
         int k = pos.getZ();
         this.invalidateBlockReceiveRegion(i, j, k, i, j, k);
-        IBlockState edited = Brush.INSTANCE.getEditedBlock(pos);
-        IBlockState finalState = (edited != null && Brush.INSTANCE.getEnabled()) ? edited : state;
+        IBlockState edited = BrushModule.INSTANCE.getEditedBlock(pos);
+        IBlockState finalState = (edited != null && BrushModule.INSTANCE.getEnabled()) ? edited : state;
         cir.setReturnValue(super.setBlockState(pos, finalState, 3));
     }
 }

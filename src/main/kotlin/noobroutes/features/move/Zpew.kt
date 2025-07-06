@@ -10,7 +10,6 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.BossEventDispatcher.inBoss

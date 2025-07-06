@@ -18,7 +18,6 @@ import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
-import noobroutes.utils.Scheduler
 import noobroutes.utils.skyblock.modMessage
 
 @RingType("Blink")

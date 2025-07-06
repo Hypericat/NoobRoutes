@@ -9,9 +9,7 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.tileentity.TileEntitySkull
 import net.minecraft.util.*
-import noobroutes.Core.logger
 import noobroutes.Core.mc
-import noobroutes.utils.skyblock.devMessage
 
 
 /**
@@ -36,7 +34,14 @@ fun getSkull(pos: BlockPos): TileEntitySkull? {
     return (mc.theWorld?.getTileEntity(pos) as? TileEntitySkull)
 }
 
-
+/**
+ * Checks if the chunk at the specified `BlockPos` is loaded.
+ * @param blockPos The position in the world to query.
+ * @return `true` if chunk is loaded, `false` otherwise
+ */
+fun isBlockLoaded(blockPos: BlockPos): Boolean{
+    return mc.theWorld.getChunkFromBlockCoords(blockPos).isLoaded
+}
 
 /**
  * Checks if the block at the specified `BlockPos` is considered "air" in the Minecraft world.

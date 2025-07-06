@@ -4,13 +4,16 @@ import com.mojang.realmsclient.util.Pair;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import noobroutes.features.misc.EWPathfinderModule;
-import noobroutes.utils.VecUtilsKt;
 import noobroutes.pathfinding.openset.BinaryHeapOpenSet;
+import noobroutes.utils.VecUtilsKt;
 import noobroutes.utils.skyblock.ChatUtilsKt;
 import noobroutes.utils.skyblock.EtherWarpHelper;
 import noobroutes.utils.skyblock.PlayerUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 import static java.lang.Math.cos;
 

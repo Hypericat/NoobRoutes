@@ -3,7 +3,7 @@ package noobroutes.mixin;
 import net.minecraft.client.Minecraft;
 import noobroutes.events.impl.ClickEvent;
 import noobroutes.events.impl.InputEvent;
-import noobroutes.features.dungeon.Brush;
+import noobroutes.features.dungeon.brush.BrushModule;
 import noobroutes.features.render.FreeCam;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -47,7 +47,7 @@ public class MixinMinecraft {
 
     @ModifyVariable(method = "sendClickBlockToController", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     public boolean holdLeftClick(boolean leftClick) {
-        if (FreeCam.INSTANCE.getEnabled() || Brush.INSTANCE.getEditMode()) {
+        if (FreeCam.INSTANCE.getEnabled() || BrushModule.INSTANCE.getEditMode()) {
             return false;
         } else return leftClick;
     }
