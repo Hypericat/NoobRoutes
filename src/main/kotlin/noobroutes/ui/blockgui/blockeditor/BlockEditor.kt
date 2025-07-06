@@ -3,7 +3,7 @@ package noobroutes.ui.blockgui.blockeditor
 import net.minecraft.block.properties.PropertyEnum
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
-import noobroutes.features.dungeon.Brush
+import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.ui.blockgui.blockeditor.elements.ElementSelector
 import noobroutes.ui.blockgui.blockeditor.elements.ElementSlider
 import noobroutes.ui.clickgui.util.ColorUtil
@@ -49,7 +49,7 @@ object BlockEditor {
     }
     private var lastBlockState: IBlockState = IBlockStateUtils.airIBlockState
     fun draw() {
-        if (lastBlockState != Brush.selectedBlockState) {
+        if (lastBlockState != BrushModule.selectedBlockState) {
             handleNewBlockState()
         }
         if (dragging) {
@@ -123,18 +123,18 @@ object BlockEditor {
     }
     private fun handleNewBlockState(){
         elements.clear()
-        Brush.selectedBlockState.propertyNames.forEach { property ->
+        BrushModule.selectedBlockState.propertyNames.forEach { property ->
             if (blackListedPropertyRegexs.any { it.contains(property.name.toString(), true) }) return@forEach
             when (property) {
                 is PropertyEnum<*> -> {
-                    elements.add(ElementSelector(property, Brush.selectedBlockState))
+                    elements.add(ElementSelector(property, BrushModule.selectedBlockState))
                 }
                 is PropertyInteger -> {
-                    elements.add(ElementSlider(property.name, property, Brush.selectedBlockState))
+                    elements.add(ElementSlider(property.name, property, BrushModule.selectedBlockState))
                 }
             }
         }
-        lastBlockState = Brush.selectedBlockState
+        lastBlockState = BrushModule.selectedBlockState
     }
 
 }

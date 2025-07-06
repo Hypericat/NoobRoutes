@@ -10,7 +10,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.config.Config
-import noobroutes.features.dungeon.Brush
+import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.routes.AutoRoute
@@ -42,8 +42,8 @@ object Core {
     }
 
     fun onFMLServerStopped() {
-        Brush.saveConfig()
-        Brush.editMode = false
+        BrushModule.saveConfig()
+        BrushModule.editMode = false
     }
 
     fun loadComplete() {
@@ -56,7 +56,7 @@ object Core {
         AutoRoute.loadFile()
         ClickGUI.init()
         RoundedRect.initShaders()
-        Brush.loadConfig()
+        BrushModule.loadConfig()
     }
     var lastChatVisibility: EntityPlayer.EnumChatVisibility? = null
     var inUI = false

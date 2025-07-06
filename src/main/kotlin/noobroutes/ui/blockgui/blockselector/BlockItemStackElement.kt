@@ -2,7 +2,7 @@ package noobroutes.ui.blockgui.blockselector
 
 import net.minecraft.block.Block
 import net.minecraft.item.ItemStack
-import noobroutes.features.dungeon.Brush
+import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.ui.blockgui.blockeditor.BlockEditor
 import noobroutes.utils.render.RenderUtils.drawItem
 
@@ -17,7 +17,7 @@ class BlockItemStackElement(x: Int, y: Int, private val blockItem: ItemStack) : 
 
     override fun mouseClicked() {
         if (isHovered) {
-            Brush.selectedBlockState = block?.getStateFromMeta(blockItem.metadata) ?: return
+            BrushModule.selectedBlockState = block?.getStateFromMeta(blockItem.metadata) ?: return
             BlockEditor.currentBlockName = displayName
         }
     }

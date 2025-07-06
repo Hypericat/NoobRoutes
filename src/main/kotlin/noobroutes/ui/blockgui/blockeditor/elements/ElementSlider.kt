@@ -3,7 +3,7 @@ package noobroutes.ui.blockgui.blockeditor.elements
 
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
-import noobroutes.features.dungeon.Brush
+import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.ui.blockgui.blockeditor.BlockEditor.originX
 import noobroutes.ui.blockgui.blockeditor.Element
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
@@ -239,7 +239,7 @@ class ElementSlider(
         }
     }
     private fun setter(newVal: Double) {
-        Brush.selectedBlockState = Brush.selectedBlockState.withProperty(property, newVal.roundToInt().coerceIn(min.toInt(), max.toInt()))
+        BrushModule.selectedBlockState = BrushModule.selectedBlockState.withProperty(property, newVal.roundToInt().coerceIn(min.toInt(), max.toInt()))
     }
 
 
