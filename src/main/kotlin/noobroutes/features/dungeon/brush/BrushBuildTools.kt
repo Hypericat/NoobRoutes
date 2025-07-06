@@ -36,7 +36,7 @@ import kotlin.math.min
 typealias MinBlockPos = BlockPos
 typealias MaxBlockPos = BlockPos
 object BrushBuildTools {
-    
+
 
     var leftBlockPos: BlockPos? = null
     var rightBlockPos: BlockPos? = null
