@@ -140,9 +140,9 @@ object Blink{
                     0.5 * sin(System.currentTimeMillis().toDouble() / 300) + 0.5,
                     0.0
                 )
-            ), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.Companion.WHITE, depth = true)
+            ), it.diameter * 0.5, it.diameter * 0.5, 0.01, 24, 1, 90, 0, 0, Color.Companion.WHITE, depth = true)
             if (AutoP3.editMode) return
-            if (AutoP3Utils.distanceToRingSq(it.coords, mc.thePlayer.positionVector) < 0.25 && mc.thePlayer.posY == it.coords.yCoord) {
+            if (it.inRing(mc.thePlayer.positionVector) && mc.thePlayer.posY == it.coords.yCoord) {
                 if (it.triggered) return@forEach
                 recordedPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
                 startRecording(it)
@@ -206,6 +206,8 @@ object Blink{
                 lastWaypoint.left,
                 lastWaypoint.center,
                 lastWaypoint.rotate,
+                lastWaypoint.diameter,
+                lastWaypoint.height,
                 recordedPackets,
                 mc.thePlayer.motionY
             ))
@@ -251,7 +253,7 @@ object Blink{
             }
             return
         }
-        if (event.packet.isMoving || movementPackets.isNotEmpty() || System.currentTimeMillis() - lastBlink < 100 || !event.packet.isOnGround) { return }
+        if (event.packet.isMoving || movementPackets.isNotEmpty() || System.currentTimeMillis() - lastBlink < 100 || !event.packet.isOnGround || (event.packet.rotating && AutoP3.keepC05)) { return }
         event.isCanceled = true
         if (cancelled < 400) cancelled++
     }

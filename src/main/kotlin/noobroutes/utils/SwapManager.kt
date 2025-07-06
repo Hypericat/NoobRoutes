@@ -73,7 +73,7 @@ object SwapManager {
                 }
             }
         }
-        if (AutoP3.cgyMode && name == "TNT") modMessage("Unable to find Infinityboom TNT in your hotbar", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == 3 && name == "TNT") modMessage("Unable to find Infinityboom TNT in your hotbar", "§0[§6Yharim§0]§7 ")
         else modMessage("$name not found.")
         return SwapState.UNKNOWN
     }

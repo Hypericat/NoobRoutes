@@ -197,14 +197,6 @@ object AutoP3Utils {
         mc.thePlayer.motionZ += movementFactor * Utils.zPart(direction)
     }
 
-    fun distanceToRingSq(ringCoords: Vec3, playerCoords: Vec3): Double {
-        return (ringCoords.xCoord - playerCoords.xCoord).pow(2) + (ringCoords.zCoord - playerCoords.zCoord).pow(2)
-    }
-
-    fun ringCheckY(ring: Ring): Boolean {
-        return (ring.coords.yCoord <= mc.thePlayer.posY && ring.coords.yCoord + 1 > mc.thePlayer.posY && ring !is BlinkRing && !ring.center) || (ring.coords.yCoord == mc.thePlayer.posY)
-    }
-
     @SubscribeEvent
     fun onKeyInput(event: InputEvent.KeyInputEvent) {
         val keyCode = Keyboard.getEventKey()

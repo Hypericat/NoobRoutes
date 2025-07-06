@@ -318,6 +318,12 @@ fun BlockPos.toAABB(add: Double = 1.0): AxisAlignedBB =
 fun Vec3.toAABB(add: Double = 1.0): AxisAlignedBB =
     AxisAlignedBB(this.xCoord, this.yCoord, this.zCoord, this.xCoord + add, this.yCoord + add, this.zCoord + add).outlineBounds()
 
+fun Vec3.toAABB(x: Double = 1.0, y: Double = 1.0, z: Double = 1.0): AxisAlignedBB =
+    AxisAlignedBB(this.xCoord, this.yCoord, this.zCoord, this.xCoord + x, this.yCoord + y, this.zCoord + z).outlineBounds()
+
+fun Vec3.toAABB(x: Float = 1f, y: Float = 1f, z: Float = 1f): AxisAlignedBB =
+    AxisAlignedBB(this.xCoord, this.yCoord, this.zCoord, this.xCoord + x, this.yCoord + y, this.zCoord + z).outlineBounds()
+
 /**
  * Turns a Vec3 into a BlockPos.
  */

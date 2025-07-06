@@ -1,13 +1,11 @@
 package noobroutes.features.routes.nodes
 
-import com.google.gson.JsonObject
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.util.Vec3
 import noobroutes.features.routes.DynamicRoute
-import noobroutes.features.routes.nodes.autoroutes.NodeLoader
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.SwapManager
 import noobroutes.utils.Utils.xPart
@@ -17,7 +15,6 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.absoluteValue
 

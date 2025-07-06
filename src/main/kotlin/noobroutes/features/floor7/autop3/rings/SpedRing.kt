@@ -24,8 +24,10 @@ class SpedRing(
     left: Boolean = false,
     center: Boolean = false,
     rotate: Boolean = false,
+    diameter: Float = 1f,
+    height: Float = 1f,
     var length: Int = 0
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
 
 
     init {
@@ -60,7 +62,7 @@ class SpedRing(
         AutoP3Utils.speeding = false
         //AutoP3Utils.setGameSpeed(100f)
         //spedFor = length
-        if (AutoP3.cgyMode) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == 3) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
         else modMessage("§c§l${cancelled}§r§f c04s available, used §c${length}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }
 }

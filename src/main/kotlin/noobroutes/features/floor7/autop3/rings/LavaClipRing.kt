@@ -18,8 +18,10 @@ class LavaClipRing(
     left: Boolean = false,
     center: Boolean = false,
     rotate: Boolean = false,
+    diameter: Float = 1f,
+    height: Float = 1f,
     var length: Double = 0.0
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
 
     init {
         addDouble("length", {length}, {length = it})
@@ -29,7 +31,7 @@ class LavaClipRing(
     override fun doRing() {
         AutoP3Utils.unPressKeys()
         super.doRing()
-        if (AutoP3.cgyMode) modMessage("Vclipping", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == 3) modMessage("Vclipping", "§0[§6Yharim§0]§7 ")
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
         LavaClip.ringClip = length

@@ -21,8 +21,10 @@ class HClipRing(
     left: Boolean = false,
     center: Boolean = false,
     rotate: Boolean = false,
+    diameter: Float = 1f,
+    height: Float = 1f,
     var walk: Boolean = false
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
 
     init {
         addBoolean("walk", {walk}, {walk = it})
@@ -33,7 +35,7 @@ class HClipRing(
             modMessage("use jump or yeet, not hclip")
             return
         }
-        if (AutoP3.cgyMode) modMessage("Hclipping", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == 3) modMessage("Hclipping", "§0[§6Yharim§0]§7 ")
         AutoP3Utils.unPressKeys()
         super.doRing()
         mc.thePlayer.motionX = 0.0

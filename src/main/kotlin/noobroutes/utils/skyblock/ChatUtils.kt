@@ -7,6 +7,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.client.ClientCommandHandler
 import noobroutes.Core.mc
+import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.render.ClickGUIModule.devMode
 import noobroutes.utils.noControlCodes
 import noobroutes.utils.runOnMCThread
@@ -40,7 +41,7 @@ fun sendChatMessage(message: Any) {
  * @param prefix If `true`, adds a prefix to the message.
  * @param chatStyle Optional chat style to be applied to the message.
  */
-fun modMessage(message: Any?, prefix: String = "§8§l-<§r§aNoob Routes§r§8§l>-§r ", chatStyle: ChatStyle? = null) {
+fun modMessage(message: Any?, prefix: String = if (ClickGUIModule.selectedPrefix == "") "§8§l-<§r§aNoob Routes§r§8§l>-§r " else ClickGUIModule.selectedPrefix.trimEnd() + " ", chatStyle: ChatStyle? = null) {
     val chatComponent = ChatComponentText("$prefix$message")
     chatStyle?.let { chatComponent.setChatStyle(it) } // Set chat style using setChatStyle method
     runOnMCThread { mc.thePlayer?.addChatMessage(chatComponent) }

@@ -30,9 +30,11 @@ class BlinkRing(
     left: Boolean = false,
     center: Boolean = false,
     rotate: Boolean = false,
+    diameter: Float = 1f,
+    height: Float = 1f,
     var packets: List<C04PacketPlayerPosition> = listOf(),
     var endYVelo: Double = 0.0
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
 
 
     init {
@@ -52,6 +54,10 @@ class BlinkRing(
             }
         }
         packets = packetsLoaded
+    }
+
+    override fun ringCheckY(): Boolean {
+        return coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround
     }
 
 
@@ -82,7 +88,7 @@ class BlinkRing(
         }
         
         if (exceedsBlinkLimit || blinkDisabled) {
-            if (AutoP3.cgyMode) modMessage("Moving", "§0[§6Yharim§0]§7 ")
+            if (AutoP3.renderStyle == 3) modMessage("Moving", "§0[§6Yharim§0]§7 ")
             movementPackets = packets.toMutableList()
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
@@ -101,7 +107,7 @@ class BlinkRing(
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
         AutoP3.isAligned = true
         mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
-        if (AutoP3.cgyMode) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == 3) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
         else modMessage("§c§l$cancelled§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }
 }
