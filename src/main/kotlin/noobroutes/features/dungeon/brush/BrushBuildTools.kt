@@ -36,7 +36,7 @@ import kotlin.math.min
 typealias MinBlockPos = BlockPos
 typealias MaxBlockPos = BlockPos
 object BrushBuildTools {
-    //TODO: Make all of the build tools on a separate thread
+    
 
     var leftBlockPos: BlockPos? = null
     var rightBlockPos: BlockPos? = null
@@ -104,10 +104,9 @@ object BrushBuildTools {
         val blocksToUndo = lastReplacedBlocks.pop()
         thread {
             val blockList = BrushModule.getBlockList(blocksToUndo.second)
-
             blocksToUndo.first.forEach { (state, pos, save) ->
             val relative = blocksToUndo.second?.getRelativeCoords(pos) ?: pos
-            devMessage(state)
+
             blockList.removeAll { it.second == relative }
             BrushModule.removeBlockFromChunk(pos)
             if (save) {
@@ -164,7 +163,7 @@ object BrushBuildTools {
         //the reason it is structured like this is so that the selected blocks render on top of the box
         if (leftPos != null && rightPos != null) {
             val bounds = getBoundsFromBlockPositions(rightPos, leftPos)
-            Renderer.drawBox(AxisAlignedBB(bounds.first, bounds.second.add(1, 1, 1)), Color.GREEN, fillAlpha = 0.3f)
+            Renderer.drawBox(AxisAlignedBB(bounds.first, bounds.second.add(1, 1, 1)), Color.GREEN, fillAlpha = 0.15f)
         }
         rightPos?.let {
             Renderer.drawBlock(it, Color(254, 138, 2), fillAlpha = 0f)
