@@ -80,7 +80,11 @@ object EWPathfinderModule : Module(
                 if (centerAngle)
                     targetVec3 = findCenteredVector(lastNode.pos, nodeVec3)
 
-                if (targetVec3 == null) targetVec3 = getEtherPosFromOrigin(nodeVec3.add(0.0, PlayerUtils.SNEAK_EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch);
+                if (targetVec3 == null) targetVec3 = getEtherPosFromOrigin(nodeVec3.add(
+                    0.0,
+                    PlayerUtils.SNEAK_EYE_HEIGHT,
+                    0.0
+                ), lastNode.yaw, lastNode.pitch);
 
                 if (targetVec3 == null) {
                     System.err.println("Invalid YAW / PITCH : " + lastNode.yaw + " : " + lastNode.pitch)
