@@ -83,7 +83,7 @@ object AutoP3: Module (
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     private var leapedIDs = mutableSetOf<Int>()
-    private val deletedRings  = mutableListOf<Ring>()
+    private val deletedRings  = ArrayDeque<Ring>()
     private var awaitingLeap = mutableSetOf<Ring>()
     private var awaitingTerm = mutableSetOf<Ring>()
     private var awaitingLeft = mutableSetOf<Ring>()

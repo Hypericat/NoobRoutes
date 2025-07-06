@@ -97,7 +97,7 @@ object AutoP3Utils {
 
     @SubscribeEvent
     fun motion(event: PacketEvent.Send) {
-        if (!motioning || event.packet !is C03PacketPlayer) return
+        if (!motioning || event.packet !is C03PacketPlayer || cancelNext) return
         when (motionTicks) {
             0 -> setSpeed(1.4)
             1 -> {
