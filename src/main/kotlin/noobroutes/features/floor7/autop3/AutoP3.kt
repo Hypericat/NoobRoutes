@@ -3,6 +3,7 @@ package noobroutes.features.floor7.autop3
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.settings.GameSettings
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
@@ -100,7 +101,6 @@ object AutoP3: Module (
     fun onRender(event: RenderWorldLastEvent) {
         if (!inF7Boss) return
         rings[route]?.forEachIndexed { i, ring ->
-
             if (alignedOnly && !isAligned && !ring.center && ring !is BlinkRing) return@forEachIndexed
 
             if (renderIndex && renderStyle != 3) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)

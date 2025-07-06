@@ -96,7 +96,7 @@ object ModuleManager {
         IceFill,
         BrushModule,
         FreeCam,
-        BHop
+        QOL
     )
 
     init {
