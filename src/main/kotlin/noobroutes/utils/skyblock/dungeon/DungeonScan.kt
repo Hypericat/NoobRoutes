@@ -4,13 +4,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import noobroutes.Core.mc
 import noobroutes.utils.equalsOneOf
-import noobroutes.utils.skyblock.dungeon.tiles.Door
-import noobroutes.utils.skyblock.dungeon.tiles.DoorType
-import noobroutes.utils.skyblock.dungeon.tiles.Room
-import noobroutes.utils.skyblock.dungeon.tiles.RoomType
-import noobroutes.utils.skyblock.dungeon.tiles.Tile
-import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
-import noobroutes.utils.skyblock.dungeon.tiles.Unknown
+import noobroutes.utils.skyblock.dungeon.tiles.*
 
 object DungeonScan {
 

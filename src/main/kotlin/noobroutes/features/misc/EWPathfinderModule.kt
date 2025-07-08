@@ -8,8 +8,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.render.ClickGUIModule
+import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.routes.nodes.DynamicNode
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
@@ -80,7 +80,11 @@ object EWPathfinderModule : Module(
                 if (centerAngle)
                     targetVec3 = findCenteredVector(lastNode.pos, nodeVec3)
 
-                if (targetVec3 == null) targetVec3 = getEtherPosFromOrigin(nodeVec3.add(0.0, PlayerUtils.SNEAK_EYE_HEIGHT, 0.0), lastNode.yaw, lastNode.pitch);
+                if (targetVec3 == null) targetVec3 = getEtherPosFromOrigin(nodeVec3.add(
+                    0.0,
+                    PlayerUtils.SNEAK_EYE_HEIGHT,
+                    0.0
+                ), lastNode.yaw, lastNode.pitch);
 
                 if (targetVec3 == null) {
                     System.err.println("Invalid YAW / PITCH : " + lastNode.yaw + " : " + lastNode.pitch)

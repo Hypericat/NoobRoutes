@@ -3,21 +3,15 @@ package noobroutes.ui.blockgui.blockeditor
 import net.minecraft.block.properties.PropertyEnum
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import noobroutes.features.dungeon.Brush
-import noobroutes.ui.blockgui.BlockDisplay
+import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.ui.blockgui.blockeditor.elements.ElementSelector
 import noobroutes.ui.blockgui.blockeditor.elements.ElementSlider
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.MouseUtils
 import noobroutes.utils.IBlockStateUtils
-import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.Color
-import noobroutes.utils.render.RenderUtils.drawItem
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
-import noobroutes.utils.skyblock.devMessage
 import kotlin.math.floor
 
 object BlockEditor {
@@ -55,7 +49,7 @@ object BlockEditor {
     }
     private var lastBlockState: IBlockState = IBlockStateUtils.airIBlockState
     fun draw() {
-        if (lastBlockState != Brush.selectedBlockState) {
+        if (lastBlockState != BrushModule.selectedBlockState) {
             handleNewBlockState()
         }
         if (dragging) {
@@ -129,18 +123,18 @@ object BlockEditor {
     }
     private fun handleNewBlockState(){
         elements.clear()
-        Brush.selectedBlockState.propertyNames.forEach { property ->
+        BrushModule.selectedBlockState.propertyNames.forEach { property ->
             if (blackListedPropertyRegexs.any { it.contains(property.name.toString(), true) }) return@forEach
             when (property) {
                 is PropertyEnum<*> -> {
-                    elements.add(ElementSelector(property, Brush.selectedBlockState))
+                    elements.add(ElementSelector(property, BrushModule.selectedBlockState))
                 }
                 is PropertyInteger -> {
-                    elements.add(ElementSlider(property.name, property, Brush.selectedBlockState))
+                    elements.add(ElementSlider(property.name, property, BrushModule.selectedBlockState))
                 }
             }
         }
-        lastBlockState = Brush.selectedBlockState
+        lastBlockState = BrushModule.selectedBlockState
     }
 
 }

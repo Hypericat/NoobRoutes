@@ -8,7 +8,6 @@ import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.AutoP3Utils.startWalk
 import noobroutes.utils.Scheduler
-import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.round
 import noobroutes.utils.routes.RouteUtils

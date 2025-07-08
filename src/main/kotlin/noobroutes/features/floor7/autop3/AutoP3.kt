@@ -3,8 +3,10 @@ package noobroutes.features.floor7.autop3
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.settings.GameSettings
 import net.minecraft.entity.player.EntityPlayer
-import noobroutes.ui.editUI.EditUI
+import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
@@ -28,6 +30,7 @@ import noobroutes.features.floor7.autop3.rings.*
 import noobroutes.features.misc.SexAura
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
+import noobroutes.ui.editUI.EditUI
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.*
 import noobroutes.utils.json.JsonUtils.asVec3
@@ -42,7 +45,6 @@ import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import kotlin.math.absoluteValue
-import kotlin.text.toIntOrNull
 
 
 @Suppress("Unused")
@@ -61,13 +63,14 @@ object AutoP3: Module (
         noRotate = !noRotate
         modMessage("can rotate: " + !noRotate)
     }
-    val cgyMode by BooleanSetting("cgy Mode", false, description = "changes some settings to look like cgy")
     val silentLook by BooleanSetting("Silent Look", false, description = "when activating a look ring only rotate serverside (may lead to desync)")
-    val renderStyle by SelectorSetting("ring design", "normal", arrayListOf("normal", "simple", "box"), false, description = "how rings should look")
+    val renderStyle by SelectorSetting("ring design", "normal", arrayListOf("normal", "simple", "box", "cgy"), false, description = "how rings should look")
+    val ringSlices by NumberSetting(name = "slices", description = "hexagons would look cool -wadey", min = 3, max = 50, default = 24).withDependency { renderStyle < 2 }
     val walkFix by SelectorSetting("walk boost", "none", arrayListOf("none", "normal", "big"), false, description = "boost of an edge")
     private val alignedOnly by BooleanSetting("aligned only", false, description = "only lets u use ring that align or while aligned")
     private val blinkShit by DropdownSetting(name = "Blink Settings")
     val speedRings by BooleanSetting(name = "Speed Rings", description = "Toggles the use of tickshift rings").withDependency { blinkShit }
+    val keepC05 by BooleanSetting(name = "allow rotation packets", description = "when enabled will not cancel rotation packets").withDependency { blinkShit }
     val blink by DualSetting(name = "actually blink", description = "blink or just movement(yes chloric this was made just for u)", default = false, left = "Movement", right = "Blink").withDependency { blinkShit }
     val mode by DualSetting(name = "movement mode", description = "how movement should look", default = false, left = "Motion", right = "Packet").withDependency { blinkShit }
     val maxBlinks by NumberSetting(name = "max blinks per instance", description = "too much blink on an instance bans apparently", min = 100, max = 300, default = 120).withDependency { blinkShit }
@@ -81,15 +84,15 @@ object AutoP3: Module (
 
     private var rings = mutableMapOf<String, MutableList<Ring>>()
     private var leapedIDs = mutableSetOf<Int>()
-    private val deletedRings  = mutableListOf<Ring>()
+    private val deletedRings  = ArrayDeque<Ring>()
     private var awaitingLeap = mutableSetOf<Ring>()
     private var awaitingTerm = mutableSetOf<Ring>()
     private var awaitingLeft = mutableSetOf<Ring>()
     private var activatedBlinks = mutableSetOf<BlinkRing>()
 
-    var spedFor = 0
-
     val ringRegistry = AutoP3Utils.discoverRings("noobroutes.features.floor7.autop3.rings")
+
+    private var keep = false
 
     private var lastLavaClip = System.currentTimeMillis()
     var isAligned = false
@@ -98,26 +101,25 @@ object AutoP3: Module (
     fun onRender(event: RenderWorldLastEvent) {
         if (!inF7Boss) return
         rings[route]?.forEachIndexed { i, ring ->
-
             if (alignedOnly && !isAligned && !ring.center && ring !is BlinkRing) return@forEachIndexed
 
-            if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
+            if (renderIndex && renderStyle != 3) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
 
             ring.renderRing()
-            if (cgyMode || ring !is BlinkRing) return@forEachIndexed
+            if (renderStyle == 3 || ring !is BlinkRing) return@forEachIndexed
 
             val vec3List: List<Vec3> = ring.packets.map { packet -> Vec3(packet.positionX, packet.positionY + 0.01, packet.positionZ) }
-            if (showEnd && ring.packets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
+            if (showEnd && ring.packets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.5, 0.5, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
             if (showLine) RenderUtils.drawGradient3DLine(vec3List, Color.GREEN, Color.RED, 1F, true)
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun tickRing(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.END || mc.thePlayer == null) return
-        if(!inF7Boss || mc.thePlayer.isSneaking || editMode || mc.thePlayer.capabilities.walkSpeed < 0.5) return
+    fun tickRing(event: PacketEvent.Send) {
+        if (event.packet !is C03PacketPlayer || mc.thePlayer == null) return
+        if(!inF7Boss || mc.thePlayer.isSneaking || editMode ) return //|| mc.thePlayer.capabilities.walkSpeed < 0.5
 
-        val bb = mc.thePlayer.entityBoundingBox
+        val bb = mc.thePlayer.entityBoundingBox //cant mc.thePlayer.collided or whatever as i need x AND z collision to align
 
         val collidesX = mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb.offset(0.001, 0.0, 0.0)).isNotEmpty() ||
                 mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb.offset(-0.001, 0.0, 0.0)).isNotEmpty()
@@ -128,11 +130,29 @@ object AutoP3: Module (
         if (collidesX && collidesZ) { isAligned = true }
 
         rings[route]?.forEach {ring ->
-            val inRing = AutoP3Utils.distanceToRingSq(ring.coords) < 0.25 && AutoP3Utils.ringCheckY(ring)
+            val inRing = ring.inRing(mc.thePlayer.positionVector) && ring.ringCheckY()
 
-            if (inRing) {
+            val isAlignRing = ring.center || ring is BlinkRing
+
+            // as player max speed is 1.4 blocks a tick one check in the middle is enough
+            val prevPositionVector = Vec3(mc.thePlayer.prevPosX, mc.thePlayer.prevPosY, mc.thePlayer.prevPosZ)
+            val middlePositionVector = mc.thePlayer.positionVector.add(prevPositionVector).multiply(0.5f)
+            val passedRing = ring.inRing(middlePositionVector) && ring.ringCheckY() //no interpolation on y as i use the fact that it doesnt
+
+            if (inRing || (passedRing && isAlignRing)) {
                 if (ring.triggered) return@forEach
-                if (alignedOnly && !isAligned && !ring.center && ring !is BlinkRing) return@forEach
+
+                if (passedRing && !inRing) {
+                    AutoP3Utils.unPressKeys()
+                    PlayerUtils.stopVelocity()
+                    event.isCanceled = true
+                    mc.thePlayer.setPosition(middlePositionVector.xCoord, mc.thePlayer.posY, middlePositionVector.zCoord)
+                    if (ring is BlinkRing) keep = true
+                    //due to the event/time it doesnt automatically send a c04
+                    PacketUtils.sendPacket(C04PacketPlayerPosition(middlePositionVector.xCoord, mc.thePlayer.posY, middlePositionVector.zCoord, mc.thePlayer.onGround))
+                }
+
+                if (alignedOnly && !isAligned && !isAlignRing) return@forEach
                 ring.triggered = true
                 ring.doRingArgs()
                 if (ring.left || ring.leap || ring.term) {
@@ -141,11 +161,11 @@ object AutoP3: Module (
                 }
                 if (ring is LavaClipRing) {
                     if (System.currentTimeMillis() - lastLavaClip > 1000) {
-                        ring.run()
+                        ring.doRing()
                         lastLavaClip = System.currentTimeMillis()
                     }
                 }
-                else if (ring !is BlinkRing) ring.run()
+                else if (ring !is BlinkRing) ring.doRing()
                 else activatedBlinks.add(ring)
             }
             else {
@@ -167,19 +187,11 @@ object AutoP3: Module (
     }
 
     @SubscribeEvent
-    fun spedTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.END || spedFor == 0) return
-        spedFor--
-        if (spedFor == 0) AutoP3Utils.setGameSpeed(1f)
-    }
-
-
-    @SubscribeEvent
     fun awaitingOpen(event: TermOpenEvent) {
         awaitingTerm.forEach {
             if (it is BlinkRing)
                 activatedBlinks.add(it)
-            else it.run()
+            else it.doRing()
         }
     }
 
@@ -193,7 +205,7 @@ object AutoP3: Module (
         awaitingLeap.forEach {
             if (it is BlinkRing)
                 activatedBlinks.add(it)
-            else it.run()
+            else it.doRing()
         }
 
         awaitingLeap.clear()
@@ -217,7 +229,7 @@ object AutoP3: Module (
 
             awaitingLeap.forEach {
                 if (it is BlinkRing) activatedBlinks.add(it)
-                else it.run()
+                else it.doRing()
             }
 
         }
@@ -303,19 +315,47 @@ object AutoP3: Module (
         val leap = args.any { it == "leap" }
         val left = args.any {it == "left"}
         val rotate = args.any {it == "rotate" || it == "look"}
+
+        val diameterRegex = Regex("""d:(\d+)""")
+        val diameterString = args.firstOrNull { diameterRegex.matches(it) }
+        val diameter = diameterString?.let { diameterRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
+
+        val heightRegex = Regex("""h:(\d+)""")
+        val heightString = args.firstOrNull { heightRegex.matches(it) }
+        val height = heightString?.let { heightRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
+
         when (args[1].lowercase()) {
             "walk" -> {
-                modMessage("added walk")
-                actuallyAddRing(WalkRing(
-                    coords,
-                    MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
-                    term,
-                    leap,
-                    left,
-                    center,
-                    rotate
-                )
-                )
+                if (args.contains("jump")) {
+                    modMessage("jump added")
+                    actuallyAddRing(JumpRing(
+                        coords,
+                        MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
+                        term,
+                        leap,
+                        left,
+                        center,
+                        rotate,
+                        diameter,
+                        height,
+                        walk
+                    ))
+                }
+                else {
+                    modMessage("added walk")
+                    actuallyAddRing(WalkRing(
+                        coords,
+                        MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
+                        term,
+                        leap,
+                        left,
+                        center,
+                        rotate,
+                        diameter,
+                        height
+                    )
+                    )
+                }
             }
 
             "hclip" -> {
@@ -328,6 +368,8 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate,
+                    diameter,
+                    height,
                     walk
                 )
                 )
@@ -341,7 +383,9 @@ object AutoP3: Module (
                     leap,
                     left,
                     center,
-                    rotate
+                    rotate,
+                    diameter,
+                    height
                 )
                 )
             }
@@ -364,6 +408,8 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate,
+                    diameter,
+                    height,
                     far = walk,
                     scale = scale
                 )
@@ -380,6 +426,8 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate,
+                    diameter,
+                    height,
                     endY
                 ))
 
@@ -399,10 +447,12 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate,
+                    diameter,
+                    height,
                     block
                 ))
             }
-            "jump" -> {
+            "jump", -> {
                 modMessage("jump added")
                 actuallyAddRing(JumpRing(
                     coords,
@@ -412,6 +462,8 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate,
+                    diameter,
+                    height,
                     walk
                 ))
             }
@@ -428,6 +480,8 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate,
+                    diameter,
+                    height,
                     length
                 ))
 
@@ -444,8 +498,9 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate,
-                    length,
-                    walk
+                    diameter,
+                    height,
+                    length
                 )
                 waypoint.triggered = true
                 blinkStarts.add(waypoint)
@@ -460,6 +515,8 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate,
+                    diameter,
+                    height,
                     walk
                 ))
             }
@@ -473,6 +530,8 @@ object AutoP3: Module (
                     left,
                     center,
                     rotate,
+                    diameter,
+                    height,
                     walk
                 )
                 )
@@ -491,9 +550,19 @@ object AutoP3: Module (
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun doTriggeredBlink(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
-        activatedBlinks.forEach {
-            if (AutoP3Utils.distanceToRingSq(it.coords) < 0.25 && AutoP3Utils.ringCheckY(it)) it.run()
-            else activatedBlinks.remove(it)
+
+        val blinksToProcess = activatedBlinks.toList()
+
+        for (it in blinksToProcess) {
+            if (keep) {
+                keep = false
+                return
+            }
+            if (it.inRing(mc.thePlayer.positionVector) && it.ringCheckY()) {
+                it.doRing()
+            } else {
+                activatedBlinks.remove(it)
+            }
         }
     }
 
@@ -566,6 +635,8 @@ object AutoP3: Module (
                     instance.center = ring.get("center")?.asBoolean == true
                     instance.rotate = ring.get("rotate")?.asBoolean == true
                     instance.left = ring.get("left")?.asBoolean == true
+                    instance.diameter = ring.get("diameter")?.asFloat ?: 1f
+                    instance.height = ring.get("height")?.asFloat ?: 1f
                     instance.loadRingData(ring)
                     ringsInJson.add(instance)
                 }

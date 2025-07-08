@@ -1,8 +1,6 @@
 package noobroutes.utils.skyblock
 
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -14,9 +12,6 @@ import noobroutes.Core.mc
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.noControlCodes
 import noobroutes.utils.render.Color
-import noobroutes.utils.render.RenderUtils.bind
-import noobroutes.utils.render.scale
-import noobroutes.utils.render.translate
 
 /**
  * Returns the ExtraAttribute Compound

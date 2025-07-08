@@ -1,15 +1,12 @@
 package noobroutes.features.routes.nodes
 
-import com.google.gson.JsonObject
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.utils.AutoP3Utils.walking
-import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.toBlockPos
 
 abstract class Node(

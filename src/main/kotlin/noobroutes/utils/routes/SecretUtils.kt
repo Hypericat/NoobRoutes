@@ -20,7 +20,6 @@ import noobroutes.utils.routes.RouteUtils.aotv
 import noobroutes.utils.routes.RouteUtils.aotvTarget
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
 
 object SecretUtils {
 

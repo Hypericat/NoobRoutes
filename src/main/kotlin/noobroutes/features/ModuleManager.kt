@@ -10,7 +10,7 @@ import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
-import noobroutes.features.dungeon.Brush
+import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.features.dungeon.puzzle.IceFill
 import noobroutes.features.dungeon.puzzle.TicTacToe
 import noobroutes.features.dungeon.puzzle.WaterBoard
@@ -59,9 +59,9 @@ object ModuleManager {
         AutoP3,
         NoDebuff,
         Zpew,
-        AutoPath,
-        EWPathfinderModule,
-        DynamicRoute,
+//        AutoPath,
+//        EWPathfinderModule,
+//        DynamicRoute,
         //ElementTester,
         Simulation,
         CoreClip,
@@ -77,7 +77,7 @@ object ModuleManager {
         InstaMid,
         Auto4,
         LeverAura,
-        WaterBoard,
+//        WaterBoard,
         TicTacToe,
         //AuraTest,
         Weirdos,
@@ -88,15 +88,15 @@ object ModuleManager {
         //EtherwarpTest,
         Doorless,
         SecretGuideManager,
-        AutoRoute,
+//        AutoRoute,
         Penis,
         RotationVisualizer,
-        CrystalAura,
-        BlinkRelic,
-        IceFill,
-        Brush,
+//        CrystalAura,
+//        BlinkRelic,
+//        IceFill,
+        BrushModule,
         FreeCam,
-        BHop
+        QOL
     )
 
     init {

@@ -21,8 +21,10 @@ class InstaRing(
     left: Boolean = false,
     center: Boolean = false,
     rotate: Boolean = false,
+    diameter: Float = 1f,
+    height: Float = 1f,
     var walk: Boolean = false
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
 
     init {
         addBoolean("walk", {walk}, {walk = it})
@@ -34,16 +36,16 @@ class InstaRing(
             return
         }
         if (mc.thePlayer.motionX != 0.0 || mc.thePlayer.motionZ != 0.0) {
-            modMessage("must be still before insta")
+            if (AutoP3.renderStyle != 3) modMessage("must be still before insta")
             return
         }
-        if (AutoP3.cgyMode) modMessage("Hclipping", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == 3) modMessage("Hclipping", "§0[§6Yharim§0]§7 ")
         AutoP3Utils.unPressKeys()
         super.doRing()
         direction = yaw
         val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
         mc.thePlayer.motionX = speed * Utils.xPart(direction)
         mc.thePlayer.motionZ = speed * Utils.zPart(direction)
-        if (walk) Scheduler.schedulePreTickTask { walking = true }
+        if (walk) Scheduler.scheduleC03Task { walking = true }
     }
 }

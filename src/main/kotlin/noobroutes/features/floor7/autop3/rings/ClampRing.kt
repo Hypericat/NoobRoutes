@@ -19,8 +19,10 @@ class ClampRing(
     left: Boolean = false,
     center: Boolean = false,
     rotate: Boolean = false,
+    diameter: Float = 1f,
+    height: Float = 1f,
     var walk: Boolean = false
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
 
     init {
         addBoolean("walk", {walk}, {walk = it})
@@ -29,7 +31,8 @@ class ClampRing(
     override fun doRing() {
         AutoP3Utils.unPressKeys()
         super.doRing()
-        if (AutoP3.cgyMode) modMessage("Looking", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == 3) modMessage("Looking", "§0[§6Yharim§0]§7 ")
+        if (walk) AutoP3Utils.startWalk(yaw)
         val motionX = mc.thePlayer.motionX
         val motionZ = mc.thePlayer.motionZ
         if (motionX * xPart(yaw) < 0 || motionZ * zPart(yaw) < 0) {
@@ -42,6 +45,5 @@ class ClampRing(
         val scale = minOf(scaleX, scaleZ)
         mc.thePlayer.motionX = xPart(yaw) * scale
         mc.thePlayer.motionZ = zPart(yaw) * scale
-        if (walk) AutoP3Utils.startWalk(yaw)
     }
 }

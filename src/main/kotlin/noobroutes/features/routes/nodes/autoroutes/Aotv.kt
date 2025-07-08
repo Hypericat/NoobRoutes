@@ -13,7 +13,6 @@ import noobroutes.utils.Utils.zPart
 import noobroutes.utils.add
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asBlockPos
-import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.routes.RouteUtils

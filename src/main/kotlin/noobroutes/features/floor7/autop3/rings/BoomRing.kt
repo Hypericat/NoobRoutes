@@ -19,8 +19,10 @@ class BoomRing(
     left: Boolean = false,
     center: Boolean = false,
     rotate: Boolean = false,
+    diameter: Float = 1f,
+    height: Float = 1f,
     var block: BlockPos = BlockPos(0, 0, 0),
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
 
     init {
         addBlockPos("block", {block}, {block = it})
@@ -28,7 +30,7 @@ class BoomRing(
 
     override fun doRing() {
         super.doRing()
-        if (AutoP3.cgyMode) modMessage("Exploding", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == 3) modMessage("Exploding", "§0[§6Yharim§0]§7 ")
         SwapManager.swapFromName("TNT")
         Scheduler.schedulePreTickTask(1) { AuraManager.auraBlock(block, force = true) }
     }

@@ -18,8 +18,8 @@ import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
-import noobroutes.utils.Scheduler
 import noobroutes.utils.skyblock.modMessage
+import kotlin.math.pow
 
 @RingType("Blink")
 class BlinkRing(
@@ -30,21 +30,15 @@ class BlinkRing(
     left: Boolean = false,
     center: Boolean = false,
     rotate: Boolean = false,
+    diameter: Float = 1f,
+    height: Float = 1f,
     var packets: List<C04PacketPlayerPosition> = listOf(),
-    var endYVelo: Double = 0.0,
-    var endXVelo: Double = 0.0,
-    var endZVelo: Double = 0.0,
-    var walk: Boolean = false,
-    var dir: Float = 0f
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+    var endYVelo: Double = 0.0
+) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
 
 
     init {
         addDouble("endYVelo", {endYVelo}, {endYVelo = it})
-        addBoolean("walk", {walk}, {walk = it})
-        addDouble("endXVelo", {endXVelo}, {endXVelo = it})
-        addDouble("endZVelo", {endZVelo}, {endZVelo = it})
-        addFloat("dir", {dir}, {dir = it})
     }
 
     override fun loadRingData(obj: JsonObject) {
@@ -60,6 +54,10 @@ class BlinkRing(
             }
         }
         packets = packetsLoaded
+    }
+
+    override fun ringCheckY(): Boolean {
+        return coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround
     }
 
 
@@ -82,15 +80,23 @@ class BlinkRing(
         val notEnoughPackets = cancelled < packets.size
         val exceedsBlinkLimit = blinksInstance + packets.size > AutoP3.maxBlinks
         val blinkDisabled = !AutoP3.blink
+
+        val firstPacket = packets.first()
+        val toFar = mc.thePlayer.getDistanceSq(firstPacket.positionX, firstPacket.positionY, firstPacket.positionZ) > (mc.thePlayer.capabilities.walkSpeed * 2.806).pow(2)
         
         if (!canBlinkNow || (notEnoughPackets && !exceedsBlinkLimit)) {
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
             return
         }
+
+        if (toFar && cancelled > 0) {
+            PacketUtils.sendPacket(C04PacketPlayerPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord, mc.thePlayer.onGround))
+            cancelled--
+        }
         
         if (exceedsBlinkLimit || blinkDisabled) {
-            if (AutoP3.cgyMode) modMessage("Moving", "§0[§6Yharim§0]§7 ")
+            if (AutoP3.renderStyle == 3) modMessage("Moving", "§0[§6Yharim§0]§7 ")
             movementPackets = packets.toMutableList()
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
@@ -101,23 +107,15 @@ class BlinkRing(
         }
         
         blinksInstance += packets.size
+        Blink.cancelled -= packets.size
         lastBlink = System.currentTimeMillis()
         lastBlinkRing = this
         packets.forEach { PacketUtils.sendPacket(it) }
         val lastPacket = packets.last()
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
         AutoP3.isAligned = true
-        if (!walk) mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
-        else {
-            mc.thePlayer.setVelocity(endXVelo, endYVelo, endZVelo)
-            var airTicks = 0
-            packets.forEach { if (!it.isOnGround) airTicks++ else airTicks = 0 }
-            Blink.cancelled -= packets.size
-            AutoP3Utils.airTicks = airTicks
-            AutoP3Utils.direction = yaw
-            AutoP3Utils.walking = true
-        }
-        if (AutoP3.cgyMode) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
+        mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
+        if (AutoP3.renderStyle == 3) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
         else modMessage("§c§l$cancelled§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }
 }

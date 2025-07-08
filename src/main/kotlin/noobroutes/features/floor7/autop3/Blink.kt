@@ -17,16 +17,13 @@ import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
-import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
-import noobroutes.utils.SecretGuideIntegration
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.text
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.sin
 
@@ -140,9 +137,9 @@ object Blink{
                     0.5 * sin(System.currentTimeMillis().toDouble() / 300) + 0.5,
                     0.0
                 )
-            ), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.Companion.WHITE, depth = true)
+            ), it.diameter * 0.5, it.diameter * 0.5, 0.01, 24, 1, 90, 0, 0, Color.Companion.WHITE, depth = true)
             if (AutoP3.editMode) return
-            if (AutoP3Utils.distanceToRingSq(it.coords) < 0.25 && mc.thePlayer.posY == it.coords.yCoord) {
+            if (it.inRing(mc.thePlayer.positionVector) && mc.thePlayer.posY == it.coords.yCoord) {
                 if (it.triggered) return@forEach
                 recordedPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
                 startRecording(it)
@@ -206,12 +203,10 @@ object Blink{
                 lastWaypoint.left,
                 lastWaypoint.center,
                 lastWaypoint.rotate,
+                lastWaypoint.diameter,
+                lastWaypoint.height,
                 recordedPackets,
-                mc.thePlayer.motionY,
-                mc.thePlayer.motionX,
-                mc.thePlayer.motionZ,
-                lastWaypoint.walk,
-                AutoP3Utils.direction
+                mc.thePlayer.motionY
             ))
         }
     }
@@ -255,8 +250,8 @@ object Blink{
             }
             return
         }
-        if (event.packet.isMoving || movementPackets.isNotEmpty() || System.currentTimeMillis() - lastBlink < 100) { return }
+        if (event.packet.isMoving || movementPackets.isNotEmpty() || System.currentTimeMillis() - lastBlink < 100 || !event.packet.isOnGround || (event.packet.rotating && AutoP3.keepC05)) { return }
         event.isCanceled = true
-        if (AutoP3.spedFor == 0 && cancelled < 400) cancelled++
+        if (cancelled < 400) cancelled++
     }
 }

@@ -1,14 +1,13 @@
 package noobroutes.utils
 
 import net.minecraft.client.settings.KeyBinding
+import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.Vec3
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.events.BossEventDispatcher
@@ -97,8 +96,8 @@ object AutoP3Utils {
     private const val TICK2 = 1.99
 
     @SubscribeEvent
-    fun motion(event: ClientTickEvent) {
-        if (!motioning || event.phase != TickEvent.Phase.START) return
+    fun motion(event: PacketEvent.Send) {
+        if (!motioning || event.packet !is C03PacketPlayer || cancelNext) return
         when (motionTicks) {
             0 -> setSpeed(1.4)
             1 -> {
@@ -147,15 +146,27 @@ object AutoP3Utils {
         mc.thePlayer.motionZ = Utils.zPart(direction) * speed
     }
 
+    var cancelNext = false
+
+    @SubscribeEvent
+    fun onC03(event: PacketEvent.Send) {
+        if (cancelNext && event.packet is C03PacketPlayer) {
+            event.isCanceled = true
+            cancelNext = false
+        }
+    }
+
     var airTicks = 0
     var jumping = false
 
     private const val JUMP_SPEED = 6.0075
     private const val SPRINT_MULTIPLIER = 1.3
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun movement(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null) return
+    var speeding = false
+
+    @SubscribeEvent
+    fun movement(event: PacketEvent.Send) {
+        if (event.packet !is C03PacketPlayer || cancelNext || mc.thePlayer == null) return
 
         if (mc.thePlayer.onGround) {
             airTicks = 0
@@ -166,7 +177,7 @@ object AutoP3Utils {
         if (mc.thePlayer.isInWater || mc.thePlayer.isInLava || !walking) return
         val speed = mc.thePlayer.aiMoveSpeed.toDouble()
 
-        if (airTicks < 1) {
+        if (airTicks == 0) {
             var speedMultiplier = 2.806
             if (jumping) {
                 jumping = false
@@ -184,14 +195,6 @@ object AutoP3Utils {
         }
         mc.thePlayer.motionX += movementFactor * Utils.xPart(direction)
         mc.thePlayer.motionZ += movementFactor * Utils.zPart(direction)
-    }
-
-    fun distanceToRingSq(coords: Vec3): Double {
-        return (coords.xCoord-mc.thePlayer.posX).pow(2)+(coords.zCoord-mc.thePlayer.posZ).pow(2)
-    }
-
-    fun ringCheckY(ring: Ring): Boolean {
-        return (ring.coords.yCoord <= mc.thePlayer.posY && ring.coords.yCoord + 1 > mc.thePlayer.posY && ring !is BlinkRing && !ring.center) || (ring.coords.yCoord == mc.thePlayer.posY)
     }
 
     @SubscribeEvent

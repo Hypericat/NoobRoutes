@@ -3,7 +3,7 @@ package noobroutes.ui.blockgui.blockselector
 
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
-import noobroutes.features.dungeon.Brush
+import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.ui.blockgui.blockeditor.BlockEditor
 import noobroutes.utils.render.RenderUtils.drawBlockTexture
 
@@ -18,7 +18,7 @@ class BlockStateElement(x: Int, y: Int, val state: IBlockState, val name: String
 
     override fun mouseClicked() {
         if (isHovered) {
-            Brush.selectedBlockState = state
+            BrushModule.selectedBlockState = state
             BlockEditor.currentBlockName = displayName
         }
     }

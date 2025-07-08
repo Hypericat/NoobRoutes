@@ -10,11 +10,11 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.config.Config
-import noobroutes.features.dungeon.Brush
+import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.routes.AutoRoute
-import noobroutes.font.fonts.MinecraftFont
+import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.util.shader.RoundedRect
 import org.apache.logging.log4j.LogManager
@@ -41,21 +41,25 @@ object Core {
         File(mc.mcDataDir, "config/noobroutes").takeIf { !it.exists() }?.mkdirs()
     }
 
+    fun onFMLServerStopped() {
+        BrushModule.saveConfig()
+        BrushModule.editMode = false
+    }
+
     fun loadComplete() {
         runBlocking(Dispatchers.IO) {
             launch {
                 Config.load()
             }.join()
         }
-
         AutoP3.loadRings()
         AutoRoute.loadFile()
         ClickGUI.init()
         RoundedRect.initShaders()
-        Brush.loadConfig()
+        BrushModule.loadConfig()
     }
-    private var lastChatVisibility: EntityPlayer.EnumChatVisibility? = null
-    private var inUI = false
+    var lastChatVisibility: EntityPlayer.EnumChatVisibility? = null
+    var inUI = false
 
     @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {

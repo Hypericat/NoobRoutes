@@ -28,7 +28,7 @@ object EtherWarpHelper {
             return rotation
         }
         var runs = 0
-        val distance = startCoords.add(0.0,SNEAK_EYE_HEIGHT,0.0).distanceTo(centeredCoords)
+        val distance = startCoords.add(0.0, SNEAK_EYE_HEIGHT, 0.0).distanceTo(centeredCoords)
         val sweepDegrees = Math.toDegrees(2 * atan(0.707 / distance)).toFloat()
         for (i in 0..10) {
             val lowerYaw = rotation.first - sweepDegrees

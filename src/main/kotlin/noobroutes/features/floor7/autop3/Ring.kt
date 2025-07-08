@@ -1,14 +1,16 @@
 package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonObject
+import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
-import noobroutes.features.floor7.autop3.AutoP3.cgyMode
 import noobroutes.features.floor7.autop3.AutoP3.depth
 import noobroutes.features.floor7.autop3.AutoP3.renderStyle
 import noobroutes.features.floor7.autop3.AutoP3.silentLook
 import noobroutes.utils.AutoP3Utils.ringColors
+import noobroutes.utils.PacketUtils
+import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
 import noobroutes.utils.add
@@ -21,6 +23,7 @@ import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.toAABB
+import kotlin.math.pow
 import kotlin.math.sin
 
 @Target(AnnotationTarget.CLASS)
@@ -34,7 +37,9 @@ abstract class Ring(
     var leap: Boolean,
     var left: Boolean,
     var center: Boolean,
-    var rotate: Boolean
+    var rotate: Boolean,
+    var diameter: Float,
+    var height: Float
 ) {
     var renderYawVector = false
     var triggered = false
@@ -51,6 +56,8 @@ abstract class Ring(
             if (left) addProperty("left", true)
             if (center) addProperty("center", true)
             if (rotate) addProperty("rotate", true)
+            if (diameter != 1f) addProperty("diameter", diameter)
+            if (height != 1f) addProperty("height", height)
         }
         addPrimitiveRingData(obj)
         addRingData(obj)
@@ -93,27 +100,35 @@ abstract class Ring(
     }
 
     fun renderRing() {
-        if (cgyMode) {
-            Renderer.drawCylinder(this.coords, 0.5, 0.5, -0.01, 24, 1, 90, 0, 0, ringColors.getOrDefault(this.type, Color(255, 0, 255)), depth = depth)
-            return
-        }
+        val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
+        val topOffset = (0.48 * sin(System.currentTimeMillis().toDouble() * 0.0033333334)) + 0.5
+        val bottomOffset = 1 - topOffset
         when (renderStyle) {
             0 -> {
-                Renderer.drawCylinder(this.coords.add(Vec3(0.0, (0.45 * sin(System.currentTimeMillis().toDouble()/300)) + 0.528 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
-                Renderer.drawCylinder(this.coords.add(Vec3(0.0, (-0.45 * sin(System.currentTimeMillis().toDouble()/300)) + 0.528 , 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
-                Renderer.drawCylinder(this.coords.add(Vec3(0.0, 0.503, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
-                Renderer.drawCylinder(this.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.DARK_GRAY, depth = depth)
-                Renderer.drawCylinder(this.coords.add(Vec3(0.0, 1.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.DARK_GRAY, depth = depth)
+                drawCylinderWithRingArgs(offsetCoords.add(0.0, topOffset * height, 0.0), Color.GREEN) //moving ring 1
+                drawCylinderWithRingArgs(offsetCoords.add(0.0, bottomOffset * height, 0.0), Color.GREEN) //moving ring 2
+                drawCylinderWithRingArgs(offsetCoords, Color.DARK_GRAY) //bottom static
+                drawCylinderWithRingArgs(offsetCoords.add(0.0, 0.5 * height, 0.0), Color.GREEN) // middle static
+                drawCylinderWithRingArgs(offsetCoords.add(0.0, height.toDouble(), 0.0), Color.DARK_GRAY) //bottom static
             }
-            1 -> Renderer.drawCylinder(this.coords.add(Vec3(0.0, 0.03, 0.0)), 0.6, 0.6, 0.01, 24, 1, 90, 0, 0, Color.GREEN, depth = depth)
-            2 -> RenderUtils.drawOutlinedAABB(this.coords.subtract(0.5, 0.0, 0.5).toAABB(), Color.GREEN, thickness = 3, depth = depth)
+            1 -> drawCylinderWithRingArgs(offsetCoords, Color.GREEN)
+            2 -> RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), Color.GREEN, thickness = 3, depth = depth)
+            3 -> Renderer.drawCylinder(this.coords, diameter * 0.5, diameter * 0.5, -0.01, 24, 1, 90, 0, 0, ringColors.getOrDefault(this.type, Color(255, 0, 255)), depth = depth)
         }
         if (this.renderYawVector) Renderer.draw3DLine(listOf(
             this.coords.add(0.0, PlayerUtils.STAND_EYE_HEIGHT, 0.0),
-            Vec3(this.yaw.xPart, 0.0, this.yaw.zPart).multiply(1.8).add(this.coords.xCoord, this.coords.yCoord + PlayerUtils.STAND_EYE_HEIGHT, this.coords.zCoord)
+            Vec3(this.yaw.xPart, 0.0, this.yaw.zPart).multiply(1.8).add(
+                this.coords.xCoord,
+                this.coords.yCoord + PlayerUtils.STAND_EYE_HEIGHT,
+                this.coords.zCoord
+            )
         ),
             Color.GREEN,
         )
+    }
+
+    private fun drawCylinderWithRingArgs(drawCoords: Vec3, color: Color) {
+        Renderer.drawCylinder(drawCoords, diameter * 0.5, diameter * 0.5, 0.01, AutoP3.ringSlices, 1, 90, 0, 0, color, depth = depth)
     }
 
     private fun loadInternalRingData(obj: JsonObject){
@@ -126,32 +141,35 @@ abstract class Ring(
     open fun doRing() {
     }
 
+    fun inRing(playerCoords: Vec3): Boolean {
+        return (coords.xCoord - playerCoords.xCoord).pow(2) + (coords.zCoord - playerCoords.zCoord).pow(2) <= (diameter * 0.5).pow(2)
+    }
+
+    open fun ringCheckY(): Boolean {
+        return (coords.yCoord <= mc.thePlayer.posY && coords.yCoord + height > mc.thePlayer.posY && !center) || center && coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround
+    }
+
     fun doRingArgs() {
         if (rotate) {
-            if (!silentLook) mc.thePlayer.rotationYaw = yaw
+            if (!silentLook) Scheduler.schedulePostTickTask { mc.thePlayer.rotationYaw = yaw }
             Blink.rotate = yaw
         }
 
-        if (cgyMode) {
-            mc.thePlayer.rotationYaw = yaw
+        if (renderStyle == 3) {
+            Scheduler.schedulePostTickTask { mc.thePlayer.rotationYaw = yaw }
             val javaRandom = java.util.Random()
             val gaussian = javaRandom.nextGaussian().toFloat()
             val scaled = gaussian * (15)
-            mc.thePlayer.rotationPitch = scaled.coerceIn(-45f, 45f) + 10f
+            Scheduler.schedulePostTickTask { mc.thePlayer.rotationPitch = scaled.coerceIn(-45f, 45f) + 10f }
         }
 
         if (center && (mc.thePlayer.onGround || System.currentTimeMillis() - Blink.lastBlink < 100)) {
             mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord)
-            Blink.rotSkip = true
+            if (Blink.cancelled > 0) {
+                PacketUtils.sendPacket(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, mc.thePlayer.onGround))
+                Blink.cancelled--
+            }
             AutoP3.isAligned = true
         }
-    }
-
-    fun run() {
-        if (center && !mc.thePlayer.onGround) {
-            triggered = false
-            return
-        }
-        doRing()
     }
 }

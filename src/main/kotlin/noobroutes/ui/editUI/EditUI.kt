@@ -182,7 +182,34 @@ object EditUI : Screen() {
                 1
             )
         )
-
+        currentY += 75f
+        elements.add(
+            ElementSlider(
+                "Diameter",
+                min = 0.0, max = 3.0,
+                unit = "",
+                increment = 0.1,
+                { ring.diameter.toDouble() }, { ring.diameter = it.toFloat() },
+                X_ALIGNMENT_LEFT, currentY,
+                550f,
+                104f,
+                2
+            )
+        )
+        currentY += 75f
+        elements.add(
+            ElementSlider(
+                "Height",
+                min = 0.0, max = 3.0,
+                unit = "",
+                increment = 0.1,
+                { ring.height.toDouble() }, { ring.height = it.toFloat() },
+                X_ALIGNMENT_LEFT, currentY,
+                550f,
+                104f,
+                2
+            )
+        )
         currentY += 75f
         elements.add(
             ElementCheckBox(
@@ -237,19 +264,6 @@ object EditUI : Screen() {
             )
         )
         when (ring) {
-            is BlinkRing -> {
-                elements.add(
-                    ElementCheckBox(
-                        X_ALIGNMENT_RIGHT,
-                        currentY,
-                        250f, 50f,
-                        { ring.walk = it },
-                        { ring.walk },
-                        "Walk"
-                    )
-                )
-            }
-
             is ClampRing -> {
                 elements.add(
                     ElementCheckBox(

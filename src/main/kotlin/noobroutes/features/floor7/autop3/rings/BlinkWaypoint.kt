@@ -12,9 +12,10 @@ class BlinkWaypoint(
     left: Boolean = false,
     center: Boolean = false,
     rotate: Boolean = false,
-    val length: Int = 0,
-    val walk: Boolean = false
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+    diameter: Float = 1f,
+    height: Float = 1f,
+    val length: Int = 0
+) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
 
     override fun doRing() {
 

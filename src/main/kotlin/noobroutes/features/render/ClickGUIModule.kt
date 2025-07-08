@@ -36,7 +36,7 @@ object  ClickGUIModule: Module(
         allowAlpha = false,
         description = "Color theme in the gui."
     )
-
+    val selectedPrefix by StringSetting("prefix", "", description = "leave empty to use original")
 
     val switchType by BooleanSetting("Switch Type", true, description = "Switches the type of the settings in the gui.")
     val forceHypixel by BooleanSetting(

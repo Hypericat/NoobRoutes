@@ -17,9 +17,11 @@ class MotionRing(
     left: Boolean = false,
     center: Boolean = false,
     rotate: Boolean = false,
+    diameter: Float = 1f,
+    height: Float = 1f,
     var far: Boolean = false,
     var scale: Float = 1f
-) : Ring(coords, yaw, term, leap, left, center, rotate) {
+) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
 
     init {
         addBoolean("far", {far}, {far = it})
@@ -29,12 +31,16 @@ class MotionRing(
     override fun doRing() {
         AutoP3Utils.unPressKeys()
         super.doRing()
-        if (AutoP3.cgyMode) modMessage("Jumping", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == 3) modMessage("Jumping", "§0[§6Yharim§0]§7 ")
         AutoP3Utils.direction = yaw
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
         AutoP3Utils.motionTicks = 1
         AutoP3Utils.scale = scale
         AutoP3Utils.motioning = true
+    }
+
+    override fun ringCheckY(): Boolean {
+        return coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround
     }
 }

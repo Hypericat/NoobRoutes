@@ -2,7 +2,7 @@ package noobroutes.mixin.player;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
-import noobroutes.features.move.BHop;
+import noobroutes.features.move.QOL;
 import noobroutes.utils.skyblock.LocationUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -17,7 +17,13 @@ public abstract class MixinEntityLivingBase {
             constant = @Constant(floatValue = 0.2F)
     )
     private float modifySprintJumpBoost(float constant) {
-        if (!BHop.INSTANCE.getEnabled() || (!LocationUtils.INSTANCE.isInSkyblock() && !Minecraft.getMinecraft().isSingleplayer())) return constant;
-        return BHop.INSTANCE.getSpeed() * Minecraft.getMinecraft().thePlayer.capabilities.getWalkSpeed();
+        if (!QOL.INSTANCE.getEnabled() || (!LocationUtils.INSTANCE.isInSkyblock() && !Minecraft.getMinecraft().isSingleplayer())) return constant;
+        return QOL.INSTANCE.getSpeed() * Minecraft.getMinecraft().thePlayer.capabilities.getWalkSpeed();
+    }
+
+    @ModifyConstant(method = "onLivingUpdate", constant = @Constant(intValue = 10))
+    private int modifyJumpResetTime(int constant) {
+        if (!QOL.INSTANCE.getEnabled()) return 10;
+        else return QOL.INSTANCE.getJumpDelay();
     }
 }

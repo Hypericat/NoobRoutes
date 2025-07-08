@@ -1,12 +1,15 @@
 package noobroutes.commands
 
+import net.minecraft.block.Block
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
+import net.minecraft.util.BlockPos
 import noobroutes.Core
-import noobroutes.Core.logger
-import noobroutes.features.dungeon.Brush
+import noobroutes.features.dungeon.brush.BrushBuildTools
+import noobroutes.features.dungeon.brush.BrushModule
+import noobroutes.features.dungeon.brush.BrushModule.editMode
 import noobroutes.ui.blockgui.BlockGui
-
+import noobroutes.utils.IBlockStateUtils
 import noobroutes.utils.skyblock.modMessage
 
 class BrushCommand: CommandBase() {
@@ -22,16 +25,53 @@ class BrushCommand: CommandBase() {
         if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Set, Clear, Load, LoadFunnyMap")
         when (args[0].lowercase()) {
             "em", "e", "edit" -> {
-                Brush.toggleEditMode()
+                BrushModule.toggleEditMode()
             }
             "bg", "g", "gui" -> {
                 Core.display = BlockGui
             }
             "load", "l" -> {
-                Brush.loadConfig()
+                BrushModule.loadConfig()
                 modMessage("Loaded Config")
             }
-            else -> modMessage("Usages: Edit, Gui, Load, LoadFME")
+            "fill", "f" -> {
+                if (!editMode) return modMessage("Edit Mode Required")
+                val state = BrushModule.getEditingBlockState()
+                if (state == IBlockStateUtils.airIBlockState || state == null) return modMessage("Selected Block State Required")
+                val selectedArea = BrushBuildTools.getSelectedArea()
+                modMessage("§l§aFilling $state")
+                if (args.size < 2) {
+                    val thread = Thread { BrushBuildTools.fill(selectedArea, state) }
+                    thread.start()
+                    return
+                }
+                val thread = Thread { BrushBuildTools.filteredFill(selectedArea, getBlockByText(sender, args[1]), state) }
+                thread.start()
+
+            }
+
+            "reload", "r" -> {
+                BrushModule.reload()
+            }
+
+            "undo" -> {
+                BrushBuildTools.handleUndo()
+            }
+
+            "clear", "c" -> {
+                if (!editMode) return modMessage("Edit Mode Required")
+                modMessage("§l§aClearing")
+                val selectedArea = BrushBuildTools.getSelectedArea()
+                if (args.size < 2) {
+                    val thread = Thread { BrushBuildTools.fill(selectedArea, IBlockStateUtils.airIBlockState) }
+                    thread.start()
+                    return
+                }
+                val thread = Thread { BrushBuildTools.filteredFill(selectedArea, getBlockByText(sender, args[1]), IBlockStateUtils.airIBlockState) }
+                thread.start()
+
+            }
+            else -> modMessage("Usages: Edit, Gui, Load, Fill, Clear, Undo")
         }
     }
 
@@ -42,5 +82,23 @@ class BrushCommand: CommandBase() {
         return listOf("br")
     }
 
+    override fun addTabCompletionOptions(
+        sender: ICommandSender?,
+        args: Array<String?>,
+        pos: BlockPos?
+    ): MutableList<String?>? {
+        return when (args.size) {
+            1 -> {
+                mutableListOf("Edit", "Gui", "Load", "Fill", "Clear", "Undo")
+            }
+            2 -> {
+                getListOfStringsMatchingLastWord(
+                    args,
+                    Block.blockRegistry.getKeys()
+                )
+            }
+            else -> null
+        }
+    }
 
 }

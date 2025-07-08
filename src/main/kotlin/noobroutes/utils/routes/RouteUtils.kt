@@ -19,25 +19,20 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.move.Zpew
 import noobroutes.features.routes.nodes.AutorouteNode
-import noobroutes.features.routes.nodes.autoroutes.Aotv
-import noobroutes.features.routes.nodes.autoroutes.Bat
-import noobroutes.features.routes.nodes.autoroutes.Etherwarp
-import noobroutes.features.routes.nodes.autoroutes.Pearl
-import noobroutes.features.routes.nodes.autoroutes.PearlClip
-import noobroutes.features.routes.nodes.autoroutes.UseItem
-import noobroutes.features.routes.nodes.autoroutes.Walk
-import noobroutes.utils.*
+import noobroutes.features.routes.nodes.autoroutes.*
 import noobroutes.utils.AutoP3Utils.walking
+import noobroutes.utils.PacketUtils
+import noobroutes.utils.RotationUtils
+import noobroutes.utils.SwapManager
 import noobroutes.utils.Utils.isEnd
+import noobroutes.utils.floor
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
-import kotlin.collections.filter
 
 object RouteUtils {
 
