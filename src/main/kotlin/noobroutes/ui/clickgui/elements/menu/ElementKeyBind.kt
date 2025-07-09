@@ -62,9 +62,8 @@ class ElementKeyBind(parent: ModuleButton, setting: KeybindSetting) :
         if (mouseButton == 0 && isHovered) {
             if (colorAnim.start()) listening = !listening
             return true
-        } else if (listening) {
-            setting.value.key = -100 + mouseButton
-            if (colorAnim.start()) listening = false
+        } else if (listening && colorAnim.start()) {
+            listening = false
         }
         return false
     }

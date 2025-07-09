@@ -18,6 +18,7 @@ import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.Scheduler
+import noobroutes.utils.clock.Clock
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle
@@ -93,16 +94,14 @@ object BlinkKeybind: Module(
     fun onRender(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) return
         val resolution = ScaledResolution(mc)
-        if (!legit) text("Blinked for $ticks ticks", resolution.scaledWidth / 2, resolution.scaledHeight / 2.5, Color.WHITE, 10, align = TextAlign.Middle)
+        if (!legit) text("Blinked for $ticks ticks", resolution.scaledWidth * 0.5f, resolution.scaledHeight * 0.4f, Color.WHITE, 10f, align = TextAlign.Middle)
         else {
             val passedTime = System.currentTimeMillis() - blinkTime
             if (passedTime > 300) {
                 toggle()
                 return
             }
-            val height = (sin(passedTime.toDouble() * PI / 300) * (resolution.scaledHeight / 2))
-            roundedRectangle(0, 0, resolution.scaledWidth, height.toFloat(), Color.BLACK, edgeSoftness = 0)
-            roundedRectangle(0, resolution.scaledHeight - height.toFloat(), resolution.scaledWidth, height.toFloat(), Color.BLACK, edgeSoftness = 0)
+            legitBlink(passedTime.toDouble())
         }
     }
 
@@ -112,5 +111,12 @@ object BlinkKeybind: Module(
         ticks = 0
         hit.clear()
         toggle()
+    }
+
+    fun legitBlink(time: Double){
+        val resolution = ScaledResolution(mc)
+        val height = (sin(time * PI * 0.0033333333333333) * (resolution.scaledHeight * 0.5f))
+        roundedRectangle(0, 0, resolution.scaledWidth, height.toFloat(), Color.BLACK, edgeSoftness = 0)
+        roundedRectangle(0, resolution.scaledHeight - height.toFloat(), resolution.scaledWidth, height.toFloat(), Color.BLACK, edgeSoftness = 0)
     }
 }

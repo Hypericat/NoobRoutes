@@ -58,33 +58,7 @@ object ElementRenderer {
         GlStateManager.popMatrix()
     }
 
-    fun drawKeybind(x: Float, y: Float, xScale: Float, yScale: Float, key: Int, colorAnimation: ColorAnimation, listening: Boolean){
-        val value = if (key > 0) Keyboard.getKeyName(key) ?: "Err"
-        else if (key < 0) Mouse.getButtonName(key + 100)
-        else "None"
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(x, y, 1f)
-        GlStateManager.scale(xScale, yScale, 1f)
-        val width = getTextWidth(value, 12f).coerceAtLeast(12f) + 9f
-        val height = getTextHeight(value, 12f) + 6f
-        roundedRectangle(width * -0.5f, height * -0.5f, width, height, ColorPalette.elementSecondary, 5f)
-        text(value, 0, 0, ColorPalette.text, 12f, align = TextAlign.Middle)
-        GlStateManager.popMatrix()
-    }
 
-    fun isHoveredKeybind(key: Int, x: Float, y: Float, xScale: Float, yScale: Float): Boolean {
-        val value = if (key > 0) Keyboard.getKeyName(key) ?: "Err"
-        else if (key < 0) Mouse.getButtonName(key + 100)
-        else "None"
-        val width = (getTextWidth(value, 12f).coerceAtLeast(12f) + 9) * xScale
-        val height = (getTextHeight(value, 12f) + 6f) * yScale
-        return MouseUtils.isAreaHovered(
-            x - width * 0.5f,
-            y - height * 0.5f,
-            width,
-            height
-        )
-    }
 
 
 }

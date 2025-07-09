@@ -6,6 +6,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
+import noobroutes.Core.logger
 import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
@@ -31,6 +32,7 @@ import noobroutes.ui.hud.HudElement
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.profile
 import noobroutes.utils.render.getTextWidth
+import noobroutes.utils.skyblock.devMessage
 
 /**
  * Class that contains all Modules and huds
@@ -59,10 +61,6 @@ object ModuleManager {
         AutoP3,
         NoDebuff,
         Zpew,
-//        AutoPath,
-//        EWPathfinderModule,
-//        DynamicRoute,
-        //ElementTester,
         Simulation,
         CoreClip,
         LavaClip,
@@ -77,29 +75,22 @@ object ModuleManager {
         InstaMid,
         Auto4,
         LeverAura,
-//        WaterBoard,
         TicTacToe,
-        //AuraTest,
         Weirdos,
         MelodyMessage,
         AutoSS,
-        //Blaze,
         InstantSlow,
-        //EtherwarpTest,
         Doorless,
         SecretGuideManager,
-//        AutoRoute,
         Penis,
         RotationVisualizer,
-//        CrystalAura,
-//        BlinkRelic,
-//        IceFill,
         BrushModule,
         FreeCam,
         QOL
     )
 
     init {
+        logger.info("initializing modules")
         for (module in modules) {
             module.keybinding?.let {
                 module.register(KeybindSetting("Keybind", it, "Toggles the module"))
@@ -166,7 +157,6 @@ object ModuleManager {
 
     @SubscribeEvent
     fun activateModuleKeyBinds(event: InputEvent.Keyboard) {
-
         for (module in modules) {
             for (setting in module.settings) {
                 if (setting is KeybindSetting && setting.value.key == event.keycode) {

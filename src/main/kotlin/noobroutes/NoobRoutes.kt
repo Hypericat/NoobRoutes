@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent
+import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.commands.*
 import noobroutes.events.BossEventDispatcher

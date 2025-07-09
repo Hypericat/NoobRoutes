@@ -4,6 +4,13 @@
   "minVersion": "0.7",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "MixinChunk",
+    "MixinEntityLivingBase",
+    "MixinKeybinding",
+    "MixinMinecraft",
+    "MixinModList",
+    "MixinNetworkManager",
+    "MixinWorldClient",
     "accessors.TimerFieldAccessor",
     "player.MixinAbstractClientPlayer",
     "player.MixinEntity",
@@ -12,13 +19,9 @@
     "render.MixinEntityRenderer",
     "render.MixinItemRenderer",
     "render.MixinRenderGlobal",
-    "render.MixinRenderManager",
-    "MixinChunk",
-    "MixinEntityLivingBase",
-    "MixinKeybinding",
-    "MixinMinecraft",
-    "MixinModList",
-    "MixinNetworkManager",
-    "MixinWorldClient"
+    "render.MixinRenderManager"
+  ],
+  "client": [
+    "accessors.ChunkListingFieldAccessor"
   ]
 }

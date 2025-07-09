@@ -37,8 +37,12 @@ abstract class UiElement(val name: String, var x: Float, var y: Float, val w: Fl
     abstract fun draw()
 
 
-    open fun mouseClicked(mouseButton: Int) {}
-    open fun mouseReleased() {}
+    open fun mouseClicked(mouseButton: Int): Boolean {}
+    open fun mouseReleased(): Boolean {
+        return false
+    }
     open fun mouseClickedAnywhere() {}
-    open fun keyTyped(typedChar: Char, keyCode: Int) {}
+    open fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
+        return false
+    }
 }

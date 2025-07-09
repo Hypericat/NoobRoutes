@@ -6,6 +6,7 @@ import noobroutes.ui.Screen
 import noobroutes.ui.util.ElementRenderer.TEXT_OFFSET
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.KeybindElement
+import noobroutes.ui.util.elements.SliderElement
 import noobroutes.ui.util.elements.SwitchElement
 import noobroutes.utils.render.text
 import org.lwjgl.input.Keyboard
@@ -21,9 +22,14 @@ object ElementTestGUI : Screen() {
             400f,
             100f
         ),
-        KeybindElement("Test 1", Keybinding(Keyboard.KEY_NONE), 300f, 500f, 400f, 100f)
-
-
+        KeybindElement("Test 1", Keybinding(Keyboard.KEY_NONE), 300f, 500f, 400f, 100f),
+        SliderElement(
+            "Test 2",
+            300f,
+            600f,
+            400f,
+            100f
+        )
     )
 
     override fun draw() {
@@ -39,9 +45,14 @@ object ElementTestGUI : Screen() {
     }
 
     override fun keyTyped(typedChar: Char, keyCode: Int) {
-        testElements.forEach { it.keyTyped(typedChar, keyCode) }
+        if (testElements.any { it.keyTyped(typedChar, keyCode) }) return
         super.keyTyped(typedChar, keyCode)
     }
-
+    private fun handleText(number: String):String {
+        if (number.isNotEmpty() && number.last() == '.' && number.count { it == '.' } >= 2) {
+            return number.dropLast(1)
+        }
+        return number
+    }
 
 }

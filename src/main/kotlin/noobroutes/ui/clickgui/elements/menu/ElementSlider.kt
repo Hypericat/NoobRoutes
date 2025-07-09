@@ -86,8 +86,6 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
         roundedRectangle(x + TEXTOFFSET, y + 37f, w - 17f, 7f, sliderBGColor, 3f)
         roundedRectangle(x + TEXTOFFSET, y + 37f, sliderPercentage * (w - 17f), 7f, color, 3f)
         //circle(x + TEXTOFFSET + sliderPercentage * (w - 17f), y + 37f + 3f, 5f, color)
-
-
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {
