@@ -7,6 +7,8 @@ import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.features.move.LavaClip
 import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.Scheduler
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 
 @RingType("LavaClip")
@@ -35,6 +37,12 @@ class LavaClipRing(
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
         LavaClip.ringClip = length
-        LavaClip.toggle()
+        resetTriggered()
+        LavaClip.onEnable()
+    }
+
+    private fun resetTriggered() {
+        triggered = true
+        Scheduler.schedulePreTickTask(60) { triggered = false }
     }
 }

@@ -37,7 +37,6 @@ object Blink{
     var rotate: Float? = null
     private var c03AfterS08 = 0
     var lastBlink = System.currentTimeMillis()
-    var lastBlinkRing: Ring? = null
     var movementPackets = mutableListOf<C04PacketPlayerPosition>()
     var endY = 0.0
     var skip = false

@@ -2,6 +2,7 @@ package noobroutes.features.move
 
 
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -60,8 +61,14 @@ object LavaClip: Module(
         toggle()
     }
 
+    @SubscribeEvent
+    fun onS08(event: PacketEvent.Receive) {
+        if (event.packet is S08PacketPlayerPosLook) onDisable()
+    }
+
     override fun onDisable() {
         ringClip = null
+        cancelS12 = false
         super.onDisable()
     }
 }

@@ -12,12 +12,13 @@ import noobroutes.features.floor7.autop3.Blink.blinksInstance
 import noobroutes.features.floor7.autop3.Blink.cancelled
 import noobroutes.features.floor7.autop3.Blink.endY
 import noobroutes.features.floor7.autop3.Blink.lastBlink
-import noobroutes.features.floor7.autop3.Blink.lastBlinkRing
 import noobroutes.features.floor7.autop3.Blink.movementPackets
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.Scheduler
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.pow
 
@@ -102,20 +103,24 @@ class BlinkRing(
             mc.thePlayer.motionZ = 0.0
             endY = endYVelo
             lastBlink = System.currentTimeMillis()
-            lastBlinkRing = null
+            resetTriggered()
             return
         }
         
         blinksInstance += packets.size
         Blink.cancelled -= packets.size
         lastBlink = System.currentTimeMillis()
-        lastBlinkRing = this
         packets.forEach { PacketUtils.sendPacket(it) }
         val lastPacket = packets.last()
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
         AutoP3.isAligned = true
         mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
+        resetTriggered()
         if (AutoP3.renderStyle == 3) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
         else modMessage("§c§l$cancelled§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
+    }
+
+    private fun resetTriggered() {
+        Scheduler.schedulePreTickTask(60) { triggered = false }
     }
 }
