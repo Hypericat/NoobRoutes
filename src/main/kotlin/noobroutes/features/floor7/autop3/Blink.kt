@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.PacketEvent
+import noobroutes.features.floor7.AutoSS
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
 import noobroutes.utils.AutoP3Utils
@@ -160,7 +161,7 @@ object Blink{
 
     @SubscribeEvent
     fun movement(event: PacketEvent.Send) {
-        if (movementPackets.isEmpty() || event.packet !is C03PacketPlayer) return
+        if (movementPackets.isEmpty() || event.packet !is C03PacketPlayer || AutoSS.dontCancel) return
         if (skip) {
             skip = false
             return
