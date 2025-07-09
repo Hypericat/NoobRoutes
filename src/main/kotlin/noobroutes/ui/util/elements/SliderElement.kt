@@ -2,8 +2,8 @@ package noobroutes.ui.util.elements
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.logger
+import noobroutes.ui.ColorPalette
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.elements.menu.ElementSlider.Companion.sliderBGColor
 import noobroutes.ui.clickgui.util.ColorUtil.brighter
 import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
 import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
@@ -54,6 +54,19 @@ class SliderElement(
 
     override fun draw() {
         drawName()
+        drawSliderTextBox(
+            getDisplay(),
+            x + w * 0.9f,
+            halfHeight,
+            1f,
+            1f,
+            colorAnim.get(
+                ColorPalette.elementPrimary,
+                ColorPalette.backgroundSecondary.brighter(1.1f),
+                !listening
+            ).darkerIf(isHoveredBox)
+        )
+        
     }
 
     companion object {
@@ -63,7 +76,7 @@ class SliderElement(
         const val HALF_SLIDER_HEIGHT = SLIDER_HEIGHT * 0.5f
         val sliderBGColor = Color(-0xefeff0)
 
-        fun drawSlider(name: String, x: Float, y: Float, xScale: Float, yScale: Float, percentage: Float, sliderColor: Color) {
+        fun drawSlider(x: Float, y: Float, xScale: Float, yScale: Float, percentage: Float, sliderColor: Color) {
             GlStateManager.pushMatrix()
             GlStateManager.translate(x, y, 1f)
             GlStateManager.scale(xScale, yScale, 1f)
