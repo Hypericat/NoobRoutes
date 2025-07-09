@@ -85,6 +85,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
     private val floorConfig = ConcurrentHashMap<String, MutableList<Pair<IBlockState, BlockPos>>>()
     private val roomConfig = ConcurrentHashMap<String, MutableList<Pair<IBlockState, BlockPos>>>()
 
+    var forceRotation by BooleanSetting("Force Rotation", description = "Forces the rotation of the Selected Block while placing. Enables when you control middle click a block")
     var selectedBlockState: IBlockState = IBlockStateUtils.airIBlockState
     private var lastPlace = System.currentTimeMillis()
 
@@ -155,7 +156,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
     private fun handlePlaceBlock(pos: BlockPos, hitVec: Vec3, facing: EnumFacing, room: UniqueRoom?){
         lastPlace = System.currentTimeMillis()
         val blockState = getEditingBlockState() ?: return
-        val state = blockState.block.onBlockPlaced(
+        val state = if (forceRotation) blockState else blockState.block.onBlockPlaced(
             mc.theWorld,
             pos,
             facing,
@@ -225,6 +226,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
         }
 
         if (event.type == ClickEvent.ClickType.Middle) {
+            forceRotation = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)
             selectedBlockState = getBlockStateAt(target)
             modMessage(
                 "Selected block state: §l§a${

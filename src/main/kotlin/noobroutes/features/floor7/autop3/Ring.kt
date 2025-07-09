@@ -101,7 +101,7 @@ abstract class Ring(
 
     fun renderRing() {
         val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
-        val topOffset = (0.48 * sin(System.currentTimeMillis().toDouble()/300)) + 0.5
+        val topOffset = (0.48 * sin(System.currentTimeMillis().toDouble() * 0.0033333334)) + 0.5
         val bottomOffset = 1 - topOffset
         when (renderStyle) {
             0 -> {
