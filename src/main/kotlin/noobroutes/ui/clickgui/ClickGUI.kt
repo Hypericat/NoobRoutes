@@ -10,10 +10,8 @@ import noobroutes.config.Config
 import noobroutes.features.Category
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.font.Font
-import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.Screen
 import noobroutes.ui.clickgui.ClickGUI.draw
-import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.elements.menu.ElementColor
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.MODULE_BUTTON_COLOR_ALPHA
@@ -21,6 +19,7 @@ import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
 import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.clickgui.util.HoverHandler
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.render.*
 import org.lwjgl.input.Mouse
 import kotlin.math.sign

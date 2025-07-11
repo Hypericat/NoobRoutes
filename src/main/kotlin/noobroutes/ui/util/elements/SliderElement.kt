@@ -2,11 +2,9 @@ package noobroutes.ui.util.elements
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.logger
-import noobroutes.features.settings.impl.Keybinding
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
 import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
 import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.clickgui.util.HoverHandler

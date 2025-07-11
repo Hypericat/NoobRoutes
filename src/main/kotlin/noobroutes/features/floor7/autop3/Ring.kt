@@ -8,21 +8,17 @@ import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.AutoP3.depth
 import noobroutes.features.floor7.autop3.AutoP3.renderStyle
 import noobroutes.features.floor7.autop3.AutoP3.silentLook
+import noobroutes.utils.*
 import noobroutes.utils.AutoP3Utils.ringColors
-import noobroutes.utils.PacketUtils
-import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
-import noobroutes.utils.add
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.SyncData
 import noobroutes.utils.json.syncdata.*
-import noobroutes.utils.multiply
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.toAABB
 import kotlin.math.pow
 import kotlin.math.sin
 

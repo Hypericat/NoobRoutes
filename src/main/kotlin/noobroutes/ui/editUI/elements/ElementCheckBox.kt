@@ -1,10 +1,8 @@
 package noobroutes.ui.editUI.elements
 
 import noobroutes.features.render.ClickGUIModule
-import noobroutes.font.fonts.MinecraftFont
+import noobroutes.font.Font
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.util.ColorUtil.brighter
 import noobroutes.ui.clickgui.util.ColorUtil.brighterIf
 import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
@@ -15,8 +13,9 @@ import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.editUI.EditUI
 import noobroutes.ui.editUI.Element
 import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.utils.render.*
-import noobroutes.font.Font
 
 class ElementCheckBox(
     x: Float,

@@ -3,7 +3,6 @@ package noobroutes.utils
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
-import net.minecraft.util.Vec3
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -18,7 +17,6 @@ import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3.walkFix
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
-import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.devMessage
@@ -33,7 +31,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
-import kotlin.math.pow
 import kotlin.reflect.KClass
 
 @Suppress("Unused")

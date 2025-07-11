@@ -12,9 +12,7 @@ import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.dungeon.brush.BrushModule
-import noobroutes.features.dungeon.puzzle.IceFill
 import noobroutes.features.dungeon.puzzle.TicTacToe
-import noobroutes.features.dungeon.puzzle.WaterBoard
 import noobroutes.features.dungeon.puzzle.Weirdos
 import noobroutes.features.floor7.*
 import noobroutes.features.floor7.autop3.AutoP3
@@ -24,15 +22,12 @@ import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.render.FreeCam
 import noobroutes.features.render.RotationVisualizer
 import noobroutes.features.render.Trail
-import noobroutes.features.routes.AutoRoute
-import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.profile
 import noobroutes.utils.render.getTextWidth
-import noobroutes.utils.skyblock.devMessage
 
 /**
  * Class that contains all Modules and huds

@@ -3,10 +3,7 @@ package noobroutes.ui.clickgui.elements.menu
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.font.Font
-import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
@@ -22,6 +19,8 @@ import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
+import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.bind

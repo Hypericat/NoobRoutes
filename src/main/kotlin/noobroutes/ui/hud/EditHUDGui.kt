@@ -3,19 +3,18 @@ package noobroutes.ui.hud
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.config.Config
 import noobroutes.features.ModuleManager.huds
-import noobroutes.font.fonts.MinecraftFont
+import noobroutes.font.Font
 import noobroutes.ui.Screen
-import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.clock.Executor
 import noobroutes.utils.clock.Executor.Companion.register
 import noobroutes.utils.render.*
 import org.lwjgl.opengl.Display
 import kotlin.math.sign
-import noobroutes.font.Font
 
 /**
  * Screen that renders all your active Hud's

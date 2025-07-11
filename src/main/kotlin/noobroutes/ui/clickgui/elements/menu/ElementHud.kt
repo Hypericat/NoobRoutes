@@ -6,8 +6,6 @@ import noobroutes.features.settings.impl.HudSetting
 import noobroutes.font.Font
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
@@ -21,6 +19,8 @@ import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 

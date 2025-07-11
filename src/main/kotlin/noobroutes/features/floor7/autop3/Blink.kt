@@ -17,7 +17,6 @@ import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
-import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.render.Color

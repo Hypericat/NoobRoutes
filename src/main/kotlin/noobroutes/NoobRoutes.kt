@@ -1,15 +1,12 @@
 package noobroutes
 
 import gg.essential.elementa.font.FontRenderer
-import net.minecraft.client.Minecraft
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
-import net.minecraftforge.fml.common.event.FMLServerStoppedEvent
-import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.commands.*
 import noobroutes.events.BossEventDispatcher
@@ -17,8 +14,6 @@ import noobroutes.events.EventDispatcher
 import noobroutes.features.ModuleManager
 import noobroutes.features.floor7.autop3.Blink
 import noobroutes.font.FontType
-import noobroutes.font.fonts.OdinFont
-import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.*
 import noobroutes.utils.clock.Executor

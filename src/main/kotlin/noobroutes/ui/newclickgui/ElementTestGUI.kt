@@ -4,6 +4,7 @@ import noobroutes.features.settings.impl.Keybinding
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.Screen
 import noobroutes.ui.util.UiElement
+import noobroutes.ui.util.elements.DualElement
 import noobroutes.ui.util.elements.KeybindElement
 import noobroutes.ui.util.elements.SliderElement
 import noobroutes.ui.util.elements.SwitchElement
@@ -33,7 +34,18 @@ object ElementTestGUI : Screen() {
             80.0,
             1.0,
             "gph"
+        ),
+        DualElement(
+            "Test 3",
+            "test L",
+            "test R",
+            300f,
+            800f,
+            400f,
+            100f,
+            false
         )
+
     )
 
     override fun draw() {

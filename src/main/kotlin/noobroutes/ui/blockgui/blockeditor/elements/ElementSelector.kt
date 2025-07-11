@@ -5,10 +5,10 @@ import net.minecraft.block.state.IBlockState
 import noobroutes.ui.blockgui.blockeditor.BlockEditor
 import noobroutes.ui.blockgui.blockeditor.Element
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle

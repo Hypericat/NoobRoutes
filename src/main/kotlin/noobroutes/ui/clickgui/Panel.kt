@@ -6,9 +6,7 @@ import noobroutes.features.Category
 import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.font.Font
-import noobroutes.font.fonts.MinecraftFont
 import noobroutes.ui.clickgui.SearchBar.currentSearch
-import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.elements.ModuleButton
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.brighter
@@ -17,6 +15,7 @@ import noobroutes.ui.clickgui.util.ColorUtil.titlePanelColor
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
+import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage

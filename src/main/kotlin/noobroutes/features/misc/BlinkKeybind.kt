@@ -18,7 +18,6 @@ import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.Scheduler
-import noobroutes.utils.clock.Clock
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle

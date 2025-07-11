@@ -5,16 +5,18 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.Core.mc
+import noobroutes.font.Font
 import noobroutes.font.FontType
-import noobroutes.font.fonts.MinecraftFont
+import noobroutes.ui.ColorPalette
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.shader.RoundedRect
-import noobroutes.utils.*
+import noobroutes.utils.coerceAlpha
+import noobroutes.utils.minus
+import noobroutes.utils.plus
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
+import noobroutes.utils.times
 import org.lwjgl.opengl.Display
 import org.lwjgl.opengl.GL11
-import noobroutes.font.Font
-import noobroutes.ui.ColorPalette
 
 val matrix = UMatrixStack.Compat
 val scaleFactor get() = ScaledResolution(mc).scaleFactor.toFloat()

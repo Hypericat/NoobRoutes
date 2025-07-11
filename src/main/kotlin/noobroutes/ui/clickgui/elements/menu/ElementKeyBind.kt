@@ -1,9 +1,8 @@
 package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.settings.impl.KeybindSetting
-import noobroutes.font.fonts.MinecraftFont
+import noobroutes.font.Font
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
@@ -13,10 +12,11 @@ import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
 import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
 import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
+import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
-import noobroutes.font.Font
+
 /**
  * Renders all the modules.
  *

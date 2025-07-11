@@ -3,13 +3,12 @@ package noobroutes.ui.clickgui
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.mc
 import noobroutes.font.Font
-import noobroutes.font.fonts.MinecraftFont
-import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.clickgui.elements.menu.ElementTextField
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.util.MouseUtils
+import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
 
