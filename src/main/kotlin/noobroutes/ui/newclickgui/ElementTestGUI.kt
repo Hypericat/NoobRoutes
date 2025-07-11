@@ -3,7 +3,6 @@ package noobroutes.ui.newclickgui
 import noobroutes.features.settings.impl.Keybinding
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.Screen
-import noobroutes.ui.util.ElementRenderer.TEXT_OFFSET
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.KeybindElement
 import noobroutes.ui.util.elements.SliderElement
@@ -28,7 +27,12 @@ object ElementTestGUI : Screen() {
             300f,
             600f,
             400f,
-            100f
+            100f,
+            20.0,
+            20.0,
+            80.0,
+            1.0,
+            "gph"
         )
     )
 
@@ -40,7 +44,6 @@ object ElementTestGUI : Screen() {
     }
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
-        if (mouseButton != 0) return
         testElements.forEach { it.mouseClicked(mouseButton) }
     }
 
@@ -53,6 +56,11 @@ object ElementTestGUI : Screen() {
             return number.dropLast(1)
         }
         return number
+    }
+
+    override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
+        testElements.forEach { it.mouseReleased() }
+
     }
 
 }

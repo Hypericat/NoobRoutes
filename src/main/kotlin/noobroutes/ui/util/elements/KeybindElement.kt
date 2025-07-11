@@ -1,20 +1,14 @@
 package noobroutes.ui.util.elements
 
-import com.sun.org.apache.xpath.internal.operations.Bool
+
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.features.settings.impl.Keybinding
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.util.ElementRenderer
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.utils.render.TextAlign
-import noobroutes.utils.render.getTextWidth
-import noobroutes.utils.render.rectangleOutline
-import noobroutes.utils.render.roundedRectangle
-import noobroutes.utils.render.text
-import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
@@ -96,15 +90,15 @@ class KeybindElement(name: String, initialKey: Keybinding, x: Float, y: Float, w
 
     }
 
-    override fun mouseClicked(mouseButton: Int) {
-        if (isHovered) {
+    override fun mouseClicked(mouseButton: Int): Boolean {
+        if (isHovered && mouseButton == 0) {
             if (colorAnim.start()) listening = !listening
-            return
+            return true
         } else if (listening) {
             setValue(Keybinding(-100 + mouseButton))
             if (colorAnim.start()) listening = false
         }
-        return
+        return false
     }
 
     override fun keyTyped(typedChar: Char, keyCode: Int): Boolean {

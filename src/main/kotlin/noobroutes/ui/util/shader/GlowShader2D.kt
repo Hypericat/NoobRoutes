@@ -1,8 +1,7 @@
 package noobroutes.ui.util.shader
 
-import org.lwjgl.opengl.GL20
 import noobroutes.Core.mc
-import noobroutes.utils.render.Color
+import org.lwjgl.opengl.GL20
 
 object GlowShader2D : FramebufferShader("source/glowShader2D") {
     override fun setupUniforms() {

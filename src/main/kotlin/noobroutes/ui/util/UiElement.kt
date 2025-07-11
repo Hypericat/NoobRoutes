@@ -2,8 +2,8 @@ package noobroutes.ui.util
 
 import noobroutes.font.Font
 import noobroutes.ui.ColorPalette
+import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.clickgui.util.ColorUtil.darker
-import noobroutes.ui.util.ElementRenderer.TEXT_OFFSET
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
 
@@ -37,7 +37,9 @@ abstract class UiElement(val name: String, var x: Float, var y: Float, val w: Fl
     abstract fun draw()
 
 
-    open fun mouseClicked(mouseButton: Int): Boolean {}
+    open fun mouseClicked(mouseButton: Int): Boolean {
+        return false
+    }
     open fun mouseReleased(): Boolean {
         return false
     }

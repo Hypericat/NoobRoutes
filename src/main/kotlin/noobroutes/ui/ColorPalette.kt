@@ -34,5 +34,5 @@ object ColorPalette {
     inline val font get() = currentColorPalette.font
 
 
-
+    const val TEXT_OFFSET = 9f
 }
