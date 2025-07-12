@@ -18,7 +18,7 @@ class ColorElement(
     override val elementValueChangeListeners = mutableListOf<(Color) -> Unit>()
 
     companion object {
-        8
+        
     }
 
 
