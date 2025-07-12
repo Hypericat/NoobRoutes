@@ -51,9 +51,9 @@ class ModuleButton(val module: Module, val panel: Panel) {
 
     private val extendAnim = EaseInOut(250)
     private val hoverHandler = HoverHandler(1000, 200)
-    private val bannableIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/bannableIcon.png"))
-    private val fpsHeavyIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/fpsHeavyIcon.png"))
-    private val newFeatureIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/newFeatureIcon.png"))
+    private val bannableIcon = DynamicTexture(loadBufferedImage("/assets/ui/bannableIcon.png"))
+    private val fpsHeavyIcon = DynamicTexture(loadBufferedImage("/assets/ui/fpsHeavyIcon.png"))
+    private val newFeatureIcon = DynamicTexture(loadBufferedImage("/assets/ui/newFeatureIcon.png"))
 
 
     init {

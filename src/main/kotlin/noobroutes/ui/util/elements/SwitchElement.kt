@@ -16,7 +16,7 @@ import noobroutes.utils.render.roundedRectangle
 class SwitchElement(
     name: String,
     val scale: Float,
-    initialValue: Boolean,
+    override var elementValue: Boolean,
     x: Float,
     y: Float,
     w: Float,
@@ -72,18 +72,7 @@ class SwitchElement(
         }
     }
 
-
-
-
-
-
-
-
-
     override val elementValueChangeListeners = mutableListOf<(Boolean) -> Unit>()
-
-    override var elementValue: Boolean = initialValue
-
     private val colorAnimation = ColorAnimation(250)
     private val linearAnimation = LinearAnimation<Float>(200)
 

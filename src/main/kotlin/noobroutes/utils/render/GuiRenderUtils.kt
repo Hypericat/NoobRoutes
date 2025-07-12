@@ -1,6 +1,7 @@
 package noobroutes.utils.render
 
 import gg.essential.universal.UMatrixStack
+import net.minecraft.client.gui.Gui.drawRect
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
@@ -22,7 +23,7 @@ val matrix = UMatrixStack.Compat
 val scaleFactor get() = ScaledResolution(mc).scaleFactor.toFloat()
 private val arrowIcon = DynamicTexture(
     loadBufferedImage(
-        "/assets/defnotstolen/clickgui/arrow.png"
+        "/assets/ui/arrow.png"
     )
 )
 
@@ -68,9 +69,6 @@ fun roundedRectangle(
 fun roundedRectangle(x: Number, y: Number, w: Number, h: Number, color: Color, radius: Number = 0f, edgeSoftness: Number = 0.5f) =
     roundedRectangle(x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat(), color, color, color,
         0f, radius.toFloat(), radius.toFloat(), radius.toFloat(), radius.toFloat(), edgeSoftness)
-
-fun roundedRectangle(box: Box, color: Color, radius: Number = 0f, edgeSoftness: Number = .5f) =
-    roundedRectangle(box.x, box.y, box.w, box.h, color, radius, edgeSoftness)
 
 fun <T: Number> roundedRectangle(box: BoxWithClass<T>, color: Color, radius: Number = 0f, edgeSoftness: Number = .5f) =
     roundedRectangle(box.x, box.y, box.w, box.h, color, radius, edgeSoftness)
@@ -190,6 +188,53 @@ fun scissor(x: Number, y: Number, w: Number, h: Number): Scissor {
     scissorList.add(scissor)
     return scissor
 }
+
+fun initUIFramebufferStencil() {
+    mc.framebuffer.bindFramebuffer(true)
+    mc.framebuffer.enableStencil()
+    mc.framebuffer.unbindFramebuffer()
+}
+
+
+/*
+    x: Number, y: Number, w: Number, h: Number,
+    color: Color, borderColor: Color, shadowColor: Color,
+    borderThickness: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number,
+    color2: Color = color, gradientDir: Int = 0, shadowSoftness: Float = 0f
+ */
+
+fun stencilRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number) {
+    stencil {roundedRectangle(x, y,w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
+}
+
+fun stencilRoundedRectangle(x: Float, y: Float, w: Float, h: Float, radius: Number = 0f, edgeSoftness: Number = 0.5f) {
+    stencilRoundedRectangle(x, y, w, h, radius, radius, radius, radius, edgeSoftness)
+}
+
+fun stencil(mask: () -> Unit) {
+    GL11.glEnable(GL11.GL_STENCIL_TEST)
+    GL11.glStencilMask(0xFF)
+    GL11.glClearStencil(0)
+    GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT)
+    GL11.glColorMask(false, false, false, false)
+    GL11.glDepthMask(false)
+    GL11.glStencilFunc(GL11.GL_ALWAYS, 1, 0xFF)
+    GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
+    mask.invoke()
+    GL11.glColorMask(true, true, true, true)
+    GL11.glDepthMask(true)
+    GL11.glStencilMask(0x00)
+    GL11.glStencilFunc(GL11.GL_EQUAL, 1, 0xFF)
+    GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
+}
+
+fun resetStencil() {
+    GL11.glDisable(GL11.GL_STENCIL_TEST)
+    GL11.glStencilFunc(GL11.GL_ALWAYS, 0, 0xFF)
+    GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
+    GL11.glStencilMask(0xFF)
+}
+
 
 fun resetScissor(scissor: Scissor) {
     val nextScissor = scissorList[scissor.context - 1]

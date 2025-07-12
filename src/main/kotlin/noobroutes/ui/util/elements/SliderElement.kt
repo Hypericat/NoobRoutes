@@ -77,7 +77,6 @@ class SliderElement(
             val newVal = min + ((mouseX - (x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f) * diff
             setValue(newVal)
         }
-        logger.info(listeningText)
     }
 
     companion object {

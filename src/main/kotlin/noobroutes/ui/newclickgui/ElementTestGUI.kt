@@ -5,6 +5,7 @@ import noobroutes.ui.ColorPalette
 import noobroutes.ui.Screen
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.DualElement
+import noobroutes.ui.util.elements.ElementSelector
 import noobroutes.ui.util.elements.KeybindElement
 import noobroutes.ui.util.elements.SliderElement
 import noobroutes.ui.util.elements.SwitchElement
@@ -13,39 +14,24 @@ import org.lwjgl.input.Keyboard
 
 object ElementTestGUI : Screen() {
     private val testElements = listOf<UiElement>(
-        SwitchElement(
+        ElementSelector(
             "Test",
-            24f,
-            false,
-            300f,
-            300f,
+            100f,
+            200f,
             400f,
-            100f
+            100f,
+            0,
+            arrayListOf("Option 0", "Option 1", "Option 2", "Option 3", "Option 4")
         ),
-        KeybindElement("Test 1", Keybinding(Keyboard.KEY_NONE), 300f, 500f, 400f, 100f),
-        SliderElement(
+        ElementSelector(
             "Test 2",
-            300f,
+            100f,
             600f,
             400f,
             100f,
-            20.0,
-            20.0,
-            80.0,
-            1.0,
-            "gph"
-        ),
-        DualElement(
-            "Test 3",
-            "test L",
-            "test R",
-            300f,
-            800f,
-            400f,
-            100f,
-            false
+            0,
+            arrayListOf("Option 0", "Option 1", "Option 2", "Option 3", "Option 4")
         )
-
     )
 
     override fun draw() {

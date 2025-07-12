@@ -12,7 +12,7 @@ import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
-class KeybindElement(name: String, initialKey: Keybinding, x: Float, y: Float, w: Float, h: Float) :
+class KeybindElement(name: String, override var elementValue: Keybinding, x: Float, y: Float, w: Float, h: Float) :
     UiElement(name, x, y, w, h), ElementValue<Keybinding> {
 
     companion object {
@@ -63,7 +63,7 @@ class KeybindElement(name: String, initialKey: Keybinding, x: Float, y: Float, w
     }
 
     override val elementValueChangeListeners = mutableListOf<(Keybinding) -> Unit>()
-    override var elementValue: Keybinding = initialKey
+
     var listening = false
 
     private inline val isHovered get() = isHoveredKeybind(

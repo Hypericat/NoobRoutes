@@ -47,7 +47,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         get() = setting.value
 
     private val hover = HoverHandler(0, 150)
-    private val hueGradiant = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/HueGradient.png"))
+    private val hueGradiant = DynamicTexture(loadBufferedImage("/assets/ui/HueGradient.png"))
 
     private var hexString = "#FFFFFFFF"
     private var stringBefore = hexString
@@ -66,8 +66,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         rectangleOutline(x + w - 40f, y + 9, 31f, 19f, color.darker().withAlpha(1f), 5f, 1.5f)
 
         if (!extended && !anim.isAnimating()) return
-        val scissor = scissor(x + 2, y, w - 4, h + 1)
-
+        stencilRoundedRectangle(x + 2, y, w - 4, h + 1, 0f)
         // SATURATION AND BRIGHTNESS
 
         drawHSBBox(x + 10f, y + 38f, w - 20f, 170f, color.hsbMax())
@@ -113,8 +112,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
             val color = colorAnim.get(ColorUtil.clickGUIColor, buttonColor, listeningForString)
             rectangleOutline(x + w / 2 - stringWidth / 2 - 13 , y + 259, stringWidth + 25f, 23f, color, 5f,2f)
         }
-
-        resetScissor(scissor)
+        resetStencil()
         Color.WHITE.bind()
     }
 

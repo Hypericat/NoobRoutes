@@ -179,7 +179,7 @@ object ClickGUI : Screen() {
             val area = wrappedTextBounds(text!!, 300f, 12f)
             scale(1f / scaleFactor, 1f / scaleFactor, 1f)
             roundedRectangle(
-                x, y, area.first + 7, (area.second + 9) / 1.8,
+                x, y, area.first + 7, (area.second + 9),
                 buttonColor.withAlpha((hoverHandler!!.percent() / 100f).coerceIn(0f, 0.8f)), 5f
             )
             wrappedText(text!!, x + 7f, y + 12f, 300f, textColor, 12f, Font.REGULAR)

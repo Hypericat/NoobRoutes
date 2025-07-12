@@ -3,6 +3,7 @@ package noobroutes.ui
 
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
+import noobroutes.utils.render.initUIFramebufferStencil
 import noobroutes.utils.render.scale
 import noobroutes.utils.render.scaleFactor
 import noobroutes.utils.render.translate
@@ -10,6 +11,7 @@ import org.lwjgl.input.Mouse
 
 
 abstract class Screen : GuiScreen() {
+
 
     protected fun scaleUI(){
         GlStateManager.pushMatrix()

@@ -20,6 +20,7 @@ import noobroutes.utils.clock.Executor
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.RenderUtils2D
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.render.initUIFramebufferStencil
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.routes.SecretUtils
 import noobroutes.utils.skyblock.LocationUtils
@@ -87,6 +88,7 @@ class NoobRoutes {
     @Mod.EventHandler
     fun postInit(event: FMLPostInitializationEvent) {
         Core.postInit()
+        initUIFramebufferStencil()
     }
 
     @Mod.EventHandler
