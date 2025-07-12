@@ -6,7 +6,6 @@ import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.util.Vec3
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.MoveEntityWithHeadingEventPost
@@ -28,6 +27,12 @@ object BarPhase: Module(
 
     private var lastPlayerPos = Vec3(0.0, 0.0, 0.0)
     private var lastPlayerSpeed = Vec3(0.0, 0.0, 0.0)
+    private var skip = false
+    private var xToChange = 0.0
+    private var zToChange = 0.0
+
+    private const val COLLIDED_WITH_IRON_BAR_DECIMAL_LOW = 0.1375
+    private const val COLLIDED_WITH_IRON_BAR_DECIMAL_HIGH = 0.8625
 
     @SubscribeEvent
     fun onMotionPost(event: MotionUpdateEvent.Pre) {
@@ -38,6 +43,10 @@ object BarPhase: Module(
     @SubscribeEvent
     fun doShit(event: MoveEntityWithHeadingEventPost) {
         if (mc.thePlayer == null || !mc.thePlayer.onGround || mc.thePlayer.isSneaking) return
+        if (skip) {
+            skip = false
+            return
+        }
         val playerPosVector = mc.thePlayer.positionVector.toBlockPos()
         if (mc.theWorld.getBlockState(playerPosVector).block != Blocks.iron_bars && mc.theWorld.getBlockState(playerPosVector.up()).block != Blocks.iron_bars) return
 
@@ -49,24 +58,26 @@ object BarPhase: Module(
         var zOffset = 0
 
         val dir = when {
-            Utils.isClose(decX, 0.1375) -> {
+            Utils.isClose(decX, COLLIDED_WITH_IRON_BAR_DECIMAL_LOW) -> {
                 EnumFaceDirection.EAST
                 xOffset++
             }
-            Utils.isClose(decX, 0.8625) -> {
+            Utils.isClose(decX, COLLIDED_WITH_IRON_BAR_DECIMAL_HIGH) -> {
                 EnumFaceDirection.WEST
                 xOffset--
             }
-            Utils.isClose(decZ, 0.1375) -> {
+            Utils.isClose(decZ, COLLIDED_WITH_IRON_BAR_DECIMAL_LOW) -> {
                 EnumFaceDirection.SOUTH
                 zOffset++
             }
-            Utils.isClose(decZ, 0.8625) -> {
+            Utils.isClose(decZ, COLLIDED_WITH_IRON_BAR_DECIMAL_HIGH) -> {
                 EnumFaceDirection.NORTH
                 zOffset--
             }
             else -> null
         } ?: return
+
+        skip = true
 
         val positions = listOf(
            playerPosVector,
@@ -104,9 +115,6 @@ object BarPhase: Module(
         if (decimal < 0) decimal = 1 + decimal
         return decimal
     }
-
-    private var xToChange = 0.0
-    private var zToChange = 0.0
 
     private fun changePos(x: Double, z: Double) {
         xToChange = x
