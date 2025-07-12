@@ -44,19 +44,19 @@ object CoreClip: Module(
     private var lastPlayerPos = Vec3(0.0, 0.0, 0.0)
     private var lastPlayerSpeed = Vec3(0.0, 0.0, 0.0)
     private var clipTo = 0.0
-    private var skip = false
+    private var skip = 0
 
     @SubscribeEvent
-    fun onMotionPost(event: MotionUpdateEvent.Pre) {
+    fun onMotionPre(event: MotionUpdateEvent.Pre) {
         lastPlayerPos = Vec3(event.x, event.y, event.z)
         lastPlayerSpeed = Vec3(event.motionX, event.motionY, event.motionZ)
     }
 
     @SubscribeEvent
-    fun onMotionPre(event: MoveEntityWithHeadingEventPost) {
+    fun afterMoveEntityWithHeading(event: MoveEntityWithHeadingEventPost) {
         if (mc.thePlayer == null || mc.thePlayer.isSneaking || !BossEventDispatcher.inF7Boss) return
-        if (skip) {
-            skip = false
+        if (skip > 0) {
+            skip--
             return
         }
         if (mc.thePlayer.posY != CORE_Y) return
@@ -68,7 +68,7 @@ object CoreClip: Module(
 
     fun clipShit(spot: Double) {
         val dir = if (spot == CORE_Z_EDGE1 + MAX_INSIDE_BLOCK) 1 else -1
-        skip = true
+        skip = 2
         mc.thePlayer.setPosition(lastPlayerPos.xCoord, lastPlayerPos.yCoord, lastPlayerPos.zCoord)
         mc.thePlayer.setVelocity(0.0, lastPlayerSpeed.yCoord, MAX_WALK_SPEED_FORWARD * GROUND_DRAG * dir)
 
@@ -80,10 +80,10 @@ object CoreClip: Module(
 
         mc.thePlayer.moveEntityWithHeading(0f, 1f) //player must walk forward
 
-        val maxWalkDistance = if (Keyboard.isKeyDown(mc.gameSettings.keyBindBack.keyCode)) MAX_WALK_SPEED_BACKWARDS else MAX_WALK_SPEED_FORWARD
+        val maxWalkDistance = if (mc.thePlayer.moveForward == -1f) MAX_WALK_SPEED_BACKWARDS else MAX_WALK_SPEED_FORWARD
 
         if (mc.thePlayer.posZ + maxWalkDistance * dir in CORE_Z_EDGE1 - 0.05..CORE_Z_EDGE2 + 0.05) {
-            mc.thePlayer.moveEntityWithHeading(0f, 1f)
+            mc.thePlayer.moveEntityWithHeading(0f, 1f) //walk again if he would still be in
             devMessage("far")
         }
 
