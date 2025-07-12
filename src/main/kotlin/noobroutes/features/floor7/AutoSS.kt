@@ -4,15 +4,18 @@ package noobroutes.features.floor7
 import net.minecraft.block.Block
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
+import net.minecraft.util.Timer
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.logger
 import noobroutes.events.impl.BlockChangeEvent
 import noobroutes.events.impl.ChatPacketEvent
@@ -23,8 +26,12 @@ import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.features.settings.impl.SelectorSetting
+import noobroutes.mixin.accessors.TimerFieldAccessor
+import noobroutes.utils.AuraManager
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.RotationUtils.getYawAndPitch
+import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.clock.Executor
 import noobroutes.utils.clock.Executor.Companion.register
 import noobroutes.utils.render.Color
@@ -32,6 +39,7 @@ import noobroutes.utils.render.RenderUtils.drawStringInWorld
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.sendCommand
 import org.lwjgl.input.Keyboard
 
@@ -52,6 +60,11 @@ object AutoSS : Module(
     private val forceDevice by BooleanSetting("Force Device", false, description = "").withDependency {devMode}
     private val resetSSKeybind by KeybindSetting("Reset SS", Keyboard.KEY_NONE, "Resets AutoSS on press").onPress { resetKey() }
 
+    private val i1Mode by SelectorSetting("i1 mode", "tickshift", arrayListOf("tickshift", "c03", "c08"), false, description = "how to i1, tickshift slows and speeds up game, c03 only sends c03 and c08 packets, c08 only sends c08 packets")
+    private val i1Keybind by KeybindSetting("i1 test", Keyboard.KEY_NONE, "tries to i1 on press").onPress { tryI1() }
+    private val i1ClickAmount by NumberSetting("i1 clicks", 24, 9, 36, 3, description = "how often i1 should click (triple of 3 man i1)")
+    private val useMousePos by BooleanSetting("use mouse pos", false, description = "")
+
     private val autoStart by BooleanSetting("Autostart", true, description = "Automatically starts autoSS")
     private val autoStartDelay by NumberSetting("Autostart delay", 125.0, 50.0, 200.0, 1.0, unit = "ms", description = "The delay used for starting autoSS")
     private val dontCheck by BooleanSetting("Faster SS?", false, description = "idk what this means")
@@ -60,9 +73,15 @@ object AutoSS : Module(
 
 
 
+
+
     init {
         ssLoop()
     }
+
+    private var timesToClickI1 = 0
+    var dontCancel = false
+    private var skip = 0
 
     var lastClickAdded = System.currentTimeMillis()
     var next = false
@@ -83,8 +102,80 @@ object AutoSS : Module(
         doneFirst = false
         doingSS = false
         clicked = false
+        skip = 0
+        dontCancel = false
+        timesToClickI1 = 0
         devMessage("Reset!")
     }
+
+
+    private fun tryI1() {
+        if (timesToClickI1 != 0 || (mc as TimerFieldAccessor).timer.timerSpeed != 1f) return
+
+        val startButton: BlockPos = BlockPos(110, 121, 91)
+        if (mc.thePlayer.getDistanceSqToCenter(startButton) > 25 && !useMousePos) return modMessage("too far")
+
+        setAndUpdateTimer(0f)
+
+        Thread{
+            Thread.sleep((i1ClickAmount * 1.2 * 50).toLong()) //sleep for a bit more then needed
+
+            setAndUpdateTimer(20f)
+
+            if (i1ClickAmount % 3 != 0) {
+                modMessage("invalid click amount")
+                return@Thread
+            }
+
+            when (i1Mode) {
+                0 -> { //tickshift
+                    Thread.sleep(49)
+                    dontCancel = true
+                    timesToClickI1 = i1ClickAmount
+                }
+                1, 2 -> { //the others
+                    dontCancel = true
+                    repeat(i1ClickAmount) {
+                        if (it % 3 == 0) Thread.sleep(50)
+                        if (i1Mode == 1) PacketUtils.sendPacket(C03PacketPlayer(mc.thePlayer.onGround))
+                        clickStartButton()
+                    }
+                    dontCancel = false
+                }
+            }
+
+        }.start()
+    }
+
+    private fun setAndUpdateTimer(speed: Float) {
+        (mc as TimerFieldAccessor).timer = Timer(speed)
+        (mc as TimerFieldAccessor).timer.updateTimer()
+    }
+
+    @SubscribeEvent
+    fun onClientTick(event: TickEvent.ClientTickEvent) {
+        if (mc.thePlayer == null || timesToClickI1 < 3 || event.isEnd) return
+
+        if (skip > 0) {
+            skip--
+            return
+        }
+
+        skip = 2
+        clickStartButton()
+        repeat(2) {
+            mc.runTick()
+            clickStartButton()
+        }
+
+        timesToClickI1 -= 3
+    }
+
+    fun clickStartButton() {
+        if (!useMousePos) clickButton(110, 121, 91)
+        else clickButton(mc.objectMouseOver.blockPos.x, mc.objectMouseOver.blockPos.y, mc.objectMouseOver.blockPos.z)
+    }
+
 
 
     private fun resetKey(){
@@ -210,7 +301,7 @@ object AutoSS : Module(
         }
     }
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
         val mop: MovingObjectPosition = mc.objectMouseOver ?: return
         if (System.currentTimeMillis() - wtflip < 1000) return
@@ -221,7 +312,7 @@ object AutoSS : Module(
             reset()
             start()
         }
-    }
+    }*/
 
     @SubscribeEvent
     fun onBlockChange(event: BlockChangeEvent) {

@@ -81,7 +81,8 @@ object ModuleManager {
         RotationVisualizer,
         BrushModule,
         FreeCam,
-        QOL
+        QOL,
+        BarPhase
     )
 
     init {

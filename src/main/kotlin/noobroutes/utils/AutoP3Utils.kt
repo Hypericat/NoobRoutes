@@ -156,7 +156,7 @@ object AutoP3Utils {
     var airTicks = 0
     var jumping = false
 
-    private const val JUMP_SPEED = 6.0075
+    const val JUMP_SPEED = 6.0075
     private const val SPRINT_MULTIPLIER = 1.3
 
     var speeding = false

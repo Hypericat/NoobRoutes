@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.move.LavaClip
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.Scheduler
 import org.lwjgl.input.Keyboard
@@ -39,7 +40,7 @@ object Simulation : Module(
 
         if (!lava || inLava) return
 
-        if (mc.thePlayer.isInLava ||
+        if (LavaClip.customInLavaCheck() ||
             mc.theWorld.getBlockState(BlockPos(floor(mc.thePlayer.posX), floor(mc.thePlayer.posY), floor(mc.thePlayer.posZ))).block == Blocks.rail
             && mc.thePlayer.posY - floor(mc.thePlayer.posY) < 0.1) {
 

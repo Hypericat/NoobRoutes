@@ -1,7 +1,9 @@
 package noobroutes.features.move
 
 
+import net.minecraft.block.material.Material
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -35,7 +37,7 @@ object LavaClip: Module(
         if (mc.thePlayer == null) return
         if (event.phase != TickEvent.Phase.END) return
 
-        if (mc.thePlayer.isInLava) {
+        if (customInLavaCheck()) {
             cancelS12 = true
             val clipDistance = if (ringClip != null) ringClip else lavaDistance.toDouble()
             if (clipDistance == null) return
@@ -60,8 +62,18 @@ object LavaClip: Module(
         toggle()
     }
 
+    @SubscribeEvent
+    fun onS08(event: PacketEvent.Receive) {
+        if (event.packet is S08PacketPlayerPosLook) onDisable()
+    }
+
     override fun onDisable() {
         ringClip = null
+        cancelS12 = false
         super.onDisable()
+    }
+
+    fun customInLavaCheck(): Boolean {
+        return mc.thePlayer.worldObj.isMaterialInBB(mc.thePlayer.getEntityBoundingBox().expand(-1.0E-4, -1.0E-4, -1.0E-4), Material.lava)
     }
 }

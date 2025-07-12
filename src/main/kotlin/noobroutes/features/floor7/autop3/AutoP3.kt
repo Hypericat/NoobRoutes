@@ -41,6 +41,7 @@ import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
+import org.lwjgl.Sys
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import kotlin.math.absoluteValue
@@ -93,7 +94,6 @@ object AutoP3: Module (
 
     private var keep = false
 
-    private var lastLavaClip = System.currentTimeMillis()
     var isAligned = false
 
     @SubscribeEvent
@@ -158,20 +158,16 @@ object AutoP3: Module (
                     doAwait(ring)
                     return@forEach
                 }
-                if (ring is LavaClipRing) {
-                    if (System.currentTimeMillis() - lastLavaClip > 1000) {
-                        ring.doRing()
-                        lastLavaClip = System.currentTimeMillis()
-                    }
-                }
-                else if (ring !is BlinkRing) ring.doRing()
+
+                if (ring !is BlinkRing) ring.doRing()
                 else activatedBlinks.add(ring)
             }
             else {
-                ring.triggered = false
                 if (ring.leap) awaitingLeap.remove(ring)
                 if (ring.term) awaitingTerm.remove(ring)
                 if (ring.left) awaitingLeft.remove(ring)
+                if (ring is BlinkRing || ring is LavaClipRing) return@forEach
+                ring.triggered = false
             }
         }
         if (awaitingLeap.isEmpty()) leapedIDs = mutableSetOf<Int>() //this should be done after ring updates
@@ -542,6 +538,7 @@ object AutoP3: Module (
 
     fun actuallyAddRing(ring: Ring) {
         ring.triggered = true
+        Scheduler.schedulePostTickTask(60) { ring.triggered = false }
         rings[route]?.add(ring) ?: run { rings[route] = mutableListOf(ring) }
         saveRings()
     }
