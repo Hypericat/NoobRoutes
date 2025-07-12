@@ -13,6 +13,7 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.Utils.isClose
+import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
 
 
@@ -44,8 +45,9 @@ object CoreClip: Module(
     }
 
     fun clipShit(spot: Double) {
+        val dir = if (spot == 53.7624) 1 else -1
         mc.thePlayer.setPosition(lastPlayerPos.xCoord, lastPlayerPos.yCoord, lastPlayerPos.zCoord)
-        mc.thePlayer.setVelocity(0.0, lastPlayerSpeed.yCoord, 1.403 * 0.546 * if (spot == 53.7624) 1 else -1)
+        mc.thePlayer.setVelocity(0.0, lastPlayerSpeed.yCoord, 1.403 * 0.546 * dir)
 
         Blocks.gold_block.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
 
@@ -53,6 +55,11 @@ object CoreClip: Module(
         mc.thePlayer.rotationYaw = if (spot == 53.7624) 0f else 180f //make game think player is walking straight at door
 
         mc.thePlayer.moveEntityWithHeading(0f, 1f) //player must walk forward
+
+        if (mc.thePlayer.posZ + 1.4 * dir in 53.65..55.35) {
+            mc.thePlayer.moveEntityWithHeading(0f, 1f)
+            devMessage("far")
+        }
 
         mc.thePlayer.rotationYaw = prevRot
 
