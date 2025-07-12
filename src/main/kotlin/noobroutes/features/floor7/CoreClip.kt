@@ -5,20 +5,16 @@ import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.util.Vec3
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.MoveEntityWithHeadingEventPost
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.Utils.isClose
-import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import org.lwjgl.input.Keyboard
-import kotlin.math.abs
-import kotlin.math.pow
+
 
 object CoreClip: Module(
     name = "CoreClip",
@@ -48,12 +44,8 @@ object CoreClip: Module(
     }
 
     fun clipShit(spot: Double) {
-        if (abs(lastPlayerSpeed.zCoord) < 0.5) return
-
-        val doTwice = lastPlayerPos.distanceToPlayerSq > 1.3 //if the distance is big we can/have to move twice
-
         mc.thePlayer.setPosition(lastPlayerPos.xCoord, lastPlayerPos.yCoord, lastPlayerPos.zCoord)
-        mc.thePlayer.setVelocity(lastPlayerSpeed.xCoord, lastPlayerSpeed.yCoord, lastPlayerSpeed.zCoord)
+        mc.thePlayer.setVelocity(0.0, lastPlayerSpeed.yCoord, 1.403 * 0.91 * if (spot == 53.7624) 1 else -1)
 
         Blocks.gold_block.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
 
@@ -61,7 +53,6 @@ object CoreClip: Module(
         mc.thePlayer.rotationYaw = if (spot == 53.7624) 0f else 180f //make game think player is walking straight at door
 
         mc.thePlayer.moveEntityWithHeading(0f, 1f) //player must walk forward
-        if (doTwice) mc.thePlayer.moveEntityWithHeading(0f, 1f)
 
         mc.thePlayer.rotationYaw = prevRot
 
