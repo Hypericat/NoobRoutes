@@ -45,7 +45,7 @@ object CoreClip: Module(
 
     fun clipShit(spot: Double) {
         mc.thePlayer.setPosition(lastPlayerPos.xCoord, lastPlayerPos.yCoord, lastPlayerPos.zCoord)
-        mc.thePlayer.setVelocity(0.0, lastPlayerSpeed.yCoord, 1.403 * 0.91 * if (spot == 53.7624) 1 else -1)
+        mc.thePlayer.setVelocity(0.0, lastPlayerSpeed.yCoord, 1.403 * 0.546 * if (spot == 53.7624) 1 else -1)
 
         Blocks.gold_block.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
 
