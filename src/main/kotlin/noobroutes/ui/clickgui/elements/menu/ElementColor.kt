@@ -66,7 +66,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         rectangleOutline(x + w - 40f, y + 9, 31f, 19f, color.darker().withAlpha(1f), 5f, 1.5f)
 
         if (!extended && !anim.isAnimating()) return
-        stencilRoundedRectangle(x + 2, y, w - 4, h + 1, 0f)
+        stencilRoundedRectangle(x + 2, y, w - 4, h, 0f)
         // SATURATION AND BRIGHTNESS
 
         drawHSBBox(x + 10f, y + 38f, w - 20f, 170f, color.hsbMax())

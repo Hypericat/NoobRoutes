@@ -1,7 +1,6 @@
 package noobroutes.utils.render
 
 import gg.essential.universal.UMatrixStack
-import net.minecraft.client.gui.Gui.drawRect
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
@@ -18,6 +17,7 @@ import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import noobroutes.utils.times
 import org.lwjgl.opengl.Display
 import org.lwjgl.opengl.GL11
+import java.util.Stack
 
 val matrix = UMatrixStack.Compat
 val scaleFactor get() = ScaledResolution(mc).scaleFactor.toFloat()
@@ -189,19 +189,13 @@ fun scissor(x: Number, y: Number, w: Number, h: Number): Scissor {
     return scissor
 }
 
+//note for if this mod goes public and people want to use this,
+//you need to call this function on initialization if you want the stencil to work
 fun initUIFramebufferStencil() {
     mc.framebuffer.bindFramebuffer(true)
     mc.framebuffer.enableStencil()
     mc.framebuffer.unbindFramebuffer()
 }
-
-
-/*
-    x: Number, y: Number, w: Number, h: Number,
-    color: Color, borderColor: Color, shadowColor: Color,
-    borderThickness: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number,
-    color2: Color = color, gradientDir: Int = 0, shadowSoftness: Float = 0f
- */
 
 fun stencilRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number) {
     stencil {roundedRectangle(x, y,w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
@@ -211,28 +205,79 @@ fun stencilRoundedRectangle(x: Float, y: Float, w: Float, h: Float, radius: Numb
     stencilRoundedRectangle(x, y, w, h, radius, radius, radius, radius, edgeSoftness)
 }
 
+
+//an int would probably be better, however, i am using a stack just in case it does more in the future
+var stencilStack = Stack<Int>()
+
 fun stencil(mask: () -> Unit) {
+    val newStencilValue = if (stencilStack.isEmpty()) 1 else stencilStack.peek() + 1
+    stencilStack.push(newStencilValue)
     GL11.glEnable(GL11.GL_STENCIL_TEST)
-    GL11.glStencilMask(0xFF)
-    GL11.glClearStencil(0)
-    GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT)
+
+
+    if (stencilStack.peek() == 1) {
+        GL11.glClearStencil(0)
+        GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT)
+    }
+
+
     GL11.glColorMask(false, false, false, false)
     GL11.glDepthMask(false)
-    GL11.glStencilFunc(GL11.GL_ALWAYS, 1, 0xFF)
-    GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
+    GL11.glStencilMask(0xFF)
+    if (stencilStack.peek() > 1) {
+
+        val previousStencilValue = stencilStack.peek() - 1
+
+        GL11.glStencilFunc(GL11.GL_EQUAL, previousStencilValue, 0xFF)
+
+        GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_INCR)
+
+    } else {
+
+        GL11.glStencilFunc(GL11.GL_ALWAYS, newStencilValue, 0xFF)
+
+        GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
+
+    }
+
     mask.invoke()
+
+    GL11.glStencilFunc(GL11.GL_EQUAL, if (stencilStack.peek() > 1) newStencilValue else 0, 0xFF)
+
+    GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
+
+    GL11.glStencilMask(0xFF)
+
+    mask.invoke()
+
+
     GL11.glColorMask(true, true, true, true)
     GL11.glDepthMask(true)
     GL11.glStencilMask(0x00)
-    GL11.glStencilFunc(GL11.GL_EQUAL, 1, 0xFF)
+
+    GL11.glStencilFunc(GL11.GL_EQUAL, newStencilValue, 0xFF)
     GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
 }
 
 fun resetStencil() {
-    GL11.glDisable(GL11.GL_STENCIL_TEST)
-    GL11.glStencilFunc(GL11.GL_ALWAYS, 0, 0xFF)
-    GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
-    GL11.glStencilMask(0xFF)
+    if (stencilStack.isEmpty()) {
+        throw IllegalStateException("StencilStack is empty")
+    }
+
+    stencilStack.pop()
+    if (stencilStack.isEmpty()) {
+        // If no more stencils, disable the test entirely
+        GL11.glDisable(GL11.GL_STENCIL_TEST)
+        GL11.glStencilFunc(GL11.GL_ALWAYS, 0, 0xFF)
+        GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
+        GL11.glStencilMask(0xFF) // Reset mask
+    } else {
+        // If there are still stencils on the stack, apply the previous one
+        val previousStencilValue = stencilStack.peek()
+        GL11.glStencilFunc(GL11.GL_EQUAL, previousStencilValue, 0xFF)
+        GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
+        GL11.glStencilMask(0x00) // Continue to disable writing unless re-entering a stencil
+    }
 }
 
 
