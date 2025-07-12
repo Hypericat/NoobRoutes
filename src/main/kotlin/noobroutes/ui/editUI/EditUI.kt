@@ -197,20 +197,23 @@ object EditUI : Screen() {
             )
         )
         currentY += 75f
-        elements.add(
-            ElementSlider(
-                "Height",
-                min = 0.0, max = 3.0,
-                unit = "",
-                increment = 0.1,
-                { ring.height.toDouble() }, { ring.height = it.toFloat() },
-                X_ALIGNMENT_LEFT, currentY,
-                550f,
-                104f,
-                2
+
+        if (ring !is BlinkRing && ring !is MotionRing && ring !is JumpRing) {
+            elements.add(
+                ElementSlider(
+                    "Height",
+                    min = 0.0, max = 3.0,
+                    unit = "",
+                    increment = 0.1,
+                    { ring.height.toDouble() }, { ring.height = it.toFloat() },
+                    X_ALIGNMENT_LEFT, currentY,
+                    550f,
+                    104f,
+                    2
+                )
             )
-        )
-        currentY += 75f
+            currentY += 75f
+        }
         elements.add(
             ElementCheckBox(
                 X_ALIGNMENT_LEFT,

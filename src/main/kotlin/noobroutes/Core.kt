@@ -14,7 +14,6 @@ import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.routes.AutoRoute
-import noobroutes.font.MinecraftFont
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.util.shader.RoundedRect
 import org.apache.logging.log4j.LogManager
@@ -34,7 +33,7 @@ object Core {
     var display: GuiScreen? = null
 
     fun init() {
-        MinecraftFont.init()
+
     }
 
     fun postInit() {
@@ -58,8 +57,8 @@ object Core {
         RoundedRect.initShaders()
         BrushModule.loadConfig()
     }
-    var lastChatVisibility: EntityPlayer.EnumChatVisibility? = null
-    var inUI = false
+    private var lastChatVisibility: EntityPlayer.EnumChatVisibility? = null
+    private var inUI = false
 
     @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {

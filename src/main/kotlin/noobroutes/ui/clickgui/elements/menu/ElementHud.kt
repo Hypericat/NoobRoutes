@@ -3,11 +3,9 @@ package noobroutes.ui.clickgui.elements.menu
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.HudSetting
-import noobroutes.font.MinecraftFont
+import noobroutes.font.Font
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.animations.impl.ColorAnimation
-import noobroutes.ui.clickgui.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
@@ -21,6 +19,8 @@ import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 
@@ -46,14 +46,14 @@ class ElementHud(parent: ModuleButton, setting: HudSetting) : Element<HudSetting
             else isAreaHovered(x + w - 30f, y + 5f, 21f, 20f)
         }
 
-    private val movementIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/MovementIcon.png"))
+    private val movementIcon = DynamicTexture(loadBufferedImage("/assets/ui/MovementIcon.png"))
     private val colorAnim = ColorAnimation(250)
     private val hover = HoverHandler(0, 150)
     private val linearAnimation = LinearAnimation<Float>(200)
 
     override fun draw() {
         roundedRectangle(x, y, w, h, ColorUtil.elementBackground)
-        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, MinecraftFont.REGULAR)
+        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, Font.REGULAR)
 
         var offset = 30f
         if (setting.displayToggle) {

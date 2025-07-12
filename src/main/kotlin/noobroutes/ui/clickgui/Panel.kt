@@ -5,9 +5,8 @@ import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.Category
 import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
-import noobroutes.font.MinecraftFont
+import noobroutes.font.Font
 import noobroutes.ui.clickgui.SearchBar.currentSearch
-import noobroutes.ui.clickgui.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.elements.ModuleButton
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.brighter
@@ -16,6 +15,7 @@ import noobroutes.ui.clickgui.util.ColorUtil.titlePanelColor
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
+import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
@@ -35,11 +35,13 @@ import kotlin.math.floor
 class Panel(
     var category: Category,
 ) {
-    private val renderIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/render.png"))
-    private val floor7Icon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/wither.png"))
-    private val moveIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/move.png"))
-    private val miscIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/misc.png"))
-
+    private val renderIcon = DynamicTexture(loadBufferedImage("/assets/ui/render.png"))
+    private val floor7Icon = DynamicTexture(loadBufferedImage("/assets/ui/wither.png"))
+    private val moveIcon = DynamicTexture(loadBufferedImage("/assets/ui/move.png"))
+    private val miscIcon = DynamicTexture(loadBufferedImage("/assets/ui/misc.png"))
+    private val dungeonIcon = DynamicTexture(loadBufferedImage("/assets/ui/dungeon.png"))
+    
+    
     val displayName = category.name.lowercase().capitalizeFirst()
 
     private var dragging = false
@@ -83,27 +85,31 @@ class Panel(
         when(category){
             Category.RENDER -> {
                 additionalOffset = 4.0
-                drawDynamicTexture(renderIcon, x + WIDTH * 0.08 - imageSize / 2 + additionalOffset, y + HEIGHT / 2 - imageSize / 2 - 2, imageSize, imageSize)
+                drawDynamicTexture(renderIcon, x + WIDTH * 0.08 - imageSize * 0.5f + additionalOffset, y + HEIGHT * 0.5f - imageSize * 0.5f - 2, imageSize, imageSize)
             }
             Category.FLOOR7 -> {
                 additionalOffset = 4.0
-                drawDynamicTexture(floor7Icon, x + WIDTH * 0.08  - imageSize / 2 + additionalOffset, y + HEIGHT / 2  - imageSize / 2, imageSize, imageSize)
+                drawDynamicTexture(floor7Icon, x + WIDTH * 0.08  - imageSize * 0.5f + additionalOffset, y + HEIGHT * 0.5f  - imageSize * 0.5f, imageSize, imageSize)
             }
             Category.MOVE -> {
                 additionalOffset = 4.0
-                drawDynamicTexture(moveIcon, x + WIDTH * 0.08  - imageSize / 2 + additionalOffset, y + HEIGHT / 2  - imageSize / 2, imageSize, imageSize)
+                drawDynamicTexture(moveIcon, x + WIDTH * 0.08 - imageSize * 0.5f + additionalOffset, y + HEIGHT * 0.5f  - imageSize * 0.5f, imageSize * 1.5f, imageSize * 1.5f)
             }
             Category.MISC -> {
                 additionalOffset = 4.0
-                drawDynamicTexture(miscIcon, x + WIDTH * 0.08  - imageSize / 2 + additionalOffset, y + HEIGHT / 2  - imageSize / 2, imageSize, imageSize)
+                drawDynamicTexture(miscIcon, x + WIDTH * 0.08  - imageSize * 0.5f + additionalOffset, y + HEIGHT * 0.5f  - imageSize * 0.5f, imageSize, imageSize)
+            }
+            Category.DUNGEON -> {
+                additionalOffset = 4.0
+                drawDynamicTexture(dungeonIcon, x + WIDTH * 0.08  - imageSize * 0.5f + additionalOffset, y + HEIGHT * 0.5f  - imageSize * 0.5f, imageSize, imageSize)
             }
             else -> {
-
+                additionalOffset = -4.0
             }
 
         }
 
-        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT / 2f, ColorUtil.textColor, 15f, type = MinecraftFont.BOLD, TextAlign.Middle)
+        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT * 0.5f, ColorUtil.textColor, 15f, type = Font.BOLD, TextAlign.Middle)
 
         //draw Panel Line
         if (extended && moduleButtons.isNotEmpty()) roundedRectangle(x, y + HEIGHT - 2, WIDTH, 2, ColorUtil.clickGUIColor.brighter(1.65f))
@@ -112,8 +118,7 @@ class Panel(
 
 
 
-
-        val s = scissor(x, y + HEIGHT, WIDTH, 5000f)
+        stencilRoundedRectangle(x, y + HEIGHT, WIDTH, 5000f)
         if (extended && moduleButtons.isNotEmpty()) {
 
             for (button in moduleButtons.filter { it.module.name.contains(currentSearch, true) }) {
@@ -156,7 +161,7 @@ class Panel(
                 0f
             )
         }
-        resetScissor(s)
+        resetStencil()
         scale(scaleFactor, scaleFactor, 1f)
     }
 

@@ -7,7 +7,7 @@ pluginManagement {
         maven("https://maven.fabricmc.net")
         maven("https://maven.minecraftforge.net/")
         maven("https://repo.spongepowered.org/maven/")
-        maven("https://repo.essential.gg/repository/maven-releases/")
+        maven("https://repo.essential.gg/public")
     }
     resolutionStrategy {
         eachPlugin {
@@ -21,6 +21,5 @@ pluginManagement {
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.9.0"
 }
-
 
 rootProject.name = "NoobRoutes"

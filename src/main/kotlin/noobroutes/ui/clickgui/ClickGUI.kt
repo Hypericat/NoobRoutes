@@ -9,10 +9,9 @@ import noobroutes.Core.display
 import noobroutes.config.Config
 import noobroutes.features.Category
 import noobroutes.features.render.ClickGUIModule
-import noobroutes.font.MinecraftFont
+import noobroutes.font.Font
 import noobroutes.ui.Screen
 import noobroutes.ui.clickgui.ClickGUI.draw
-import noobroutes.ui.clickgui.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.elements.menu.ElementColor
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.MODULE_BUTTON_COLOR_ALPHA
@@ -20,6 +19,7 @@ import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
 import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.clickgui.util.HoverHandler
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.render.*
 import org.lwjgl.input.Mouse
 import kotlin.math.sign
@@ -179,10 +179,10 @@ object ClickGUI : Screen() {
             val area = wrappedTextBounds(text!!, 300f, 12f)
             scale(1f / scaleFactor, 1f / scaleFactor, 1f)
             roundedRectangle(
-                x, y, area.first + 7, (area.second + 9) / 1.8,
+                x, y, area.first + 7, (area.second + 9),
                 buttonColor.withAlpha((hoverHandler!!.percent() / 100f).coerceIn(0f, 0.8f)), 5f
             )
-            wrappedText(text!!, x + 7f, y + 12f, 300f, textColor, 12f, MinecraftFont.REGULAR)
+            wrappedText(text!!, x + 7f, y + 12f, 300f, textColor, 12f, Font.REGULAR)
             if (hoverHandler!!.percent() == 0) {
                 text = null
                 hoverHandler = null

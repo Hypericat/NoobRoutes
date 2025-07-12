@@ -35,9 +35,9 @@ void main() {
     // Interpolate colors based on the distance
     vec4 gradientColor = mix(u_colorRect, u_colorRect2, (strength.x == 0.0) ? strength.y + 0.5 : strength.x + 0.5);
 
-    float u_borderSoftness  = 2.0; // How soft the (internal) border should be (in pixels)
-    vec2  u_shadowOffset   = vec2(0.0, 0.0); // The pixel-space shadow offset from rectangle center
-    vec4  u_colorBg     = vec4(0.0); // The color of background
+    float u_borderSoftness = 2.0; // How soft the (internal) border should be (in pixels)
+    vec2  u_shadowOffset = vec2(0.0, 0.0); // The pixel-space shadow offset from rectangle center
+    vec4  u_colorBg = vec4(0.0); // The color of background
     vec2 halfSize = (u_rectSize / 2.0); // Rectangle extents (half of the size)
 
 

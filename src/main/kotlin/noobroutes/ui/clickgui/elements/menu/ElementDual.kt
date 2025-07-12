@@ -1,8 +1,7 @@
 package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.settings.impl.DualSetting
-import noobroutes.font.MinecraftFont
-import noobroutes.ui.clickgui.animations.impl.EaseInOut
+import noobroutes.font.Font
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
@@ -12,6 +11,7 @@ import noobroutes.ui.clickgui.util.ColorUtil.darker
 import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
 import noobroutes.ui.util.MouseUtils
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle
@@ -32,20 +32,20 @@ class ElementDual(parent: ModuleButton, setting: DualSetting) : Element<DualSett
     private val posAnim = EaseInOut(250)
 
     private val isRightHovered: Boolean
-        get() = MouseUtils.isAreaHovered(x + w / 2 + 5f, y + 2f, w / 2 - 10f, 30f)
+        get() = MouseUtils.isAreaHovered(x + w * 0.5f + 5f, y + 2f, w * 0.5f - 10f, 30f)
 
     private val isLeftHovered: Boolean
-        get() = MouseUtils.isAreaHovered(x + 5f, y + 2f, w / 2 - 10f, 30f)
+        get() = MouseUtils.isAreaHovered(x + 5f, y + 2f, w * 0.5f - 10f, 30f)
 
     override fun draw() {
         roundedRectangle(x, y, w, h, elementBackground)
         roundedRectangle(x + 7f, y + 3f, w - 14f, 28f, buttonColor, 5f)
 
-        val pos = posAnim.get(8f, w / 2, !setting.enabled)
-        roundedRectangle(x + pos, y + 3f, w / 2 - 6f, 28f, clickGUIColor.darker(0.8f), 5f)
+        val pos = posAnim.get(8f, w * 0.5f, !setting.enabled)
+        roundedRectangle(x + pos, y + 3f, w * 0.5f - 6f, 28f, clickGUIColor.darker(0.8f), 5f)
 
-        text(setting.left, x + w / 4 + 6f, y + 1f + h / 2, Color.WHITE.darkerIf(isLeftHovered), 12f, MinecraftFont.REGULAR, TextAlign.Middle)
-        text(setting.right, x + w * 3 / 4 - 3f,y + 1f + h / 2, Color.WHITE.darkerIf(isRightHovered), 12f, MinecraftFont.REGULAR, TextAlign.Middle)
+        text(setting.left, x + w * 0.25f + 6f, y + 1f + h * 0.5f, Color.WHITE.darkerIf(isLeftHovered), 12f, Font.REGULAR, TextAlign.Middle)
+        text(setting.right, x + w * 3 * 0.25f - 3f,y + 1f + h * 0.5f, Color.WHITE.darkerIf(isRightHovered), 12f, Font.REGULAR, TextAlign.Middle)
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {

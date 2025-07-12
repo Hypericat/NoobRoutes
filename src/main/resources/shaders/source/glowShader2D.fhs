@@ -1,0 +1,45 @@
+
+// shader gotten from https://www.shadertoy.com/view/Mdf3zr
+#version 120
+
+uniform sampler2D u_texture;
+uniform vec2 u_resolution;
+//uniform float time;
+
+float d;
+
+float lookup(vec2 p, float dx, float dy) {
+    vec2 uv = (p + vec2(dx, dy)) / u_resolution;
+    vec4 c = texture2D(u_texture, uv);
+    return dot(c.rgb, vec3(0.2126, 0.7152, 0.0722));
+}
+
+void main() {
+    d = sin(5.0)*0.5 + 1.5; // kernel offset
+    vec2 p = gl_FragCoord.xy;
+
+	// simple sobel edge detection
+    float gx = 0.0;
+    gx += -1.0 * lookup(p, -1.0, -1.0);
+    gx += -2.0 * lookup(p, -1.0,  0.0);
+    gx += -1.0 * lookup(p, -1.0,  1.0);
+    gx +=  1.0 * lookup(p,  1.0, -1.0);
+    gx +=  2.0 * lookup(p,  1.0,  0.0);
+    gx +=  1.0 * lookup(p,  1.0,  1.0);
+
+    float gy = 0.0;
+    gy += -1.0 * lookup(p, -1.0, -1.0);
+    gy += -2.0 * lookup(p,  0.0, -1.0);
+    gy += -1.0 * lookup(p,  1.0, -1.0);
+    gy +=  1.0 * lookup(p, -1.0,  1.0);
+    gy +=  2.0 * lookup(p,  0.0,  1.0);
+    gy +=  1.0 * lookup(p,  1.0,  1.0);
+
+    float g = gx*gx + gy*gy;
+    float g2 = g * (sin(5.0) / 2.0 + 0.5);
+
+    vec4 col = texture2D(u_texture, p / u_resolution.xy);
+    col += vec4(0.0, g, g2, 1.0);
+
+    gl_FragColor = col;
+}

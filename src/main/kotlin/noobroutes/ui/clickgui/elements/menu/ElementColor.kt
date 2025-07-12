@@ -2,10 +2,8 @@ package noobroutes.ui.clickgui.elements.menu
 
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.settings.impl.ColorSetting
-import noobroutes.font.MinecraftFont
+import noobroutes.font.Font
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.animations.impl.ColorAnimation
-import noobroutes.ui.clickgui.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
@@ -21,6 +19,8 @@ import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
+import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.bind
@@ -47,7 +47,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         get() = setting.value
 
     private val hover = HoverHandler(0, 150)
-    private val hueGradiant = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/HueGradient.png"))
+    private val hueGradiant = DynamicTexture(loadBufferedImage("/assets/ui/HueGradient.png"))
 
     private var hexString = "#FFFFFFFF"
     private var stringBefore = hexString
@@ -61,13 +61,12 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         hover.handle(x + w - 41, y, 31.5f, 19f)
 
         roundedRectangle(x, y, w, h, elementBackground)
-        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, MinecraftFont.REGULAR)
+        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, Font.REGULAR)
         roundedRectangle(x + w - 40f, y + 9, 31f, 19f, color.brighter(1 + hover.percent() / 500f), 5f)
         rectangleOutline(x + w - 40f, y + 9, 31f, 19f, color.darker().withAlpha(1f), 5f, 1.5f)
 
         if (!extended && !anim.isAnimating()) return
-        val scissor = scissor(x + 2, y, w - 4, h + 1)
-
+        stencilRoundedRectangle(x + 2, y, w - 4, h, 0f)
         // SATURATION AND BRIGHTNESS
 
         drawHSBBox(x + 10f, y + 38f, w - 20f, 170f, color.hsbMax())
@@ -107,14 +106,13 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
 
         val stringWidth = getTextWidth(hexString, 12f)
         roundedRectangle(x + w / 2 - stringWidth / 2 - 12, y + 260, stringWidth + 24, 22f, buttonColor, 5f)
-        text(hexString, x + w / 2, y + 271, Color.WHITE, 12f, MinecraftFont.REGULAR, TextAlign.Middle, TextPos.Middle)
+        text(hexString, x + w / 2, y + 271, Color.WHITE, 12f, Font.REGULAR, TextAlign.Middle, TextPos.Middle)
 
         if (listeningForString || colorAnim.isAnimating()) {
             val color = colorAnim.get(ColorUtil.clickGUIColor, buttonColor, listeningForString)
             rectangleOutline(x + w / 2 - stringWidth / 2 - 13 , y + 259, stringWidth + 25f, 23f, color, 5f,2f)
         }
-
-        resetScissor(scissor)
+        resetStencil()
         Color.WHITE.bind()
     }
 
