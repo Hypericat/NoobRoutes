@@ -80,7 +80,7 @@ object HClip: Module(
         hclip()
     }
 
-    private fun yawChange(): Int {
+    fun yawChange(): Int {
         if (!omni) return 0
         val deltaX = (if (Keyboard.isKeyDown(mc.gameSettings.keyBindRight.keyCode)) 1 else 0) + (if (Keyboard.isKeyDown(mc.gameSettings.keyBindLeft.keyCode)) -1 else 0)
         val deltaZ = (if (Keyboard.isKeyDown(mc.gameSettings.keyBindForward.keyCode)) 1 else 0) + (if (Keyboard.isKeyDown(mc.gameSettings.keyBindBack.keyCode)) -1 else 0)

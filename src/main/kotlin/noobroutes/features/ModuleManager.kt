@@ -96,7 +96,8 @@ object ModuleManager {
 //        IceFill,
         BrushModule,
         FreeCam,
-        QOL
+        QOL,
+        BarPhase
     )
 
     init {
