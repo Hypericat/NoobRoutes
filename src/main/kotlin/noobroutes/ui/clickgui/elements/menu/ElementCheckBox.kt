@@ -2,10 +2,8 @@ package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.font.MinecraftFont
+import noobroutes.font.Font
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.animations.impl.ColorAnimation
-import noobroutes.ui.clickgui.animations.impl.LinearAnimation
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
@@ -19,6 +17,8 @@ import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
 import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.utils.render.*
 
 /**
@@ -44,7 +44,7 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
 
         override fun draw() {
             roundedRectangle(x, y, w, h, elementBackground)
-            text(name, x + TEXTOFFSET, y + h / 2f, textColor, 12f, MinecraftFont.REGULAR)
+            text(name, x + TEXTOFFSET, y + h / 2f, textColor, 12f, Font.REGULAR)
 
             hover.handle(x + w - 43f, y + 4f, 34f, 20f)
             val color = colorAnim.get(clickGUIColor.darkerIf(hover.percent() > 0, 0.7f), buttonColor.brighter(1.3f).brighterIf(hover.percent() > 0, 1.3f), setting.enabled)
@@ -66,6 +66,11 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
                 )
             }
         }
+
+    //240 - 43
+    //197
+    //240 - 33
+    //207
 
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (mouseButton == 0 && isHovered) {

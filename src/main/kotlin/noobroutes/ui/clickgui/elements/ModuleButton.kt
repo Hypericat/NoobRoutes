@@ -4,11 +4,9 @@ import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.Module
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.*
-import noobroutes.font.MinecraftFont
+import noobroutes.font.Font
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.clickgui.Panel
-import noobroutes.ui.clickgui.animations.impl.ColorAnimation
-import noobroutes.ui.clickgui.animations.impl.EaseInOut
 import noobroutes.ui.clickgui.elements.menu.*
 import noobroutes.ui.clickgui.util.ColorUtil.brighter
 import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
@@ -16,6 +14,8 @@ import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.clickgui.util.ColorUtil.moduleButtonColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import kotlin.math.floor
@@ -51,9 +51,9 @@ class ModuleButton(val module: Module, val panel: Panel) {
 
     private val extendAnim = EaseInOut(250)
     private val hoverHandler = HoverHandler(1000, 200)
-    private val bannableIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/bannableIcon.png"))
-    private val fpsHeavyIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/fpsHeavyIcon.png"))
-    private val newFeatureIcon = DynamicTexture(loadBufferedImage("/assets/defnotstolen/clickgui/newFeatureIcon.png"))
+    private val bannableIcon = DynamicTexture(loadBufferedImage("/assets/ui/bannableIcon.png"))
+    private val fpsHeavyIcon = DynamicTexture(loadBufferedImage("/assets/ui/fpsHeavyIcon.png"))
+    private val newFeatureIcon = DynamicTexture(loadBufferedImage("/assets/ui/newFeatureIcon.png"))
 
 
     init {
@@ -76,7 +76,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
                     is ActionSetting -> ElementAction(this, setting)
                     is DualSetting -> ElementDual(this, setting)
                     is HudSetting -> ElementHud(this, setting)
-                    is noobroutes.features.settings.impl.KeybindSetting -> ElementKeyBind(this, setting)
+                    is KeybindSetting -> ElementKeyBind(this, setting)
                     is DropdownSetting -> ElementDropdown(this, setting)
                     else -> {
                         position--
@@ -106,7 +106,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
 
         roundedRectangle(x, y, width, height, moduleButtonColor)
 
-        text(module.name, x + width / 2, y + height / 2, color, 14f, MinecraftFont.REGULAR, TextAlign.Middle)
+        text(module.name, x + width / 2, y + height / 2, color, 14f, Font.REGULAR, TextAlign.Middle)
         val textWidth = getTextWidth(module.name, 18f)
 
         if (textWidth < width - 80) {// too long text, not drawing symbol

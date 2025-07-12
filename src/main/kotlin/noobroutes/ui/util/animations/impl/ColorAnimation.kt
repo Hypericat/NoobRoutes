@@ -1,4 +1,4 @@
-package noobroutes.ui.clickgui.animations.impl
+package noobroutes.ui.util.animations.impl
 
 import noobroutes.utils.render.Color
 

@@ -2,9 +2,8 @@ package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.Core.logger
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.font.MinecraftFont
+import noobroutes.font.Font
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.animations.impl.ColorAnimation
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
@@ -17,6 +16,7 @@ import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
+import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.utils.floor
 import noobroutes.utils.render.*
 import noobroutes.utils.skyblock.modMessage
@@ -79,15 +79,13 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting<*>) :
         roundedRectangle(x, y, w, h, elementBackground)
         roundedRectangle(x + w - 2, y, 2, h, clickGUIColor, 0f, edgeSoftness = 0)
 
-        text(name, x + TEXTOFFSET, y + h / 2f - 10f, textColor, 12f, MinecraftFont.REGULAR)
-        text(getDisplay(), x + w - TEXTOFFSET, y + h / 2f - 10f, textColor.darkerIf(isHoveredBox), 12f, MinecraftFont.REGULAR, TextAlign.Right)
+        text(name, x + TEXTOFFSET, y + h / 2f - 10f, textColor, 12f, Font.REGULAR)
+        text(getDisplay(), x + w - TEXTOFFSET, y + h / 2f - 10f, textColor.darkerIf(isHoveredBox), 12f, Font.REGULAR, TextAlign.Right)
 
         //draw slider
         roundedRectangle(x + TEXTOFFSET, y + 37f, w - 17f, 7f, sliderBGColor, 3f)
         roundedRectangle(x + TEXTOFFSET, y + 37f, sliderPercentage * (w - 17f), 7f, color, 3f)
         //circle(x + TEXTOFFSET + sliderPercentage * (w - 17f), y + 37f + 3f, 5f, color)
-
-
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {

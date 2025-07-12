@@ -1,8 +1,12 @@
-package noobroutes.ui.clickgui.animations.impl
+package noobroutes.ui.util.animations.impl
 
-import noobroutes.ui.clickgui.animations.Animation
+import noobroutes.ui.util.animations.Animation
+import kotlin.math.max
+import kotlin.math.min
 
 class LinearAnimation<E>(duration: Long): Animation<E>(duration) where E : Number, E: Comparable<E> {
+
+
 
     @Suppress("UNCHECKED_CAST")
     override fun get(start: E, end: E, reverse: Boolean): E {
@@ -10,6 +14,9 @@ class LinearAnimation<E>(duration: Long): Animation<E>(duration) where E : Numbe
         val endVal = if (reverse) start.toFloat()  else end.toFloat()
 
         if (!isAnimating()) return if (reverse) start else end
-        return (startVal + (endVal - startVal) * (getPercent() / 100f)) as E
+        return (startVal + (endVal - startVal) * (getPercent() / 100f)).coerceIn(
+            min(start.toFloat(), end.toFloat()),
+            max(start.toFloat(), end.toFloat())
+        ) as E
     }
 }

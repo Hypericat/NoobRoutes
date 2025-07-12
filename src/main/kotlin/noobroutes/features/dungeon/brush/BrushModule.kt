@@ -27,34 +27,21 @@ import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.mixin.accessors.ChunkListingFieldAccessor
-import noobroutes.utils.IBlockStateUtils
+import noobroutes.utils.*
 import noobroutes.utils.IBlockStateUtils.withProperty
 import noobroutes.utils.Utils.ID
-import noobroutes.utils.add
-import noobroutes.utils.capitalizeFirst
-import noobroutes.utils.getBlockStateAt
 import noobroutes.utils.json.JsonUtils.add
 import noobroutes.utils.json.JsonUtils.asBlockPos
-import noobroutes.utils.render.RenderUtils.renderVec
-import noobroutes.utils.runOnMCThread
-import noobroutes.utils.setBlock
-import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.Island
 import noobroutes.utils.skyblock.LocationUtils
-import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.toBlockPos
-import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
-import java.util.ArrayList
-import java.util.HashMap
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.iterator
 
 @Suppress("unused")
 object BrushModule : Module("Brush", description = "It is just fme but way less laggy. Works with FME floor config, but not the room config.", category = Category.DUNGEON) {

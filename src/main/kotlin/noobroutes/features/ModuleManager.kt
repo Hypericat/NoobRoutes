@@ -6,14 +6,13 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
+import noobroutes.Core.logger
 import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.dungeon.brush.BrushModule
-import noobroutes.features.dungeon.puzzle.IceFill
 import noobroutes.features.dungeon.puzzle.TicTacToe
-import noobroutes.features.dungeon.puzzle.WaterBoard
 import noobroutes.features.dungeon.puzzle.Weirdos
 import noobroutes.features.floor7.*
 import noobroutes.features.floor7.autop3.AutoP3
@@ -23,8 +22,6 @@ import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.render.FreeCam
 import noobroutes.features.render.RotationVisualizer
 import noobroutes.features.render.Trail
-import noobroutes.features.routes.AutoRoute
-import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.hud.HudElement
@@ -59,10 +56,6 @@ object ModuleManager {
         AutoP3,
         NoDebuff,
         Zpew,
-//        AutoPath,
-//        EWPathfinderModule,
-//        DynamicRoute,
-        //ElementTester,
         Simulation,
         CoreClip,
         LavaClip,
@@ -77,23 +70,15 @@ object ModuleManager {
         InstaMid,
         Auto4,
         LeverAura,
-//        WaterBoard,
         TicTacToe,
-        //AuraTest,
         Weirdos,
         MelodyMessage,
         AutoSS,
-        //Blaze,
         InstantSlow,
-        //EtherwarpTest,
         Doorless,
         SecretGuideManager,
-//        AutoRoute,
         Penis,
         RotationVisualizer,
-//        CrystalAura,
-//        BlinkRelic,
-//        IceFill,
         BrushModule,
         FreeCam,
         QOL,
@@ -101,6 +86,7 @@ object ModuleManager {
     )
 
     init {
+        logger.info("initializing modules")
         for (module in modules) {
             module.keybinding?.let {
                 module.register(KeybindSetting("Keybind", it, "Toggles the module"))
@@ -167,7 +153,6 @@ object ModuleManager {
 
     @SubscribeEvent
     fun activateModuleKeyBinds(event: InputEvent.Keyboard) {
-
         for (module in modules) {
             for (setting in module.settings) {
                 if (setting is KeybindSetting && setting.value.key == event.keycode) {
