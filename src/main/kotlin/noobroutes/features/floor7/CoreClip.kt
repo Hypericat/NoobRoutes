@@ -4,6 +4,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
+import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -18,6 +19,7 @@ import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isClose
 import noobroutes.utils.Utils.lastPlayerPos
 import noobroutes.utils.Utils.lastPlayerSpeed
+import noobroutes.utils.isAir
 import org.lwjgl.input.Keyboard
 import kotlin.math.abs
 
@@ -36,6 +38,8 @@ object CoreClip: Module(
     private const val CORE_Z_EDGE1 = 53.7
     private const val CORE_Z_EDGE2 = 55.3
 
+    private val MIDDLE_CORE_BLOCK = BlockPos(54, 115, 54) //this like is a const trust
+
     private const val MAX_INSIDE_BLOCK = 0.0624
 
     private var clipTo = 0.0
@@ -43,7 +47,7 @@ object CoreClip: Module(
 
     @SubscribeEvent
     fun afterMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
-        if (mc.thePlayer == null || !BossEventDispatcher.inF7Boss) return
+        if (mc.thePlayer == null || !BossEventDispatcher.inF7Boss || isAir(MIDDLE_CORE_BLOCK)) return
         if (skip == true) {
             skip = false
             return
@@ -70,7 +74,7 @@ object CoreClip: Module(
 
     @SubscribeEvent
     fun onC03(event: PacketEvent.Send) {
-        if (clipTo == 0.0 || event.packet !is C03PacketPlayer) return
+        if (clipTo == 0.0 || event.packet !is C03PacketPlayer || !BossEventDispatcher.inF7Boss || isAir(MIDDLE_CORE_BLOCK)) return
         event.isCanceled = true
         val z = clipTo
         clipTo = 0.0
