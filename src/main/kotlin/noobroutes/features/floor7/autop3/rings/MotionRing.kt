@@ -39,8 +39,4 @@ class MotionRing(
         AutoP3Utils.scale = scale
         AutoP3Utils.motioning = true
     }
-
-    override fun ringCheckY(): Boolean {
-        return coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround
-    }
 }

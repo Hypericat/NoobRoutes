@@ -1,6 +1,5 @@
 package noobroutes.features.move
 
-import net.minecraft.client.renderer.EnumFaceDirection
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
@@ -8,13 +7,14 @@ import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.MotionUpdateEvent
-import noobroutes.events.impl.MoveEntityWithHeadingEventPost
+import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.utils.PacketUtils
-import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils
+import noobroutes.utils.Utils.lastPlayerPos
+import noobroutes.utils.Utils.lastPlayerSpeed
 import noobroutes.utils.toBlockPos
 import org.lwjgl.input.Keyboard
 
@@ -25,8 +25,6 @@ object BarPhase: Module(
     description = "fucking take a guess"
 ) {
 
-    private var lastPlayerPos = Vec3(0.0, 0.0, 0.0)
-    private var lastPlayerSpeed = Vec3(0.0, 0.0, 0.0)
     private var skip = false
     private var xToChange = 0.0
     private var zToChange = 0.0
@@ -34,21 +32,21 @@ object BarPhase: Module(
     private const val COLLIDED_WITH_IRON_BAR_DECIMAL_LOW = 0.1375
     private const val COLLIDED_WITH_IRON_BAR_DECIMAL_HIGH = 0.8625
 
-    @SubscribeEvent
-    fun onMotionPost(event: MotionUpdateEvent.Pre) {
-        lastPlayerPos = Vec3(event.x, event.y, event.z)
-        lastPlayerSpeed = Vec3(event.motionX, event.motionY, event.motionZ)
-    }
 
     @SubscribeEvent
-    fun doShit(event: MoveEntityWithHeadingEventPost) {
+    fun doShit(event: MoveEntityWithHeadingEvent) {
         if (mc.thePlayer == null || !mc.thePlayer.onGround || mc.thePlayer.isSneaking) return
         if (skip) {
             skip = false
             return
         }
         val playerPosVector = mc.thePlayer.positionVector.toBlockPos()
-        if (mc.theWorld.getBlockState(playerPosVector).block != Blocks.iron_bars && mc.theWorld.getBlockState(playerPosVector.up()).block != Blocks.iron_bars) return
+
+
+        if (
+            mc.theWorld.getBlockState(playerPosVector.up()).block != Blocks.iron_bars &&
+            (mc.theWorld.getBlockState(playerPosVector).block != Blocks.iron_bars || mc.theWorld.isAirBlock(playerPosVector.up(2)))
+        ) return
 
         val decX = getDecimal(mc.thePlayer.posX)
         val decZ = getDecimal(mc.thePlayer.posZ)
@@ -57,25 +55,13 @@ object BarPhase: Module(
         var xOffset = 0
         var zOffset = 0
 
-        val dir = when {
-            Utils.isClose(decX, COLLIDED_WITH_IRON_BAR_DECIMAL_LOW) -> {
-                EnumFaceDirection.EAST
-                xOffset++
-            }
-            Utils.isClose(decX, COLLIDED_WITH_IRON_BAR_DECIMAL_HIGH) -> {
-                EnumFaceDirection.WEST
-                xOffset--
-            }
-            Utils.isClose(decZ, COLLIDED_WITH_IRON_BAR_DECIMAL_LOW) -> {
-                EnumFaceDirection.SOUTH
-                zOffset++
-            }
-            Utils.isClose(decZ, COLLIDED_WITH_IRON_BAR_DECIMAL_HIGH) -> {
-                EnumFaceDirection.NORTH
-                zOffset--
-            }
-            else -> null
-        } ?: return
+        when {
+            Utils.isClose(decX, COLLIDED_WITH_IRON_BAR_DECIMAL_LOW) -> xOffset++
+            Utils.isClose(decX, COLLIDED_WITH_IRON_BAR_DECIMAL_HIGH) -> xOffset--
+            Utils.isClose(decZ, COLLIDED_WITH_IRON_BAR_DECIMAL_LOW) -> zOffset++
+            Utils.isClose(decZ, COLLIDED_WITH_IRON_BAR_DECIMAL_HIGH) -> zOffset--
+            else -> return
+        }
 
         skip = true
 
@@ -103,10 +89,8 @@ object BarPhase: Module(
 
         mc.thePlayer.moveEntityWithHeading(mc.thePlayer.moveStrafing, mc.thePlayer.moveForward)
 
-        Scheduler.scheduleC03Task(1) {
-            for ((i, block) in blocks.withIndex()) {
-                mc.theWorld.setBlockState(positions[i], block)
-            }
+        for ((i, block) in blocks.withIndex()) {
+            mc.theWorld.setBlockState(positions[i], block)
         }
     }
 

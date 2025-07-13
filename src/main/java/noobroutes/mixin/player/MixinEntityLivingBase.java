@@ -2,7 +2,7 @@ package noobroutes.mixin.player;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
-import noobroutes.events.impl.MoveEntityWithHeadingEventPost;
+import noobroutes.events.impl.MoveEntityWithHeadingEvent;
 import noobroutes.features.move.QOL;
 import noobroutes.utils.skyblock.LocationUtils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,9 +39,17 @@ public abstract class MixinEntityLivingBase {
 
     @Inject(
             method = {"moveEntityWithHeading"},
+            at = @At("HEAD")
+    )
+    private void onMoveEntityWithHeadingPre(float strafe, float forward, CallbackInfo ci) {
+        postAndCatch(new MoveEntityWithHeadingEvent.Pre());
+    }
+
+    @Inject(
+            method = {"moveEntityWithHeading"},
             at = @At("TAIL")
     )
-    private void onMoveEntityWithHeading(float strafe, float forward, CallbackInfo ci) {
-        postAndCatch(new MoveEntityWithHeadingEventPost());
+    private void onMoveEntityWithHeadingPost(float strafe, float forward, CallbackInfo ci) {
+        postAndCatch(new MoveEntityWithHeadingEvent.Post());
     }
 }

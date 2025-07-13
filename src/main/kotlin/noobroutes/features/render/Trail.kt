@@ -36,7 +36,7 @@ object Trail: Module(
     private val mode by DualSetting(name = "Trail mode", description = "Whether to show line or individual positions", default = false, left = "Line", right = "Boxes")
     private val tickDelay by BooleanSetting("Tick Delay", description = "Delays the trail by a tick, makes it look nicer", default = true)
 
-    private var positions = mutableListOf<Vec3>()
+    private var positions = mutableListOf<C04PacketPlayerPosition>()
 
 
     @SubscribeEvent
@@ -54,10 +54,10 @@ object Trail: Module(
         if (mc.thePlayer == null) return
         if (event.packet !is C03PacketPlayer) return
         if (event.isCanceled) return
-        val posVec = getVec3(event.packet)
         if (event.packet !is C04PacketPlayerPosition && event.packet !is C06PacketPlayerPosLook) return
-        if (positions.isEmpty() || !positions[positions.size-1].equal(posVec)) {
-            if (tickDelay) Scheduler.schedulePreTickTask { positions.add(0, posVec) } else positions.add(0, posVec)
+        val c04 = getC04(event.packet)
+        if (positions.isEmpty() || positions[positions.size-1] != c04) {
+            if (tickDelay) Scheduler.schedulePreTickTask { positions.add(0, c04) } else positions.add(0, c04)
         }
         positions.coerceMax(trailDistance)
     }
@@ -66,7 +66,7 @@ object Trail: Module(
     fun onRender(event: RenderWorldLastEvent) {
         val positionsCopy = positions.toList() //concurrent smth smth error moment
         if (!mode) {
-            val positionsUp = positionsCopy.map { it.add(0.0, 0.01, 0.0) }.toMutableList()
+            val positionsUp = positionsCopy.map { Vec3(it.positionX, it.positionY + 0.01, it.positionZ) }.toMutableList()
             if (movementPackets.isEmpty() || !AutoP3.mode)  {
                 val viewEntity = mc.renderViewEntity
                 val camX = viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * event.partialTicks
@@ -77,21 +77,17 @@ object Trail: Module(
             Renderer.draw3DLine(positionsUp, Color.CYAN, depth = true)
         } else {
             positionsCopy.forEach {
-                val aaBB = AxisAlignedBB(it.xCoord - 0.03, it.yCoord, it.zCoord - 0.03, it.xCoord + 0.03, it.yCoord + 0.06, it.zCoord + 0.03)
-                drawBox(aaBB, Color.CYAN, depth = true, fillAlpha = 0)
+                val aaBB = AxisAlignedBB(it.positionX - 0.03, it.positionY, it.positionZ - 0.03, it.positionX + 0.03, it.positionY + 0.06, it.positionZ + 0.03)
+                drawBox(aaBB, if (it.isOnGround) Color.RED else Color.CYAN, depth = true, fillAlpha = 0)
             }
         }
     }
 
-    private fun theSmallerOne(n1: Int, n2: Int): Int {
-        return if (n1 >= n2) n2 else n1
-    }
-
-    private fun getVec3(packet: C03PacketPlayer): Vec3 {
+    private fun getC04(packet: C03PacketPlayer): C04PacketPlayerPosition {
         return when (packet) {
-            is C04PacketPlayerPosition -> Vec3(packet.positionX, packet.positionY, packet.positionZ)
-            is C06PacketPlayerPosLook -> Vec3(packet.positionX, packet.positionY, packet.positionZ)
-            else -> Vec3(0.0, 0.0, 0.0)
+            is C04PacketPlayerPosition -> packet
+            is C06PacketPlayerPosLook -> C04PacketPlayerPosition(packet.positionX, packet.positionY, packet.positionZ, packet.isOnGround)
+            else -> C04PacketPlayerPosition(0.0, 0.0, 0.0, false)
         }
 
     }

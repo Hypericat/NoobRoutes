@@ -5,18 +5,21 @@ import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.util.Vec3
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.BossEventDispatcher
-import noobroutes.events.EventDispatcher
 import noobroutes.events.impl.MotionUpdateEvent
-import noobroutes.events.impl.MoveEntityWithHeadingEventPost
+import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isClose
-import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.Utils.lastPlayerPos
+import noobroutes.utils.Utils.lastPlayerSpeed
 import org.lwjgl.input.Keyboard
+import kotlin.math.abs
 
 
 object CoreClip: Module(
@@ -35,28 +38,14 @@ object CoreClip: Module(
 
     private const val MAX_INSIDE_BLOCK = 0.0624
 
-    private const val MAX_WALK_SPEED_FORWARD = 1.403
-    private const val MAX_WALK_SPEED_BACKWARDS = 1.0
-    private const val GROUND_DRAG = 0.546
-
-
-
-    private var lastPlayerPos = Vec3(0.0, 0.0, 0.0)
-    private var lastPlayerSpeed = Vec3(0.0, 0.0, 0.0)
     private var clipTo = 0.0
-    private var skip = 0
+    private var skip = true
 
     @SubscribeEvent
-    fun onMotionPre(event: MotionUpdateEvent.Pre) {
-        lastPlayerPos = Vec3(event.x, event.y, event.z)
-        lastPlayerSpeed = Vec3(event.motionX, event.motionY, event.motionZ)
-    }
-
-    @SubscribeEvent
-    fun afterMoveEntityWithHeading(event: MoveEntityWithHeadingEventPost) {
-        if (mc.thePlayer == null || mc.thePlayer.isSneaking || !BossEventDispatcher.inF7Boss) return
-        if (skip > 0) {
-            skip--
+    fun afterMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
+        if (mc.thePlayer == null || !BossEventDispatcher.inF7Boss) return
+        if (skip == true) {
+            skip = false
             return
         }
         if (mc.thePlayer.posY != CORE_Y) return
@@ -67,27 +56,14 @@ object CoreClip: Module(
     }
 
     fun clipShit(spot: Double) {
-        val dir = if (spot == CORE_Z_EDGE1 + MAX_INSIDE_BLOCK) 1 else -1
-        skip = 2
+        skip = true
         mc.thePlayer.setPosition(lastPlayerPos.xCoord, lastPlayerPos.yCoord, lastPlayerPos.zCoord)
-        mc.thePlayer.setVelocity(0.0, lastPlayerSpeed.yCoord, MAX_WALK_SPEED_FORWARD * GROUND_DRAG * dir)
+        mc.thePlayer.setVelocity(lastPlayerSpeed.xCoord, lastPlayerSpeed.yCoord, lastPlayerSpeed.zCoord)
 
         Blocks.gold_block.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
         Blocks.barrier.setBlockBounds(-1f,-1f,-1f,-1f,-1f,-1f)
 
-        val prevRot = mc.thePlayer.rotationYaw
-        mc.thePlayer.rotationYaw = if (dir == 1) 0f else 180f //make game think player is walking straight at door
-
-        mc.thePlayer.moveEntityWithHeading(0f, 1f) //player must walk forward
-
-        val maxWalkDistance = if (mc.thePlayer.moveForward == -1f) MAX_WALK_SPEED_BACKWARDS else MAX_WALK_SPEED_FORWARD
-
-        if (mc.thePlayer.posZ + maxWalkDistance * dir in CORE_Z_EDGE1 - 0.05..CORE_Z_EDGE2 + 0.05) {
-            mc.thePlayer.moveEntityWithHeading(0f, 1f) //walk again if he would still be in
-            devMessage("far")
-        }
-
-        mc.thePlayer.rotationYaw = prevRot
+        mc.thePlayer.moveEntityWithHeading(mc.thePlayer.moveStrafing, mc.thePlayer.moveForward)
 
         clipTo = spot
     }
@@ -98,11 +74,41 @@ object CoreClip: Module(
         event.isCanceled = true
         val z = clipTo
         clipTo = 0.0
-        Blocks.gold_block.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
-        Blocks.barrier.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
+
+        Scheduler.schedulePreTickTask(3) {
+            Blocks.gold_block.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
+            Blocks.barrier.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
+        }
+
         if (event.packet.rotating) {
             PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.positionX, event.packet.positionY, z, event.packet.yaw, event.packet.pitch, event.packet.isOnGround))
         }
         else PacketUtils.sendPacket(C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, z, event.packet.isOnGround))
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun noInWall(event: PacketEvent.Send) {
+        if (event.packet !is C03PacketPlayer || !BossEventDispatcher.inF7Boss) return
+
+        if (event.packet.positionY != CORE_Y) return
+        if (event.packet.positionX !in CORE_MIN_X..CORE_MAX_X) return
+
+        val noNoSpot1 = CORE_Z_EDGE1 + MAX_INSIDE_BLOCK
+        val noNoSpot2 = CORE_Z_EDGE2 - MAX_INSIDE_BLOCK
+
+        if (event.packet.positionZ !in CORE_Z_EDGE1 ..CORE_Z_EDGE2 ||
+            event.packet.positionZ == noNoSpot1 ||
+            event.packet.positionZ == noNoSpot2) return
+
+        event.isCanceled = true
+
+        val goatedZ = listOf(noNoSpot1, noNoSpot2).minBy { abs(it - event.packet.positionZ) }
+
+        if (event.packet.rotating) {
+            PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.positionX, event.packet.positionY, goatedZ, event.packet.yaw, event.packet.pitch, event.packet.isOnGround))
+        }
+        else {
+            PacketUtils.sendPacket(C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, goatedZ, event.packet.isOnGround))
+        }
     }
 }

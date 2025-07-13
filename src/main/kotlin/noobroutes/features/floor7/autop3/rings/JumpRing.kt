@@ -32,14 +32,13 @@ class JumpRing (
         super.doRing()
         if (AutoP3.renderStyle == 3) modMessage("Jumping", "§0[§6Yharim§0]§7 ")
         if (mc.thePlayer.onGround) mc.thePlayer.jump()
-        else return
+        else {
+            triggered = false
+            return
+        }
         if (walk) {
             AutoP3Utils.startWalk(yaw)
             AutoP3Utils.jumping = true
         }
-    }
-
-    override fun ringCheckY(): Boolean {
-        return coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround
     }
 }

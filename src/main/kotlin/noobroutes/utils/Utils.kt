@@ -17,10 +17,12 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.Vec3
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.Core.logger
 import noobroutes.Core.mc
+import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.modMessage
@@ -86,6 +88,15 @@ object Utils {
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣦⣤⣤⣤⣶⣦⣿⣿⣶⣾⣿⣥⣤⣤⣬⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
     )
 
+    var lastPlayerPos = Vec3(0.0, 0.0, 0.0)
+    var lastPlayerSpeed = Vec3(0.0, 0.0, 0.0)
+
+    @SubscribeEvent
+    fun beforeMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Pre) {
+        if (mc.thePlayer == null) return
+        lastPlayerPos = Vec3(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ)
+        lastPlayerSpeed = Vec3(mc.thePlayer.motionX, mc.thePlayer.motionY, mc.thePlayer.motionZ)
+    }
 
 
     fun isClose(number1: Double, number2: Double): Boolean {

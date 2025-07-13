@@ -102,7 +102,7 @@ object AutoP3: Module (
         rings[route]?.forEachIndexed { i, ring ->
             if (alignedOnly && !isAligned && !ring.center && ring !is BlinkRing) return@forEachIndexed
 
-            if (renderIndex && renderStyle != 3) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
+            if (renderIndex && renderStyle != 3) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth, shadow = false)
 
             ring.renderRing()
             if (renderStyle == 3 || ring !is BlinkRing) return@forEachIndexed
@@ -116,7 +116,7 @@ object AutoP3: Module (
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun tickRing(event: PacketEvent.Send) {
         if (event.packet !is C03PacketPlayer || mc.thePlayer == null) return
-        if(!inF7Boss || mc.thePlayer.isSneaking || editMode ) return //|| mc.thePlayer.capabilities.walkSpeed < 0.5
+        if(!inF7Boss || mc.thePlayer.isSneaking || editMode || mc.thePlayer.capabilities.walkSpeed < 0.5) return
 
         val bb = mc.thePlayer.entityBoundingBox //cant mc.thePlayer.collided or whatever as i need x AND z collision to align
 
