@@ -198,4 +198,12 @@ object BlockUtils {
             else -> null
         }
     }
+
+    fun Block.removeHitbox() {
+        this.setBlockBounds(-1f, -1f, -1f, -1f, -1f, -1f)
+    }
+
+    fun Block.restoreHitbox() {
+        this.setBlockBounds(0f, 0f, 0f, 1f, 1f, 1f)
+    }
 }
