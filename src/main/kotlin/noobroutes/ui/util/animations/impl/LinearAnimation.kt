@@ -14,7 +14,7 @@ class LinearAnimation<E>(duration: Long): Animation<E>(duration) where E : Numbe
         val endVal = if (reverse) start.toFloat()  else end.toFloat()
 
         if (!isAnimating()) return if (reverse) start else end
-        return (startVal + (endVal - startVal) * (getPercent() / 100f)).coerceIn(
+        return (startVal + (endVal - startVal) * (getPercent() * 0.01f)).coerceIn(
             min(start.toFloat(), end.toFloat()),
             max(start.toFloat(), end.toFloat())
         ) as E

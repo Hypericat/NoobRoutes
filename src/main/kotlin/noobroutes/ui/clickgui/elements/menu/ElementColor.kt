@@ -112,7 +112,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
             val color = colorAnim.get(ColorUtil.clickGUIColor, buttonColor, listeningForString)
             rectangleOutline(x + w / 2 - stringWidth / 2 - 13 , y + 259, stringWidth + 25f, 23f, color, 5f,2f)
         }
-        resetStencil()
+        popStencil()
         Color.WHITE.bind()
     }
 

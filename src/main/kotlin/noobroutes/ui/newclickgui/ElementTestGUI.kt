@@ -1,44 +1,46 @@
 package noobroutes.ui.newclickgui
 
-import noobroutes.features.settings.impl.Keybinding
+import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.Screen
 import noobroutes.ui.util.UiElement
-import noobroutes.ui.util.elements.DualElement
-import noobroutes.ui.util.elements.ElementSelector
-import noobroutes.ui.util.elements.KeybindElement
-import noobroutes.ui.util.elements.SliderElement
-import noobroutes.ui.util.elements.SwitchElement
+import noobroutes.ui.util.elements.ColorElement
+import noobroutes.ui.util.elements.SelectorElement
+import noobroutes.utils.render.Color
 import noobroutes.utils.render.text
-import org.lwjgl.input.Keyboard
+import org.lwjgl.opengl.GL11
 
 object ElementTestGUI : Screen() {
     private val testElements = listOf<UiElement>(
-        ElementSelector(
-            "Test",
+        ColorElement(
             100f,
-            200f,
-            400f,
-            100f,
-            0,
-            arrayListOf("Option 0", "Option 1", "Option 2", "Option 3", "Option 4")
+            500f,
+            30f,
+            15f,
+            5f,
+            Color.GREEN,
+            false
         ),
-        ElementSelector(
-            "Test 2",
-            100f,
-            600f,
-            400f,
-            100f,
-            0,
-            arrayListOf("Option 0", "Option 1", "Option 2", "Option 3", "Option 4")
-        )
+        ColorElement(
+            300f,
+            500f,
+            30f,
+            15f,
+        5f,
+        Color.GREEN,
+        true
+    )
     )
 
     override fun draw() {
+        GlStateManager.pushMatrix()
+        GlStateManager.enableBlend()
+        GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA)
         scaleUI()
         testElements.forEach { it.draw() }
         resetScale()
         text("Unscaled Text", 100f, 100f, ColorPalette.text, 8f, fontType = ColorPalette.font)
+        GlStateManager.popMatrix()
     }
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {

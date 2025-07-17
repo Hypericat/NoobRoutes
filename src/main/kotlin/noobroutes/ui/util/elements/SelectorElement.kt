@@ -1,42 +1,33 @@
 package noobroutes.ui.util.elements
 
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.Core.logger
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.Animation
+import noobroutes.ui.util.animations.impl.CubicBezierAnimation
 import noobroutes.ui.util.animations.impl.LinearAnimation
-import noobroutes.ui.util.elements.ElementSelector.Companion.SELECTOR_ELEMENT_CUSHIONING
-import noobroutes.ui.util.elements.ElementSelector.Companion.SELECTOR_ELEMENT_HALF_OPTION_HEIGHT
-import noobroutes.ui.util.elements.ElementSelector.Companion.SELECTOR_ELEMENT_OPTION_HEIGHT
-import noobroutes.ui.util.elements.ElementSelector.Companion.SELECTOR_ELEMENT_WIDTH
-import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
-import noobroutes.utils.render.rectangleOutline
-import noobroutes.utils.render.resetStencil
+import noobroutes.utils.render.popStencil
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.stencilRoundedRectangle
 import noobroutes.utils.render.text
-import kotlin.math.E
 
-class ElementSelector(
-    name: String,
+class SelectorElement(
     x: Float,
     y: Float,
-    w: Float,
-    h: Float,
+    val xScale: Float,
+    val yScale: Float,
     override var elementValue: Int,
     val options: ArrayList<String>
-) : UiElement(name, x, y, w, h), ElementValue<Int> {
+) : UiElement(x, y), ElementValue<Int> {
     companion object {
         const val SELECTOR_ELEMENT_WIDTH = 150f
         const val SELECTOR_ELEMENT_OPTION_HEIGHT = 20f
         const val SELECTOR_ELEMENT_CUSHIONING = 7f
         const val SELECTOR_ELEMENT_HALF_WIDTH = SELECTOR_ELEMENT_WIDTH * 0.5f
         const val SELECTOR_ELEMENT_HALF_OPTION_HEIGHT = SELECTOR_ELEMENT_OPTION_HEIGHT * 0.5f
-
 
         fun drawSelector(
             x: Float,
@@ -91,7 +82,7 @@ class ElementSelector(
                         align = TextAlign.Middle
                     )
                 }
-                resetStencil()
+                popStencil()
             }
 
             GlStateManager.popMatrix()
@@ -100,13 +91,12 @@ class ElementSelector(
 
     override val elementValueChangeListeners = mutableListOf<(Int) -> Unit>()
     var extended = false
-    val openAnimation = LinearAnimation<Float>(125)
+    val openAnimation = CubicBezierAnimation(125L, .4, 0, .2, 1)
 
     override fun draw() {
-        drawName()
         drawSelector(
-            x + w - SELECTOR_ELEMENT_WIDTH - ColorPalette.TEXT_OFFSET - SELECTOR_ELEMENT_HALF_WIDTH - SELECTOR_ELEMENT_CUSHIONING,
-            y + halfHeight,
+            x -SELECTOR_ELEMENT_HALF_WIDTH - SELECTOR_ELEMENT_CUSHIONING,
+            y,
             1f,
             1f,
             elementValue,
@@ -114,13 +104,12 @@ class ElementSelector(
             options,
             openAnimation
         )
-        //logger.info(extended)
     }
 
     private inline val isHovered
         get() = MouseUtils.isAreaHovered(
-            x + w - SELECTOR_ELEMENT_WIDTH * 2f - ColorPalette.TEXT_OFFSET,
-            y + halfHeight - SELECTOR_ELEMENT_HALF_OPTION_HEIGHT - SELECTOR_ELEMENT_CUSHIONING,
+            x - SELECTOR_ELEMENT_WIDTH * 2f,
+            y - SELECTOR_ELEMENT_HALF_OPTION_HEIGHT - SELECTOR_ELEMENT_CUSHIONING,
             SELECTOR_ELEMENT_WIDTH,
             SELECTOR_ELEMENT_OPTION_HEIGHT + SELECTOR_ELEMENT_CUSHIONING
         )
@@ -140,8 +129,8 @@ class ElementSelector(
     private fun findHoveredOption() : Boolean{
         for (index in 0 until options.size) {
             if (MouseUtils.isAreaHovered(
-                    x + w - SELECTOR_ELEMENT_WIDTH * 2f - ColorPalette.TEXT_OFFSET,
-                    y + halfHeight + SELECTOR_ELEMENT_HALF_OPTION_HEIGHT + SELECTOR_ELEMENT_CUSHIONING + (SELECTOR_ELEMENT_OPTION_HEIGHT + SELECTOR_ELEMENT_CUSHIONING * 0.5f) * index,
+                    x - SELECTOR_ELEMENT_WIDTH * 2f,
+                    y + SELECTOR_ELEMENT_HALF_OPTION_HEIGHT + SELECTOR_ELEMENT_CUSHIONING + (SELECTOR_ELEMENT_OPTION_HEIGHT + SELECTOR_ELEMENT_CUSHIONING * 0.5f) * index,
                     SELECTOR_ELEMENT_WIDTH,
                     SELECTOR_ELEMENT_OPTION_HEIGHT
                 )) {
