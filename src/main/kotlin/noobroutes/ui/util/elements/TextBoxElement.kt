@@ -15,6 +15,8 @@ import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.stencilRoundedRectangle
 import noobroutes.utils.render.text
 
+
+//make it so you can add custom string filters
 class TextBoxElement(
     val name: String,
     x: Float,
@@ -26,6 +28,7 @@ class TextBoxElement(
     val radius: Float,
     val textPadding: Float,
     val boxColor: Color,
+    var maxCharacters: Int,
     val boxType: TextBoxType,
     override var elementValue: String
 ) : UiElement(x, y), ElementValue<String> {
@@ -37,6 +40,13 @@ class TextBoxElement(
     override val elementValueChangeListeners = mutableListOf<(String) -> Unit>()
     override fun draw() {
         drawTextBoxWithGapTitle(elementValue, name, x, y, minWidth, h, radius, textScale, textPadding, boxColor, textAlign)
+    }
+
+    var listening = false
+
+    override fun mouseClicked(mouseButton: Int): Boolean {
+        return false
+
     }
 
 

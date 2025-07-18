@@ -5,6 +5,7 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.TextPos
 
+//C:\Users\wadey\Downloads\msdf-atlas-gen.exe -font "Downloads\Lexend\Lexend-Regular.ttf" -type msdf -imageout "Downloads\Regular.png" -json "Downloads\Regular.json" -format png -dimensions 512 512 -pxrange 16 -emrange 1 -yorigin bottom -size 32
 typealias EssentialFont = gg.essential.elementa.font.data.Font
 
 interface Font {

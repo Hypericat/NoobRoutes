@@ -5,15 +5,15 @@ import noobroutes.utils.render.Color
 
 object ColorPalette {
     data class Palette(
-        val text: Color,
-        val subText: Color,
-        val elementPrimary: Color,
-        val elementSecondary: Color,
-        val backgroundPrimary: Color,
-        val backgroundSecondary: Color,
-        val font: FontType
+        var text: Color,
+        var subText: Color,
+        var elementPrimary: Color,
+        var elementSecondary: Color,
+        var backgroundPrimary: Color,
+        var backgroundSecondary: Color,
+        var font: FontType
     )
-    private val defaultPalette = Palette(
+    val defaultPalette = Palette(
         Color(205, 214, 244),
         Color(166, 173, 200),
         Color(75, 75, 204),
