@@ -15,6 +15,7 @@ interface Font {
     fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = REGULAR, shadow: Boolean = false)
     fun wrappedTextBounds(text: String, width: Float, size: Float): Pair<Float, Float>
     fun init()
+    fun xOrigin(text: String, x: Float, align: TextAlign, scale: Float): Float
     companion object {
         const val REGULAR = 1
         const val BOLD = 2

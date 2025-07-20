@@ -19,6 +19,15 @@ object MinecraftFont : Font {
         fontRenderer = mc.fontRendererObj
     }
 
+    override fun xOrigin(text: String, x: Float, align: TextAlign, scale: Float): Float {
+        val reducedScale = scale * 0.125f
+        return when (align) {
+            TextAlign.Left -> x
+            TextAlign.Right -> x - OdinFont.getTextWidth(text, reducedScale)
+            TextAlign.Middle -> x - OdinFont.getTextWidth(text, reducedScale) * 0.5f
+        }
+    }
+
     override fun text(text: String, x: Float, y: Float, color: Color, scale: Float, align: TextAlign, verticalAlign: TextPos, shadow: Boolean, type: Int) {
         if (color.isTransparent) return
         val reducedScale = scale * 0.125f

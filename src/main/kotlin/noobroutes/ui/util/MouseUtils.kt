@@ -1,9 +1,13 @@
 package noobroutes.ui.util
 
 import noobroutes.Core.mc
+import noobroutes.utils.render.scaleFactor
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
-
+import org.lwjgl.opengl.GL11
+import org.lwjgl.BufferUtils
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 object MouseUtils {
 
@@ -23,8 +27,8 @@ object MouseUtils {
 
     fun getQuadrant(): Int {
         return when {
-            mouseX >= Display.getWidth() / 2 -> if (mouseY >= Display.getHeight() / 2) 4 else 2
-            else -> if (mouseY >= Display.getHeight() / 2) 3 else 1
+            mouseX >= Display.getWidth() * 0.5 -> if (mouseY >= Display.getHeight() * 0.5) 4 else 2
+            else -> if (mouseY >= Display.getHeight() * 0.5) 3 else 1
         }
     }
 }

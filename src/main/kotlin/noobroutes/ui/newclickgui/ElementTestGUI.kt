@@ -4,8 +4,7 @@ import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.Screen
 import noobroutes.ui.util.UiElement
-import noobroutes.ui.util.elements.ColorElement
-import noobroutes.ui.util.elements.SelectorElement
+import noobroutes.ui.util.elements.colorelement.ColorElement
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.text
 import org.lwjgl.opengl.GL11
