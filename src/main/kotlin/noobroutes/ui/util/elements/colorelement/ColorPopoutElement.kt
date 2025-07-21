@@ -29,7 +29,7 @@ class ColorPopoutElement(
     private val popupWidth = ColorElementsConstants.COLOR_POPOUT_WIDTH + if (alphaEnabled) ColorElementsConstants.COLOR_POPOUT_ALPHA_WIDTH else 0f
 
     init {
-        uiChildren.addAll(
+        addChildren(
             listOf("R", "G", "B").mapIndexed { index, label ->
                 TextBoxElement(
                     label, 0f, 0f,
@@ -46,7 +46,7 @@ class ColorPopoutElement(
                 )
             }
         )
-        uiChildren.add(
+        addChild(
             TextBoxElement(
                 "HEX", 0f, 0f,
                 popupWidth - ColorElementsConstants.COLOR_POPOUT_GAP * 3f + 3f,
@@ -57,15 +57,17 @@ class ColorPopoutElement(
                 elementValue.hex,
             )
         )
-        uiChildren.add(ColorBoxElement(0f, 0f, elementValue))
-        uiChildren.add(ColorSliderElement(0f, 0f, elementValue))
-        if (alphaEnabled) uiChildren.add(AlphaSliderElement(0f, 0f, elementValue))
+
+
+        addChild(ColorBoxElement(0f, 0f, elementValue))
+        addChild(ColorSliderElement(0f, 0f, elementValue))
+        if (alphaEnabled) addChild(AlphaSliderElement(0f, 0f, elementValue))
     }
 
 
     override fun draw() {
         GlStateManager.pushMatrix()
-        GlStateManager.translate(x, y, 1f)
+        translate(x, y)
         val width = ColorElementsConstants.COLOR_POPOUT_WIDTH + if (alphaEnabled) ColorElementsConstants.COLOR_POPOUT_ALPHA_WIDTH else 0f
         val topRX = width * -0.5f
         val topRY = ColorElementsConstants.COLOR_POPOUT_HEIGHT * -0.5f
@@ -90,10 +92,20 @@ class ColorPopoutElement(
                 topRY + ColorElementsConstants.COLOR_POPOUT_GAP * 2f + ColorElementsConstants.COLOR_BOX_SIZE
             )
         }
-        uiChildren[3].updatePosition(topRX + ColorElementsConstants.COLOR_POPOUT_GAP + ColorElementsConstants.COLOR_BOX_SIZE_HALF, topRY + ColorElementsConstants.COLOR_POPOUT_GAP + ColorElementsConstants.COLOR_BOX_SIZE_HALF)
-        uiChildren[4].updatePosition(topRX + ColorElementsConstants.COLOR_POPOUT_GAP, topRY + ColorElementsConstants.COLOR_POPOUT_GAP * 3f + ColorElementsConstants.COLOR_BOX_SIZE + ColorElementsConstants.TEXT_BOX_HEIGHT)
+        uiChildren[3].updatePosition(
+            topRX + ColorElementsConstants.COLOR_POPOUT_GAP,
+            topRY + ColorElementsConstants.COLOR_POPOUT_GAP * 3f + ColorElementsConstants.COLOR_BOX_SIZE + ColorElementsConstants.TEXT_BOX_HEIGHT
+        )
+        uiChildren[4].updatePosition(
+            topRX + ColorElementsConstants.COLOR_POPOUT_GAP + ColorElementsConstants.COLOR_BOX_SIZE_HALF,
+            topRY + ColorElementsConstants.COLOR_POPOUT_GAP + ColorElementsConstants.COLOR_BOX_SIZE_HALF
+        )
+        uiChildren[5].updatePosition(
+            topRX + ColorElementsConstants.COLOR_BOX_SIZE + ColorElementsConstants.COLOR_POPOUT_GAP * 2f + ColorElementsConstants.COLOR_SLIDER_WIDTH * 0.5f,
+            topRY + ColorElementsConstants.COLOR_POPOUT_GAP + ColorElementsConstants.COLOR_BOX_SIZE_HALF
+        )
         if (alphaEnabled) {
-            uiChildren[5].updatePosition(
+            uiChildren[6].updatePosition(
                 topRX + ColorElementsConstants.COLOR_BOX_SIZE + ColorElementsConstants.COLOR_POPOUT_GAP * 3f + ColorElementsConstants.COLOR_SLIDER_WIDTH * 1.5f,
                 topRY + ColorElementsConstants.COLOR_POPOUT_GAP + ColorElementsConstants.COLOR_BOX_SIZE_HALF
             )

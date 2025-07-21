@@ -21,7 +21,7 @@ class AlphaSliderElement(
 
     override fun draw() {
         GlStateManager.pushMatrix()
-        GlStateManager.translate(x, y, 0f)
+        translate(x, y)
         stencilRoundedRectangle(
             -ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF,
             -ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,

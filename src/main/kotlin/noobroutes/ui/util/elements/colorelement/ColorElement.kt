@@ -61,7 +61,7 @@ class ColorElement(
         const val TEXT_BOX_THICKNESS = 3f
 
         //idk why I had to subtract 4, but I did
-        const val TEXT_BOX_WIDTH = (COLOR_BOX_SIZE + COLOR_SLIDER_WIDTH * 2  - COLOR_POPOUT_GAP * 2f) / 3
+        const val TEXT_BOX_WIDTH = (COLOR_BOX_SIZE + COLOR_SLIDER_WIDTH * 2 - COLOR_POPOUT_GAP * 2f) / 3
         const val TEXT_BOX_WIDTH_WITH_GAP = (COLOR_BOX_SIZE + COLOR_SLIDER_WIDTH * 2 - TEXT_BOX_THICKNESS) / 3
         const val COLOR_POPOUT_GAP_THIRD = COLOR_POPOUT_GAP / 3
 
@@ -104,7 +104,9 @@ class ColorElement(
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {
-        if (super.mouseClicked(mouseButton)) return true
+        if (isOpen && super.mouseClicked(mouseButton)) {
+            return true
+        }
         if (isHovered) {
             isOpen = !isOpen
             return true

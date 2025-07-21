@@ -1,17 +1,13 @@
 package noobroutes.ui.util.elements
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.font.Font
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.clickgui.util.ColorUtil.darker
 import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.Animation
 import noobroutes.ui.util.animations.impl.EaseInOut
-import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text

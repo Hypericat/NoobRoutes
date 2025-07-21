@@ -23,7 +23,7 @@ class ColorBoxElement(
 
     override fun draw() {
         GlStateManager.pushMatrix()
-        GlStateManager.translate(x, y, 1f)
+        translate(x, y)
         stencilRoundedRectangle(
             -ColorElementsConstants.COLOR_BOX_SIZE_HALF,
             -ColorElementsConstants.COLOR_BOX_SIZE_HALF,

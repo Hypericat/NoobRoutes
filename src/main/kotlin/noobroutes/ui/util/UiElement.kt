@@ -1,8 +1,20 @@
 package noobroutes.ui.util
 
+import net.minecraft.client.renderer.GlStateManager
+
 
 abstract class UiElement(var x: Float, var y: Float) {
+    var parent: UiElement? = null
     val uiChildren = mutableListOf<UiElement>()
+    var xOrigin = 0f
+    var yOrigin = 0f
+    var globalXScale = 1f
+    var globalYScale = 1f
+    private var deltaX = 0f
+    private var deltaY = 0f
+    private var deltaScaleX = 1f
+    private var deltaScaleY = 1f
+
 
     fun updatePosition(x: Float, y: Float){
         val deltaX = this.x - x
@@ -29,5 +41,62 @@ abstract class UiElement(var x: Float, var y: Float) {
     open fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
         return uiChildren.any { it.keyTyped(typedChar, keyCode) }
     }
+
+    protected fun addChildren(children: Collection<UiElement>) {
+        children.map { it.parent = this }
+        uiChildren.addAll(children)
+    }
+
+    protected fun addChild(child: UiElement) {
+        child.parent = this
+        uiChildren.add(child)
+    }
+
+    protected fun translate(x: Float, y: Float){
+        deltaX = x
+        deltaY = y
+        updateChildrenTranslation()
+        GlStateManager.translate(x, y, 1f)
+    }
+    protected fun scale(x: Float, y: Float){
+        deltaScaleX = x
+        deltaScaleY = y
+        updateChildrenScale()
+        GlStateManager.scale(x, y, 1f)
+    }
+
+    protected fun updateChildrenTranslation(){
+        val xOrigin =getEffectiveX()
+        val yOrigin = getEffectiveY()
+        uiChildren.forEach {
+            it.xOrigin = xOrigin
+            it.yOrigin = yOrigin
+        }
+    }
+
+    protected fun updateChildrenScale(){
+        val xScale = getEffectiveXScale()
+        val yScale = getEffectiveYScale()
+        uiChildren.forEach {
+            it.globalXScale = xScale
+            it.globalYScale = yScale
+        }
+    }
+
+    open fun getEffectiveX(): Float {
+        return xOrigin + deltaX
+    }
+    open fun getEffectiveY(): Float {
+        return yOrigin + deltaY
+    }
+    open fun getEffectiveXScale(): Float {
+        return globalXScale * deltaScaleX
+    }
+    open fun getEffectiveYScale(): Float {
+        return globalYScale * deltaScaleY
+    }
+
+
+
 
 }

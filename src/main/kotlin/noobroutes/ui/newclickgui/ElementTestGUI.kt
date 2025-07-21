@@ -4,13 +4,60 @@ import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.Screen
 import noobroutes.ui.util.UiElement
+import noobroutes.ui.util.elements.TextBoxElement
 import noobroutes.ui.util.elements.colorelement.ColorElement
 import noobroutes.utils.render.Color
+import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.text
 import org.lwjgl.opengl.GL11
 
 object ElementTestGUI : Screen() {
     private val testElements = listOf<UiElement>(
+        TextBoxElement(
+            "Men",
+            400f,
+            200f,
+            150f,
+            35f,
+            12f,
+            TextAlign.Left,
+            5f,
+            9f,
+            ColorPalette.text,
+            6,
+            TextBoxElement.TextBoxType.GAP,
+            "Cocina"
+        ),
+        TextBoxElement(
+            "Men",
+            400f,
+            250f,
+            150f,
+            35f,
+            12f,
+            TextAlign.Middle,
+            5f,
+            9f,
+            ColorPalette.text,
+            6,
+            TextBoxElement.TextBoxType.GAP,
+            "Cocina"
+        ),
+        TextBoxElement(
+            "Men",
+            400f,
+            300f,
+            150f,
+            35f,
+            12f,
+            TextAlign.Right,
+            5f,
+            9f,
+            ColorPalette.text,
+            6,
+            TextBoxElement.TextBoxType.GAP,
+            "Cocina"
+        ),
         ColorElement(
             100f,
             500f,
@@ -38,7 +85,6 @@ object ElementTestGUI : Screen() {
         scaleUI()
         testElements.forEach { it.draw() }
         resetScale()
-        text("Unscaled Text", 100f, 100f, ColorPalette.text, 8f, fontType = ColorPalette.font)
         GlStateManager.popMatrix()
     }
 
