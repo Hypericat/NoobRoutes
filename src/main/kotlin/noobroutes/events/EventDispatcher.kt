@@ -12,11 +12,14 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.Core.scope
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.*
 import noobroutes.utils.*
+import noobroutes.utils.Utils.isEnd
+import noobroutes.utils.Utils.isStart
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.dungeonItemDrops
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.isSecret
@@ -96,5 +99,10 @@ object EventDispatcher {
     fun onS2D(event: S2DEvent) {
         val title = event.packet.windowTitle.unformattedText
         if (System.currentTimeMillis() - lastEntityClick < 400 && termNames.any{regex -> regex.matches(title)}) TermOpenEvent().postAndCatch()
+    }
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.isEnd) AutoP3MovementEvent().postAndCatch()
     }
 }

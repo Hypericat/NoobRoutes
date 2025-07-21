@@ -43,14 +43,14 @@ object CoreClip: Module(
          get() = isAir(MIDDLE_CORE_BLOCK)
 
     fun inDoor(posZ: Double): Boolean {
-        return posZ in CORE_Z_EDGE1 ..CORE_Z_EDGE2 && (posZ != SLIGHTLY_IN1 && posZ != SLIGHTLY_IN2)
+        return posZ in CORE_Z_EDGE1 ..CORE_Z_EDGE2 && posZ != SLIGHTLY_IN1 && posZ != SLIGHTLY_IN2
     }
 
     @SubscribeEvent()
     fun noInWall(event: PacketEvent.Send) {
         if (event.packet !is C03PacketPlayer || !BossEventDispatcher.inF7Boss || doorOpen) return
 
-        if (MIDDLE_CORE_BLOCK.distanceToPlayerSq > 10 || mc.thePlayer.isSneaking) {
+        if (abs(MIDDLE_CORE_BLOCK.z - mc.thePlayer.posZ) > 5 || mc.thePlayer.isSneaking || !mc.thePlayer.onGround) {
             Blocks.gold_block.restoreHitbox()
             Blocks.barrier.restoreHitbox()
         }

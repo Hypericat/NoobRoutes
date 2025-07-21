@@ -19,6 +19,7 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import kotlin.math.pow
 import kotlin.math.sin
 
@@ -142,7 +143,7 @@ abstract class Ring(
     }
 
     open fun ringCheckY(): Boolean {
-        return (coords.yCoord <= mc.thePlayer.posY && coords.yCoord + height > mc.thePlayer.posY && !center) || center && coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround
+        return (coords.yCoord <= mc.thePlayer.posY && coords.yCoord + height > mc.thePlayer.posY && !center) || (center && coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround)
     }
 
     fun doRingArgs() {
@@ -165,6 +166,7 @@ abstract class Ring(
                 PacketUtils.sendPacket(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, mc.thePlayer.onGround))
                 Blink.cancelled--
             }
+            mc.thePlayer.isSprinting = false
             AutoP3.isAligned = true
         }
     }

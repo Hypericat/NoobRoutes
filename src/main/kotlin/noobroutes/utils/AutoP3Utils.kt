@@ -10,7 +10,9 @@ import net.minecraftforge.fml.common.gameevent.InputEvent
 import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.events.BossEventDispatcher
+import noobroutes.events.impl.AutoP3MovementEvent
 import noobroutes.events.impl.MotionUpdateEvent
+import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.Phase
 import noobroutes.features.floor7.autop3.AutoP3
@@ -49,7 +51,6 @@ object AutoP3Utils {
         if (!stop) return
         walking = false
         motioning = false
-        testing = false
     }
 
     fun rePressKeys() {
@@ -60,8 +61,8 @@ object AutoP3Utils {
     var direction = 0F
     var motioning = false
     var motionTicks = 0
-    var testing = false
-    var testTicks = 0
+
+    var skipC03 = false
 
     fun startWalk(dir: Float) {
         direction = dir
@@ -76,7 +77,6 @@ object AutoP3Utils {
     fun stopShit() {
         walking = false
         motioning = false
-        testing = false
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -93,8 +93,8 @@ object AutoP3Utils {
     private const val TICK2 = 1.99
 
     @SubscribeEvent
-    fun motion(event: PacketEvent.Send) {
-        if (!motioning || event.packet !is C03PacketPlayer || cancelNext) return
+    fun motion(event: AutoP3MovementEvent) {
+        if (!motioning) return
         when (motionTicks) {
             0 -> setSpeed(1.4)
             1 -> {
@@ -143,27 +143,15 @@ object AutoP3Utils {
         mc.thePlayer.motionZ = Utils.zPart(direction) * speed
     }
 
-    var cancelNext = false
-
-    @SubscribeEvent
-    fun onC03(event: PacketEvent.Send) {
-        if (cancelNext && event.packet is C03PacketPlayer) {
-            event.isCanceled = true
-            cancelNext = false
-        }
-    }
-
     var airTicks = 0
     var jumping = false
 
     const val JUMP_SPEED = 6.0075
     private const val SPRINT_MULTIPLIER = 1.3
 
-    var speeding = false
-
     @SubscribeEvent
-    fun movement(event: PacketEvent.Send) {
-        if (event.packet !is C03PacketPlayer || cancelNext || mc.thePlayer == null) return
+    fun doMovement(event: AutoP3MovementEvent) {
+        if (mc.thePlayer == null) return
 
         if (mc.thePlayer.onGround) {
             airTicks = 0
@@ -177,6 +165,7 @@ object AutoP3Utils {
         if (airTicks == 0) {
             var speedMultiplier = 2.806
             if (jumping) {
+                devMessage("yeet")
                 jumping = false
                 speedMultiplier = JUMP_SPEED
             }
@@ -203,7 +192,6 @@ object AutoP3Utils {
         AutoP3.isAligned = false
         walking = false
         motioning = false
-        testing = false
     }
 
     val ringColors = mapOf(

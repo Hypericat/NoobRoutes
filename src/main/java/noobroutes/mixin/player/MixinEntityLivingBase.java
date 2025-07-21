@@ -6,6 +6,7 @@ import noobroutes.events.impl.MoveEntityWithHeadingEvent;
 import noobroutes.features.move.QOL;
 import noobroutes.utils.skyblock.LocationUtils;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import net.minecraft.block.material.Material;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -15,6 +16,8 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 
 @Mixin(EntityLivingBase.class)
 public abstract class MixinEntityLivingBase {
+
+    @Shadow protected abstract boolean isPlayer();
 
     @ModifyConstant(
             method = "jump",
@@ -42,7 +45,7 @@ public abstract class MixinEntityLivingBase {
             at = @At("HEAD")
     )
     private void onMoveEntityWithHeadingPre(float strafe, float forward, CallbackInfo ci) {
-        postAndCatch(new MoveEntityWithHeadingEvent.Pre());
+        if (this.isPlayer()) postAndCatch(new MoveEntityWithHeadingEvent.Pre());
     }
 
     @Inject(
@@ -50,6 +53,6 @@ public abstract class MixinEntityLivingBase {
             at = @At("TAIL")
     )
     private void onMoveEntityWithHeadingPost(float strafe, float forward, CallbackInfo ci) {
-        postAndCatch(new MoveEntityWithHeadingEvent.Post());
+        if (this.isPlayer()) postAndCatch(new MoveEntityWithHeadingEvent.Post());
     }
 }

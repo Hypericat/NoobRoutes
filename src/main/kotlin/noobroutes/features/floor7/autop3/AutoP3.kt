@@ -19,6 +19,8 @@ import noobroutes.Core.logger
 import noobroutes.config.DataManager
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.BossEventDispatcher.inF7Boss
+import noobroutes.events.impl.AutoP3MovementEvent
+import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.Phase
 import noobroutes.events.impl.TermOpenEvent
@@ -113,9 +115,9 @@ object AutoP3: Module (
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun tickRing(event: PacketEvent.Send) {
-        if (event.packet !is C03PacketPlayer || mc.thePlayer == null) return
+    @SubscribeEvent(priority = EventPriority.HIGHEST) //go before ring actions
+    fun tickRing(event: AutoP3MovementEvent) {
+        if (mc.thePlayer == null) return
         if(!inF7Boss || mc.thePlayer.isSneaking || editMode || mc.thePlayer.capabilities.walkSpeed < 0.5) return
 
         val bb = mc.thePlayer.entityBoundingBox //cant mc.thePlayer.collided or whatever as i need x AND z collision to align
@@ -133,23 +135,19 @@ object AutoP3: Module (
 
             val isAlignRing = ring.center || ring is BlinkRing
 
-            // as player max speed is 1.4 blocks a tick one check in the middle is enough
+            /*// as player max speed is 1.4 blocks a tick one check in the middle is enough
             val prevPositionVector = Vec3(mc.thePlayer.prevPosX, mc.thePlayer.prevPosY, mc.thePlayer.prevPosZ)
             val middlePositionVector = mc.thePlayer.positionVector.add(prevPositionVector).multiply(0.5f)
-            val passedRing = ring.inRing(middlePositionVector) && ring.ringCheckY() //no interpolation on y as i use the fact that it doesnt
+            val passedRing = ring.inRing(middlePositionVector) && ring.ringCheckY() //no interpolation on y as i use the fact that it doesnt*/
 
-            if (inRing || (passedRing && isAlignRing)) {
+            if (inRing) { // || (passedRing && isAlignRing)
                 if (ring.triggered) return@forEach
 
-                if (passedRing && !inRing) {
-                    AutoP3Utils.unPressKeys()
-                    PlayerUtils.stopVelocity()
-                    event.isCanceled = true
+                /*if (passedRing && !inRing) {
                     mc.thePlayer.setPosition(middlePositionVector.xCoord, mc.thePlayer.posY, middlePositionVector.zCoord)
                     if (ring is BlinkRing) keep = true
-                    //due to the event/time it doesnt automatically send a c04
-                    PacketUtils.sendPacket(C04PacketPlayerPosition(middlePositionVector.xCoord, mc.thePlayer.posY, middlePositionVector.zCoord, mc.thePlayer.onGround))
-                }
+                    devMessage("passed")
+                }*/
 
                 if (alignedOnly && !isAligned && !isAlignRing) return@forEach
                 ring.triggered = true

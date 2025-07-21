@@ -41,7 +41,7 @@ class HClipRing(
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
         AutoP3Utils.direction = yaw
-        Scheduler.scheduleC03Task(1) {
+        Scheduler.scheduleC03Task {
             val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
             mc.thePlayer.motionX = speed * Utils.xPart(direction)
             mc.thePlayer.motionZ = speed * Utils.zPart(direction)
