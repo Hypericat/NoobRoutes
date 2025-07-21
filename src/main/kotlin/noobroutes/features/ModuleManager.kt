@@ -83,8 +83,7 @@ object ModuleManager {
         BrushModule,
         FreeCam,
         QOL,
-        BarPhase,
-        TemporaryColorPalletModule
+        BarPhase
     )
 
     init {
