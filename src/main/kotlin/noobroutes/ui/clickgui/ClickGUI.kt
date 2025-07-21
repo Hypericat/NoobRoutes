@@ -22,6 +22,7 @@ import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.render.*
 import org.lwjgl.input.Mouse
+import org.lwjgl.opengl.GL11
 import kotlin.math.sign
 
 /**
@@ -50,6 +51,8 @@ object ClickGUI : Screen() {
 
     override fun draw() {
         GlStateManager.pushMatrix()
+        GlStateManager.enableBlend()
+        GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA)
         translate(0f, 0f, 200f)
         if (anim.isAnimating()) {
             //translate(0f, floor(anim.get(-10f, 0f, !open)))
@@ -71,7 +74,6 @@ object ClickGUI : Screen() {
             ColorUtil.clickGUIColor.alpha = 1f
             Color.WHITE.alpha = 1f
         }
-        translate(0f, 0f, -200f)
         GlStateManager.popMatrix()
     }
 

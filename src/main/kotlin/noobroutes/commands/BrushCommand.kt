@@ -22,7 +22,7 @@ class BrushCommand: CommandBase() {
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Set, Clear, Load, LoadFunnyMap")
+        if (args == null || args.isEmpty()) return modMessage("Usages: Edit, Gui, Clear, Load, Reload, Fill, Clear, Undo")
         when (args[0].lowercase()) {
             "em", "e", "edit" -> {
                 BrushModule.toggleEditMode()
@@ -52,9 +52,10 @@ class BrushCommand: CommandBase() {
 
             "reload", "r" -> {
                 BrushModule.reload()
+                modMessage("Reloading")
             }
 
-            "undo" -> {
+            "undo", "u" -> {
                 BrushBuildTools.handleUndo()
             }
 
@@ -71,7 +72,7 @@ class BrushCommand: CommandBase() {
                 thread.start()
 
             }
-            else -> modMessage("Usages: Edit, Gui, Load, Fill, Clear, Undo")
+            else -> modMessage("Usages: Edit, Gui, Clear, Load, Reload, Fill, Clear, Undo")
         }
     }
 
@@ -89,7 +90,7 @@ class BrushCommand: CommandBase() {
     ): MutableList<String?>? {
         return when (args.size) {
             1 -> {
-                mutableListOf("Edit", "Gui", "Load", "Fill", "Clear", "Undo")
+                mutableListOf("Edit", "Gui", "Clear", "Load", "Reload", "Fill", "Clear", "Undo")
             }
             2 -> {
                 getListOfStringsMatchingLastWord(

@@ -75,7 +75,7 @@ loom {
     runConfigs {
         getByName("client") {
             programArgs("--tweakClass", "gg.essential.loader.stage0.EssentialSetupTweaker")
-            programArgs("--mixin", "mixins.odin.json")
+            programArgs("--mixin", "mixins.noobroutes.json")
             isIdeConfigGenerated = true
         }
         remove(getByName("server"))

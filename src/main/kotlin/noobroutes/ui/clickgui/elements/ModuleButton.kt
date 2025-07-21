@@ -106,16 +106,16 @@ class ModuleButton(val module: Module, val panel: Panel) {
 
         roundedRectangle(x, y, width, height, moduleButtonColor)
 
-        text(module.name, x + width / 2, y + height / 2, color, 14f, Font.REGULAR, TextAlign.Middle)
+        text(module.name, x + width * 0.5, y + height * 0.5, color, 14f, Font.REGULAR, TextAlign.Middle)
         val textWidth = getTextWidth(module.name, 18f)
 
         if (textWidth < width - 80) {// too long text, not drawing symbol
             if (module.tag == Module.TagType.RISKY) {
-                drawDynamicTexture(bannableIcon, x + width / 2 + textWidth / 2, y + 2f, 25f, 25f)
+                drawDynamicTexture(bannableIcon, x + width * 0.5 + textWidth * 0.5, y + 2f, 25f, 25f)
             } else if (module.tag == Module.TagType.FPSTAX) {
-                drawDynamicTexture(fpsHeavyIcon, x + width / 2 + textWidth / 2, y, 35f, 35f)
+                drawDynamicTexture(fpsHeavyIcon, x + width * 0.5 + textWidth * 0.5, y, 35f, 35f)
             } else if (module.tag == Module.TagType.NEW && ClickGUIModule.firstTimeOnVersion) {
-                drawDynamicTexture(newFeatureIcon, x + width / 2 + textWidth / 2, y, 35f, 35f)
+                drawDynamicTexture(newFeatureIcon, x + width * 0.5 + textWidth * 0.5, y, 35f, 35f)
             }
         }
 

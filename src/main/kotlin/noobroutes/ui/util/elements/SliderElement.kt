@@ -24,15 +24,17 @@ class SliderElement(
     name: String,
     x: Float,
     y: Float,
-    h: Float,
-    w: Float,
+    val w: Float,
+    val h: Float,
+    val xScale: Float,
+    val yScale: Float,
     override var elementValue: Double,
     val min: Double, val max: Double,
     val increment: Double,
     val unit: String = "",
     val roundTo: Int = 2,
     val divideBy: Double = 1.0
-) : UiElement(name, x, y, h, w), ElementValue<Double> {
+) : UiElement(x, y), ElementValue<Double> {
 
     override val elementValueChangeListeners = mutableListOf<(Double) -> Unit>()
     private val handler = HoverHandler(0, 0)
@@ -41,13 +43,8 @@ class SliderElement(
     private var listeningTextField: String = ""
     var listening = false
 
-    private inline val isHoveredBox: Boolean
-        get() = isAreaHovered(x + w - TEXTOFFSET - getBoxWidth - SLIDER_TEXT_BOX_PADDING, y + halfHeight - TEXT_BOX_HEIGHT * 0.5f, getBoxWidth + SLIDER_TEXT_BOX_PADDING * 2f, TEXT_BOX_HEIGHT)
-
-    private inline val getBoxWidth get() = getTextWidth(getDisplay(), 12f) + SLIDER_TEXT_BOX_PADDING
-
     private inline val isHovered: Boolean
-        get() = isAreaHovered(x + TEXTOFFSET, y + halfHeight + SLIDER_VERTICAL_OFFSET - SLIDER_HEIGHT, w - TEXTOFFSET, SLIDER_HEIGHT * 3f)
+        get() = isAreaHovered(x + TEXTOFFSET, y + SLIDER_VERTICAL_OFFSET - SLIDER_HEIGHT, w - TEXTOFFSET, SLIDER_HEIGHT * 3f)
 
     private var sliderPercentage: Float = ((elementValue- min) / (max - min)).toFloat()
 
@@ -56,8 +53,9 @@ class SliderElement(
 
 
     override fun draw() {
-        handler.handle(x + TEXTOFFSET, y + halfHeight + SLIDER_VERTICAL_OFFSET - SLIDER_HEIGHT, w - TEXTOFFSET, SLIDER_HEIGHT * 3f)
-        drawName()
+        handler.handle(x + TEXTOFFSET, y + SLIDER_VERTICAL_OFFSET - SLIDER_HEIGHT, w - TEXTOFFSET, SLIDER_HEIGHT * 3f)
+        //need to impliment a text element here
+        /*
         drawSliderTextBox(
             getDisplay(),
             x + w - TEXTOFFSET,
@@ -70,7 +68,9 @@ class SliderElement(
                 !listening
             ).darkerIf(isHoveredBox)
         )
-        drawSlider(x + TEXTOFFSET, y + halfHeight + SLIDER_VERTICAL_OFFSET, w - TEXTOFFSET, SLIDER_HEIGHT, sliderPercentage, color)
+
+         */
+        drawSlider(x + TEXTOFFSET, SLIDER_VERTICAL_OFFSET, w - TEXTOFFSET, SLIDER_HEIGHT, sliderPercentage, color)
         updateSlider()
         if (listening) {
             val diff = max - min
@@ -147,6 +147,7 @@ class SliderElement(
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (mouseButton != 0) return false
         when {
+            /*
             isHoveredBox -> {
                 if (listeningText) {
                     textUnlisten()
@@ -156,6 +157,8 @@ class SliderElement(
                 }
                 return true
             }
+
+             */
             listeningText -> {
                 textUnlisten()
                 listeningText = false
@@ -176,7 +179,7 @@ class SliderElement(
     }
 
     override fun mouseClickedAnywhere(){
-        if (listeningText && !isHovered && !isHoveredBox) {
+        if (listeningText && !isHovered) {
             textUnlisten()
             return
         }
@@ -244,7 +247,7 @@ class SliderElement(
                 }
             }
         }
-        if (isHovered || isHoveredBox) {
+        if (isHovered) {
             val amount = when (keyCode) {
                 Keyboard.KEY_RIGHT -> increment
                 Keyboard.KEY_LEFT -> -increment

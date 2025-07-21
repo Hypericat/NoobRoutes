@@ -50,14 +50,14 @@ object EditHUDGui : Screen() {
             val animVal = openAnim.get(0f, 1f, !open)
             scale(animVal, animVal)
         }
-        hoverHandler.handle(Display.getWidth() / 2 - 75f, Display.getHeight() * .86f - 30, 150f, 40f)
+        hoverHandler.handle(Display.getWidth() * 0.5f - 75f, Display.getHeight() * .86f - 30, 150f, 40f)
 
         //dropShadow(-100f, -25f, 200f, 50f, 10f, 1f)
-        roundedRectangle(Display.getWidth() / 2 - 75, Display.getHeight() * .86f - 30, 150f, 40f, color, 9f)
+        roundedRectangle(Display.getWidth() * 0.5f - 75, Display.getHeight() * .86f - 30, 150f, 40f, color, 9f)
 
         text(
             "Reset",
-            Display.getWidth() / 2f,
+            Display.getWidth() * 0.5f,
             Display.getHeight() * .86f,
             textColor,
             18f,

@@ -21,6 +21,7 @@ import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.EaseInOut
+import noobroutes.utils.Utils.COLOR_NORMALIZER
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.bind
@@ -105,14 +106,14 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         }
 
         val stringWidth = getTextWidth(hexString, 12f)
-        roundedRectangle(x + w / 2 - stringWidth / 2 - 12, y + 260, stringWidth + 24, 22f, buttonColor, 5f)
-        text(hexString, x + w / 2, y + 271, Color.WHITE, 12f, Font.REGULAR, TextAlign.Middle, TextPos.Middle)
+        roundedRectangle(x + w * 0.5 - stringWidth * 0.5 - 12, y + 260, stringWidth + 24, 22f, buttonColor, 5f)
+        text(hexString, x + w * 0.5, y + 271, Color.WHITE, 12f, Font.REGULAR, TextAlign.Middle, TextPos.Middle)
 
         if (listeningForString || colorAnim.isAnimating()) {
             val color = colorAnim.get(ColorUtil.clickGUIColor, buttonColor, listeningForString)
-            rectangleOutline(x + w / 2 - stringWidth / 2 - 13 , y + 259, stringWidth + 25f, 23f, color, 5f,2f)
+            rectangleOutline(x + w * 0.5 - stringWidth * 0.5 - 13 , y + 259, stringWidth + 25f, 23f, color, 5f,2f)
         }
-        resetStencil()
+        popStencil()
         Color.WHITE.bind()
     }
 
@@ -123,7 +124,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         val stringWithoutHash = hexString.substring(1)
         if (stringWithoutHash.length.equalsOneOf(6, 8)) {
             try {
-                val alpha = if (stringWithoutHash.length == 8) stringWithoutHash.substring(6).toInt(16) / 255f else 1f
+                val alpha = if (stringWithoutHash.length == 8) stringWithoutHash.substring(6).toInt(16) * COLOR_NORMALIZER else 1f
                 val red = stringWithoutHash.substring(0, 2).toInt(16)
                 val green = stringWithoutHash.substring(2, 4).toInt(16)
                 val blue = stringWithoutHash.substring(4, 6).toInt(16)

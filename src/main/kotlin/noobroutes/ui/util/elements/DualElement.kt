@@ -1,17 +1,13 @@
 package noobroutes.ui.util.elements
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.font.Font
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.clickgui.util.ColorUtil.darker
 import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.Animation
 import noobroutes.ui.util.animations.impl.EaseInOut
-import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
@@ -19,31 +15,28 @@ import noobroutes.utils.render.text
 
 
 class DualElement(
-    name: String,
     val left: String,
     val right: String,
     x: Float,
     y: Float,
-    w: Float,
-    h: Float,
+    val xScale: Float,
+    val yScale: Float,
     override var elementValue: Boolean
-) : UiElement(name, x, y, w, h), ElementValue<Boolean> {
+) : UiElement(x, y), ElementValue<Boolean> {
     private val posAnim = EaseInOut(250)
-
-    private val elementDrawLocation = w - DUAL_ELEMENT_HALF_WIDTH - ColorPalette.TEXT_OFFSET
 
     private inline val isRightHovered: Boolean
         get() = MouseUtils.isAreaHovered(
-            x + elementDrawLocation,
-            y + h * 0.5f - DUAL_ELEMENT_HALF_HEIGHT,
+            x,
+            y - DUAL_ELEMENT_HALF_HEIGHT,
             DUAL_ELEMENT_HALF_WIDTH,
             DUAL_ELEMENT_HEIGHT
         )
 
     private inline val isLeftHovered: Boolean
         get() = MouseUtils.isAreaHovered(
-            x + elementDrawLocation - DUAL_ELEMENT_HALF_WIDTH,
-            y + h * 0.5f - DUAL_ELEMENT_HALF_HEIGHT,
+            x- DUAL_ELEMENT_HALF_WIDTH,
+            y - DUAL_ELEMENT_HALF_HEIGHT,
             DUAL_ELEMENT_HALF_WIDTH,
             DUAL_ELEMENT_HEIGHT
         )
@@ -90,8 +83,8 @@ class DualElement(
     override val elementValueChangeListeners = mutableListOf<(Boolean) -> Unit>()
 
     override fun draw() {
-        drawName()
-        drawDualElement(left, right, isLeftHovered, isRightHovered, elementValue, x + elementDrawLocation, y + halfHeight, 1f, 1f, posAnim)
+
+        drawDualElement(left, right, isLeftHovered, isRightHovered, elementValue, x, y, xScale, yScale, posAnim)
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {

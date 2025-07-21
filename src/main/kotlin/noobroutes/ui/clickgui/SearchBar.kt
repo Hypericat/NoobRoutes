@@ -16,14 +16,14 @@ object SearchBar {
 
     var currentSearch = ""
     private var listening = false
-    private val isHovered get() = MouseUtils.isAreaHovered(mc.displayWidth / 2f - 200f, mc.displayHeight - 100f, 400f, 30f)
+    private val isHovered get() = MouseUtils.isAreaHovered(mc.displayWidth * 0.5f - 200f, mc.displayHeight - 100f, 400f, 30f)
     private val colorAnim = ColorAnimation(100)
 
     fun draw() {
         GlStateManager.pushMatrix()
         scale(1f / scaleFactor, 1f / scaleFactor, 1f)
 
-        translate(mc.displayWidth / 2f, mc.displayHeight - 100f)
+        translate(mc.displayWidth * 0.5f, mc.displayHeight - 100f)
         roundedRectangle(-200f, 0f, 400f, 30f, ColorUtil.moduleButtonColor, 9f)
         if (listening || colorAnim.isAnimating()) {
             val color = colorAnim.get(ColorUtil.clickGUIColor, buttonColor, listening)
@@ -32,7 +32,7 @@ object SearchBar {
         if (currentSearch.isEmpty()) {
             text("Search here...", 0f, 18f, Color.WHITE.withAlpha(0.5f), 18f, Font.REGULAR, TextAlign.Middle)
         } else text(currentSearch, 0f, 12f, Color.WHITE, 18f, Font.REGULAR, TextAlign.Middle)
-        translate(-mc.displayWidth / 4f, -mc.displayHeight / 4f + 200f)
+        translate(-mc.displayWidth * 0.25f, -mc.displayHeight * 0.25f + 200f)
         scale(scaleFactor, scaleFactor, 1f)
         GlStateManager.popMatrix()
     }

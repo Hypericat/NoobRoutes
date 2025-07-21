@@ -13,6 +13,10 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.circle
 import noobroutes.utils.render.roundedRectangle
 
+
+/**
+ * Drawn from the center
+ */
 class SwitchElement(
     name: String,
     val scale: Float,
@@ -21,7 +25,7 @@ class SwitchElement(
     y: Float,
     w: Float,
     h: Float,
-    ) : UiElement(name, x, y, w, h), ElementValue<Boolean>  {
+    ) : UiElement(x, y), ElementValue<Boolean>  {
 
 
 
@@ -78,17 +82,17 @@ class SwitchElement(
 
 
     private inline val isHovered get() = isHoveredSwitch(
-        x + w * 0.9f,
-        y + halfHeight,
+        x,
+        y,
         1f,
         1f,
     )
 
     override fun draw() {
-        drawName()
+
         drawSwitch(
-            x + w * 0.9f,
-            y + halfHeight,
+            x,
+            y,
             1.3f,
             1.3f,
             elementValue,
@@ -107,8 +111,4 @@ class SwitchElement(
         return false
 
     }
-
-
-
-
 }

@@ -45,7 +45,6 @@ object LocationUtils {
 
             lastArea = currentArea
             if (currentArea.isArea(Island.Unknown)) currentArea = getArea()
-            if (lastArea != currentArea) LocationChangeEvent(currentArea).postAndCatch()
 
             if ((DungeonUtils.inDungeons || currentArea.isArea(
                     Island.SinglePlayer
@@ -54,6 +53,7 @@ object LocationUtils {
                 getFloor() ?: return@Executor
             )
 
+            if (lastArea != currentArea) LocationChangeEvent(currentArea).postAndCatch()
         }.register()
     }
 

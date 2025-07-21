@@ -3,12 +3,14 @@ package noobroutes.ui.util.shader
 import gg.essential.elementa.components.UIBlock
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.shader.*
+import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.logger
+import noobroutes.utils.Utils.COLOR_NORMALIZER
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils.createLegacyShader
+import org.lwjgl.opengl.GL11
 
 object RoundedRect {
-
     fun initShaders() {
         logger.info("initing rounded rect shader")
         RoundedRectangle.initShader()
@@ -24,26 +26,28 @@ object RoundedRect {
         color2: Color, gradientDir: Int, shadowSoftness: Float = 0f
     ) {
         if (!RoundedRectangle.isInitialized() || !RoundedRectangle.shader.usable) return
+
+
         RoundedRectangle.shader.bind()
-        RoundedRectangle.shaderCenterUniform.setValue(x + (width / 2), y + (height / 2))
+        RoundedRectangle.shaderCenterUniform.setValue(x + (width * 0.5f), y + (height * 0.5f))
         RoundedRectangle.shaderSizeUniform.setValue(width, height)
         RoundedRectangle.shaderRadiusUniform.setValue(botR, topR, botL, topL)
         RoundedRectangle.shaderBorderThicknessUniform.setValue(borderThickness)
         RoundedRectangle.shaderEdgeSoftnessUniform.setValue(edgeSoftness)
-        RoundedRectangle.shaderColorUniform.setValue(color.r / 255f, color.g / 255f, color.b / 255f, color.alpha)
-        RoundedRectangle.shaderColor2Uniform.setValue(color2.r / 255f, color2.g / 255f, color2.b / 255f, color2.alpha)
+        RoundedRectangle.shaderColorUniform.setValue(color.r * COLOR_NORMALIZER, color.g * COLOR_NORMALIZER, color.b * COLOR_NORMALIZER, color.alpha)
+        RoundedRectangle.shaderColor2Uniform.setValue(color2.r * COLOR_NORMALIZER, color2.g * COLOR_NORMALIZER, color2.b * COLOR_NORMALIZER, color2.alpha)
         val direction = RoundedRectangle.directionVecs[gradientDir]
         RoundedRectangle.shaderGradientDir.setValue(direction.first, direction.second)
         RoundedRectangle.shaderBorderColorUniform.setValue(
-            borderColor.r / 255f,
-            borderColor.g / 255f,
-            borderColor.b / 255f,
+            borderColor.r * COLOR_NORMALIZER,
+            borderColor.g * COLOR_NORMALIZER,
+            borderColor.b * COLOR_NORMALIZER,
             borderColor.alpha
         )
         RoundedRectangle.shaderShadowColorUniform.setValue(
-            shadowColor.r / 255f,
-            shadowColor.g / 255f,
-            shadowColor.b / 255f,
+            shadowColor.r * COLOR_NORMALIZER,
+            shadowColor.g * COLOR_NORMALIZER,
+            shadowColor.b * COLOR_NORMALIZER,
             shadowColor.alpha
         )
         RoundedRectangle.shaderShadowSoftness.setValue(shadowSoftness)
@@ -64,9 +68,9 @@ object RoundedRect {
         if (!HSBBox.isInitialized() || !HSBBox.shader.usable) return
 
         HSBBox.shader.bind()
-        HSBBox.shaderCenterUniform.setValue(x + (width / 2), y + (height / 2))
+        HSBBox.shaderCenterUniform.setValue(x + (width * 0.5f), y + (height * 0.5f))
         HSBBox.shaderSizeUniform.setValue(width, height)
-        HSBBox.shaderColorUniform.setValue(color.r / 255f, color.g / 255f, color.b / 255f, color.alpha)
+        HSBBox.shaderColorUniform.setValue(color.r * COLOR_NORMALIZER, color.g * COLOR_NORMALIZER, color.b * COLOR_NORMALIZER, color.alpha)
 
         UIBlock.drawBlockWithActiveShader(
             matrixStack,
@@ -94,11 +98,11 @@ object RoundedRect {
         Circle.shader.bind()
         Circle.shaderCenterUniform.setValue(x, y)
         Circle.shaderRadiusUniform.setValue(radius)
-        Circle.shaderColorUniform.setValue(color.r / 255f, color.g / 255f, color.b / 255f, color.alpha)
+        Circle.shaderColorUniform.setValue(color.r * COLOR_NORMALIZER, color.g * COLOR_NORMALIZER, color.b * COLOR_NORMALIZER, color.alpha)
         Circle.shaderBorderColorUniform.setValue(
-            borderColor.r / 255f,
-            borderColor.g / 255f,
-            borderColor.b / 255f,
+            borderColor.r * COLOR_NORMALIZER,
+            borderColor.g * COLOR_NORMALIZER,
+            borderColor.b * COLOR_NORMALIZER,
             borderColor.alpha
         )
         Circle.shaderBorderThicknessUniform.setValue(borderThickness)
@@ -131,13 +135,13 @@ object RoundedRect {
         if (!DropShadow.isInitialized() || !DropShadow.shader.usable) return
 
         DropShadow.shader.bind()
-        DropShadow.shaderCenterUniform.setValue(x + (width / 2), y + (height / 2))
+        DropShadow.shaderCenterUniform.setValue(x + (width * 0.5f), y + (height * 0.5f))
         DropShadow.shaderSizeUniform.setValue(width, height)
         DropShadow.shaderRadiusUniform.setValue(botR, topR, botL, topL)
         DropShadow.shaderShadowColorUniform.setValue(
-            shadowColor.r / 255f,
-            shadowColor.g / 255f,
-            shadowColor.b / 255f,
+            shadowColor.r * COLOR_NORMALIZER,
+            shadowColor.g * COLOR_NORMALIZER,
+            shadowColor.b * COLOR_NORMALIZER,
             shadowColor.alpha
         )
         DropShadow.shaderShadowSoftness.setValue(shadowSoftness)
