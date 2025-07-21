@@ -75,6 +75,7 @@ void main() {
 
     vec4 combinedColor = mix(gradientColor, u_colorBorder, borderAlpha);
     vec4 finalColor = mix(res_shadow_color, combinedColor, smoothedAlpha);
-
+    finalColor.rgb *= finalColor.a;
     gl_FragColor = finalColor;
+
 }

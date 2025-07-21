@@ -1,6 +1,7 @@
 package noobroutes.utils.render
 
 import com.google.gson.*
+import noobroutes.utils.Utils.COLOR_NORMALIZER
 import java.awt.Color.HSBtoRGB
 import java.awt.Color.RGBtoHSB
 import java.lang.reflect.Type
@@ -13,13 +14,13 @@ import java.awt.Color as JavaColor
 class Color(hue: Float, saturation: Float, brightness: Float, alpha: Float = 1f) {
     constructor(hsb: FloatArray, alpha: Float = 1f) : this(hsb[0], hsb[1], hsb[2], alpha)
     constructor(r: Int, g: Int, b: Int, alpha: Float = 1f) : this(RGBtoHSB(r, g, b, FloatArray(size = 3)), alpha)
-    constructor(rgba: Int) : this(rgba.red, rgba.green, rgba.blue, alpha = rgba.alpha / 255f)
+    constructor(rgba: Int) : this(rgba.red, rgba.green, rgba.blue, alpha = rgba.alpha * COLOR_NORMALIZER)
     constructor(rgba: Int, alpha: Float) : this(rgba.red, rgba.green, rgba.blue, alpha)
     constructor(hex: String) : this(
         hex.substring(0, 2).toInt(16),
         hex.substring(2, 4).toInt(16),
         hex.substring(4, 6).toInt(16),
-        hex.substring(6, 8).toInt(16) / 255f
+        hex.substring(6, 8).toInt(16) * COLOR_NORMALIZER
     )
 
     var hue = hue
@@ -76,9 +77,9 @@ class Color(hue: Float, saturation: Float, brightness: Float, alpha: Float = 1f)
     inline val b get() = rgba.blue
     inline val a get() = rgba.alpha
 
-    inline val redFloat get() = r / 255f
-    inline val greenFloat get() = g / 255f
-    inline val blueFloat get() = b / 255f
+    inline val redFloat get() = r * COLOR_NORMALIZER
+    inline val greenFloat get() = g * COLOR_NORMALIZER
+    inline val blueFloat get() = b * COLOR_NORMALIZER
     inline val alphaFloat get() = this.alpha
 
     @OptIn(ExperimentalStdlibApi::class)

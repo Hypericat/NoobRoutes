@@ -113,6 +113,10 @@ fun circle(x: Number, y: Number, radius: Number, color: Color, borderColor: Colo
     }
 }
 
+fun drawTextWithSelection(text: String, selectionStart: Int, selectionEnd: Int, x: Number, y: Number, color: Color, size: Number, type: Int = Font.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font){
+
+}
+
 fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = Font.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font) {
     fontType.font.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
 }
@@ -197,19 +201,19 @@ fun initUIFramebufferStencil() {
     mc.framebuffer.unbindFramebuffer()
 }
 
-fun stencilRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number) {
-    stencil {roundedRectangle(x, y,w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
+fun stencilRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number, inverse: Boolean = false) {
+    stencil(inverse) {roundedRectangle(x, y,w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
 }
 
-fun stencilRoundedRectangle(x: Float, y: Float, w: Float, h: Float, radius: Number = 0f, edgeSoftness: Number = 0.5f) {
-    stencilRoundedRectangle(x, y, w, h, radius, radius, radius, radius, edgeSoftness)
+fun stencilRoundedRectangle(x: Float, y: Float, w: Float, h: Float, radius: Number = 0f, edgeSoftness: Number = 0.5f, inverse: Boolean = false) {
+    stencilRoundedRectangle(x, y, w, h, radius, radius, radius, radius, edgeSoftness, inverse)
 }
 
 
 //an int would probably be better, however, i am using a stack just in case it does more in the future
-var stencilStack = Stack<Int>()
+private var stencilStack = Stack<Int>()
 
-fun stencil(mask: () -> Unit) {
+fun stencil(inverse: Boolean = false, mask: () -> Unit) {
     val newStencilValue = if (stencilStack.isEmpty()) 1 else stencilStack.peek() + 1
     stencilStack.push(newStencilValue)
     GL11.glEnable(GL11.GL_STENCIL_TEST)
@@ -245,21 +249,18 @@ fun stencil(mask: () -> Unit) {
     GL11.glStencilFunc(GL11.GL_EQUAL, if (stencilStack.peek() > 1) newStencilValue else 0, 0xFF)
 
     GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
-
     GL11.glStencilMask(0xFF)
-
     mask.invoke()
-
 
     GL11.glColorMask(true, true, true, true)
     GL11.glDepthMask(true)
     GL11.glStencilMask(0x00)
 
-    GL11.glStencilFunc(GL11.GL_EQUAL, newStencilValue, 0xFF)
+    GL11.glStencilFunc(if (inverse) GL11.GL_NOTEQUAL else GL11.GL_EQUAL, newStencilValue, 0xFF)
     GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
 }
 
-fun resetStencil() {
+fun popStencil() {
     if (stencilStack.isEmpty()) {
         throw IllegalStateException("StencilStack is empty")
     }

@@ -161,7 +161,7 @@ class Panel(
                 0f
             )
         }
-        resetStencil()
+        popStencil()
         scale(scaleFactor, scaleFactor, 1f)
     }
 

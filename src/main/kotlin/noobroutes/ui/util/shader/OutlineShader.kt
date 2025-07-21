@@ -1,6 +1,7 @@
 package noobroutes.ui.util.shader
 
 import noobroutes.Core.mc
+import noobroutes.utils.Utils.COLOR_NORMALIZER
 import noobroutes.utils.render.Color
 import org.lwjgl.opengl.GL20
 
@@ -26,7 +27,7 @@ object OutlineShader : FramebufferShader("source/entity/outlineEntity.fsh") {
     }
 
     private fun updateColor(color: Color) {
-        GL20.glUniform4f(getUniform("color"), color.r / 255f, color.g / 255f, color.b / 255f, color.alpha)
+        GL20.glUniform4f(getUniform("color"), color.r * COLOR_NORMALIZER, color.g * COLOR_NORMALIZER, color.b * COLOR_NORMALIZER, color.alpha)
     }
 
     private fun updateThickness(thickness: Float) {

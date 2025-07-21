@@ -22,6 +22,14 @@ object OdinFont : Font {
         )
     }
 
+    override fun xOrigin(text: String, x: Float, align: TextAlign, scale: Float): Float {
+        return when (align) {
+            TextAlign.Left -> x
+            TextAlign.Right -> x - getTextWidth(text, scale)
+            TextAlign.Middle -> x - getTextWidth(text, scale) * 0.5f
+        }
+    }
+
     override fun text(text: String, x: Float, y: Float, color: Color, scale: Float, align: TextAlign, verticalAlign: TextPos, shadow: Boolean, type: Int) {
         if (color.isTransparent) return
         val drawX = when (align) {

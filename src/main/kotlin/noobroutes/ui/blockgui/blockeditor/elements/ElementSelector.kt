@@ -31,7 +31,7 @@ class ElementSelector(private val property: PropertyEnum<*>, val block: IBlockSt
 
     init {
         property.allowedValues.forEach {
-            options.add(it.name)
+            //options.add(it.name)
         }
 
     }
