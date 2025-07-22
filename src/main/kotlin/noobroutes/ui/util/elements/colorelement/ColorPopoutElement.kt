@@ -2,21 +2,15 @@ package noobroutes.ui.util.elements.colorelement
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
+import noobroutes.ui.util.elements.NumberBoxElement
 import noobroutes.ui.util.elements.TextBoxElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.TEXT_BOX_WIDTH
 import noobroutes.utils.render.Color
-import noobroutes.utils.render.GradientDirection
 import noobroutes.utils.render.TextAlign
-import noobroutes.utils.render.circle
-import noobroutes.utils.render.drawDynamicTexture
-import noobroutes.utils.render.gradientRect
-import noobroutes.utils.render.popStencil
 import noobroutes.utils.render.roundedRectangle
-import noobroutes.utils.render.stencilRoundedRectangle
 
 class ColorPopoutElement(
     x: Float,
@@ -31,17 +25,20 @@ class ColorPopoutElement(
     init {
         addChildren(
             listOf("R", "G", "B").mapIndexed { index, label ->
-                TextBoxElement(
+                NumberBoxElement(
                     label, 0f, 0f,
                     TEXT_BOX_WIDTH, ColorElementsConstants.TEXT_BOX_HEIGHT,
                     12f, TextAlign.Left, 5f, 6f,
                     ColorPalette.text,
                     3,
                     TextBoxElement.TextBoxType.GAP,
+                    0,
+                    0.0,
+                    255.0,
                     when (index) {
-                        0 -> elementValue.r.toString()
-                        1 -> elementValue.g.toString()
-                        else -> elementValue.b.toString()
+                        0 -> elementValue.r.toDouble()
+                        1 -> elementValue.g.toDouble()
+                        else -> elementValue.b.toDouble()
                     }
                 )
             }

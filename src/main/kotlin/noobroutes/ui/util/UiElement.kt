@@ -16,12 +16,14 @@ abstract class UiElement(var x: Float, var y: Float) {
     private var deltaScaleY = 1f
 
 
-    fun updatePosition(x: Float, y: Float){
-        val deltaX = this.x - x
-        val deltaY = this.y - y
+    open fun updatePosition(x: Float, y: Float){
+        val deltaX = x - this.x
+        val deltaY = y - this.y
         this.x = x
         this.y = y
-        uiChildren.forEach { it.updatePosition(it.x + deltaX, y + deltaY) }
+        uiChildren.forEach {
+            it.updatePosition(it.x + deltaX, it.y + deltaY)
+        }
     }
 
     open fun draw() {
@@ -66,11 +68,12 @@ abstract class UiElement(var x: Float, var y: Float) {
     }
 
     protected fun updateChildrenTranslation(){
-        val xOrigin =getEffectiveX()
+        val xOrigin = getEffectiveX()
         val yOrigin = getEffectiveY()
         uiChildren.forEach {
             it.xOrigin = xOrigin
             it.yOrigin = yOrigin
+            it.updateChildrenTranslation()
         }
     }
 
@@ -80,6 +83,7 @@ abstract class UiElement(var x: Float, var y: Float) {
         uiChildren.forEach {
             it.globalXScale = xScale
             it.globalYScale = yScale
+            it.updateChildrenScale()
         }
     }
 
@@ -96,6 +100,9 @@ abstract class UiElement(var x: Float, var y: Float) {
         return globalYScale * deltaScaleY
     }
 
+    protected fun isAreaHovered(x: Float, y: Float, w: Float, h: Float): Boolean {
+        return MouseUtils.isAreaHovered(x + xOrigin, y + yOrigin, w, h)
+    }
 
 
 

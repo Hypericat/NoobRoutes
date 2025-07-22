@@ -1,13 +1,8 @@
 package noobroutes.ui.util
 
 import noobroutes.Core.mc
-import noobroutes.utils.render.scaleFactor
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
-import org.lwjgl.opengl.GL11
-import org.lwjgl.BufferUtils
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 object MouseUtils {
 
