@@ -149,7 +149,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
 
     fun stopMovement() {
         if (!instantSlow) return
-        speedVector = Vec3(0.0, 0.0, 0.0)
+        speedVector = Vec3(0.0, speedVector.yCoord, 0.0)
         oldPos = lastRenderPos
         pos = lastRenderPos
     }

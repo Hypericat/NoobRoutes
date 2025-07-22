@@ -143,6 +143,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
     private fun handlePlaceBlock(pos: BlockPos, hitVec: Vec3, facing: EnumFacing, room: UniqueRoom?){
         lastPlace = System.currentTimeMillis()
         val blockState = getEditingBlockState() ?: return
+        if (!isAir(pos)) return
         val state = if (forceRotation) blockState else blockState.block.onBlockPlaced(
             mc.theWorld,
             pos,
