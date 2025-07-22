@@ -11,6 +11,7 @@ import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
 import net.minecraftforge.client.event.GuiOpenEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
@@ -103,6 +104,11 @@ object EventDispatcher {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.isEnd) AutoP3MovementEvent().postAndCatch()
+        if (event.isStart) AutoP3MovementEvent().postAndCatch()
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onTickHighest(event: TickEvent.ClientTickEvent) {
+        if (event.isStart) AutoP3RingEvent().postAndCatch()
     }
 }

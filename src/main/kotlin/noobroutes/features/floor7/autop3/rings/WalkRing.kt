@@ -31,6 +31,10 @@ class WalkRing(
         AutoP3Utils.unPressKeys()
         super.doRing()
         if (AutoP3.renderStyle == 3) modMessage("Looking", "§0[§6Yharim§0]§7 ")
-        AutoP3Utils.startWalk(yaw)
+        if (!center) AutoP3Utils.startWalk(yaw)
+        else {
+            Scheduler.schedulePostMoveEntityWithHeadingTask(2) { mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord) }
+            Scheduler.schedulePostTickTask(1) { AutoP3Utils.startWalk(yaw) }
+        }
     }
 }

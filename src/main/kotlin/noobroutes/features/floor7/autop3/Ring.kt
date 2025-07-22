@@ -1,10 +1,11 @@
 package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonObject
-import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
+import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.floor7.autop3.AutoP3.depth
 import noobroutes.features.floor7.autop3.AutoP3.renderStyle
 import noobroutes.features.floor7.autop3.AutoP3.silentLook
@@ -112,14 +113,15 @@ abstract class Ring(
             2 -> RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), Color.GREEN, thickness = 3, depth = depth)
             3 -> Renderer.drawCylinder(this.coords, diameter * 0.5, diameter * 0.5, -0.01, 24, 1, 90, 0, 0, ringColors.getOrDefault(this.type, Color(255, 0, 255)), depth = depth)
         }
-        if (this.renderYawVector) Renderer.draw3DLine(listOf(
-            this.coords.add(0.0, PlayerUtils.STAND_EYE_HEIGHT, 0.0),
-            Vec3(this.yaw.xPart, 0.0, this.yaw.zPart).multiply(1.8).add(
-                this.coords.xCoord,
-                this.coords.yCoord + PlayerUtils.STAND_EYE_HEIGHT,
-                this.coords.zCoord
-            )
-        ),
+        if (this.renderYawVector) Renderer.draw3DLine(
+            listOf(
+                this.coords.add(0.0, PlayerUtils.STAND_EYE_HEIGHT, 0.0),
+                Vec3(this.yaw.xPart, 0.0, this.yaw.zPart).multiply(1.8).add(
+                    this.coords.xCoord,
+                    this.coords.yCoord + PlayerUtils.STAND_EYE_HEIGHT,
+                    this.coords.zCoord
+                )
+            ),
             Color.GREEN,
         )
     }
@@ -161,12 +163,13 @@ abstract class Ring(
         }
 
         if (center && (mc.thePlayer.onGround || System.currentTimeMillis() - Blink.lastBlink < 100)) {
-            mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord)
-            if (Blink.cancelled > 0) {
-                PacketUtils.sendPacket(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, mc.thePlayer.onGround))
-                Blink.cancelled--
+
+            AutoP3Utils.unPressKeys()
+
+            Scheduler.schedulePostMoveEntityWithHeadingTask {
+                mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord)
+                PlayerUtils.stopVelocity()
             }
-            mc.thePlayer.isSprinting = false
             AutoP3.isAligned = true
         }
     }

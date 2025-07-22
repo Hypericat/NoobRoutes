@@ -20,6 +20,7 @@ import noobroutes.config.DataManager
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.BossEventDispatcher.inF7Boss
 import noobroutes.events.impl.AutoP3MovementEvent
+import noobroutes.events.impl.AutoP3RingEvent
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.Phase
@@ -115,10 +116,10 @@ object AutoP3: Module (
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST) //go before ring actions
-    fun tickRing(event: AutoP3MovementEvent) {
+    @SubscribeEvent() //go before ring actions
+    fun tickRing(event: AutoP3RingEvent) {
         if (mc.thePlayer == null) return
-        if(!inF7Boss || mc.thePlayer.isSneaking || editMode || mc.thePlayer.capabilities.walkSpeed < 0.5) return
+        if(!inF7Boss || mc.thePlayer.isSneaking || editMode ) return //|| mc.thePlayer.capabilities.walkSpeed < 0.5
 
         val bb = mc.thePlayer.entityBoundingBox //cant mc.thePlayer.collided or whatever as i need x AND z collision to align
 
