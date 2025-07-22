@@ -3,6 +3,7 @@ package noobroutes.ui.util.elements.colorelement
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.util.ElementValue
+import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
 import noobroutes.utils.render.*
@@ -44,13 +45,46 @@ class AlphaSliderElement(
         )
         circle(
             0f,
-            -ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF + ColorElementsConstants.COLOR_SLIDER_HEIGHT - ColorElementsConstants.COLOR_SLIDER_HEIGHT * elementValue.alpha,
+            ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF - ColorElementsConstants.COLOR_SLIDER_HEIGHT * elementValue.alpha,
             ColorElementsConstants.COLOR_SLIDER_CIRCLE_RADIUS,
             Color.Companion.TRANSPARENT,
             Color.Companion.WHITE,
             ColorElementsConstants.COLOR_SLIDER_CIRCLE_BORDER_THICKNESS
         )
         popStencil()
+        uiChildren.forEach { it.draw() }
+        if (dragging) {
+            elementValue.alpha = 1f - ((MouseUtils.mouseY - y - yOrigin + ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF) / ColorElementsConstants.COLOR_SLIDER_HEIGHT).coerceIn(0f, 1f)
+            invokeValueChangeListeners()
+        }
         GlStateManager.popMatrix()
     }
+
+    private inline val isHovered get() = isAreaHovered(
+        x - ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF,
+        y - ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
+        ColorElementsConstants.COLOR_SLIDER_WIDTH,
+        ColorElementsConstants.COLOR_SLIDER_HEIGHT,
+    )
+    var dragging: Boolean = false
+
+    override fun mouseClicked(mouseButton: Int): Boolean {
+        if (super.mouseClicked(mouseButton)) return true
+        if (mouseButton != 0) return false
+        if (isHovered) {
+            dragging = true
+            return true
+        }
+        return false
+    }
+
+    override fun mouseReleased(): Boolean {
+        if (super.mouseReleased()) return true
+        dragging = false
+        return false
+    }
+
+
+
+
 }

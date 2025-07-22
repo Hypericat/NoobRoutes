@@ -15,6 +15,7 @@ abstract class UiElement(var x: Float, var y: Float) {
     private var deltaScaleX = 1f
     private var deltaScaleY = 1f
 
+    open fun updateChildren(){}
 
     open fun updatePosition(x: Float, y: Float){
         val deltaX = x - this.x

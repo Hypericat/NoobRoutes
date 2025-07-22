@@ -315,6 +315,7 @@ class TextBoxElement(
             TextBoxType.GAP -> drawTextBoxWithGapTitle()
         }
         if (!listening) return
+
         val (textX, textY) = getTextOrigin()
         if (listeningTextSelection) {
             val cursorIndex = getCursorIndexFromX(mouseX - xOrigin - textX)
@@ -352,16 +353,17 @@ class TextBoxElement(
         }
     }
 
-
+    val resetClickStageClock = Clock(500)
+    var clickSelectStage = 0
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (mouseButton != 0) return false
-        if (this.parent is NumberBoxElement) logger.info("x:${xOrigin + x}, y:${yOrigin + y}, w:${stringWidth(elementValue, textScale, minWidth, textPadding)}, h:$h")
         if (!isHovered) {
             listening = false
             resetSelection()
             invokeValueChangeListeners()
             return false
         }
+        if (resetClickStageClock.hasTimePassed(false)) clickSelectStage = 0
         resetCursorBlink()
         activeTextBoxElement?.let {
             it.listening = false
@@ -376,6 +378,26 @@ class TextBoxElement(
         selectionEnd = selectionStart
         insertionCursor = selectionStart
         listeningTextSelection = true
+        when (clickSelectStage) {
+            0 -> {
+                clickSelectStage++
+                resetClickStageClock.update()
+            }
+            1 -> {
+                resetSelection()
+                selectionStart = getWordIndexLeft()
+                if (selectionStart != 0) selectionStart++
+                selectionEnd = getWordIndexRight()
+                clickSelectStage++
+                resetClickStageClock.update()
+            }
+            2 -> {
+                resetSelection()
+                selectionStart = 0
+                selectionEnd = elementValue.length
+                clickSelectStage = 0
+            }
+        }
         return true
     }
 
@@ -441,7 +463,6 @@ class TextBoxElement(
                 insertionCursorOrigin
             }
             else -> {
-                //this crashes when you add a period because it removes the period when converted to an int, making insertionCursor invalid
                 insertionCursorOrigin + getTextWidth(elementValue.substring(0, insertionCursor.coerceAtMost(elementValue.length - 1)), textScale)
             }
         }

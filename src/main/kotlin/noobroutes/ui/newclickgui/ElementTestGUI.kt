@@ -59,6 +59,7 @@ object ElementTestGUI : Screen() {
     }
 
     override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
+        if (state != 0) return
         testElements.forEach { it.mouseReleased() }
 
     }

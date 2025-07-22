@@ -105,4 +105,8 @@ class NumberBoxElement(
         textBox.elementValue = if (roundTo == 0) this.elementValue.toInt().toString() else this.elementValue.toString()
     }
 
+    override fun updateChildren() {
+        updateTextBoxValue()
+    }
+
 }
