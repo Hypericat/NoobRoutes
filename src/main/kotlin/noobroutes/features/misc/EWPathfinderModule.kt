@@ -4,6 +4,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core
 import noobroutes.features.Category
@@ -120,6 +121,16 @@ object EWPathfinderModule : Module(
             drawBox(aabb, Color.RED, 3, 1, 0, false, true)
         }
     }
+
+
+    @SubscribeEvent
+    fun onWorldUnload(event: WorldEvent.Unload) {
+        lastPath = null;
+        currentBlock = null;
+    }
+
+
+
 
 
     /**
