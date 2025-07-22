@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
+import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
 
 object Scheduler {
@@ -28,6 +29,7 @@ object Scheduler {
     private val scheduledC03Tasks = Tasks()
     private val scheduledLowestC03Tasks = Tasks()
     private val scheduledSoundTasks = Tasks()
+    private val scheduledPostMoveEntityWithHeadingTasks = Tasks()
 
     private val scheduledPreMotionUpdateTasks = Tasks()
     private val scheduledLowPreMotionUpdateTasks = Tasks()
@@ -98,6 +100,12 @@ object Scheduler {
     fun schedulePostPlayerTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledPostPlayerTickTasks.add(Task({ p -> callback(p) }, ticks, priority))
+    }
+
+    @Throws(IndexOutOfBoundsException::class)
+    fun schedulePostMoveEntityWithHeadingTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+        if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
+        scheduledPostMoveEntityWithHeadingTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
@@ -209,6 +217,10 @@ object Scheduler {
         if (scheduledLowPreMotionUpdateTasks.doTasks(event)) event.isCanceled = true
     }
 
+    @SubscribeEvent
+    fun moveEntityWithHeadingPost(event: MoveEntityWithHeadingEvent.Post){
+        if (scheduledPostMoveEntityWithHeadingTasks.doTasks(event)) event.isCanceled = true
+    }
 
     @SubscribeEvent
     fun onSound(event: PacketEvent.Receive) {

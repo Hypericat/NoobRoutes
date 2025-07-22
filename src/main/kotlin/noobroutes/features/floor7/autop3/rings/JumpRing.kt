@@ -6,6 +6,7 @@ import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 
 @RingType("Jump")
@@ -32,13 +33,11 @@ class JumpRing (
         super.doRing()
         if (AutoP3.renderStyle == 3) modMessage("Jumping", "§0[§6Yharim§0]§7 ")
         if (mc.thePlayer.onGround) mc.thePlayer.jump()
-        else {
-            triggered = false
-            return
-        }
+        else return
         if (walk) {
-            AutoP3Utils.startWalk(yaw)
             AutoP3Utils.jumping = true
+            AutoP3Utils.startWalk(yaw)
+            devMessage("boing")
         }
     }
 }

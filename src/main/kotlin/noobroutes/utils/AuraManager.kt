@@ -156,7 +156,7 @@ object AuraManager {
     }
 
 
-    private fun clickBlock(aura: BlockAura, removeFirst: Boolean = false) {
+    fun clickBlock(aura: BlockAura, removeFirst: Boolean = false) {
         var aabb = BlockUtils.getAABB(aura.pos)
         if (aura.force && aabb == null) {
             aabb = AxisAlignedBB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)

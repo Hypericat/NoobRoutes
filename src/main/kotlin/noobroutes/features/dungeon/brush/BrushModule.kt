@@ -143,6 +143,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
     private fun handlePlaceBlock(pos: BlockPos, hitVec: Vec3, facing: EnumFacing, room: UniqueRoom?){
         lastPlace = System.currentTimeMillis()
         val blockState = getEditingBlockState() ?: return
+        if (!isAir(pos)) return
         val state = if (forceRotation) blockState else blockState.block.onBlockPlaced(
             mc.theWorld,
             pos,
@@ -156,9 +157,10 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
         val blockList = getBlockList(room)
         val blockToAdd = Pair(state , room?.getRealCoords(pos) ?: pos)
         blockList.removeAll { it.second.x == blockToAdd.second.x && it.second.y == blockToAdd.second.y && it.second.z == blockToAdd.second.z }
+        removeBlockFromChunk(pos)
         blockList.add(blockToAdd)
         setBlock(pos, state)
-        removeBlockFromChunk(pos)
+        addBlockToChunk(pos, state)
     }
 
     fun getEditingBlockState(): IBlockState? {
@@ -237,11 +239,11 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
             val removed = blockList.removeAll{ (_, blockPos) ->
                 pos == blockPos
             }
+            removeBlockFromChunk(pos)
+            setBlock(pos, IBlockStateUtils.airIBlockState)
+            if (removed) return modMessage("thing")
             addBlockToChunk(pos, IBlockStateUtils.airIBlockState)
-
-            if (removed) return
             blockList.add(IBlockStateUtils.airIBlockState to pos)
-
             return
         }
     }
@@ -260,7 +262,11 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
     }
 
     fun registerLocation(room: UniqueRoom?){
-        registerChunkBlocks(room, floorConfig[room?.name ?: getLocation()] ?: return)
+        if (room != null) {
+            registerChunkBlocks(room, roomConfig[room.name] ?: return)
+            return
+        }
+        registerChunkBlocks(null, floorConfig[getLocation()] ?: return)
     }
 
     @SubscribeEvent
@@ -307,7 +313,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
         val location = LocationUtils.currentArea
         return when (location) {
             Island.Dungeon -> {
-                "${DungeonUtils.floorNumber}"
+                DungeonUtils.floorNumber.toString()
             }
             Island.SinglePlayer -> {
                 "7"
@@ -370,16 +376,6 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
         saveAreaConfig(roomConfig, "roomConfig")
     }
 
-
-    private fun blockStateSerializer(state: IBlockState): String {
-        val blockName = Block.blockRegistry.getNameForObject(state.block)?.toString() ?: return "minecraft:air"
-        if (state.properties.isEmpty()) return blockName
-        val propString = state.properties.entries.joinToString(",") { (key, value) ->
-            "${key.name}=${key.getName(value)}"
-        }
-        return "$blockName[$propString]"
-    }
-
     private fun getBlockStateFromString(raw: String): IBlockState {
         val hasArgs = raw.contains("[") && raw.contains("]")
 
@@ -400,9 +396,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
             val key = parts[0]
             val value = parts[1]
             val prop = state.propertyNames
-                .firstOrNull { it.name == key } as? IProperty<*>
-                ?: continue
-
+                .firstOrNull { it.name == key } as IProperty<*>
             state = state.withProperty(prop, value)
         }
 

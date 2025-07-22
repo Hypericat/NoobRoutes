@@ -16,10 +16,6 @@ class NoobRoutesCommand : CommandBase() {
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args != null && args.isNotEmpty()) {
-            display = ElementTestGUI
-            return
-        }
         display = ClickGUI
     }
 

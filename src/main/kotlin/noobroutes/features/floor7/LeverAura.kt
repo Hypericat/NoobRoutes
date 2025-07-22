@@ -4,10 +4,13 @@ import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.events.BossEventDispatcher.inF7Boss
+import noobroutes.events.impl.AutoP3MovementEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.AuraManager
+import noobroutes.utils.Utils.isStart
 import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 
@@ -19,6 +22,8 @@ object LeverAura: Module(
     description = "does levers (duh)"
 ) {
     class Lever (val coords: BlockPos, var lastClick: Long)
+
+    private val speedToggle by BooleanSetting("click speed", false, description = "clicks levers during speed ring")
     private val range by NumberSetting(name = "range", description = "how much reach the aura should have", min = 5f, max = 6.5f, default = 6f, increment = 0.1f)
     private val cooldown by NumberSetting(name = "cooldown", description = "how long to wait beetween presses", min = 0.1, max = 20, default = 10, unit = "s", increment = 0.1)
 
@@ -42,13 +47,22 @@ object LeverAura: Module(
     )
 
     @SubscribeEvent
-    fun doShit(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !inF7Boss) return
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (!speedToggle && event.isStart) doShit()
+    }
+
+    @SubscribeEvent
+    fun onSped(event: AutoP3MovementEvent) {
+        if (speedToggle) doShit()
+    }
+
+    fun doShit() {
+        if (!inF7Boss) return
         val eyePos = mc.thePlayer.getPositionEyes(0f)
         levers.forEach { lever ->
             if (eyePos.distanceTo(lever.coords.toVec3()) > range) return@forEach
             if (System.currentTimeMillis() - lever.lastClick < cooldown * 1000) return@forEach
-            AuraManager.auraBlock(lever.coords)
+            AuraManager.clickBlock(AuraManager.BlockAura(lever.coords, false) {}) //i need offtick
             lever.lastClick = System.currentTimeMillis()
             return
         }

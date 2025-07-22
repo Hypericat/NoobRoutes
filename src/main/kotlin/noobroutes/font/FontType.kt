@@ -9,5 +9,5 @@ enum class FontType(val font: Font) {
     MINECRAFT(MinecraftFont),
     ODIN(OdinFont),
     MANROPE(ManropeFont),
-    NUNITO(NunitoFont)
+    NUNITO(NunitoFont),
 }

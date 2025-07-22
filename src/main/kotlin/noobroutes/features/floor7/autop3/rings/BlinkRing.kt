@@ -84,19 +84,12 @@ class BlinkRing(
 
         val firstPacket = packets.first()
         val toFar = mc.thePlayer.getDistanceSq(firstPacket.positionX, firstPacket.positionY, firstPacket.positionZ) > (mc.thePlayer.capabilities.walkSpeed * 2.806).pow(2)
-        
-        if (!canBlinkNow || (notEnoughPackets && !exceedsBlinkLimit)) {
-            mc.thePlayer.motionX = 0.0
-            mc.thePlayer.motionZ = 0.0
-            return
-        }
 
-        if (toFar && cancelled > 0) {
-            PacketUtils.sendPacket(C04PacketPlayerPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord, mc.thePlayer.onGround))
-            cancelled--
-        }
-        
         if (exceedsBlinkLimit || blinkDisabled) {
+            if (toFar && cancelled > 0) {
+                PacketUtils.sendPacket(C04PacketPlayerPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord, mc.thePlayer.onGround))
+                cancelled--
+            }
             if (AutoP3.renderStyle == 3) modMessage("Moving", "§0[§6Yharim§0]§7 ")
             movementPackets = packets.toMutableList()
             mc.thePlayer.motionX = 0.0
@@ -105,6 +98,17 @@ class BlinkRing(
             lastBlink = System.currentTimeMillis()
             resetTriggered()
             return
+        }
+        
+        if (!canBlinkNow || (notEnoughPackets)) {
+            mc.thePlayer.motionX = 0.0
+            mc.thePlayer.motionZ = 0.0
+            return
+        }
+
+        if (toFar && cancelled > 0) {
+            PacketUtils.sendPacket(C04PacketPlayerPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord, mc.thePlayer.onGround))
+            cancelled--
         }
         
         blinksInstance += packets.size

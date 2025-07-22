@@ -12,8 +12,8 @@ import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
-class KeybindElement(name: String, override var elementValue: Keybinding, x: Float, y: Float, w: Float, h: Float) :
-    UiElement(name, x, y, w, h), ElementValue<Keybinding> {
+class KeybindElement(override var elementValue: Keybinding, x: Float, y: Float, val xScale: Float, val yScale: Float) :
+    UiElement(x, y), ElementValue<Keybinding> {
 
     companion object {
         const val KEYBIND_HEIGHT = 20f
@@ -68,21 +68,19 @@ class KeybindElement(name: String, override var elementValue: Keybinding, x: Flo
 
     private inline val isHovered get() = isHoveredKeybind(
         elementValue.key,
-        x + w * 0.9f,
-        y + halfHeight,
+        x,
+        y,
         1.3f,
         1.3f
     )
 
     private val colorAnim = ColorAnimation(100)
     override fun draw() {
-        drawName()
-        colorAnim.isAnimating()
         drawKeybind(
-            x + w * 0.9f,
-            y + halfHeight,
-            1.3f,
-            1.3f,
+            x,
+            y,
+            xScale,
+            yScale,
             elementValue.key,
             colorAnim,
             listening

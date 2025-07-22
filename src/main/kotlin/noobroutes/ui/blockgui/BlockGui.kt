@@ -33,12 +33,12 @@ object BlockGui : Screen() {
 
 
     override fun keyTyped(typedChar: Char, keyCode: Int) {
-        BlockEditor.keyTyped(typedChar, keyCode)
+        //BlockEditor.keyTyped(typedChar, keyCode)
         super.keyTyped(typedChar, keyCode)
     }
 
     override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
-        BlockEditor.mouseReleased()
+        //BlockEditor.mouseReleased()
         BlockSelector.dragging = false
     }
 
@@ -47,10 +47,10 @@ object BlockGui : Screen() {
         if (isResetHovered) {
             BlockSelector.originX = 100f
             BlockSelector.originY = 200f
-            BlockEditor.originX = 500f
-            BlockEditor.originY = 200f
+            //BlockEditor.originX = 500f
+            //BlockEditor.originY = 200f
         }
-        if (BlockEditor.mouseClicked(mouseButton)) return
+        //if (BlockEditor.mouseClicked(mouseButton)) return
         BlockSelector.mouseClicked()
     }
 
@@ -65,7 +65,7 @@ object BlockGui : Screen() {
         translate(0f, 0f, 200f)
         scale(1f / scaleFactor, 1f / scaleFactor, 1f)
         BlockSelector.draw()
-        BlockEditor.draw()
+        //BlockEditor.draw()
 
         roundedRectangle(mc.displayWidth * 0.5 - 75, mc.displayHeight * 0.9f - 40, 150f, 80f, ColorUtil.buttonColor, 15f)
         text("Reset", mc.displayWidth * 0.5, mc.displayHeight * 0.9f, Color.WHITE.darkerIf(isResetHovered), 26f, align = TextAlign.Middle)

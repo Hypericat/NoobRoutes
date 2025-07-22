@@ -25,11 +25,13 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.utils.render.Color
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import java.util.*
 import kotlin.math.*
 
 object Utils {
+    const val COLOR_NORMALIZER = 1 / 255f
 
     inline val Float.xPart: Double get() = xPart(this)
     inline val Float.zPart: Double get() = zPart(this)

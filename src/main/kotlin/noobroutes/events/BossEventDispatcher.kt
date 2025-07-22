@@ -12,6 +12,7 @@ import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.Floor
+import noobroutes.utils.skyblock.modMessage
 
 object BossEventDispatcher {
 
@@ -121,24 +122,5 @@ object BossEventDispatcher {
                 }
             }
         }
-    }
-
-    @SubscribeEvent
-    fun onBossEnd(event: BossEvent.BossFinish) {
-        devMessage("Boss finished!")
-    }
-    @SubscribeEvent
-    fun onBossStart(event: BossEvent.BossStart) {
-        devMessage("Boss started!")
-    }
-
-    @SubscribeEvent
-    fun onPhaseChange(event: BossEvent.PhaseChange) {
-        devMessage("Phase change phase! ${event.phase.name}")
-    }
-
-    @SubscribeEvent
-    fun onTermPhaseChange(event: BossEvent.TerminalPhaseChange) {
-        devMessage("Term phase change phase! ${event.phase.name}")
     }
 }

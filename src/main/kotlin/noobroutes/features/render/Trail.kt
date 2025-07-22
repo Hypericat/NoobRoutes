@@ -24,6 +24,7 @@ import noobroutes.utils.equal
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.render.Renderer.drawBox
+import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
 
 object Trail: Module(
@@ -57,6 +58,7 @@ object Trail: Module(
         if (event.packet !is C04PacketPlayerPosition && event.packet !is C06PacketPlayerPosLook) return
         val c04 = getC04(event.packet)
         if (positions.isEmpty() || positions[positions.size-1] != c04) {
+            //devMessage("${c04.positionX} ${c04.positionY} ${c04.positionZ}")
             if (tickDelay) Scheduler.schedulePreTickTask { positions.add(0, c04) } else positions.add(0, c04)
         }
         positions.coerceMax(trailDistance)
