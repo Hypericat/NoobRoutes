@@ -15,7 +15,7 @@ object VertJerry: Module(
 ) {
     @SubscribeEvent
     fun onJerry(event: PacketEvent.Receive) {
-        if (event.packet !is S12PacketEntityVelocity || event.packet.entityID != mc.thePlayer.entityId || event.packet.motionY != 4800) return
+        if (event.packet !is S12PacketEntityVelocity || mc.thePlayer == null || event.packet.entityID != mc.thePlayer.entityId || event.packet.motionY != 4800) return
         event.isCanceled = true
         mc.thePlayer.setVelocity(mc.thePlayer.motionX, 0.6, mc.thePlayer.motionZ)
     }

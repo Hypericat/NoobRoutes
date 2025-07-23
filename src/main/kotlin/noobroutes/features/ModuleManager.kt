@@ -11,6 +11,7 @@ import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
+import noobroutes.features.dungeon.AutoBr
 import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.features.dungeon.puzzle.TicTacToe
 import noobroutes.features.dungeon.puzzle.Weirdos
@@ -23,6 +24,7 @@ import noobroutes.features.render.FreeCam
 import noobroutes.features.render.RotationVisualizer
 import noobroutes.features.render.TemporaryColorPalletModule
 import noobroutes.features.render.Trail
+import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.hud.HudElement
@@ -83,7 +85,12 @@ object ModuleManager {
         BrushModule,
         FreeCam,
         QOL,
-        BarPhase
+        BarPhase,
+        AutoBr,
+        AutoPath,
+        EWPathfinderModule,
+        DynamicRoute
+
     )
 
     init {

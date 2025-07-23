@@ -57,9 +57,11 @@ object Zpew : Module(
         PlayerUtils.playLoudSound(getSound(), volume.toFloat(), pitch.toFloat())
     }).withDependency { dingdingding }
 
+    private val maxQueuePackets by NumberSetting("Max Queueueueue", 5, 3, 10, description = "how many packets it can q")
+
     private const val FAILWATCHPERIOD: Int = 20
     private const val MAXFAILSPERFAILPERIOD: Int = 3
-    private const val MAXQUEUEDPACKETS: Int = 5
+    //private const val MAXQUEUEDPACKETS: Int = 5
 
     private var updatePosition = true
     private val recentlySentC06s = mutableListOf<SentC06>()
@@ -76,7 +78,7 @@ object Zpew : Module(
     private fun checkAllowedFails(): Boolean {
         if(LocationUtils.currentArea.isArea(Island.SinglePlayer)) return true;
 
-        if (recentlySentC06s.size >= MAXQUEUEDPACKETS) return false
+        if (recentlySentC06s.size >= maxQueuePackets) return false
 
         while (recentFails.isNotEmpty() && System.currentTimeMillis() - recentFails[0] > FAILWATCHPERIOD * 1000) recentFails.removeFirst()
 

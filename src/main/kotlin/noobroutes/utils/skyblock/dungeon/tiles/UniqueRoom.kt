@@ -4,9 +4,11 @@ import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import noobroutes.Core.mc
+import noobroutes.events.impl.BloodRoomSpawnEvent
 import noobroutes.utils.Vec2i
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.getBlockIdAt
+import noobroutes.utils.postAndCatch
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.Dungeon
 
@@ -148,6 +150,7 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
                 }
             }
         } ?: return // Rotation isn't found if we can't find the clay block
+        if (this.name == "Blood") BloodRoomSpawnEvent(this).postAndCatch()
     }
 
 
@@ -218,6 +221,7 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
         }
         room.uniqueRoom = this
         Dungeon.Info.uniqueRooms.add(this)
+        //if (this.name == "Blood") BloodRoomSpawnEvent(this).postAndCatch()
         roomShape = when (name) {
             in room1x4Names -> RoomShape.oneByFour
             in room1x3Names -> RoomShape.oneByThree
