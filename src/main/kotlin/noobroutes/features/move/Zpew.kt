@@ -57,7 +57,7 @@ object Zpew : Module(
         PlayerUtils.playLoudSound(getSound(), volume.toFloat(), pitch.toFloat())
     }).withDependency { dingdingding }
 
-    private val maxQueuePackets by NumberSetting("Max Queueueueue", 5, 3, 10, description = "how many packets it can q")
+    private val maxQueuePackets by NumberSetting("Max Queueueueue", 5, 3, 20, description = "how many packets it can q")
 
     private const val FAILWATCHPERIOD: Int = 20
     private const val MAXFAILSPERFAILPERIOD: Int = 3
@@ -219,6 +219,7 @@ object Zpew : Module(
         }
         if (RouteUtils.routing) return
         val prediction = predictTeleport(info.distance) ?: return
+        devMessage(info.distance)
         doZeroPingAotv(prediction.toBlockPos())
     }
 

@@ -46,6 +46,17 @@ object RotationUtils {
         return Pair(normalizedYaw.toFloat(), pitch.toFloat())
     }
 
+    fun getYaw(x: Double, z: Double): Float {
+        val dx = x - mc.thePlayer.posX
+        val dz = z - mc.thePlayer.posZ
+
+        val yaw = Math.toDegrees(atan2(-dx, dz))
+
+        val normalizedYaw = if (yaw < -180) yaw + 360 else yaw
+
+        return normalizedYaw.toFloat()
+    }
+
     fun getYawAndPitchOrigin(originX: Double, originY: Double, originZ: Double, x: Double, y: Double, z: Double, sneaking: Boolean = false): Pair<Float, Float> {
         val dx = x - originX
         val dy = y - (originY + 1.62 - if (sneaking) SNEAK_HEIGHT_INVERTED else 0.0)
