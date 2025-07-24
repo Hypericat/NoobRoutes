@@ -16,6 +16,7 @@ import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.routes.RouteUtils
+import noobroutes.utils.routes.RouteUtils.swapToEtherwarp
 import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
@@ -125,12 +126,7 @@ class Etherwarp(
     override fun run() {
         val room = currentRoom ?: return
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target), true)
-        val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
-        if (state == SwapManager.SwapState.UNKNOWN) return
-        if (state == SwapManager.SwapState.TOO_FAST) {
-            modMessage("Tried to 0 tick swap gg")
-            return
-        }
+        swapToEtherwarp()
         RouteUtils.setRotation(angles.first,angles.second, isSilent())
         stopWalk()
         PlayerUtils.unSneak()

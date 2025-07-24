@@ -23,6 +23,7 @@ import noobroutes.features.routes.nodes.autoroutes.*
 import noobroutes.utils.AutoP3Utils.walking
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.RotationUtils
+import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.floor
@@ -32,6 +33,7 @@ import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.skyblock.sendChatMessage
 import org.lwjgl.input.Keyboard
 
 object RouteUtils {
@@ -53,13 +55,7 @@ object RouteUtils {
     }
 
     fun etherwarp(yaw: Float, pitch: Float, silent: Boolean = false){
-        val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
-        if (state == SwapManager.SwapState.UNKNOWN) return
-        if (state == SwapManager.SwapState.TOO_FAST) {
-            modMessage("Tried to 0 tick swap gg")
-            return
-        }
-
+        swapToEtherwarp()
         PlayerUtils.stopVelocity()
         setRotation(yaw, pitch, silent)
         walking = false
@@ -69,6 +65,33 @@ object RouteUtils {
     }
 
 
+    fun swapToEtherwarp(){
+        val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+        if (state == SwapManager.SwapState.UNKNOWN) return
+        if (state == SwapManager.SwapState.TOO_FAST) {
+            modMessage("Tried to 0 tick swap gg")
+            return
+        }
+    }
+
+    fun pearlClip(distance: Int, silent: Boolean) {
+        if (distance > 70) return modMessage("Invalid Clip Distance")
+        walking = false
+        PlayerUtils.unPressKeys()
+        val state = SwapManager.swapFromName("ender pearl")
+        if (state == SwapManager.SwapState.UNKNOWN) return
+        if (state == SwapManager.SwapState.TOO_FAST) {
+            modMessage("Tried to 0 tick swap gg")
+            return
+        }
+        clipDistance = distance
+        if (LocationUtils.isSinglePlayer) {
+            Scheduler.schedulePreTickTask(1) { sendChatMessage("/tp ~ ~-$distance ~") }
+        }
+        pearlSoundRegistered = true
+        setRotation(null, 90f, silent)
+        rightClick()
+    }
 
     @SubscribeEvent
     fun onKeyInputEvent(event: InputEvent.KeyInputEvent){

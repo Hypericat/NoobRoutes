@@ -10,6 +10,7 @@ import noobroutes.utils.SwapManager
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.routes.RouteUtils
+import noobroutes.utils.routes.RouteUtils.pearlClip
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
@@ -96,21 +97,7 @@ class PearlClip(
     }
 
     override fun run() {
-        if (distance > 70) return modMessage("Invalid Clip Distance")
-        stopWalk()
-        val state = SwapManager.swapFromName("ender pearl")
-        if (state == SwapManager.SwapState.UNKNOWN) return
-        if (state == SwapManager.SwapState.TOO_FAST) {
-            modMessage("Tried to 0 tick swap gg")
-            return
-        }
-        RouteUtils.clipDistance = distance
-        if (LocationUtils.isSinglePlayer) {
-            Scheduler.schedulePreTickTask(1) { sendChatMessage("/tp ~ ~-$distance ~") }
-        }
-        RouteUtils.pearlSoundRegistered = true
-        RouteUtils.setRotation(null, 90f, isSilent())
-        RouteUtils.rightClick()
+        pearlClip(distance, isSilent())
     }
 
     override fun getType(): NodeType {

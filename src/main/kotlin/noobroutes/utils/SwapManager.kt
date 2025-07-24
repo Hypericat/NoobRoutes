@@ -2,11 +2,15 @@ package noobroutes.utils
 
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.utils.Utils.ID
+import noobroutes.utils.Utils.isEnd
+import noobroutes.utils.Utils.isStart
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.skyblockID
@@ -17,14 +21,18 @@ import noobroutes.utils.skyblock.unformattedName
  * Taken from CGA
  */
 object SwapManager {
-    var lastSwap = 0L
-    inline val recentlySwapped get() = System.currentTimeMillis() - lastSwap < 50L
+    var recentlySwapped = false
 
 
 
     @SubscribeEvent
     fun onPacket(event: PacketEvent.Send){
-        if (event.packet is C09PacketHeldItemChange) lastSwap = System.currentTimeMillis()
+        if (event.packet is C09PacketHeldItemChange) recentlySwapped = true
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onTickEnd(event: TickEvent.ClientTickEvent){
+        if (event.isEnd) recentlySwapped = false
     }
 
 
@@ -59,12 +67,11 @@ object SwapManager {
             if (itemName != null) {
                 if (itemName.contains(name, ignoreCase = true)) {
                     if (mc.thePlayer.inventory.currentItem != i) {
-                        if (System.currentTimeMillis() - lastSwap < 50L) devMessage("old 0 tick swap")
                         if (recentlySwapped) {
-                            modMessage("yo somethings wrong $itemName")
+                            modMessage("Swapped too fast $itemName")
                             return SwapState.TOO_FAST
                         }
-                        lastSwap = System.currentTimeMillis()
+                        recentlySwapped = true
                         mc.thePlayer.inventory.currentItem = i
                         return SwapState.SWAPPED
                     } else {
@@ -97,12 +104,11 @@ object SwapManager {
             if (itemName != null) {
                 if (skyblockID.any { it == itemName }) {
                     if (mc.thePlayer.inventory.currentItem != i) {
-                        if (System.currentTimeMillis() - lastSwap < 50L) devMessage("old 0 tick swap")
                         if (recentlySwapped) {
                             modMessage("yo somethings wrong $itemName")
                             return SwapState.TOO_FAST
                         }
-                        lastSwap = System.currentTimeMillis()
+                        recentlySwapped = true
                         mc.thePlayer.inventory.currentItem = i
                         return SwapState.SWAPPED
                     } else {
@@ -139,7 +145,7 @@ object SwapManager {
                             modMessage("yo somethings wrong $itemName")
                             return SwapState.TOO_FAST
                         }
-                        lastSwap = System.currentTimeMillis()
+                        recentlySwapped = true
                         mc.thePlayer.inventory.currentItem = i
                         return SwapState.SWAPPED
                     } else {
@@ -175,7 +181,7 @@ object SwapManager {
                             modMessage("yo somethings wrong $itemName")
                             return SwapState.TOO_FAST
                         }
-                        lastSwap = System.currentTimeMillis()
+                        recentlySwapped = true
                         mc.thePlayer.inventory.currentItem = i
                         return SwapState.SWAPPED
                     } else {
@@ -206,7 +212,7 @@ object SwapManager {
                 modMessage("u swapping too faaaast")
                 return SwapState.TOO_FAST
             }
-            lastSwap = System.currentTimeMillis()
+            recentlySwapped = true
             mc.thePlayer.inventory.currentItem = slot
             return SwapState.SWAPPED
         } else return SwapState.ALREADY_HELD
