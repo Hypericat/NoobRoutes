@@ -50,7 +50,7 @@ public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
                     shift = At.Shift.BEFORE
             ),
             cancellable = true)
-    public void onUpdatePre(CallbackInfo ci) {
+    public void onUpdatePre$noobRoutes(CallbackInfo ci) {
         this.noobRoutes$oldPosX = this.posX;
         this.noobRoutes$oldPosY = this.posY;
         this.noobRoutes$oldPosZ = this.posZ;
@@ -83,7 +83,7 @@ public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
             ),
             cancellable = true
     )
-    public void onUpdatePost(CallbackInfo ci) {
+    public void onUpdatePost$noobRoutes(CallbackInfo ci) {
         this.posX = this.noobRoutes$oldPosX;
         this.posY = this.noobRoutes$oldPosY;
         this.posZ = this.noobRoutes$oldPosZ;
@@ -108,7 +108,7 @@ public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
     }
 
     @Redirect(method = {"pushOutOfBlocks"}, at = @At(value = "FIELD", target = "Lnet/minecraft/client/entity/EntityPlayerSP;noClip:Z"))
-    public boolean shouldPrevent(EntityPlayerSP instance) {
+    public boolean shouldPrevent$noobRoutes(EntityPlayerSP instance) {
         return NoDebuff.INSTANCE.getNoPush();
     }
 
@@ -120,7 +120,7 @@ public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
                     opcode = Opcodes.GETFIELD
             )
     )
-    private int alwaysZeroPositionUpdateTicks(EntityPlayerSP self) {
+    private int alwaysZeroPositionUpdateTicks$noobRoutes(EntityPlayerSP self) {
         if (BossEventDispatcher.INSTANCE.getInF7Boss()) {
             return 0;
         }
