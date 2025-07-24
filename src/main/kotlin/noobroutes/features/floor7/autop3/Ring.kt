@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonObject
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
@@ -24,11 +25,8 @@ import noobroutes.utils.skyblock.devMessage
 import kotlin.math.pow
 import kotlin.math.sin
 
-@Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class RingType(val name: String, val aliases: Array<String> = [])
 
-abstract class Ring(
+data class RingBase(
     var coords: Vec3 = Vec3(mc.thePlayer?.posX ?: 0.0, mc.thePlayer?.posY ?: 0.0, mc.thePlayer?.posZ ?: 0.0),
     var yaw: Float,
     var term: Boolean,
@@ -38,15 +36,51 @@ abstract class Ring(
     var rotate: Boolean,
     var diameter: Float,
     var height: Float
+)
+
+abstract class Ring(
+    val base: RingBase,
+    val type: RingType
 ) {
+    inline var coords: Vec3
+        get() = base.coords
+        set(value) {base.coords = value}
+    inline var yaw: Float
+        get() = base.yaw
+        set(value) {base.yaw = value}
+    inline var term: Boolean
+        get() = base.term
+        set(value) {base.term = value}
+    inline var leap: Boolean
+        get() = base.leap
+        set(value) {base.leap = value}
+    inline var left: Boolean
+        get() = base.left
+        set(value) {base.left = value}
+    inline var center: Boolean
+        get() = base.center
+        set(value) {base.center = value}
+    inline var rotate: Boolean
+        get() = base.rotate
+        set(value) {base.rotate = value}
+    inline var diameter: Float
+        get() = base.diameter
+        set(value) {base.diameter = value}
+    inline var height: Float
+        get() = base.height
+        set(value) {base.height = value}
+
+    inline val isAwait: Boolean
+        get() = (term || leap || left)
+
+
     var renderYawVector = false
     var triggered = false
-    val type = javaClass.getAnnotation(RingType::class.java)?.name ?: "Unknown"
     val internalRingData = mutableListOf<SyncData>()
 
     fun getAsJsonObject(): JsonObject{
         val obj = JsonObject().apply {
-            addProperty("type", type)
+            addProperty("type", type.ringName)
             addProperty("coords", coords)
             addProperty("yaw", yaw)
             if (term) addProperty("term", true)
@@ -62,10 +96,11 @@ abstract class Ring(
         return obj
     }
 
+    abstract fun generateRingFromArgs(): Ring?
+
     protected open fun addPrimitiveRingData(obj: JsonObject){
         internalRingData.forEach { it.writeTo(obj) }
     }
-
 
     open fun loadRingData(obj: JsonObject){
         internalRingData.forEach { it.readFrom(obj) }
@@ -97,6 +132,7 @@ abstract class Ring(
         internalRingData.add(SyncLong(name, getter, setter))
     }
 
+
     fun renderRing() {
         val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
         val topOffset = (0.48 * sin(System.currentTimeMillis().toDouble() * 0.0033333334)) + 0.5
@@ -126,22 +162,32 @@ abstract class Ring(
         )
     }
 
-    private fun drawCylinderWithRingArgs(drawCoords: Vec3, color: Color) {
+    fun drawCylinderWithRingArgs(drawCoords: Vec3, color: Color) {
         Renderer.drawCylinder(drawCoords, diameter * 0.5, diameter * 0.5, 0.01, AutoP3.ringSlices, 1, 90, 0, 0, color, depth = depth)
     }
-
-    private fun loadInternalRingData(obj: JsonObject){
-        internalRingData.forEach { it.readFrom(obj) }
-    }
-
 
     open fun addRingData(obj: JsonObject) {}
 
     open fun doRing() {
     }
 
-    fun inRing(playerCoords: Vec3): Boolean {
-        return (coords.xCoord - playerCoords.xCoord).pow(2) + (coords.zCoord - playerCoords.zCoord).pow(2) <= (diameter * 0.5).pow(2)
+    fun inRing(): Boolean {
+        val ringAABB = AxisAlignedBB(coords.xCoord - diameter * 0.5, coords.yCoord, coords.zCoord - diameter * 0.5, coords.xCoord + diameter * 0.5, coords.yCoord + height, coords.zCoord + diameter * 0.5)
+        return ringAABB.isVecInside(mc.thePlayer.positionVector)
+    }
+
+    fun run() {
+        mc.thePlayer.isSprinting = false
+        AutoP3Utils.unPressKeys()
+
+        if (center) {
+            PlayerUtils.stopVelocity()
+            Scheduler.schedulePostMoveEntityWithHeadingTask {
+                PlayerUtils.setPosition(coords.xCoord, coords.zCoord)
+                
+            }
+        }
+
     }
 
     open fun ringCheckY(): Boolean {

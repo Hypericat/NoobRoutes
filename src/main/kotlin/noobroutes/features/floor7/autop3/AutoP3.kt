@@ -172,6 +172,8 @@ object AutoP3: Module (
         if (awaitingLeap.isEmpty()) leapedIDs = mutableSetOf<Int>() //this should be done after ring updates
     }
 
+
+
     fun doAwait(ring: Ring) {
         AutoP3Utils.unPressKeys()
         PlayerUtils.stopVelocity()
@@ -599,7 +601,7 @@ object AutoP3: Module (
             for ((routeName, rings) in rings) {
                 val ringArray = JsonArray().apply {
                     for (ring in rings) {
-                        add(ring.getAsJsonObject())
+                        if (ring.type.canSave) add(ring.getAsJsonObject())
                     }
                 }
                 outObj.add(routeName, ringArray)
@@ -612,34 +614,5 @@ object AutoP3: Module (
     }
 
 
-    fun loadRings() {
-        rings.clear()
-        try {
-            val file = DataManager.loadDataFromFileObject("rings")
-            for (route in file) {
-                val ringsInJson = mutableListOf<Ring>()
-                route.value.forEach {
-                    val ring = it.asJsonObject
-                    val ringType = ring.get("type")?.asString ?: "Unknown"
-                    val ringClass = ringRegistry[ringType]
-                    val instance: Ring = ringClass?.java?.getDeclaredConstructor()?.newInstance() ?: return@forEach
-                    instance.coords = ring.get("coords").asVec3
-                    instance.yaw = MathHelper.wrapAngleTo180_float(ring.get("yaw")?.asFloat ?: 0f)
-                    instance.term = ring.get("term")?.asBoolean == true
-                    instance.leap = ring.get("leap")?.asBoolean == true
-                    instance.center = ring.get("center")?.asBoolean == true
-                    instance.rotate = ring.get("rotate")?.asBoolean == true
-                    instance.left = ring.get("left")?.asBoolean == true
-                    instance.diameter = ring.get("diameter")?.asFloat ?: 1f
-                    instance.height = ring.get("height")?.asFloat ?: 1f
-                    instance.loadRingData(ring)
-                    ringsInJson.add(instance)
-                }
-                rings[route.key] = ringsInJson
-            }
-        } catch (e: Exception) {
-            modMessage("Error Loading Rings, Please Send Log to Wadey")
-            logger.info(e)
-        }
-    }
+
 }

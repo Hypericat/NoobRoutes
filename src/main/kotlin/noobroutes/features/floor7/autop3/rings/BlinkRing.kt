@@ -14,6 +14,7 @@ import noobroutes.features.floor7.autop3.Blink.endY
 import noobroutes.features.floor7.autop3.Blink.lastBlink
 import noobroutes.features.floor7.autop3.Blink.movementPackets
 import noobroutes.features.floor7.autop3.Ring
+import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
@@ -22,20 +23,15 @@ import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.pow
 
-@RingType("Blink")
+
 class BlinkRing(
-    coords: Vec3 = Vec3(0.0, 0.0, 0.0),
-    yaw: Float = 0f,
-    term: Boolean = false,
-    leap: Boolean = false,
-    left: Boolean = false,
-    center: Boolean = false,
-    rotate: Boolean = false,
-    diameter: Float = 1f,
-    height: Float = 1f,
+    ringBase: RingBase,
     var packets: List<C04PacketPlayerPosition> = listOf(),
     var endYVelo: Double = 0.0
-) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
+) : Ring(ringBase, RingType.BLINK) {
+    override fun generateRingFromArgs(): Ring? {
+        return null
+    }
 
 
     init {

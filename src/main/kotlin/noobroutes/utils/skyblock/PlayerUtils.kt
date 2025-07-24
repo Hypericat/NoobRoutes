@@ -55,6 +55,10 @@ object PlayerUtils {
         mc.thePlayer.motionZ = z
     }
 
+    fun setPosition(x: Double, z: Double){
+        mc.thePlayer.setPosition(x, mc.thePlayer.posY, z)
+    }
+
     inline val movementKeysPressed: Boolean get() = playerControlsKeycodes.any { Keyboard.isKeyDown(it) } && mc.currentScreen == null
 
 
