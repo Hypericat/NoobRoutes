@@ -101,8 +101,26 @@ abstract class UiElement(var x: Float, var y: Float) {
         return globalYScale * deltaScaleY
     }
 
+
+
     protected fun isAreaHovered(x: Float, y: Float, w: Float, h: Float): Boolean {
-        return MouseUtils.isAreaHovered(x + xOrigin, y + yOrigin, w, h)
+        return MouseUtils.isAreaHovered(getEffectiveXScale() * (x + getEffectiveX()), getEffectiveYScale() * (y + getEffectiveY()), w * getEffectiveXScale(), h * getEffectiveYScale())
+    }
+
+    /**
+     * Returns how far the mouse X position is within the given horizontal bounds as a percentage [0.0, 1.0].
+     *
+     * @param x The starting x-coordinate of the bounds.
+     * @param w The width of the bounds.
+     * @param invert If true, returns the inverted percentage (1.0 = left, 0.0 = right).
+     */
+    protected fun getMouseXPercentageInBounds(x: Float, w: Float, invert: Boolean = false): Float {
+        val relative = ((MouseUtils.mouseX - (x + getEffectiveX()) * getEffectiveXScale()) / (w * getEffectiveXScale())).coerceIn(0f, 1f)
+        return if (invert) 1f - relative else relative
+    }
+    protected fun getMouseYPercentageInBounds(y: Float, h: Float, invert: Boolean = false): Float {
+        val relative = ((MouseUtils.mouseY - (y + getEffectiveY()) * getEffectiveYScale()) / (h * getEffectiveYScale())).coerceIn(0f, 1f)
+        return if (invert) 1f - relative else relative
     }
 
 

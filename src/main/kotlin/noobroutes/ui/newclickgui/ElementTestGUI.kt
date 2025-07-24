@@ -24,7 +24,7 @@ object ElementTestGUI : Screen() {
         ),
         ColorElement(
             300f,
-            500f,
+            100f,
             30f,
             15f,
         5f,

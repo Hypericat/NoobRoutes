@@ -45,16 +45,14 @@ class ColorBoxElement(
         popStencil()
         GlStateManager.popMatrix()
         if (dragging) {
-            elementValue.saturation =
-                ((MouseUtils.mouseX - x - xOrigin + ColorElementsConstants.COLOR_BOX_SIZE_HALF) / ColorElementsConstants.COLOR_BOX_SIZE).coerceIn(
-                    0f,
-                    1f
-                )
-            elementValue.brightness =
-                ((ColorElementsConstants.COLOR_BOX_SIZE - (MouseUtils.mouseY - y - yOrigin + ColorElementsConstants.COLOR_BOX_SIZE_HALF) ) / ColorElementsConstants.COLOR_BOX_SIZE).coerceIn(
-                    0f,
-                    1f
-                )
+            elementValue.saturation = getMouseXPercentageInBounds(
+                0f,
+                ColorElementsConstants.COLOR_BOX_SIZE
+            )
+            elementValue.brightness = getMouseYPercentageInBounds(
+                0f,
+                ColorElementsConstants.COLOR_BOX_SIZE, true
+            )
             invokeValueChangeListeners()
         }
 
@@ -62,8 +60,8 @@ class ColorBoxElement(
 
     var dragging = false
     val isHovered get() = isAreaHovered(
-        -ColorElementsConstants.COLOR_BOX_SIZE_HALF + x,
-        -ColorElementsConstants.COLOR_BOX_SIZE_HALF + y,
+        0f,
+        0f,
         ColorElementsConstants.COLOR_BOX_SIZE,
         ColorElementsConstants.COLOR_BOX_SIZE,
     )

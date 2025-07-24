@@ -44,7 +44,10 @@ class ColorSliderElement(
         popStencil()
 
         if (dragging) {
-            elementValue.hue = (1 - ((MouseUtils.mouseY - y - yOrigin + ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF) / ColorElementsConstants.COLOR_SLIDER_HEIGHT).coerceIn(0f, 1f))
+            elementValue.hue = getMouseYPercentageInBounds(
+                ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
+                ColorElementsConstants.COLOR_SLIDER_HEIGHT, true
+            )
             invokeValueChangeListeners()
         }
         GlStateManager.popMatrix()
@@ -52,8 +55,8 @@ class ColorSliderElement(
 
 
     private inline val isHovered get() = isAreaHovered(
-        x - ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF,
-        y - ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
+        ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF,
+        ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
         ColorElementsConstants.COLOR_SLIDER_WIDTH,
         ColorElementsConstants.COLOR_SLIDER_HEIGHT,
     )

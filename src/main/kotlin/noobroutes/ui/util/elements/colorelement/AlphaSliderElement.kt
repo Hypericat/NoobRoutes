@@ -16,10 +16,10 @@ class AlphaSliderElement(
 
     override fun draw() {
         GlStateManager.pushMatrix()
-        translate(x, y)
+        translate(x - ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF, y - ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF)
         stencilRoundedRectangle(
-            -ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF,
-            -ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
+            0f,
+            0f,
             ColorElementsConstants.COLOR_SLIDER_WIDTH,
             ColorElementsConstants.COLOR_SLIDER_HEIGHT,
             ColorElementsConstants.COLOR_SLIDER_CIRCLE_RADIUS
@@ -28,14 +28,14 @@ class AlphaSliderElement(
         //it will get cut by the stencil tool to match the actual wanted size
         drawDynamicTexture(
             ColorElementsConstants.ALPHA_BACKGROUND,
-            -ColorElementsConstants.ALPHA_BACKGROUND_WIDTH_HALF,
-            -ColorElementsConstants.ALPHA_BACKGROUND_HEIGHT_HALF,
+            0f,
+            0f,
             ColorElementsConstants.ALPHA_BACKGROUND_WIDTH,
             ColorElementsConstants.ALPHA_BACKGROUND_HEIGHT
         )
         gradientRect(
-            -ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF,
-            -ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
+            0f,
+            0f,
             ColorElementsConstants.COLOR_SLIDER_WIDTH,
             ColorElementsConstants.COLOR_SLIDER_HEIGHT,
             Color.Companion.TRANSPARENT,
@@ -44,8 +44,8 @@ class AlphaSliderElement(
             GradientDirection.Up
         )
         circle(
-            0f,
-            ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF - ColorElementsConstants.COLOR_SLIDER_HEIGHT * elementValue.alpha,
+            ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
+            ColorElementsConstants.COLOR_SLIDER_HEIGHT - ColorElementsConstants.COLOR_SLIDER_HEIGHT * elementValue.alpha,
             ColorElementsConstants.COLOR_SLIDER_CIRCLE_RADIUS,
             Color.Companion.TRANSPARENT,
             Color.Companion.WHITE,
@@ -54,15 +54,19 @@ class AlphaSliderElement(
         popStencil()
         uiChildren.forEach { it.draw() }
         if (dragging) {
-            elementValue.alpha = 1f - ((MouseUtils.mouseY - y - yOrigin + ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF) / ColorElementsConstants.COLOR_SLIDER_HEIGHT).coerceIn(0f, 1f)
+            elementValue.alpha = getMouseYPercentageInBounds(
+                0f,
+                ColorElementsConstants.COLOR_SLIDER_HEIGHT,
+                true
+            )
             invokeValueChangeListeners()
         }
         GlStateManager.popMatrix()
     }
 
     private inline val isHovered get() = isAreaHovered(
-        x - ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF,
-        y - ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
+        0f,
+        0f,
         ColorElementsConstants.COLOR_SLIDER_WIDTH,
         ColorElementsConstants.COLOR_SLIDER_HEIGHT,
     )
@@ -83,8 +87,4 @@ class AlphaSliderElement(
         dragging = false
         return false
     }
-
-
-
-
 }

@@ -85,6 +85,7 @@ class ColorElement(
             0.5f
         )
         if (isOpen) {
+            scale(2f, 2f)
             uiChildren[0].updatePosition(x + 300f, y)
             uiChildren[0].draw()
         }

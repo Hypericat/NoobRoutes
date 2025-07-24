@@ -318,7 +318,7 @@ class TextBoxElement(
 
         val (textX, textY) = getTextOrigin()
         if (listeningTextSelection) {
-            val cursorIndex = getCursorIndexFromX(mouseX - xOrigin - textX)
+            val cursorIndex = getCursorIndexFromX(mouseX - (xOrigin + textX) * getEffectiveXScale())
             if (cursorIndex != selectionEnd) resetCursorBlink()
             selectionEnd = cursorIndex
             insertionCursor = selectionEnd
@@ -347,7 +347,7 @@ class TextBoxElement(
             TextAlign.Left -> textPadding
         }
         elementValue.forEach { ch ->
-            val w = getTextWidth(ch.toString(), textScale)
+            val w = getTextWidth(ch.toString(), textScale) * getEffectiveXScale()
             charHitboxes += CharHitbox(currentX, currentX + w)
             currentX += w
         }
@@ -374,7 +374,7 @@ class TextBoxElement(
         val (textX, textY) = getTextOrigin()
         lastClickedXPosition = mouseX
         generateCharacterHitboxes()
-        selectionStart = getCursorIndexFromX(mouseX - xOrigin - textX)
+        selectionStart = getCursorIndexFromX(mouseX - (xOrigin + textX) * getEffectiveXScale())
         selectionEnd = selectionStart
         insertionCursor = selectionStart
         listeningTextSelection = true
