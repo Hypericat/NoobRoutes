@@ -10,6 +10,7 @@ import noobroutes.features.misc.NoDebuff;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -21,14 +22,19 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 @Mixin(value = {EntityPlayerSP.class})
 public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
     @Shadow private int positionUpdateTicks;
-    private double oldPosX;
-    private double oldPosY;
-    private double oldPosZ;
+    @Unique
+    private double noobRoutes$oldPosX;
+    @Unique
+    private double noobRoutes$oldPosY;
+    @Unique
+    private double noobRoutes$oldPosZ;
+    @Unique
+    private float noobRoutes$oldYaw;
+    @Unique
+    private float noobRoutes$oldPitch;
+    @Unique
+    private boolean noobRoutes$oldOnGround;
 
-    private float oldYaw;
-    private float oldPitch;
-
-    private boolean oldOnGround;
     public MixinEntityPlayerSP_EntityPlayer(World worldIn, GameProfile gameProfileIn) {
         super(worldIn, gameProfileIn);
     }
@@ -45,15 +51,14 @@ public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
             ),
             cancellable = true)
     public void onUpdatePre(CallbackInfo ci) {
+        this.noobRoutes$oldPosX = this.posX;
+        this.noobRoutes$oldPosY = this.posY;
+        this.noobRoutes$oldPosZ = this.posZ;
 
-        this.oldPosX = this.posX;
-        this.oldPosY = this.posY;
-        this.oldPosZ = this.posZ;
+        this.noobRoutes$oldYaw = this.rotationYaw;
+        this.noobRoutes$oldPitch = this.rotationPitch;
 
-        this.oldYaw = this.rotationYaw;
-        this.oldPitch = this.rotationPitch;
-
-        this.oldOnGround = this.onGround;
+        this.noobRoutes$oldOnGround = this.onGround;
 
         MotionUpdateEvent.Pre motionUpdateEvent = new MotionUpdateEvent.Pre(this.posX, this.posY, this.posZ, this.motionX, this.motionY, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround);
 
@@ -79,14 +84,14 @@ public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
             cancellable = true
     )
     public void onUpdatePost(CallbackInfo ci) {
-        this.posX = this.oldPosX;
-        this.posY = this.oldPosY;
-        this.posZ = this.oldPosZ;
+        this.posX = this.noobRoutes$oldPosX;
+        this.posY = this.noobRoutes$oldPosY;
+        this.posZ = this.noobRoutes$oldPosZ;
 
-        this.rotationYaw = this.oldYaw;
-        this.rotationPitch = this.oldPitch;
+        this.rotationYaw = this.noobRoutes$oldYaw;
+        this.rotationPitch = this.noobRoutes$oldPitch;
 
-        this.onGround = this.oldOnGround;
+        this.onGround = this.noobRoutes$oldOnGround;
 
         MotionUpdateEvent.Post motionUpdateEvent = new MotionUpdateEvent.Post(posX, posY, posZ, motionX, motionY, motionZ, rotationYaw, rotationPitch, onGround);
 

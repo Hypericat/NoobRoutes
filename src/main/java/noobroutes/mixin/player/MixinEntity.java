@@ -14,10 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinEntity {
     @Shadow private int entityId;
     @Unique
-    Minecraft mc = Minecraft.getMinecraft();
+    Minecraft noobRoutes$mc = Minecraft.getMinecraft();
     @Inject(method = "setAngles", at = @At("HEAD"), cancellable = true)
     public void setAngles(float yaw, float pitch, CallbackInfo ci) {
-        if (FreeCam.INSTANCE.getEnabled() && this.entityId == mc.thePlayer.getEntityId()) {
+        if (FreeCam.INSTANCE.getEnabled() && this.entityId == noobRoutes$mc.thePlayer.getEntityId()) {
             FreeCam.INSTANCE.setAngles(yaw, pitch);
             ci.cancel();
         }
