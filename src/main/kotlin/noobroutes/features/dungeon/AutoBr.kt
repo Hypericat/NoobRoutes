@@ -1,44 +1,33 @@
 package noobroutes.features.dungeon
 
-import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
-import net.minecraft.util.Vec3
 import net.minecraft.util.Vec3i
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import noobroutes.events.impl.BlockChangeEvent
-import noobroutes.events.impl.BloodRoomSpawnEvent
 import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.misc.EWPathfinderModule
+import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.routes.nodes.autoroutes.PearlClip
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
-import noobroutes.utils.Utils.isStart
-import noobroutes.utils.isAir
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.routes.RouteUtils.setRotation
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.toBlockPos
-import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 import kotlin.math.round
@@ -55,6 +44,10 @@ object AutoBr: Module(
     private val noWait by BooleanSetting("faster pearls", description = "pearls diffrently, might be faster")
     private val silent by BooleanSetting("silent", description = "do silent rotations")
 
+    //private val meme by KeybindSetting("send 60 c08s", Keyboard.KEY_NONE, "for the meme").withDependency { ClickGUIModule.devMode }.onPress { repeat(60) { PlayerUtils.airClick() } }
+
+    private val doTest by BooleanSetting("testing shit", description = "tests shit").withDependency { ClickGUIModule.devMode }
+
     private val BLOOD_MIDDLE_COORDS = BlockPos(0, 99, 0)
 
     private val MIDDLE = Vec3i(-104, 0, -104)
@@ -65,8 +58,6 @@ object AutoBr: Module(
 
     private var hasRunStarted = false
 
-    private var userPressed = false
-
     private const val VERTICAL_TP_AMOUNT = 5
 
     @SubscribeEvent
@@ -74,11 +65,17 @@ object AutoBr: Module(
         if (event.message == "Starting in 4 seconds.") {
             testAutoPearl()
         }
-        else if (event.message == "[NPC] Mort: Here, I found this map when I first entered the dungeon." && userPressed && !goOn1) {
+        else if (event.message == "[NPC] Mort: Here, I found this map when I first entered the dungeon." && !goOn1) {
             hasRunStarted = true
             testAutoPearl()
         }
-        else if (event.message == "Starting in 1 second." && userPressed && goOn1) {
+        else if (event.message == "Starting in 1 second." && goOn1 && !doTest) {
+            Scheduler.schedulePreTickTask(goOn1Delay) {
+                hasRunStarted = true
+                testAutoPearl()
+            }
+        }
+        else if (doTest && event.message == "Starting in 2 seconds.") {
             Scheduler.schedulePreTickTask(goOn1Delay) {
                 hasRunStarted = true
                 testAutoPearl()
@@ -93,7 +90,6 @@ object AutoBr: Module(
             pearlCLipNode.run()
             RouteUtils.pearlClip(if (mc.thePlayer.posY == 72.0) 10 else 9, silent)
             waitingForClip = true
-            userPressed = true
         }
     }
 
@@ -129,20 +125,30 @@ object AutoBr: Module(
 
     @SubscribeEvent
     fun onBloodEnter(event: RoomEnterEvent) {
-        if (event.room?.name != "Blood" || mc.thePlayer.posY > 40 || !hasRunStarted) return
-        Scheduler.schedulePreTickTask {
-            setRotation(null, -90f, silent)
+        if (event.room?.name != "Blood" || !hasRunStarted) return
+        if (mc.thePlayer.posY < 40) {
             Scheduler.schedulePreTickTask {
-                repeat(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() }
+                setRotation(null, -90f, silent)
+                Scheduler.schedulePreTickTask {
+                    repeat(if (doTest) VERTICAL_TP_AMOUNT - 1 else VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() }
 
-                SwapManager.swapFromName("pearl")
+                    SwapManager.swapFromName("pearl")
 
-                RouteUtils.rightClick()
+                    RouteUtils.rightClick()
 
-                if (noWait) Scheduler.schedulePreTickTask(1) { PlayerUtils.airClick() }
+                    if (doTest) {
+                        Scheduler.scheduleLowS08Task(1) {
+                            PlayerUtils.airClick()
+                            Scheduler.schedulePreTickTask(1) { PlayerUtils.airClick() }
+                        }
+                    }
 
-                else Scheduler.scheduleLowS08Task(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() }
+                    if (doTest) return@schedulePreTickTask
 
+                    if (noWait) Scheduler.schedulePreTickTask(1) { PlayerUtils.airClick() }
+
+                    else Scheduler.scheduleLowS08Task(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() }
+                }
             }
         }
     }
@@ -150,7 +156,6 @@ object AutoBr: Module(
     fun reset() {
         waitingForClip = false
         hasRunStarted = false
-        userPressed = false
     }
 
     @SubscribeEvent
