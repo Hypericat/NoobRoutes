@@ -3,6 +3,7 @@ package noobroutes.utils
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.living.LivingEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,9 +31,11 @@ object Scheduler {
     private val scheduledLowestC03Tasks = Tasks()
     private val scheduledSoundTasks = Tasks()
     private val scheduledPostMoveEntityWithHeadingTasks = Tasks()
+    private val scheduledFrameTasks = Tasks()
 
     private val scheduledPreMotionUpdateTasks = Tasks()
     private val scheduledLowPreMotionUpdateTasks = Tasks()
+    private val scheduledPostMotionUpdateTasks = Tasks()
 
 
     @Throws(IndexOutOfBoundsException::class)
@@ -53,10 +56,23 @@ object Scheduler {
     }
 
     @Throws(IndexOutOfBoundsException::class)
+    fun schedulePostMotionUpdateTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+        if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
+        scheduledPostMotionUpdateTasks.add(Task({ p -> callback(p) }, ticks, priority))
+    }
+
+    @Throws(IndexOutOfBoundsException::class)
     fun scheduleSoundTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledSoundTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
+
+    @Throws(IndexOutOfBoundsException::class)
+    fun scheduleFrameTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+        if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
+        scheduledFrameTasks.add(Task({ p -> callback(p) }, ticks, priority))
+    }
+
 
 
 
@@ -217,6 +233,11 @@ object Scheduler {
         if (scheduledLowPreMotionUpdateTasks.doTasks(event)) event.isCanceled = true
     }
 
+    @SubscribeEvent()
+    fun postMotionUpdateEvent(event: MotionUpdateEvent.Post){
+        if (scheduledPostMotionUpdateTasks.doTasks(event)) event.isCanceled = true
+    }
+
     @SubscribeEvent
     fun moveEntityWithHeadingPost(event: MoveEntityWithHeadingEvent.Post){
         if (scheduledPostMoveEntityWithHeadingTasks.doTasks(event)) event.isCanceled = true
@@ -226,6 +247,11 @@ object Scheduler {
     fun onSound(event: PacketEvent.Receive) {
         if (event.packet is S29PacketSoundEffect) return
         if (scheduledSoundTasks.doTasks(event)) event.isCanceled = true
+    }
+
+    @SubscribeEvent
+    fun onFrame(event: RenderWorldLastEvent) {
+        if (scheduledFrameTasks.doTasks(event)) event.isCanceled = true
     }
 
     class Task(val callback: (Any?) -> Unit, var ticks: Int = 0, val priority: Int = 0, val cancel: Boolean = false) : Comparable<Task> {

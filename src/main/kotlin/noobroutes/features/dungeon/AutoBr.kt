@@ -50,9 +50,10 @@ object AutoBr: Module(
     category = Category.DUNGEON,
     description = "Bloodrushes very fast (does it outside of map)"
 ) {
-    private val testPearls by KeybindSetting("test pearls", Keyboard.KEY_NONE, "tests").onPress { testAutoPearl() }
     private val goOn1 by BooleanSetting("go on 1", description = "goes down on 1")
     private val goOn1Delay by NumberSetting("go on delay", 2, 0, 20, description = "how long to wait before u actually go down (ticks)").withDependency { goOn1 }
+    private val noWait by BooleanSetting("faster pearls", description = "pearls diffrently, might be faster")
+    private val silent by BooleanSetting("silent", description = "do silent rotations")
 
     private val BLOOD_MIDDLE_COORDS = BlockPos(0, 99, 0)
 
@@ -61,27 +62,12 @@ object AutoBr: Module(
     private const val GO_STRAIGHT_ON_AOTV_PITCH = 4f
 
     private var waitingForClip = false
-    private var waitingForS08 = false
-
-    private val MIDDLE_DOOR_BLOCK = BlockPos(0, 69, 16)
 
     private var hasRunStarted = false
 
     private var userPressed = false
 
     private const val VERTICAL_TP_AMOUNT = 5
-
-    /*@SubscribeEvent
-    fun onBlockChange(event: BlockChangeEvent) {
-        val room = Dungeon.currentRoom ?: return
-        if (room.name != "Entrance") return
-
-        if (event.pos == room.getRealCoords(MIDDLE_DOOR_BLOCK) && event.update.block == Blocks.barrier && !hasRunStarted) {
-            hasRunStarted = true
-            //if (userPressed) { Scheduler.schedulePreTickTask(10) { testAutoPearl() } }
-            if (userPressed) testAutoPearl()
-        }
-    }*/
 
     @SubscribeEvent
     fun onChat(event: ChatPacketEvent) {
@@ -105,6 +91,7 @@ object AutoBr: Module(
         Scheduler.schedulePreTickTask {
             val pearlCLipNode = PearlClip(mc.thePlayer.positionVector, if (mc.thePlayer.posY == 72.0) 10 else 9)
             pearlCLipNode.run()
+            RouteUtils.pearlClip(if (mc.thePlayer.posY == 72.0) 10 else 9, silent)
             waitingForClip = true
             userPressed = true
         }
@@ -118,7 +105,7 @@ object AutoBr: Module(
         Scheduler.schedulePreTickTask {
             val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
             if (state == SwapManager.SwapState.UNKNOWN || state == SwapManager.SwapState.TOO_FAST) return@schedulePreTickTask
-            setRotation(0f, 90f, false)
+            setRotation(0f, 90f, silent)
 
             Scheduler.schedulePreTickTask { repeat(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() } }
 
@@ -132,7 +119,7 @@ object AutoBr: Module(
                     val distance = sqrt((mc.thePlayer.posX - coords.x).pow(2) + (mc.thePlayer.posZ - coords.z).pow(2))
                     val aotvNumber = round(distance * 0.08333333333333333333333333333333).toInt() // 1/12
 
-                    setRotation(yaw, GO_STRAIGHT_ON_AOTV_PITCH, false)
+                    setRotation(yaw, GO_STRAIGHT_ON_AOTV_PITCH, silent)
 
                     Scheduler.schedulePreTickTask { repeat(aotvNumber) { PlayerUtils.airClick() } }
                 }
@@ -142,35 +129,37 @@ object AutoBr: Module(
 
     @SubscribeEvent
     fun onBloodEnter(event: RoomEnterEvent) {
-        if (event.room?.name != "Blood" || mc.thePlayer.posY > 40) return
+        if (event.room?.name != "Blood" || mc.thePlayer.posY > 40 || !hasRunStarted) return
         Scheduler.schedulePreTickTask {
-            setRotation(null, -90f, false)
-            Scheduler.schedulePreTickTask { repeat(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() } }
-            waitingForS08 = true
-        }
-    }
+            setRotation(null, -90f, silent)
+            Scheduler.schedulePreTickTask {
+                repeat(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() }
 
-    @SubscribeEvent
-    fun onDifferentS08(event: PacketEvent.Receive) {
-        if (event.packet !is S08PacketPlayerPosLook || !waitingForS08 || event.packet.y != 64.0) return
-        waitingForS08 = false
+                SwapManager.swapFromName("pearl")
 
-        Scheduler.schedulePreTickTask {
-            SwapManager.swapFromName("pearl")
+                RouteUtils.rightClick()
 
-            Scheduler.schedulePreTickTask { PlayerUtils.airClick() }
+                if (noWait) Scheduler.schedulePreTickTask(1) { PlayerUtils.airClick() }
 
-            Scheduler.scheduleLowS08Task {
-                PlayerUtils.airClick()
+                else Scheduler.scheduleLowS08Task(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() }
+
             }
         }
     }
 
-    @SubscribeEvent
-    fun onUnload(event: WorldEvent.Unload) {
-        waitingForS08 = false
+    fun reset() {
         waitingForClip = false
         hasRunStarted = false
         userPressed = false
+    }
+
+    @SubscribeEvent
+    fun onUnload(event: WorldEvent.Unload) {
+        reset()
+    }
+
+    @SubscribeEvent
+    fun onLoad(event: WorldEvent.Load) {
+        reset()
     }
 }
