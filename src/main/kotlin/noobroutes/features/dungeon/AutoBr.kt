@@ -11,12 +11,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.events.impl.BlockChangeEvent
 import noobroutes.events.impl.BloodRoomSpawnEvent
+import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.misc.EWPathfinderModule
 import noobroutes.features.routes.nodes.autoroutes.PearlClip
+import noobroutes.features.settings.Setting.Companion.withDependency
+import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.RotationUtils
@@ -48,6 +51,8 @@ object AutoBr: Module(
     description = "Bloodrushes very fast (does it outside of map)"
 ) {
     private val testPearls by KeybindSetting("test pearls", Keyboard.KEY_NONE, "tests").onPress { testAutoPearl() }
+    private val goOn1 by BooleanSetting("go on 1", description = "goes down on 1")
+    private val goOn1Delay by NumberSetting("go on delay", 2, 0, 20, description = "how long to wait before u actually go down (ticks)").withDependency { goOn1 }
 
     private val BLOOD_MIDDLE_COORDS = BlockPos(0, 99, 0)
 
@@ -66,7 +71,7 @@ object AutoBr: Module(
 
     private const val VERTICAL_TP_AMOUNT = 5
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     fun onBlockChange(event: BlockChangeEvent) {
         val room = Dungeon.currentRoom ?: return
         if (room.name != "Entrance") return
@@ -75,6 +80,23 @@ object AutoBr: Module(
             hasRunStarted = true
             //if (userPressed) { Scheduler.schedulePreTickTask(10) { testAutoPearl() } }
             if (userPressed) testAutoPearl()
+        }
+    }*/
+
+    @SubscribeEvent
+    fun onChat(event: ChatPacketEvent) {
+        if (event.message == "Starting in 4 seconds.") {
+            testAutoPearl()
+        }
+        else if (event.message == "[NPC] Mort: Here, I found this map when I first entered the dungeon." && userPressed && !goOn1) {
+            hasRunStarted = true
+            testAutoPearl()
+        }
+        else if (event.message == "Starting in 1 second." && userPressed && goOn1) {
+            Scheduler.schedulePreTickTask(goOn1Delay) {
+                hasRunStarted = true
+                testAutoPearl()
+            }
         }
     }
 
