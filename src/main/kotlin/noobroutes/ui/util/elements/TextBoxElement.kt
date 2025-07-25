@@ -57,7 +57,6 @@ class TextBoxElement(
         GAP,
         NORMAL
     }
-    data class CharHitbox(val left: Float, val right: Float)
 
     override val elementValueChangeListeners = mutableListOf<(String) -> Unit>()
 
@@ -302,7 +301,7 @@ class TextBoxElement(
     val cursorClock = Clock(1000)
     var lastClickedXPosition: Float = 0f
     var listeningTextSelection = false
-    val charHitboxes = mutableListOf<CharHitbox>()
+    val charHitboxes = mutableListOf<Float>()
     var insertionCursor: Int = 0
     var selectionStart = 0
     var selectionEnd = 0
@@ -333,8 +332,7 @@ class TextBoxElement(
 
     fun getCursorIndexFromX(mouseX: Float): Int {
         for ((i, hitbox) in charHitboxes.withIndex()) {
-            val mid = (hitbox.left + hitbox.right) * 0.5f
-            if (mouseX < mid) return i
+            if (mouseX < hitbox) return i
         }
         return elementValue.length
     }
@@ -348,7 +346,7 @@ class TextBoxElement(
         }
         elementValue.forEach { ch ->
             val w = getTextWidth(ch.toString(), textScale) * getEffectiveXScale()
-            charHitboxes += CharHitbox(currentX, currentX + w)
+            charHitboxes += currentX + w * 0.5f
             currentX += w
         }
     }
@@ -411,7 +409,7 @@ class TextBoxElement(
         val start = minSelection
 
         if (start in 0 until end && end <= charHitboxes.size) {
-            val selectionStartX = textX + charHitboxes[start].left
+            val selectionStartX = textX + getTextWidth(elementValue.substring(0, start), textScale)
             val selectedText = elementValue.substring(start, end)
             val selectionWidth = getTextWidth(selectedText, textScale)
 
