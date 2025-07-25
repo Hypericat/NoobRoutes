@@ -29,7 +29,6 @@ class SelectorElement(
     val openAnimation = CubicBezierAnimation(125L, .4, 0, .2, 1)
 
     override fun draw() {
-
         GlStateManager.pushMatrix()
         GlStateManager.translate(x -SELECTOR_ELEMENT_HALF_WIDTH - SELECTOR_ELEMENT_CUSHIONING, y, 1f)
         GlStateManager.scale(xScale, yScale, 1f)
@@ -43,10 +42,10 @@ class SelectorElement(
             -SELECTOR_ELEMENT_HALF_OPTION_HEIGHT - SELECTOR_ELEMENT_CUSHIONING,
             SELECTOR_ELEMENT_WIDTH + SELECTOR_ELEMENT_CUSHIONING * 2f,
             height,
-            ColorPalette.backgroundSecondary,
+            ColorPalette.elementBackground,
             5f
         )
-        text(options[elementValue], 0f, 0f, ColorPalette.text, 12f, align = TextAlign.Middle)
+        text(options[elementValue], 0f, 0f, ColorPalette.textColor, 12f, align = TextAlign.Middle)
         if (extended || openAnimation.isAnimating()) {
             stencilRoundedRectangle(
                 -SELECTOR_ELEMENT_HALF_WIDTH - SELECTOR_ELEMENT_CUSHIONING,
@@ -61,14 +60,14 @@ class SelectorElement(
                     (SELECTOR_ELEMENT_OPTION_HEIGHT + SELECTOR_ELEMENT_CUSHIONING * 0.5) * (index + 1) - SELECTOR_ELEMENT_HALF_OPTION_HEIGHT + SELECTOR_ELEMENT_CUSHIONING,
                     SELECTOR_ELEMENT_WIDTH,
                     SELECTOR_ELEMENT_OPTION_HEIGHT,
-                    ColorPalette.elementSecondary,
+                    ColorPalette.elementBackground,
                     5f
                 )
                 text(
                     option,
                     0f,
                     0f + (SELECTOR_ELEMENT_OPTION_HEIGHT + SELECTOR_ELEMENT_CUSHIONING * 0.5) * (index + 1) + SELECTOR_ELEMENT_CUSHIONING,
-                    ColorPalette.text,
+                    ColorPalette.textColor,
                     12f,
                     align = TextAlign.Middle
                 )

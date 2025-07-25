@@ -2,12 +2,12 @@ package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.settings.impl.DropdownSetting
 import noobroutes.font.Font
+import noobroutes.ui.ColorPalette.elementBackground
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
-import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.utils.render.drawArrow

@@ -1,16 +1,12 @@
 package noobroutes.ui.util.elements
 
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.renderer.GlStateManager
-import noobroutes.Core.logger
-import noobroutes.events.impl.InputEvent
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.util.ElementValue
-import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.utils.ColorUtil.withAlpha
 import noobroutes.utils.clock.Clock
 import noobroutes.utils.render.*
 import noobroutes.utils.writeToClipboard
@@ -310,7 +306,7 @@ class TextBoxElement(
 
     override fun draw() {
         when (boxType) {
-            TextBoxType.NORMAL -> {}
+            TextBoxType.NORMAL -> drawTextBox()
             TextBoxType.GAP -> drawTextBoxWithGapTitle()
         }
         if (!listening) return
@@ -351,7 +347,7 @@ class TextBoxElement(
         }
     }
 
-    val resetClickStageClock = Clock(500)
+    val resetClickStageClock = Clock(250)
     var clickSelectStage = 0
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (mouseButton != 0) return false
@@ -409,7 +405,7 @@ class TextBoxElement(
         val start = minSelection
 
         if (start in 0 until end && end <= charHitboxes.size) {
-            val selectionStartX = textX + getTextWidth(elementValue.substring(0, start), textScale)
+            val selectionStartX = textX + getTextWidth(elementValue.substring(0, start), textScale) + getPadding()
             val selectedText = elementValue.substring(start, end)
             val selectionWidth = getTextWidth(selectedText, textScale)
 
@@ -418,39 +414,37 @@ class TextBoxElement(
                 textY - textHeight * 0.5f,
                 selectionWidth,
                 textHeight,
-                copyColorAnimation.get(ColorPalette.elementPrimary.withAlpha(0.651f), textSelectionColor, false),
+                copyColorAnimation.get(ColorPalette.clickGUIColor.withAlpha(0.651f), textSelectionColor, false),
                 0f
             )
+        }
+    }
+
+    private fun getPadding(): Float {
+        return when (textAlign) {
+            TextAlign.Left -> textPadding
+            TextAlign.Middle -> 0f
+            TextAlign.Right -> -textPadding
         }
     }
 
     fun getTextOrigin(): Pair<Float, Float> {
         val width = stringWidth(elementValue, textScale, minWidth, textPadding)
         val textWidth = getTextWidth(elementValue, textScale)
-        when (boxType) {
-            TextBoxType.NORMAL -> {
-                return 0f to 0f
-            }
-            TextBoxType.GAP -> {
-                val textOrigin = when (textAlign) {
-                    TextAlign.Right -> width - textWidth
-                    TextAlign.Middle -> width * 0.5f - textWidth * 0.5f
-                    TextAlign.Left -> 0f
+
+        val textOrigin = when (textAlign) {
+            TextAlign.Right -> width - textWidth
+            TextAlign.Middle -> width * 0.5f - textWidth * 0.5f
+            TextAlign.Left -> 0f
                 }
-                return (x + textOrigin) to (y + h * 0.5f)
-            }
-        }
+        return (x + textOrigin) to (y + h * 0.5f)
     }
 
     private fun drawCursor(textX: Float){
         cursorClock.hasTimePassed(true)
         if (cursorClock.getTime() > 500L) return
         val textHeight = fontHeight
-        val insertionCursorOrigin = when (textAlign) {
-            TextAlign.Left -> textPadding
-            TextAlign.Middle -> 0f
-            TextAlign.Right -> -textPadding
-        }
+        val insertionCursorOrigin = getPadding()
 
         val insertionCursorX = if (elementValue.isEmpty()) insertionCursorOrigin else
             when (insertionCursor) {
@@ -487,8 +481,19 @@ class TextBoxElement(
             TextAlign.Middle -> width * 0.5f
             TextAlign.Left -> textPadding
         }
-        text(name, x + nameOrigin, y + fontHeight * TEXT_BOX_GAP_TEXT_MULTIPLIER, ColorPalette.text, textScale, align = TextAlign.Middle)
-        text(elementValue, x + textOrigin, y + h * 0.5f, ColorPalette.text, textScale, align = textAlign)
+        text(name, x + nameOrigin, y + fontHeight * TEXT_BOX_GAP_TEXT_MULTIPLIER, ColorPalette.textColor, textScale, align = TextAlign.Middle)
+        text(elementValue, x + textOrigin, y + h * 0.5f, ColorPalette.textColor, textScale, align = textAlign)
+    }
+    private fun drawTextBox(){
+        val width = stringWidth(elementValue, textScale, minWidth, textPadding)
+        rectangleOutline(x, y, width, h, boxColor, radius, TEXT_BOX_THICKNESS)
+
+        val textOrigin = when (textAlign) {
+            TextAlign.Right -> width - textPadding
+            TextAlign.Middle -> width * 0.5f
+            TextAlign.Left -> textPadding
+        }
+        text(elementValue, x + textOrigin, y + h * 0.5f, ColorPalette.textColor, textScale, align = textAlign)
     }
 
     fun resetSelection(){

@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core
 import noobroutes.Core.mc
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.utils.ColorUtil.withAlpha
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13

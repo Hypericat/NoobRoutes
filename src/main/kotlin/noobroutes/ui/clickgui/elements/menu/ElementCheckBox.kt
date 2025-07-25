@@ -3,22 +3,22 @@ package noobroutes.ui.clickgui.elements.menu
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.font.Font
+import noobroutes.ui.ColorPalette.buttonColor
+import noobroutes.ui.ColorPalette.clickGUIColor
+import noobroutes.ui.ColorPalette.elementBackground
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
-import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.brighterIf
-import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
-import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
-import noobroutes.ui.clickgui.util.ColorUtil.darker
-import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
-import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.LinearAnimation
+import noobroutes.utils.ColorUtil.brighter
+import noobroutes.utils.ColorUtil.brighterIf
+import noobroutes.utils.ColorUtil.darker
+import noobroutes.utils.ColorUtil.darkerIf
 import noobroutes.utils.render.*
 
 /**
@@ -47,7 +47,11 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
             text(name, x + TEXTOFFSET, y + h * 0.5, textColor, 12f, Font.REGULAR)
 
             hover.handle(x + w - 43f, y + 4f, 34f, 20f)
-            val color = colorAnim.get(clickGUIColor.darkerIf(hover.percent() > 0, 0.7f), buttonColor.brighter(1.3f).brighterIf(hover.percent() > 0, 1.3f), setting.enabled)
+            val color = colorAnim.get(
+                clickGUIColor.darkerIf(hover.percent() > 0, 0.7f),
+                buttonColor.brighter(1.3f).brighterIf(hover.percent() > 0, 1.3f),
+                setting.enabled
+            )
 
 
             if (!ClickGUIModule.switchType) {

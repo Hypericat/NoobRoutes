@@ -9,7 +9,6 @@ import noobroutes.utils.render.TextAlign
 import noobroutes.utils.round
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
-import kotlin.math.max
 
 class NumberBoxElement(
     val name: String,

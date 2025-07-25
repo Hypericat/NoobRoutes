@@ -4,8 +4,8 @@ import net.minecraft.client.renderer.GlStateManager
 import noobroutes.config.Config
 import noobroutes.features.ModuleManager.huds
 import noobroutes.font.Font
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.Screen
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.isAreaHovered

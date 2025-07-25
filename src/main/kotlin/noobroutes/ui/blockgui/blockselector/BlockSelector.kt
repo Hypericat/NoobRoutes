@@ -4,7 +4,8 @@ import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import noobroutes.ui.clickgui.util.ColorUtil
+import noobroutes.ui.ColorPalette.buttonColor
+import noobroutes.ui.ColorPalette.titlePanelColor
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.utils.ceil
@@ -107,12 +108,12 @@ object BlockSelector {
             originY,
             HEIGHT,
             70,
-            ColorUtil.titlePanelColor,
-            ColorUtil.titlePanelColor,
+            titlePanelColor,
+            titlePanelColor,
             Color.TRANSPARENT,
             0, 20f, 20f, 0f, 0f, 0f
         )
-        roundedRectangle(originX, originY, WIDTH, HEIGHT, ColorUtil.buttonColor, radius = 20)
+        roundedRectangle(originX, originY, WIDTH, HEIGHT, buttonColor, radius = 20)
         text("Block Selector", originX + 20, originY + 37.5, Color.WHITE, size = 30)
         val s = scissor(originX, originY + 70, WIDTH, HEIGHT - 100)
         for (block in blockList) {

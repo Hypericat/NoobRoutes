@@ -8,7 +8,8 @@ import noobroutes.Core.mc
 import noobroutes.font.Font
 import noobroutes.font.FontType
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.clickgui.util.ColorUtil
+import noobroutes.ui.ColorPalette.moduleButtonColor
+import noobroutes.utils.ColorUtil
 import noobroutes.ui.util.shader.RoundedRect
 import noobroutes.utils.coerceAlpha
 import noobroutes.utils.minus
@@ -175,11 +176,11 @@ fun dropShadow(x: Number, y: Number, w: Number, h: Number, shadowColor: Color, s
     translate(0f, 0f, 100f)
 }
 
-fun dropShadow(x: Number, y: Number, w: Number, h: Number,  radius: Number, shadowSoftness: Number = 1f, shadowColor: Color = ColorUtil.moduleButtonColor) {
+fun dropShadow(x: Number, y: Number, w: Number, h: Number,  radius: Number, shadowSoftness: Number = 1f, shadowColor: Color = moduleButtonColor) {
     dropShadow(x, y, w, h, shadowColor, shadowSoftness, radius, radius, radius, radius)
 }
 
-fun dropShadow(box: Box, radius: Number, shadowSoftness: Number = 1f, shadowColor: Color = ColorUtil.moduleButtonColor) =
+fun dropShadow(box: Box, radius: Number, shadowSoftness: Number = 1f, shadowColor: Color = moduleButtonColor) =
     dropShadow(box.x, box.y, box.w, box.h, radius, shadowSoftness, shadowColor)
 
 data class Scissor(val x: Number, val y: Number, val w: Number, val h: Number, val context: Int)

@@ -2,16 +2,16 @@ package noobroutes.ui.util.elements
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
+import noobroutes.ui.ColorPalette.buttonColor
+import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.util.ElementValue
-import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
-import noobroutes.ui.util.animations.Animation
 import noobroutes.ui.util.animations.impl.EaseInOut
+import noobroutes.utils.ColorUtil.darker
+import noobroutes.utils.ColorUtil.darkerIf
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
-
 
 
 class DualElement(
@@ -26,17 +26,17 @@ class DualElement(
     private val posAnim = EaseInOut(250)
 
     private inline val isRightHovered: Boolean
-        get() = MouseUtils.isAreaHovered(
-            x,
-            y - DUAL_ELEMENT_HALF_HEIGHT,
+        get() = isAreaHovered(
+            0f,
+            -DUAL_ELEMENT_HALF_HEIGHT,
             DUAL_ELEMENT_HALF_WIDTH,
             DUAL_ELEMENT_HEIGHT
         )
 
     private inline val isLeftHovered: Boolean
-        get() = MouseUtils.isAreaHovered(
-            x- DUAL_ELEMENT_HALF_WIDTH,
-            y - DUAL_ELEMENT_HALF_HEIGHT,
+        get() = isAreaHovered(
+            DUAL_ELEMENT_HALF_WIDTH,
+            -DUAL_ELEMENT_HALF_HEIGHT,
             DUAL_ELEMENT_HALF_WIDTH,
             DUAL_ELEMENT_HEIGHT
         )
@@ -50,41 +50,35 @@ class DualElement(
         const val DUAL_LEFT_TEXT_POSITION = (DUAL_ELEMENT_WIDTH * 0.25) - DUAL_ELEMENT_HALF_WIDTH
         const val DUAL_RIGHT_TEXT_POSITION = (DUAL_ELEMENT_WIDTH * 0.75) - DUAL_ELEMENT_HALF_WIDTH
 
-
-        fun drawDualElement(left: String, right: String, leftIsHovered: Boolean, rightIsHovered: Boolean, enabled: Boolean, x: Float, y: Float, xScale: Float, yScale: Float, posAnim: Animation<Float>) {
-            GlStateManager.pushMatrix()
-            GlStateManager.translate(x, y, 1f)
-            GlStateManager.scale(xScale, yScale, 1f)
-            roundedRectangle(
-                -DUAL_ELEMENT_HALF_WIDTH,
-                -DUAL_ELEMENT_HALF_HEIGHT,
-                DUAL_ELEMENT_WIDTH,
-                DUAL_ELEMENT_HEIGHT,
-                ColorPalette.backgroundSecondary,
-                radius = 5f
-            )
-            val pos = posAnim.get(0f, DUAL_ELEMENT_HALF_WIDTH, !enabled)
-            roundedRectangle(
-                -DUAL_ELEMENT_HALF_WIDTH + pos,
-                -DUAL_ELEMENT_HALF_HEIGHT,
-                DUAL_ELEMENT_HALF_WIDTH,
-                DUAL_ELEMENT_HEIGHT,
-                ColorPalette.elementPrimary,
-                radius = 5f
-            )
-
-            text(left, DUAL_LEFT_TEXT_POSITION, 0f, ColorPalette.text.darkerIf(leftIsHovered), 12f, align = TextAlign.Middle)
-            text(right, DUAL_RIGHT_TEXT_POSITION, 0f, ColorPalette.text.darkerIf(rightIsHovered), 12f, align = TextAlign.Middle)
-
-            GlStateManager.popMatrix()
-        }
-
     }
     override val elementValueChangeListeners = mutableListOf<(Boolean) -> Unit>()
 
     override fun draw() {
+        GlStateManager.pushMatrix()
+        translate(x, y)
+        scale(xScale, yScale)
+        roundedRectangle(
+            -DUAL_ELEMENT_HALF_WIDTH,
+            -DUAL_ELEMENT_HALF_HEIGHT,
+            DUAL_ELEMENT_WIDTH,
+            DUAL_ELEMENT_HEIGHT,
+            buttonColor,
+            radius = 5f
+        )
+        val pos = posAnim.get(0f, DUAL_ELEMENT_HALF_WIDTH, !elementValue)
+        roundedRectangle(
+            -DUAL_ELEMENT_HALF_WIDTH + pos,
+            -DUAL_ELEMENT_HALF_HEIGHT,
+            DUAL_ELEMENT_HALF_WIDTH,
+            DUAL_ELEMENT_HEIGHT,
+            clickGUIColor.darker(0.8f),
+            radius = 5f
+        )
 
-        drawDualElement(left, right, isLeftHovered, isRightHovered, elementValue, x, y, xScale, yScale, posAnim)
+        text(left, DUAL_LEFT_TEXT_POSITION, 0f, ColorPalette.textColor.darkerIf(isLeftHovered), 12f, align = TextAlign.Middle)
+        text(right, DUAL_RIGHT_TEXT_POSITION, 0f, ColorPalette.textColor.darkerIf(isRightHovered), 12f, align = TextAlign.Middle)
+
+        GlStateManager.popMatrix()
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {

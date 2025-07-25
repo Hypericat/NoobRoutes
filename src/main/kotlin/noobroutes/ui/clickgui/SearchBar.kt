@@ -3,12 +3,13 @@ package noobroutes.ui.clickgui
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.mc
 import noobroutes.font.Font
+import noobroutes.ui.ColorPalette.buttonColor
+import noobroutes.ui.ColorPalette.clickGUIColor
+import noobroutes.ui.ColorPalette.moduleButtonColor
 import noobroutes.ui.clickgui.elements.menu.ElementTextField
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.utils.ColorUtil.withAlpha
 import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
 
@@ -24,9 +25,9 @@ object SearchBar {
         scale(1f / scaleFactor, 1f / scaleFactor, 1f)
 
         translate(mc.displayWidth * 0.5f, mc.displayHeight - 100f)
-        roundedRectangle(-200f, 0f, 400f, 30f, ColorUtil.moduleButtonColor, 9f)
+        roundedRectangle(-200f, 0f, 400f, 30f, moduleButtonColor, 9f)
         if (listening || colorAnim.isAnimating()) {
-            val color = colorAnim.get(ColorUtil.clickGUIColor, buttonColor, listening)
+            val color = colorAnim.get(clickGUIColor, buttonColor, listening)
             rectangleOutline(-202f, -1f, 404f, 32f, color, 9f,3f)
         }
         if (currentSearch.isEmpty()) {

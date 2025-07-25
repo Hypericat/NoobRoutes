@@ -2,17 +2,17 @@ package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.font.Font
+import noobroutes.ui.ColorPalette
+import noobroutes.ui.ColorPalette.clickGUIColor
+import noobroutes.ui.ColorPalette.elementBackground
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
-import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.utils.ColorUtil.brighter
 import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
@@ -34,7 +34,7 @@ class ElementKeyBind(parent: ModuleButton, setting: KeybindSetting) :
     private val hover = HoverHandler(0, 150)
 
     private val buttonColor: Color
-        inline get() = ColorUtil.buttonColor.brighter(1 + hover.percent() / 500f)
+        inline get() = ColorPalette.buttonColor.brighter(1 + hover.percent() / 500f)
 
     override fun draw() {
         val key = setting.value.key
@@ -44,8 +44,8 @@ class ElementKeyBind(parent: ModuleButton, setting: KeybindSetting) :
 
         roundedRectangle(x, y, w, h, elementBackground)
 
-            val width = getTextWidth(value, 12f)
-            hover.handle(x + w - 20 - width, y + 4, width + 12f, 22f)
+        val width = getTextWidth(value, 12f)
+        hover.handle(x + w - 20 - width, y + 4, width + 12f, 22f)
 
         roundedRectangle(x + w - 20 - width, y + 4, width + 12f, 22f, buttonColor, 5f)
 

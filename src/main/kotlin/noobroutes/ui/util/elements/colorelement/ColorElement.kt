@@ -1,5 +1,6 @@
 package noobroutes.ui.util.elements.colorelement
 
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.util.ElementValue
@@ -69,13 +70,14 @@ class ColorElement(
     }
 
     override fun draw() {
+        GlStateManager.pushMatrix()
         roundedRectangle(
             x,
             y,
             w,
             h,
             elementValue,
-            ColorPalette.backgroundSecondary,
+            ColorPalette.elementBackground,
             Color.Companion.TRANSPARENT,
             TEXT_BOX_THICKNESS,
             radius,
@@ -89,6 +91,7 @@ class ColorElement(
             uiChildren[0].updatePosition(x + 300f, y)
             uiChildren[0].draw()
         }
+        GlStateManager.popMatrix()
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {

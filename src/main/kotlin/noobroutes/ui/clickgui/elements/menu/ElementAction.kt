@@ -2,13 +2,13 @@ package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.settings.impl.ActionSetting
 import noobroutes.font.Font
+import noobroutes.ui.ColorPalette.elementBackground
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
-import noobroutes.ui.clickgui.util.ColorUtil.darker
-import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.util.MouseUtils
+import noobroutes.utils.ColorUtil.darker
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.TextPos
 import noobroutes.utils.render.roundedRectangle

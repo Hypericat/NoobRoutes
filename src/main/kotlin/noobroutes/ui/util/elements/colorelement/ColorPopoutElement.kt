@@ -8,6 +8,7 @@ import noobroutes.ui.util.elements.NumberBoxElement
 import noobroutes.ui.util.elements.TextBoxElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.TEXT_BOX_WIDTH
+import noobroutes.utils.ColorUtil.darker
 import noobroutes.utils.Utils.COLOR_NORMALIZER
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Color.Companion.HEX_REGEX
@@ -31,7 +32,7 @@ class ColorPopoutElement(
                     label, 0f, 0f,
                     TEXT_BOX_WIDTH, ColorElementsConstants.TEXT_BOX_HEIGHT,
                     12f, TextAlign.Left, 5f, 6f,
-                    ColorPalette.text,
+                    ColorPalette.textColor,
                     3,
                     TextBoxElement.TextBoxType.GAP,
                     0,
@@ -67,7 +68,7 @@ class ColorPopoutElement(
                 popupWidth - ColorElementsConstants.COLOR_POPOUT_GAP * 3f + 3f,
                 ColorElementsConstants.TEXT_BOX_HEIGHT,
                 12f, TextAlign.Middle, 5f, 6f,
-                ColorPalette.text, if (alphaEnabled) 8 else 6,
+                ColorPalette.textColor, if (alphaEnabled) 8 else 6,
                 TextBoxElement.TextBoxType.GAP,
                 elementValue.hex,
             ).apply {
@@ -127,8 +128,8 @@ class ColorPopoutElement(
             topRY,
             width,
             ColorElementsConstants.COLOR_POPOUT_HEIGHT,
-            ColorPalette.backgroundPrimary,
-            ColorPalette.backgroundSecondary,
+            ColorPalette.elementBackground,
+            ColorPalette.elementBackground.darker(0.7f),
             Color.Companion.TRANSPARENT,
             5f,
             10f,

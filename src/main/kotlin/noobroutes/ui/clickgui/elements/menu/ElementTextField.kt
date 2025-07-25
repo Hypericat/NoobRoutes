@@ -2,16 +2,17 @@ package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.settings.impl.StringSetting
 import noobroutes.font.Font
+import noobroutes.ui.ColorPalette
+import noobroutes.ui.ColorPalette.clickGUIColor
+import noobroutes.ui.ColorPalette.elementBackground
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.utils.ColorUtil.brighter
 import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
 
@@ -35,7 +36,7 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
 
 
     private val buttonColor: Color
-        inline get() = ColorUtil.buttonColor.brighter(1 + hover.percent() / 500f)
+        inline get() = ColorPalette.buttonColor.brighter(1 + hover.percent() / 500f)
 
     override fun draw() {
         roundedRectangle(x, y, w, h, elementBackground)
@@ -45,7 +46,7 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
             roundedRectangle(x + w - 15 - width, y + 4, width + 12f, 22f, buttonColor, 5f)
 
             if (listening || colorAnim.isAnimating()) {
-                val color = colorAnim.get(ColorUtil.clickGUIColor, buttonColor, listening)
+                val color = colorAnim.get(clickGUIColor, buttonColor, listening)
                 rectangleOutline(x + w - 16 - width, y + 3, width + 12.5f, 22.5f, color, 4f,1.5f)
             }
 
@@ -56,7 +57,7 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
             if (isHovered || listening) {
                 hover.handle(x + w - 15 - width, y + 4, width + 12f, 22f)
                 if (listening || colorAnim.isAnimating()) {
-                    val color = colorAnim.get(ColorUtil.clickGUIColor, buttonColor, listening)
+                    val color = colorAnim.get(clickGUIColor, buttonColor, listening)
                     rectangleOutline(x + w / 2 - width / 2 - 7, y + 3, width + 12.5f, 22.5f, color, 4f,3f)
                 }
                 if (display == "") roundedRectangle(x + w / 2 - width / 2 - 6, y + 4, width + 12f, 22f, buttonColor, 5f)
@@ -100,8 +101,7 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
             }
             return true
         }
-        return false
-    }
+        return false }
 
     companion object {
         val keyBlackList = intArrayOf(

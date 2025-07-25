@@ -2,13 +2,14 @@ package noobroutes.ui.util.elements
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.saturationIf
+import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.LinearAnimation
+import noobroutes.utils.ColorUtil.darkerIf
+import noobroutes.utils.ColorUtil.saturationIf
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.circle
 import noobroutes.utils.render.roundedRectangle
@@ -23,8 +24,8 @@ class SwitchElement(
     override var elementValue: Boolean,
     x: Float,
     y: Float,
-    w: Float,
-    h: Float,
+    val xScale: Float,
+    val yScale: Float,
     ) : UiElement(x, y), ElementValue<Boolean>  {
 
 
@@ -44,36 +45,6 @@ class SwitchElement(
             return MouseUtils.isAreaHovered(x - width * 0.5f, y - height * 0.5f, width, height)
         }
 
-        fun drawSwitch(x: Float, y: Float, xScale: Float, yScale: Float, enabled: Boolean, linear: LinearAnimation<Float>, colorAnimation: ColorAnimation) {
-            val hovered = isHoveredSwitch(x, y, xScale, yScale)
-
-            GlStateManager.pushMatrix()
-            GlStateManager.translate(x, y, 1f)
-            GlStateManager.scale(xScale, yScale, 1f)
-
-            val backgroundColor = colorAnimation.get(
-                ColorPalette.elementPrimary,
-                ColorPalette.backgroundPrimary.brighter(1.1f),
-                enabled
-            ).saturationIf(hovered, 0.75f)
-
-            roundedRectangle(
-                -SWITCH_WIDTH_HALF,
-                -SWITCH_HEIGHT_HALF,
-                SWITCH_WIDTH,
-                SWITCH_HEIGHT,
-                ColorPalette.backgroundPrimary.brighter(1.2f).saturationIf(hovered, 0.75f), 9f
-            )
-
-            if (enabled || linear.isAnimating()) {
-                roundedRectangle(-SWITCH_WIDTH_HALF, -SWITCH_HEIGHT_HALF, linear.get(SWITCH_WIDTH, 9f, enabled), SWITCH_HEIGHT, backgroundColor, 9f)
-            }
-
-            circle(linear.get(-SWITCH_CIRCLE_START, -SWITCH_WIDTH_HALF, !enabled) + SWITCH_CIRCLE_OFFSET, 0, 6f,
-                Color(220, 220, 220)
-            )
-            GlStateManager.popMatrix()
-        }
     }
 
     override val elementValueChangeListeners = mutableListOf<(Boolean) -> Unit>()
@@ -89,16 +60,33 @@ class SwitchElement(
     )
 
     override fun draw() {
+        GlStateManager.pushMatrix()
+        translate(x, y)
+        scale(xScale, yScale)
 
-        drawSwitch(
-            x,
-            y,
-            1.3f,
-            1.3f,
-            elementValue,
-            linearAnimation,
-            colorAnimation
+        val backgroundColor = colorAnimation.get(
+            ColorPalette.clickGUIColor,
+            ColorPalette.buttonColor,
+            elementValue
+        ).saturationIf(isHovered, 0.75f)
+
+        roundedRectangle(
+            -SWITCH_WIDTH_HALF,
+            -SWITCH_HEIGHT_HALF,
+            SWITCH_WIDTH,
+            SWITCH_HEIGHT,
+            buttonColor,
+            9f
         )
+
+        if (elementValue || linearAnimation.isAnimating()) {
+            roundedRectangle(-SWITCH_WIDTH_HALF, -SWITCH_HEIGHT_HALF, linearAnimation.get(SWITCH_WIDTH, 9f, elementValue), SWITCH_HEIGHT, backgroundColor, 9f)
+        }
+
+        circle(linearAnimation.get(-SWITCH_CIRCLE_START, -SWITCH_WIDTH_HALF, !elementValue) + SWITCH_CIRCLE_OFFSET, 0, 6f,
+            Color(220, 220, 220).darkerIf(isHovered, 0.9f)
+        )
+        GlStateManager.popMatrix()
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {

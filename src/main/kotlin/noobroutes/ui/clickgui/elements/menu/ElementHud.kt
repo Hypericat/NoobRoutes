@@ -4,23 +4,23 @@ import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.HudSetting
 import noobroutes.font.Font
+import noobroutes.ui.ColorPalette.buttonColor
+import noobroutes.ui.ColorPalette.clickGUIColor
+import noobroutes.ui.ColorPalette.elementBackground
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
-import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
-import noobroutes.ui.clickgui.util.ColorUtil.darker
-import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.LinearAnimation
+import noobroutes.utils.ColorUtil.brighter
+import noobroutes.utils.ColorUtil.darker
+import noobroutes.utils.ColorUtil.darkerIf
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 
@@ -52,7 +52,7 @@ class ElementHud(parent: ModuleButton, setting: HudSetting) : Element<HudSetting
     private val linearAnimation = LinearAnimation<Float>(200)
 
     override fun draw() {
-        roundedRectangle(x, y, w, h, ColorUtil.elementBackground)
+        roundedRectangle(x, y, w, h, elementBackground)
         text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, Font.REGULAR)
 
         var offset = 30f

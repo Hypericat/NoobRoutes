@@ -27,13 +27,7 @@ object TemporaryColorPalletModule : Module(
     @SubscribeEvent
     fun onTick(tickEvent: TickEvent.ClientTickEvent) {
         if (tickEvent.isEnd) return
-        ColorPalette.defaultPalette.text = text
-        ColorPalette.defaultPalette.subText = subText
-        ColorPalette.defaultPalette.elementPrimary = elementPrimary
-        ColorPalette.defaultPalette.elementSecondary = elementSecondary
-        ColorPalette.defaultPalette.backgroundPrimary = backgroundPrimary
-        ColorPalette.defaultPalette.backgroundSecondary = backgroundSecondary
-        ColorPalette.defaultPalette.font = FontType.entries[font]
+
     }
 
 

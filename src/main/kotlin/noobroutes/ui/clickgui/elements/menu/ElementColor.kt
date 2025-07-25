@@ -3,24 +3,24 @@ package noobroutes.ui.clickgui.elements.menu
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.font.Font
+import noobroutes.ui.ColorPalette.buttonColor
+import noobroutes.ui.ColorPalette.clickGUIColor
+import noobroutes.ui.ColorPalette.elementBackground
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
-import noobroutes.ui.clickgui.util.ColorUtil.darker
-import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
-import noobroutes.ui.clickgui.util.ColorUtil.hsbMax
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.EaseInOut
+import noobroutes.utils.ColorUtil.brighter
+import noobroutes.utils.ColorUtil.darker
+import noobroutes.utils.ColorUtil.hsbMax
+import noobroutes.utils.ColorUtil.withAlpha
 import noobroutes.utils.Utils.COLOR_NORMALIZER
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.render.*
@@ -110,7 +110,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         text(hexString, x + w * 0.5, y + 271, Color.WHITE, 12f, Font.REGULAR, TextAlign.Middle, TextPos.Middle)
 
         if (listeningForString || colorAnim.isAnimating()) {
-            val color = colorAnim.get(ColorUtil.clickGUIColor, buttonColor, listeningForString)
+            val color = colorAnim.get(clickGUIColor, buttonColor, listeningForString)
             rectangleOutline(x + w * 0.5 - stringWidth * 0.5 - 13 , y + 259, stringWidth + 25f, 23f, color, 5f,2f)
         }
         popStencil()

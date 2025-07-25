@@ -10,16 +10,13 @@ import noobroutes.config.Config
 import noobroutes.features.Category
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.font.Font
+import noobroutes.ui.ColorPalette.buttonColor
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.Screen
 import noobroutes.ui.clickgui.ClickGUI.draw
 import noobroutes.ui.clickgui.elements.menu.ElementColor
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.MODULE_BUTTON_COLOR_ALPHA
-import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.clickgui.util.HoverHandler
-import noobroutes.ui.util.animations.impl.EaseInOut
+import noobroutes.utils.ColorUtil.withAlpha
 import noobroutes.utils.render.*
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11
@@ -39,7 +36,6 @@ object ClickGUI : Screen() {
 
     private val panels: ArrayList<Panel> = arrayListOf()
 
-    private var anim = EaseInOut(700)
     private var open = false
     private var desc: Description = Description(null, 0f, 0f, null)
 
@@ -54,13 +50,6 @@ object ClickGUI : Screen() {
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA)
         translate(0f, 0f, 200f)
-        if (anim.isAnimating()) {
-            //translate(0f, floor(anim.get(-10f, 0f, !open)))
-            val alpha = anim.get(0.7f, 1f, !open)
-            ColorUtil.moduleButtonColor.alpha = alpha * MODULE_BUTTON_COLOR_ALPHA
-            ColorUtil.clickGUIColor.alpha = alpha
-            Color.WHITE.alpha = alpha
-        }
 
         for (i in 0 until panels.size) {
             panels[i].draw()
@@ -69,11 +58,7 @@ object ClickGUI : Screen() {
         SearchBar.draw()
         desc.render()
 
-        if (anim.isAnimating()) {
-            ColorUtil.moduleButtonColor.alpha = 1f
-            ColorUtil.clickGUIColor.alpha = 1f
-            Color.WHITE.alpha = 1f
-        }
+
         GlStateManager.popMatrix()
     }
 
@@ -105,7 +90,7 @@ object ClickGUI : Screen() {
             if (panels[i].keyTyped(typedChar, keyCode)) return
         }
 
-        if (keyCode == ClickGUIModule.settings.last().value && !anim.isAnimating()) {
+        if (keyCode == ClickGUIModule.settings.last().value) {
             mc.displayGuiScreen(null as GuiScreen?)
             if (mc.currentScreen == null) {
                 mc.setIngameFocus()
@@ -117,7 +102,6 @@ object ClickGUI : Screen() {
 
     override fun initGui() {
         open = true
-        anim.start(true)
 
         if (OpenGlHelper.shadersSupported && mc.renderViewEntity is EntityPlayer && ClickGUIModule.blur) {
             mc.entityRenderer.stopUseShader()

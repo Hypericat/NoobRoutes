@@ -2,13 +2,14 @@ package noobroutes.ui.blockgui.blockeditor.elements
 
 import net.minecraft.block.properties.PropertyEnum
 import net.minecraft.block.state.IBlockState
+import noobroutes.ui.ColorPalette.buttonColor
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.blockgui.blockeditor.BlockEditor
 import noobroutes.ui.blockgui.blockeditor.Element
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.EaseInOut
+import noobroutes.utils.ColorUtil.darkerIf
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle
@@ -63,7 +64,7 @@ class ElementSelector(private val property: PropertyEnum<*>, val block: IBlockSt
     }
 
     override fun draw() {
-        text(name.capitalizeFirst(), xLeftBound, y + 17.75f, ColorUtil.textColor, 20f)
+        text(name.capitalizeFirst(), xLeftBound, y + 17.75f, textColor, 20f)
         val optionsHovered = findHoveredOptions()
         if (extended) options.forEachIndexed { index, name ->
             roundedRectangle(
@@ -71,13 +72,13 @@ class ElementSelector(private val property: PropertyEnum<*>, val block: IBlockSt
                 yBound + index * (HEIGHT * 1.1f),
                 WIDTH,
                 HEIGHT,
-                ColorUtil.buttonColor, radius = 10
+                buttonColor, radius = 10
             )
             text(
                 name,
                 xLeftBound + (WIDTH * 0.5),
                 HEIGHT * 0.5 + yBound + index * (HEIGHT * 1.1f),
-                ColorUtil.textColor.darkerIf(optionsHovered[index]),
+                textColor.darkerIf(optionsHovered[index]),
                 SCALE,
                 align = TextAlign.Middle
             )
@@ -87,13 +88,13 @@ class ElementSelector(private val property: PropertyEnum<*>, val block: IBlockSt
                 yBound,
                 WIDTH,
                 HEIGHT,
-                ColorUtil.buttonColor, radius = 10
+                buttonColor, radius = 10
             )
             text(
                 options.first(),
                 xLeftBound + (WIDTH * 0.5),
                 HEIGHT * 0.5 + yBound,
-                ColorUtil.textColor.darkerIf(optionsHovered.first()),
+                textColor.darkerIf(optionsHovered.first()),
                 SCALE,
                 align = TextAlign.Middle
             )

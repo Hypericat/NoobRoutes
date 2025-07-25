@@ -6,16 +6,18 @@ import noobroutes.features.Category
 import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.font.Font
+import noobroutes.ui.ColorPalette.clickGUIColor
+import noobroutes.ui.ColorPalette.moduleButtonColor
+import noobroutes.ui.ColorPalette.textColor
+import noobroutes.ui.ColorPalette.titlePanelColor
 import noobroutes.ui.clickgui.SearchBar.currentSearch
 import noobroutes.ui.clickgui.elements.ModuleButton
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
-import noobroutes.ui.clickgui.util.ColorUtil.titlePanelColor
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
 import noobroutes.ui.util.animations.impl.LinearAnimation
+import noobroutes.utils.ColorUtil.brighter
+import noobroutes.utils.ColorUtil.darkerIf
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
@@ -109,10 +111,10 @@ class Panel(
 
         }
 
-        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT * 0.5f, ColorUtil.textColor, 15f, type = Font.BOLD, TextAlign.Middle)
+        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT * 0.5f, textColor, 15f, type = Font.BOLD, TextAlign.Middle)
 
         //draw Panel Line
-        if (extended && moduleButtons.isNotEmpty()) roundedRectangle(x, y + HEIGHT - 2, WIDTH, 2, ColorUtil.clickGUIColor.brighter(1.65f))
+        if (extended && moduleButtons.isNotEmpty()) roundedRectangle(x, y + HEIGHT - 2, WIDTH, 2, clickGUIColor.brighter(1.65f))
         //draw minus sign
         roundedRectangle(x + WIDTH * 0.85 + 5, y + HEIGHT * 0.4 , 20, 5, Color.WHITE.darkerIf(isHoveredOverExtendToggle, 0.7f), radius = 1.5f)
 
@@ -134,9 +136,9 @@ class Panel(
                 y + startY,
                 WIDTH,
                 10f,
-                ColorUtil.moduleButtonColor,
-                ColorUtil.moduleButtonColor,
-                ColorUtil.moduleButtonColor,
+                moduleButtonColor,
+                moduleButtonColor,
+                moduleButtonColor,
                 0f,
                 0f,
                 0f,

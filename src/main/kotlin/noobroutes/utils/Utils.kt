@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.Core.logger
 import noobroutes.Core.mc
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.utils.ColorUtil.withAlpha
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.modMessage
 import java.util.*

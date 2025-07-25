@@ -1,18 +1,18 @@
 package noobroutes.ui.editUI.elements
 
 
+import noobroutes.ui.ColorPalette.buttonColor
+import noobroutes.ui.ColorPalette.clickGUIColor
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
-import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
-import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.editUI.EditUI
 import noobroutes.ui.editUI.Element
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.utils.ColorUtil.brighter
+import noobroutes.utils.ColorUtil.darkerIf
 import noobroutes.utils.render.*
 import noobroutes.utils.round
 import noobroutes.utils.skyblock.modMessage

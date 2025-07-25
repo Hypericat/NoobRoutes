@@ -7,11 +7,11 @@ import noobroutes.features.Module
 import noobroutes.features.ModuleManager.huds
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.hud.EditHUDGui.dragging
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.EaseInOut
+import noobroutes.utils.ColorUtil.withAlpha
 import noobroutes.utils.endProfile
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.rectangleOutline

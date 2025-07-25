@@ -1,11 +1,10 @@
 package noobroutes.ui.util.elements.colorelement
 
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.util.ElementValue
-import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
+import noobroutes.utils.ColorUtil.withAlpha
 import noobroutes.utils.render.*
 
 class AlphaSliderElement(
@@ -52,7 +51,6 @@ class AlphaSliderElement(
             ColorElementsConstants.COLOR_SLIDER_CIRCLE_BORDER_THICKNESS
         )
         popStencil()
-        uiChildren.forEach { it.draw() }
         if (dragging) {
             elementValue.alpha = getMouseYPercentageInBounds(
                 0f,

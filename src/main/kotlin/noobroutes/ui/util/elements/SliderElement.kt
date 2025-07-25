@@ -3,15 +3,14 @@ package noobroutes.ui.util.elements
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.logger
 import noobroutes.ui.ColorPalette
+import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.ElementValue
-import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.utils.ColorUtil.brighter
 import noobroutes.utils.floor
 import noobroutes.utils.render.*
 import noobroutes.utils.round
@@ -120,9 +119,9 @@ class SliderElement(
             GlStateManager.translate(x, y, 1f)
             GlStateManager.scale(xScale, yScale, 1f)
             val textWidth = getTextWidth(display, 12f)
-            roundedRectangle(-textWidth - SLIDER_TEXT_BOX_PADDING, -HALF_TEXT_BOX_HEIGHT, textWidth + SLIDER_TEXT_BOX_PADDING * 2f, TEXT_BOX_HEIGHT, ColorPalette.elementPrimary, 4f, edgeSoftness = 1f)
+            roundedRectangle(-textWidth - SLIDER_TEXT_BOX_PADDING, -HALF_TEXT_BOX_HEIGHT, textWidth + SLIDER_TEXT_BOX_PADDING * 2f, TEXT_BOX_HEIGHT, clickGUIColor, 4f, edgeSoftness = 1f)
             rectangleOutline(-textWidth - SLIDER_TEXT_BOX_PADDING, -HALF_TEXT_BOX_HEIGHT, textWidth + SLIDER_TEXT_BOX_PADDING * 2f, TEXT_BOX_HEIGHT, color,4f, 3f)
-            text(display, 0, 0, ColorPalette.text, 12f, align =  TextAlign.Right)
+            text(display, 0, 0, ColorPalette.textColor, 12f, align =  TextAlign.Right)
             GlStateManager.popMatrix()
         }
     }
