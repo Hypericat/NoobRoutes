@@ -2,21 +2,14 @@ package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.Vec3
 import noobroutes.features.floor7.autop3.Ring
+import noobroutes.features.floor7.autop3.RingBase
+import noobroutes.features.floor7.autop3.RingType
 
 
 class BlinkWaypoint(
-    coords: Vec3 = Vec3(0.0, 0.0, 0.0),
-    yaw: Float = 0f,
-    term: Boolean = false,
-    leap: Boolean = false,
-    left: Boolean = false,
-    center: Boolean = false,
-    rotate: Boolean = false,
-    diameter: Float = 1f,
-    height: Float = 1f,
+    ringBase: RingBase,
     val length: Int = 0
-) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
-
+) : Ring(ringBase, RingType.BLINK_WAYPOINT) {
     override fun doRing() {
 
     }

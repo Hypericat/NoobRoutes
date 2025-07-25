@@ -29,8 +29,24 @@ class BlinkRing(
     var packets: List<C04PacketPlayerPosition> = listOf(),
     var endYVelo: Double = 0.0
 ) : Ring(ringBase, RingType.BLINK) {
-    override fun generateRingFromArgs(): Ring? {
-        return null
+    override fun generateRingFromArgs(args: Array<out String>): Ring? {
+        if (args.size < 3) {
+            modMessage("need a length arg (positive number)")
+            return null
+        }
+
+        val length = args[2].toIntOrNull()
+        if (length == null) {
+            modMessage("need a length arg (positive number)")
+            return null
+        }
+
+        if (length < 1) {
+            modMessage("need a number greater than 0")
+            return null
+        }
+
+        return BlinkWaypoint(generateRingBaseFromArgs(args), length)
     }
 
 

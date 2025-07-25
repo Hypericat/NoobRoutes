@@ -159,6 +159,7 @@ object AutoP3: Module (
                 }
 
                 if (ring !is BlinkRing) ring.doRing()
+
                 else activatedBlinks.add(ring)
             }
             else {
@@ -304,21 +305,6 @@ object AutoP3: Module (
             modMessage("Rings: walk, hclip, stop, motion, lava, tnt, jump, speed, clamp, test, insta")
             return
         }
-        val coords = mc.thePlayer.positionVector
-        val center = args.any {it == "center"}
-        val walk = args.any {it == "walk"}
-        val term = args.any {it == "term"}
-        val leap = args.any { it == "leap" }
-        val left = args.any {it == "left"}
-        val rotate = args.any {it == "rotate" || it == "look"}
-
-        val diameterRegex = Regex("""d:(\d+)""")
-        val diameterString = args.firstOrNull { diameterRegex.matches(it) }
-        val diameter = diameterString?.let { diameterRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
-
-        val heightRegex = Regex("""h:(\d+)""")
-        val heightString = args.firstOrNull { heightRegex.matches(it) }
-        val height = heightString?.let { heightRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
 
         when (args[1].lowercase()) {
             "walk" -> {

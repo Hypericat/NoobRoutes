@@ -2,15 +2,23 @@ package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.MathHelper
 import net.minecraft.util.MovingObjectPosition
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent
 import noobroutes.Core.logger
 import noobroutes.config.DataManager
+import noobroutes.events.BossEventDispatcher
 import noobroutes.events.BossEventDispatcher.inF7Boss
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
+import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.Phase
+import noobroutes.events.impl.TermOpenEvent
+import noobroutes.events.impl.TerminalPhase
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.floor7.autop3.rings.BlinkRing
@@ -18,12 +26,15 @@ import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.StringSetting
+import noobroutes.utils.Scheduler
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
+import org.lwjgl.input.Mouse
+import kotlin.collections.forEach
 import kotlin.collections.iterator
 import kotlin.jvm.java
 
@@ -42,6 +53,11 @@ object AutoP3New: Module (
         editMode = !editMode
         modMessage("edit Mode: " + !editMode)
     }
+
+
+    var waitingRing: Ring? = null
+
+    var leapedIds = mutableSetOf<Int>() //hyper pls forgive me but duplicates would murder me
 
 
 
@@ -75,6 +91,72 @@ object AutoP3New: Module (
                 ring.run()
             }
 
+        }
+    }
+
+    @SubscribeEvent
+    fun awaitingLeap(event: PacketEvent.Receive) {
+        if (waitingRing?.leap != true || event.packet !is S18PacketEntityTeleport) return
+        val ring = waitingRing ?: return
+
+        val entity  = mc.theWorld.getEntityByID(event.packet.entityId)
+        if (entity !is EntityPlayer) return
+
+        val x = event.packet.x shr 5
+        val y = event.packet.y shr 5
+        val z = event.packet.z shr 5
+
+        if (mc.thePlayer.getDistanceSq(x.toDouble(), y.toDouble(), z.toDouble()) < 5) leapedIds.add(event.packet.entityId)
+        if (leapedIds.size == leapPlayers()) {
+
+            if (!ring.inRing()) {
+                waitingRing = null
+                return
+            }
+            modMessage("everyone leaped")
+
+            Scheduler.schedulePostMoveEntityWithHeadingTask {
+                ring.doRing()
+                waitingRing = null
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun awaitingTerm(event: TermOpenEvent) {
+        waitingRing?.let { ring ->
+            if (!ring.term) return
+
+            if (ring.inRing()) {
+                Scheduler.schedulePostMoveEntityWithHeadingTask {
+                    ring.doRing()
+                    waitingRing = null
+                }
+            }
+            else waitingRing = null
+        }
+    }
+
+    @SubscribeEvent
+    fun awaitingLeft(event: InputEvent.MouseInputEvent) {
+        if (Mouse.getEventButton() != 0 || !Mouse.getEventButtonState()) return
+
+        waitingRing?.let { ring ->
+            if (ring.inRing()) {
+                Scheduler.schedulePostMoveEntityWithHeadingTask {
+                    ring.doRing()
+                    waitingRing = null
+                }
+            }
+            else waitingRing = null
+        }
+    }
+
+    private fun leapPlayers(): Int {
+        return when {
+            BossEventDispatcher.currentBossPhase == Phase.P2 -> 1 //core
+            BossEventDispatcher.currentTerminalPhase == TerminalPhase.S3 -> 3 //ee3
+            else -> 4
         }
     }
 

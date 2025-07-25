@@ -10,7 +10,7 @@ import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
 import noobroutes.utils.skyblock.modMessage
 
-@RingType("Boom")
+
 class BoomRing(
     coords: Vec3 = Vec3(0.0, 0.0, 0.0),
     yaw: Float = 0f,

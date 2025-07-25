@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
+import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
@@ -35,8 +36,12 @@ data class RingBase(
     var center: Boolean,
     var rotate: Boolean,
     var diameter: Float,
-    var height: Float
-)
+    var height: Float) {
+    companion object {
+        val diameterRegex = Regex("""d:(\d+)""")
+        val heightRegex = Regex("""h:(\d+)""")
+    }
+}
 
 abstract class Ring(
     val base: RingBase,
@@ -50,13 +55,31 @@ abstract class Ring(
         set(value) {base.yaw = value}
     inline var term: Boolean
         get() = base.term
-        set(value) {base.term = value}
+        set(value) {
+            if (value) {
+                base.left = false
+                base.leap = false
+            }
+            base.term = value
+        }
     inline var leap: Boolean
         get() = base.leap
-        set(value) {base.leap = value}
+        set(value) {
+            if (value) {
+                base.term = false
+                base.left = false
+            }
+            base.leap = value
+        }
     inline var left: Boolean
         get() = base.left
-        set(value) {base.left = value}
+        set(value) {
+            if (value) {
+                base.term = false
+                base.leap = false
+            }
+            base.left = value
+        }
     inline var center: Boolean
         get() = base.center
         set(value) {base.center = value}
@@ -96,7 +119,27 @@ abstract class Ring(
         return obj
     }
 
-    abstract fun generateRingFromArgs(): Ring?
+    open fun generateRingFromArgs(args: Array<out String>): Ring? {
+        return null
+    }
+
+    protected fun generateRingBaseFromArgs(args: Array<out String>): RingBase {
+        val diameterString = args.firstOrNull { RingBase.diameterRegex.matches(it) }
+        val diameter = diameterString?.let { RingBase.diameterRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
+        val heightString = args.firstOrNull { RingBase.heightRegex.matches(it) }
+        val height = heightString?.let { RingBase.heightRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
+        return RingBase(
+            mc.thePlayer.positionVector,
+            MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
+            args.any {it == "term"},
+            args.any { it == "leap" },
+            args.any {it == "left"},
+            args.any {it == "center"},
+            args.any {it == "rotate" || it == "look"},
+            diameter,
+            height
+        )
+    }
 
     protected open fun addPrimitiveRingData(obj: JsonObject){
         internalRingData.forEach { it.writeTo(obj) }
@@ -135,20 +178,7 @@ abstract class Ring(
 
     fun renderRing() {
         val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
-        val topOffset = (0.48 * sin(System.currentTimeMillis().toDouble() * 0.0033333334)) + 0.5
-        val bottomOffset = 1 - topOffset
-        when (renderStyle) {
-            0 -> {
-                drawCylinderWithRingArgs(offsetCoords.add(0.0, topOffset * height, 0.0), Color.GREEN) //moving ring 1
-                drawCylinderWithRingArgs(offsetCoords.add(0.0, bottomOffset * height, 0.0), Color.GREEN) //moving ring 2
-                drawCylinderWithRingArgs(offsetCoords, Color.DARK_GRAY) //bottom static
-                drawCylinderWithRingArgs(offsetCoords.add(0.0, 0.5 * height, 0.0), Color.GREEN) // middle static
-                drawCylinderWithRingArgs(offsetCoords.add(0.0, height.toDouble(), 0.0), Color.DARK_GRAY) //bottom static
-            }
-            1 -> drawCylinderWithRingArgs(offsetCoords, Color.GREEN)
-            2 -> RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), Color.GREEN, thickness = 3, depth = depth)
-            3 -> Renderer.drawCylinder(this.coords, diameter * 0.5, diameter * 0.5, -0.01, 24, 1, 90, 0, 0, ringColors.getOrDefault(this.type, Color(255, 0, 255)), depth = depth)
-        }
+        RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), Color.GREEN, thickness = 3, depth = depth)
         if (this.renderYawVector) Renderer.draw3DLine(
             listOf(
                 this.coords.add(0.0, PlayerUtils.STAND_EYE_HEIGHT, 0.0),
@@ -184,10 +214,18 @@ abstract class Ring(
             PlayerUtils.stopVelocity()
             Scheduler.schedulePostMoveEntityWithHeadingTask {
                 PlayerUtils.setPosition(coords.xCoord, coords.zCoord)
-                
+                if (!isAwait) doRing()
             }
         }
 
+        if (rotate) {
+            Blink.rotate = yaw
+        }
+
+        if (isAwait) {
+            PlayerUtils.stopVelocity()
+            AutoP3New.waitingRing = this
+        }
     }
 
     open fun ringCheckY(): Boolean {
