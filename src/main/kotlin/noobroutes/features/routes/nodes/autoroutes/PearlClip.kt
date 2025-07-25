@@ -5,17 +5,13 @@ import net.minecraft.util.Vec3
 import noobroutes.features.routes.AutoRoute
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
-import noobroutes.utils.Scheduler
-import noobroutes.utils.SwapManager
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.routes.RouteUtils.pearlClip
-import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.skyblock.sendChatMessage
 import kotlin.math.absoluteValue
 
 class PearlClip(

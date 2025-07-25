@@ -5,6 +5,7 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.living.LivingEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -36,6 +37,38 @@ object Scheduler {
     private val scheduledPreMotionUpdateTasks = Tasks()
     private val scheduledLowPreMotionUpdateTasks = Tasks()
     private val scheduledPostMotionUpdateTasks = Tasks()
+
+    private fun reset() { //i cba to make this better rn. pwetty pls wadey
+        scheduledPreTickTasks.clear()
+        scheduledPostTickTasks.clear()
+        scheduledHighPreTickTasks.clear()
+        scheduledHighPostTickTasks.clear()
+        scheduledLowestPreTickTasks.clear()
+        scheduledLowestPostTickTasks.clear()
+        scheduledPrePlayerTickTasks.clear()
+        scheduledPostPlayerTickTasks.clear()
+        scheduledLowS08Tasks.clear()
+        scheduledPlayerLivingUpdateTasks.clear()
+        scheduledC03Tasks.clear()
+        scheduledLowestC03Tasks.clear()
+        scheduledSoundTasks.clear()
+        scheduledPostMoveEntityWithHeadingTasks.clear()
+        scheduledFrameTasks.clear()
+
+        scheduledPreMotionUpdateTasks.clear()
+        scheduledLowPreMotionUpdateTasks.clear()
+        scheduledPostMotionUpdateTasks.clear()
+    }
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        reset()
+    }
+
+    @SubscribeEvent
+    fun onWorldUnload(event: WorldEvent.Unload) {
+        reset()
+    }
 
 
     @Throws(IndexOutOfBoundsException::class)
@@ -296,6 +329,10 @@ object Scheduler {
                 println("Error while doing tasks: ${e.message}")
             }
             return cancelled
+        }
+
+        fun clear() {
+            queue.clear()
         }
     }
 

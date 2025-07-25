@@ -46,9 +46,9 @@ object RotationUtils {
         return Pair(normalizedYaw.toFloat(), pitch.toFloat())
     }
 
-    fun getYaw(x: Double, z: Double): Float {
-        val dx = x - mc.thePlayer.posX
-        val dz = z - mc.thePlayer.posZ
+    fun getYaw(coords: Vec2i): Float {
+        val dx = coords.x - mc.thePlayer.posX
+        val dz = coords.z - mc.thePlayer.posZ
 
         val yaw = Math.toDegrees(atan2(-dx, dz))
 

@@ -4,8 +4,6 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
@@ -19,14 +17,13 @@ import noobroutes.Core.logger
 import noobroutes.config.DataManager
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.BossEventDispatcher.inF7Boss
-import noobroutes.events.impl.AutoP3MovementEvent
 import noobroutes.events.impl.AutoP3RingEvent
-import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.Phase
 import noobroutes.events.impl.TermOpenEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.dungeon.AutoBr
 import noobroutes.features.floor7.autop3.Blink.blinkStarts
 import noobroutes.features.floor7.autop3.rings.*
 import noobroutes.features.misc.SexAura
@@ -44,7 +41,6 @@ import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
-import org.lwjgl.Sys
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import kotlin.math.absoluteValue
@@ -260,6 +256,7 @@ object AutoP3: Module (
             "restore" -> restoreRing()
             "test" -> testFunctions(args)
             "load" -> loadRings()
+            "snipe" -> AutoBr.snipeCommand(args)
             else -> modMessage("not an option")
         }
     }
