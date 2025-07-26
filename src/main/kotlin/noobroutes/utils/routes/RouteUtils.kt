@@ -154,9 +154,9 @@ object RouteUtils {
             event.isCanceled = true
             PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
             mc.thePlayer.setPosition(
-                mc.thePlayer.posX.floor() + 0.5,
+                event.packet.x,
                 mc.thePlayer.posY.floor() - clipDistance,
-                mc.thePlayer.posZ.floor() + 0.5
+                event.packet.z
             )
             pearlSoundRegistered = false
             clipRegistered = false

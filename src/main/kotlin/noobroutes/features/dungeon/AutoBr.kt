@@ -47,6 +47,8 @@ object AutoBr: Module(
     private val noWait by BooleanSetting("faster pearls", description = "pearls diffrently, might be faster")
     private val silent by BooleanSetting("silent", description = "do silent rotations")
 
+    private val snipeTick by NumberSetting("Snipe Tick", 1, 0, 40, description = "how to align with the server ticks")
+
     private val BLOOD_MIDDLE_COORDS = BlockPos(0, 99, 0)
 
     private const val GO_STRAIGHT_ON_AOTV_PITCH = 4f
@@ -209,7 +211,7 @@ object AutoBr: Module(
     @SubscribeEvent
     fun onServerTick(event: ServerTickEvent) {
         serverTickCount++
-        if (serverTickCount == 1 && snipeCoords != null) testAutoPearl()
+        if (serverTickCount == snipeTick && snipeCoords != null) testAutoPearl()
         if (serverTickCount >= 40) serverTickCount = 0
     }
 
