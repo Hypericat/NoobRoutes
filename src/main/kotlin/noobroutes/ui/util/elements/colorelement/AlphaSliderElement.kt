@@ -71,7 +71,6 @@ class AlphaSliderElement(
     var dragging: Boolean = false
 
     override fun mouseClicked(mouseButton: Int): Boolean {
-        if (super.mouseClicked(mouseButton)) return true
         if (mouseButton != 0) return false
         if (isHovered) {
             dragging = true
@@ -81,7 +80,6 @@ class AlphaSliderElement(
     }
 
     override fun mouseReleased(): Boolean {
-        if (super.mouseReleased()) return true
         dragging = false
         return false
     }

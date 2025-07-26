@@ -61,10 +61,9 @@ class ColorBoxElement(
         0f,
         0f,
         ColorElementsConstants.COLOR_BOX_SIZE,
-        ColorElementsConstants.COLOR_BOX_SIZE,
+        ColorElementsConstants.COLOR_BOX_SIZE
     )
     override fun mouseClicked(mouseButton: Int): Boolean {
-        if (super.mouseClicked(mouseButton)) return true
         if (mouseButton != 0) return false
         if (isHovered) {
             dragging = true
@@ -75,6 +74,6 @@ class ColorBoxElement(
 
     override fun mouseReleased(): Boolean {
         dragging = false
-        return super.mouseReleased()
+        return false
     }
 }

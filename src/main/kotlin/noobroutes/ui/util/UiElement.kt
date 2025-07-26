@@ -4,16 +4,22 @@ import net.minecraft.client.renderer.GlStateManager
 
 
 abstract class UiElement(var x: Float, var y: Float) {
-    var parent: UiElement? = null
-    val uiChildren = mutableListOf<UiElement>()
-    var xOrigin = 0f
-    var yOrigin = 0f
-    var globalXScale = 1f
-    var globalYScale = 1f
+    protected var parent: UiElement? = null
+    protected val uiChildren = mutableListOf<UiElement>()
+    var visible = true
+    var enabled = true
+    protected var xOrigin = 0f
+    protected var yOrigin = 0f
+    private var globalXScale = 1f
+    private var globalYScale = 1f
     private var deltaX = 0f
     private var deltaY = 0f
     private var deltaScaleX = 1f
     private var deltaScaleY = 1f
+
+    protected fun drawChildren(){
+        uiChildren.forEach { it.handleDraw() }
+    }
 
     open fun updateChildren(){}
 
@@ -27,26 +33,52 @@ abstract class UiElement(var x: Float, var y: Float) {
         }
     }
 
-    open fun draw() {
-        uiChildren.forEach { it.draw() }
+    fun handleDraw(){
+        if (!visible) return
+        draw()
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(deltaX, deltaY, 1f)
+        GlStateManager.scale(deltaScaleX, deltaScaleY, 1f)
+        drawChildren()
+        GlStateManager.popMatrix()
     }
+
+    fun handleMouseClicked(mouseButton: Int): Boolean{
+        if (!enabled || !visible) return false
+        if (uiChildren.any { it.handleMouseClicked(mouseButton) }) return true
+        return mouseClicked(mouseButton)
+    }
+
+    fun handleMouseReleased(mouseButton: Int): Boolean{
+        if (!enabled || !visible) return false
+        if (uiChildren.any { it.handleMouseReleased(mouseButton) }) return true
+        return mouseClicked(mouseButton)
+    }
+
+    fun handleKeyTyped(typedChar: Char, keyCode: Int): Boolean {
+        if (!enabled || !visible) return false
+        if (uiChildren.any { it.handleKeyTyped(typedChar, keyCode) }) return true
+        return keyTyped(typedChar, keyCode)
+    }
+
+    open fun draw() {}
 
     open fun mouseClicked(mouseButton: Int): Boolean {
-        return uiChildren.any { it.mouseClicked(mouseButton) }
-    }
-    open fun mouseReleased(): Boolean {
-        return uiChildren.any { it.mouseReleased() }
+        return false
     }
 
-    open fun mouseClickedAnywhere() {
-        uiChildren.forEach { it.mouseClickedAnywhere() }
+    open fun mouseReleased(): Boolean {
+        return false
     }
+
     open fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
-        return uiChildren.any { it.keyTyped(typedChar, keyCode) }
+        return false
     }
 
     protected fun addChildren(children: Collection<UiElement>) {
-        children.map { it.parent = this }
+        children.forEach {
+            it.parent = this
+        }
         uiChildren.addAll(children)
     }
 
@@ -55,56 +87,55 @@ abstract class UiElement(var x: Float, var y: Float) {
         uiChildren.add(child)
     }
 
+
     protected fun translate(x: Float, y: Float){
-        deltaX = x
-        deltaY = y
+        deltaX = x * globalXScale
+        deltaY = y * globalYScale
         updateChildrenTranslation()
         GlStateManager.translate(x, y, 1f)
     }
     protected fun scale(x: Float, y: Float){
-        deltaScaleX = x
-        deltaScaleY = y
+        this.deltaScaleX = x
+        this.deltaScaleY = y
         updateChildrenScale()
         GlStateManager.scale(x, y, 1f)
     }
 
     protected fun updateChildrenTranslation(){
-        val xOrigin = getEffectiveX()
-        val yOrigin = getEffectiveY()
         uiChildren.forEach {
-            it.xOrigin = xOrigin
-            it.yOrigin = yOrigin
-            it.updateChildrenTranslation()
+            it.xOrigin = this.xOrigin + deltaX
+            it.yOrigin = this.yOrigin + deltaY
         }
     }
 
     protected fun updateChildrenScale(){
-        val xScale = getEffectiveXScale()
-        val yScale = getEffectiveYScale()
         uiChildren.forEach {
-            it.globalXScale = xScale
-            it.globalYScale = yScale
-            it.updateChildrenScale()
+            it.globalXScale = this.deltaScaleX * this.globalXScale
+            it.globalYScale = this.deltaScaleY * this.globalYScale
         }
     }
 
     open fun getEffectiveX(): Float {
-        return xOrigin + deltaX
+        return this.xOrigin + deltaX
     }
     open fun getEffectiveY(): Float {
-        return yOrigin + deltaY
+        return this.yOrigin + this.deltaY
     }
     open fun getEffectiveXScale(): Float {
-        return globalXScale * deltaScaleX
+        return this.deltaScaleX * globalXScale
     }
     open fun getEffectiveYScale(): Float {
-        return globalYScale * deltaScaleY
+        return this.deltaScaleY * globalYScale
     }
-
 
 
     protected fun isAreaHovered(x: Float, y: Float, w: Float, h: Float): Boolean {
-        return MouseUtils.isAreaHovered(getEffectiveXScale() * (x + getEffectiveX()), getEffectiveYScale() * (y + getEffectiveY()), w * getEffectiveXScale(), h * getEffectiveYScale())
+        return MouseUtils.isAreaHovered(
+            getEffectiveX() + x * getEffectiveXScale(),
+            getEffectiveY() + y * getEffectiveYScale(),
+            w * getEffectiveXScale(),
+            h * getEffectiveYScale()
+        )
     }
 
     /**
@@ -118,11 +149,9 @@ abstract class UiElement(var x: Float, var y: Float) {
         val relative = ((MouseUtils.mouseX - (x + getEffectiveX()) * getEffectiveXScale()) / (w * getEffectiveXScale())).coerceIn(0f, 1f)
         return if (invert) 1f - relative else relative
     }
+
     protected fun getMouseYPercentageInBounds(y: Float, h: Float, invert: Boolean = false): Float {
         val relative = ((MouseUtils.mouseY - (y + getEffectiveY()) * getEffectiveYScale()) / (h * getEffectiveYScale())).coerceIn(0f, 1f)
         return if (invert) 1f - relative else relative
     }
-
-
-
 }

@@ -145,6 +145,10 @@ class SliderElement(
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (mouseButton != 0) return false
         when {
+            listeningText && !isHovered -> {
+                textUnlisten()
+                return false
+            }
             /*
             isHoveredBox -> {
                 if (listeningText) {
@@ -174,14 +178,6 @@ class SliderElement(
     override fun mouseReleased(): Boolean {
         listening = false
         return false
-    }
-
-    override fun mouseClickedAnywhere(){
-        if (listeningText && !isHovered) {
-            textUnlisten()
-            return
-        }
-        return
     }
 
     private fun textUnlisten() {

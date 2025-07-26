@@ -320,7 +320,6 @@ class TextBoxElement(
         }
         if (hasSelection) drawSelection(textX, textY, fontHeight)
         drawCursor(textX)
-        uiChildren.forEach { it.draw() }
     }
 
     var listening = false

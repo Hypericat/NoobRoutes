@@ -162,8 +162,6 @@ class ColorPopoutElement(
                 topRY + ColorElementsConstants.COLOR_POPOUT_GAP + ColorElementsConstants.COLOR_BOX_SIZE_HALF
             )
         }
-        uiChildren.forEach { it.draw() }
-
         GlStateManager.popMatrix()
     }
 }

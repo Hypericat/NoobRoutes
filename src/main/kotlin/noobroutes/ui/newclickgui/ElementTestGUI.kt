@@ -9,24 +9,7 @@ import org.lwjgl.opengl.GL11
 
 object ElementTestGUI : Screen() {
     private val testElements = listOf<UiElement>(
-        ColorElement(
-            100f,
-            500f,
-            30f,
-            15f,
-            5f,
-            Color.GREEN,
-            false
-        ),
-        ColorElement(
-            300f,
-            100f,
-            30f,
-            15f,
-        5f,
-        Color.GREEN,
-        true
-    )
+        ColorElement(100f, 300f, 100f, 35f, 8f, Color(50, 50, 50, 0.4f), true)
     )
 
     override fun draw() {
@@ -34,7 +17,7 @@ object ElementTestGUI : Screen() {
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA)
         scaleUI()
-        testElements.forEach { it.draw() }
+        testElements.forEach { it.handleDraw() }
         resetScale()
         GlStateManager.popMatrix()
     }
@@ -47,17 +30,10 @@ object ElementTestGUI : Screen() {
         if (testElements.any { it.keyTyped(typedChar, keyCode) }) return
         super.keyTyped(typedChar, keyCode)
     }
-    private fun handleText(number: String):String {
-        if (number.isNotEmpty() && number.last() == '.' && number.count { it == '.' } >= 2) {
-            return number.dropLast(1)
-        }
-        return number
-    }
 
     override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
         if (state != 0) return
         testElements.forEach { it.mouseReleased() }
-
     }
 
 }
