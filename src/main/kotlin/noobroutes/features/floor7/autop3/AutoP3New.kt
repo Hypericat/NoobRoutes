@@ -8,6 +8,7 @@ import net.minecraft.util.MathHelper
 import net.minecraft.util.MovingObjectPosition
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
 import noobroutes.Core.logger
@@ -54,7 +55,6 @@ object AutoP3New: Module (
         modMessage("edit Mode: " + !editMode)
     }
 
-
     var waitingRing: Ring? = null
 
     var leapedIds = mutableSetOf<Int>() //hyper pls forgive me but duplicates would murder me
@@ -79,7 +79,7 @@ object AutoP3New: Module (
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
         if (!inF7Boss) return
 
@@ -159,8 +159,6 @@ object AutoP3New: Module (
             else -> 4
         }
     }
-
-
 
     fun loadRings() {
         rings.clear()

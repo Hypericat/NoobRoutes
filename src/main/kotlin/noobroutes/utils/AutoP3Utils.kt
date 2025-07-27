@@ -42,7 +42,8 @@ object AutoP3Utils {
         mc.gameSettings.keyBindForward,
         mc.gameSettings.keyBindLeft,
         mc.gameSettings.keyBindRight,
-        mc.gameSettings.keyBindBack
+        mc.gameSettings.keyBindBack,
+        mc.gameSettings.keyBindJump
     )
 
     fun unPressKeys(stop: Boolean = true) {

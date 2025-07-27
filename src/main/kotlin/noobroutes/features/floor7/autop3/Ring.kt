@@ -11,6 +11,7 @@ import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.floor7.autop3.AutoP3.depth
 import noobroutes.features.floor7.autop3.AutoP3.renderStyle
 import noobroutes.features.floor7.autop3.AutoP3.silentLook
+import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.utils.*
 import noobroutes.utils.AutoP3Utils.ringColors
 import noobroutes.utils.Utils.xPart
@@ -202,13 +203,18 @@ abstract class Ring(
     }
 
     fun inRing(): Boolean {
-        val ringAABB = AxisAlignedBB(coords.xCoord - diameter * 0.5, coords.yCoord, coords.zCoord - diameter * 0.5, coords.xCoord + diameter * 0.5, coords.yCoord + height, coords.zCoord + diameter * 0.5)
+        val ringAABB = AxisAlignedBB(coords.xCoord - diameter * 0.5, coords.yCoord, coords.zCoord - diameter * 0.5, coords.xCoord + diameter * 0.5, coords.yCoord + getHeight(), coords.zCoord + diameter * 0.5)
         return ringAABB.isVecInside(mc.thePlayer.positionVector)
+    }
+
+    private fun getHeight(): Float {
+        return if (this is BlinkRing || center) 0f else height
     }
 
     fun run() {
         mc.thePlayer.isSprinting = false
         AutoP3Utils.unPressKeys()
+        triggered = true
 
         if (center) {
             PlayerUtils.stopVelocity()
@@ -225,36 +231,9 @@ abstract class Ring(
         if (isAwait) {
             PlayerUtils.stopVelocity()
             AutoP3New.waitingRing = this
-        }
-    }
-
-    open fun ringCheckY(): Boolean {
-        return (coords.yCoord <= mc.thePlayer.posY && coords.yCoord + height > mc.thePlayer.posY && !center) || (center && coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround)
-    }
-
-    fun doRingArgs() {
-        if (rotate) {
-            if (!silentLook) Scheduler.schedulePostTickTask { mc.thePlayer.rotationYaw = yaw }
-            Blink.rotate = yaw
+            return
         }
 
-        if (renderStyle == 3) {
-            Scheduler.schedulePostTickTask { mc.thePlayer.rotationYaw = yaw }
-            val javaRandom = java.util.Random()
-            val gaussian = javaRandom.nextGaussian().toFloat()
-            val scaled = gaussian * (15)
-            Scheduler.schedulePostTickTask { mc.thePlayer.rotationPitch = scaled.coerceIn(-45f, 45f) + 10f }
-        }
-
-        if (center && (mc.thePlayer.onGround || System.currentTimeMillis() - Blink.lastBlink < 100)) {
-
-            AutoP3Utils.unPressKeys()
-
-            Scheduler.schedulePostMoveEntityWithHeadingTask {
-                mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord)
-                PlayerUtils.stopVelocity()
-            }
-            AutoP3.isAligned = true
-        }
+        doRing()
     }
 }

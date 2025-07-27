@@ -17,6 +17,7 @@ import noobroutes.utils.render.Renderer
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 object PlayerUtils {
     var shouldBypassVolume = false
@@ -147,6 +148,7 @@ object PlayerUtils {
     }
 
 
+    // Good boy
     inline val keyBindings get() =  listOf(
         mc.gameSettings.keyBindForward,
         mc.gameSettings.keyBindLeft,
@@ -159,11 +161,11 @@ object PlayerUtils {
 
     fun unPressKeys() {
         Keyboard.enableRepeatEvents(false)
-        AutoP3Utils.keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
+        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
     }
 
     fun rePressKeys() {
-        AutoP3Utils.keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, Keyboard.isKeyDown(it.keyCode)) }
+        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, Keyboard.isKeyDown(it.keyCode)) }
     }
 }
 
