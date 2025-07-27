@@ -126,7 +126,7 @@ object Doorless: Module(
         s08Pos = Pair(event.packet.x, event.packet.z)
         devMessage(s08Pos)
         clipped = true
-        AutoP3Utils.unPressKeys()
+        PlayerUtils.unPressKeys()
         if (!faster) {
             Scheduler.schedulePreTickTask { clip() }
             return
@@ -174,7 +174,7 @@ object Doorless: Module(
         Blocks.monster_egg.setBlockBounds(-1f, -1f, -1f, -1f, -1f, -1f)
         if (!faster) mc.thePlayer.rotationYaw = prevRot.first
         if (!faster) mc.thePlayer.rotationPitch = prevRot.second
-        Scheduler.schedulePreTickTask { AutoP3Utils.rePressKeys() }
+        Scheduler.schedulePreTickTask { PlayerUtils.rePressKeys() }
         Scheduler.schedulePreTickTask(15) {
             doingShit = false
             clipped = false

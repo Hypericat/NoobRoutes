@@ -8,7 +8,6 @@ import noobroutes.ui.util.elements.TextBoxElement
 import noobroutes.ui.util.elements.colorelement.ColorElement
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
-import noobroutes.utils.render.text
 import org.lwjgl.opengl.GL11
 
 object ElementTestGUI : Screen() {

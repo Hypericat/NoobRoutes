@@ -12,19 +12,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.floor7.autop3.AutoP3
-import noobroutes.features.floor7.autop3.Blink.movementPackets
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.DualSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.Scheduler
-import noobroutes.utils.add
 import noobroutes.utils.coerceMax
-import noobroutes.utils.equal
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.render.Renderer.drawBox
-import noobroutes.utils.skyblock.devMessage
 import org.lwjgl.input.Keyboard
 
 object Trail: Module(
@@ -69,13 +64,11 @@ object Trail: Module(
         val positionsCopy = positions.toList() //concurrent smth smth error moment
         if (!mode) {
             val positionsUp = positionsCopy.map { Vec3(it.positionX, it.positionY + 0.01, it.positionZ) }.toMutableList()
-            if (movementPackets.isEmpty() || !AutoP3.mode)  {
-                val viewEntity = mc.renderViewEntity
-                val camX = viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * event.partialTicks
-                val camY = viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * event.partialTicks
-                val camZ = viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * event.partialTicks
-                positionsUp.add(0, Vec3(camX, camY + 0.01, camZ))
-            }
+            val viewEntity = mc.renderViewEntity
+            val camX = viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * event.partialTicks
+            val camY = viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * event.partialTicks
+            val camZ = viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * event.partialTicks
+            positionsUp.add(0, Vec3(camX, camY + 0.01, camZ))
             Renderer.draw3DLine(positionsUp, Color.CYAN, depth = true)
         } else {
             positionsCopy.forEach {

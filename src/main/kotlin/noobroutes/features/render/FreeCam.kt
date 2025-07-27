@@ -22,6 +22,7 @@ import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
+import noobroutes.utils.skyblock.PlayerUtils
 import org.lwjgl.input.Keyboard
 import kotlin.math.sign
 
@@ -130,7 +131,7 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
 
     @SubscribeEvent
     fun onKey(event: InputEvent.KeyInputEvent) {
-        val keyCodes = AutoP3Utils.keyBindings.map { it.keyCode }
+        val keyCodes = PlayerUtils.keyBindings.map { it.keyCode }
         if (!keyCodes.contains(Keyboard.getEventKey())) return
         if (!keyCodes.any{ Keyboard.isKeyDown(it) }) stopMovement()
     }

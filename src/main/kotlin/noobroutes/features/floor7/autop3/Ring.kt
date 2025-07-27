@@ -1,19 +1,13 @@
 package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonObject
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
-import noobroutes.events.impl.MotionUpdateEvent
-import noobroutes.features.floor7.autop3.AutoP3.depth
-import noobroutes.features.floor7.autop3.AutoP3.renderStyle
-import noobroutes.features.floor7.autop3.AutoP3.silentLook
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.utils.*
-import noobroutes.utils.AutoP3Utils.ringColors
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
 import noobroutes.utils.json.JsonUtils.addProperty
@@ -22,10 +16,8 @@ import noobroutes.utils.json.syncdata.*
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
-import kotlin.math.pow
-import kotlin.math.sin
 
 
 data class RingBase(
@@ -48,6 +40,8 @@ abstract class Ring(
     val base: RingBase,
     val type: RingType
 ) {
+    inline val ringName get() = type.ringName
+
     inline var coords: Vec3
         get() = base.coords
         set(value) {base.coords = value}
@@ -142,6 +136,10 @@ abstract class Ring(
         )
     }
 
+    protected fun getWalkFromArgs(args: Array<out String>): Boolean {
+        return args.any {it == "walk"}
+    }
+
     protected open fun addPrimitiveRingData(obj: JsonObject){
         internalRingData.forEach { it.writeTo(obj) }
     }
@@ -179,7 +177,7 @@ abstract class Ring(
 
     fun renderRing() {
         val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
-        RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), Color.GREEN, thickness = 3, depth = depth)
+        RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), Color.GREEN, thickness = 3, depth = true)
         if (this.renderYawVector) Renderer.draw3DLine(
             listOf(
                 this.coords.add(0.0, PlayerUtils.STAND_EYE_HEIGHT, 0.0),
@@ -194,30 +192,32 @@ abstract class Ring(
     }
 
     fun drawCylinderWithRingArgs(drawCoords: Vec3, color: Color) {
-        Renderer.drawCylinder(drawCoords, diameter * 0.5, diameter * 0.5, 0.01, AutoP3.ringSlices, 1, 90, 0, 0, color, depth = depth)
+        Renderer.drawCylinder(drawCoords, diameter * 0.5, diameter * 0.5, 0.01, 24, 1, 90, 0, 0, color, depth = true)
     }
 
     open fun addRingData(obj: JsonObject) {}
 
     open fun doRing() {
+        AutoP3MovementHandler.resetShit()
     }
 
     fun inRing(): Boolean {
-        val ringAABB = AxisAlignedBB(coords.xCoord - diameter * 0.5, coords.yCoord, coords.zCoord - diameter * 0.5, coords.xCoord + diameter * 0.5, coords.yCoord + getHeight(), coords.zCoord + diameter * 0.5)
+        val ringAABB = AxisAlignedBB(coords.xCoord - diameter * 0.5, coords.yCoord, coords.zCoord - diameter * 0.5, coords.xCoord + diameter * 0.5, coords.yCoord + getRingHeight(), coords.zCoord + diameter * 0.5)
         return ringAABB.isVecInside(mc.thePlayer.positionVector)
     }
 
-    private fun getHeight(): Float {
+    private fun getRingHeight(): Float {
         return if (this is BlinkRing || center) 0f else height
     }
 
     fun run() {
-        mc.thePlayer.isSprinting = false
-        AutoP3Utils.unPressKeys()
         triggered = true
 
         if (center) {
             PlayerUtils.stopVelocity()
+            mc.thePlayer.isSprinting = false
+            PlayerUtils.unPressKeys()
+
             Scheduler.schedulePostMoveEntityWithHeadingTask {
                 PlayerUtils.setPosition(coords.xCoord, coords.zCoord)
                 if (!isAwait) doRing()
@@ -225,12 +225,12 @@ abstract class Ring(
         }
 
         if (rotate) {
-            Blink.rotate = yaw
+            RouteUtils.setRotation(yaw, 0f, true)
         }
 
         if (isAwait) {
             PlayerUtils.stopVelocity()
-            AutoP3New.waitingRing = this
+            AutoP3.waitingRing = this
             return
         }
 

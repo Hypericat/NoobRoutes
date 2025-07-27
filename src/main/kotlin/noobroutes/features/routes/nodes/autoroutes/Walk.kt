@@ -3,10 +3,10 @@ package noobroutes.features.routes.nodes.autoroutes
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.routes.AutoRoute
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
-import noobroutes.utils.AutoP3Utils.startWalk
 import noobroutes.utils.Scheduler
 import noobroutes.utils.render.Color
 import noobroutes.utils.round
@@ -91,11 +91,11 @@ class Walk(
         val yaw = room.getRealYaw(yaw)
         if (RouteUtils.serverSneak) {
             Scheduler.schedulePreTickTask {
-                startWalk(yaw)
+                AutoP3MovementHandler.setDirection(yaw)
             }
             return
         }
-        startWalk(yaw)
+        AutoP3MovementHandler.setDirection(yaw)
     }
 
     override fun getType(): NodeType {

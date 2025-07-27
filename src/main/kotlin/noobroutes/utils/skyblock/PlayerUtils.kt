@@ -10,14 +10,12 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
-import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 import kotlin.math.sqrt
-import kotlin.random.Random
 
 object PlayerUtils {
     var shouldBypassVolume = false

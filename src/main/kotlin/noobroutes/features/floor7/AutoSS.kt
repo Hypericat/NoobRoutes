@@ -7,12 +7,10 @@ import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.BlockPos
-import net.minecraft.util.MovingObjectPosition
 import net.minecraft.util.Timer
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -28,7 +26,6 @@ import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.mixin.accessors.TimerFieldAccessor
-import noobroutes.utils.AuraManager
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.RotationUtils.getYawAndPitch
 import noobroutes.utils.Utils.isEnd

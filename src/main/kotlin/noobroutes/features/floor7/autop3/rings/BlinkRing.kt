@@ -1,27 +1,11 @@
 package noobroutes.features.floor7.autop3.rings
 
-import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
-import net.minecraft.util.Vec3
-import noobroutes.Core.mc
-import noobroutes.features.floor7.autop3.AutoP3
-import noobroutes.features.floor7.autop3.Blink
-import noobroutes.features.floor7.autop3.Blink.blinksInstance
-import noobroutes.features.floor7.autop3.Blink.cancelled
-import noobroutes.features.floor7.autop3.Blink.endY
-import noobroutes.features.floor7.autop3.Blink.lastBlink
-import noobroutes.features.floor7.autop3.Blink.movementPackets
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
-import noobroutes.utils.AutoP3Utils
-import noobroutes.utils.PacketUtils
-import noobroutes.utils.Scheduler
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
-import kotlin.math.pow
 
 
 class BlinkRing(
@@ -68,7 +52,7 @@ class BlinkRing(
         }
         packets = packetsLoaded
     }
-
+/*
     override fun ringCheckY(): Boolean {
         return coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround
     }
@@ -139,4 +123,6 @@ class BlinkRing(
     private fun resetTriggered() {
         Scheduler.schedulePreTickTask(60) { triggered = false }
     }
+
+ */
 }

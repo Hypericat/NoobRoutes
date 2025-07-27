@@ -291,18 +291,16 @@ object EditUI : Screen() {
                         "Walk"
                     )
                 )
-            }
 
-            is InstaRing -> {
-                elements.add(
-                    ElementCheckBox(
-                        X_ALIGNMENT_RIGHT,
-                        currentY,
-                        250f, 50f,
-                        { ring.walk = it },
-                        { ring.walk },
-                        "Walk"
-                    )
+                currentY += 75
+
+                ElementCheckBox(
+                    X_ALIGNMENT_RIGHT,
+                    currentY,
+                    250f, 50f,
+                    { ring.insta = it },
+                    { ring.insta },
+                    "Insta"
                 )
             }
 
@@ -442,7 +440,7 @@ object EditUI : Screen() {
         GlStateManager.pushMatrix()
         translate(0f, 0f, 200f)
 
-        scale(1f / scaleFactor, 1f / scaleFactor, 1f)
+        scaleUI()
         if (dragging) {
             originX = floor(x2 + mouseX)
             originY = floor(y2 + mouseY)
@@ -452,10 +450,10 @@ object EditUI : Screen() {
         //roundedRectangle(ORIGIN_X + 200f, ORIGIN_Y + 10f, 200f, 5f, Color.WHITE, 2f)
         roundedRectangle(originX, originY, 600, 70, ColorUtil.titlePanelColor,  ColorUtil.titlePanelColor, Color.TRANSPARENT, 0, 20f, 20f, 0f, 0f, 0f)
         roundedRectangle(originX, originY, 600, currentY, ColorUtil.buttonColor, radius = 20)
-        text(ring.type, originX + X_ALIGNMENT_LEFT - 10, originY + 37.5, Color.WHITE, size = 30)
+        text(ring.ringName, originX + X_ALIGNMENT_LEFT - 10, originY + 37.5, Color.WHITE, size = 30)
         elements.forEach { it.draw(originX + it.x, originY + it.y) }
         ring.coords = Vec3(ringX, ringY, ringZ)
-        scale(scaleFactor, scaleFactor, 1f)
+        resetScale()
         GlStateManager.popMatrix()
     }
 

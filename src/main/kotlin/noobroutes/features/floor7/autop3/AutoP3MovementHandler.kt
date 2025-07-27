@@ -7,7 +7,6 @@ import net.minecraftforge.fml.common.gameevent.InputEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.S08Event
-import noobroutes.features.floor7.autop3.AutoP3.walkFix
 import noobroutes.utils.Utils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
@@ -22,7 +21,7 @@ object AutoP3MovementHandler {
 
     private var lastSpeed = 0.0
 
-    private const val DEFAULT_SPEED = 2.806
+    const val DEFAULT_SPEED = 2.806
     private const val JUMP_SPEED = 6.0075
     private const val SPRINT_MULTIPLIER = 1.3
 
@@ -57,9 +56,9 @@ object AutoP3MovementHandler {
 
         var movementFactor = 0.02 * SPRINT_MULTIPLIER;
 
-        if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0 && AutoP3.walkFix != 0)) {
+        if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0 && AutoP3.walkBoost != 0)) {
             movementFactor = speed;
-            if (walkFix == 2)
+            if (AutoP3.walkBoost == 2)
                 movementFactor *= SPRINT_MULTIPLIER;
         }
 
@@ -80,7 +79,7 @@ object AutoP3MovementHandler {
         }
     }
 
-    fun doMotionTick() {
+    private fun doMotionTick() {
         if (motionTicks == 0 && mc.thePlayer.onGround) {
             mc.thePlayer.jump();
             setVelocity(TICK1 * scale)
@@ -104,7 +103,7 @@ object AutoP3MovementHandler {
         setVelocity(lastSpeed * scale)
     }
 
-    private fun setVelocity(velo: Double) {
+    fun setVelocity(velo: Double) {
         val dir = direction ?: return
         mc.thePlayer.motionX = velo * mc.thePlayer.aiMoveSpeed * Utils.xPart(dir)
         mc.thePlayer.motionZ = velo * mc.thePlayer.aiMoveSpeed * Utils.zPart(dir)
@@ -135,7 +134,7 @@ object AutoP3MovementHandler {
         resetShit()
     }
 
-    private fun resetShit() {
+    fun resetShit() {
         motionTicks = -1
         jumping = false
         direction = null
@@ -146,8 +145,8 @@ object AutoP3MovementHandler {
         motionTicks = ticks
     }
 
-    fun setJumping(isJumping: Boolean) {
-        jumping = isJumping
+    fun setJumpingTrue() {
+        jumping = true
     }
 
     fun setDirection(dir: Float?) {

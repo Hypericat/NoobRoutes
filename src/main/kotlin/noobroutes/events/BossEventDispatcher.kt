@@ -12,7 +12,6 @@ import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.Floor
-import noobroutes.utils.skyblock.modMessage
 
 object BossEventDispatcher {
 

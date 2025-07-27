@@ -1,16 +1,6 @@
 package noobroutes.features.floor7.autop3
 
-import noobroutes.features.floor7.autop3.rings.BlinkRing
-import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
-import noobroutes.features.floor7.autop3.rings.BoomRing
-import noobroutes.features.floor7.autop3.rings.ClampRing
-import noobroutes.features.floor7.autop3.rings.HClipRing
-import noobroutes.features.floor7.autop3.rings.JumpRing
-import noobroutes.features.floor7.autop3.rings.LavaClipRing
-import noobroutes.features.floor7.autop3.rings.MotionRing
-import noobroutes.features.floor7.autop3.rings.SpedRing
-import noobroutes.features.floor7.autop3.rings.StopRing
-import noobroutes.features.floor7.autop3.rings.WalkRing
+import noobroutes.features.floor7.autop3.rings.*
 
 enum class RingType(val ringName: String, val clazz: Class<out Ring>, val commandGenerated: Boolean = true, val canSave: Boolean = true) {
     BLINK("Blink", BlinkRing::class.java, commandGenerated = false),

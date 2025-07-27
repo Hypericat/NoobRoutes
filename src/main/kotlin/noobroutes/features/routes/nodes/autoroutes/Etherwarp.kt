@@ -7,7 +7,6 @@ import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.RotationUtils.offset
-import noobroutes.utils.SwapManager
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
 import noobroutes.utils.add
@@ -18,7 +17,6 @@ import noobroutes.utils.render.Renderer
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.routes.RouteUtils.swapToEtherwarp
 import noobroutes.utils.skyblock.EtherWarpHelper
-import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords

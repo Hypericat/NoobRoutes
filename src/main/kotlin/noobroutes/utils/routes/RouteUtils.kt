@@ -17,23 +17,15 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
+import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.move.Zpew
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.autoroutes.*
-import noobroutes.utils.AutoP3Utils.walking
-import noobroutes.utils.PacketUtils
-import noobroutes.utils.RotationUtils
-import noobroutes.utils.Scheduler
-import noobroutes.utils.SwapManager
+import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
-import noobroutes.utils.floor
-import noobroutes.utils.skyblock.LocationUtils
-import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
-import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.skyblock.sendChatMessage
 import org.lwjgl.input.Keyboard
 
 object RouteUtils {
@@ -58,7 +50,7 @@ object RouteUtils {
         swapToEtherwarp()
         PlayerUtils.stopVelocity()
         setRotation(yaw, pitch, silent)
-        walking = false
+        AutoP3MovementHandler.resetShit()
         PlayerUtils.unSneak()
         lastRoute = System.currentTimeMillis()
         ether()
@@ -76,7 +68,7 @@ object RouteUtils {
 
     fun pearlClip(distance: Int, silent: Boolean) {
         if (distance > 70) return modMessage("Invalid Clip Distance")
-        walking = false
+        AutoP3MovementHandler.resetShit()
         PlayerUtils.unPressKeys()
         val state = SwapManager.swapFromName("ender pearl")
         if (state == SwapManager.SwapState.UNKNOWN) return
