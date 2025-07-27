@@ -6,7 +6,7 @@ import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.utils.ColorUtil.withAlpha
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.clock.Clock
 import noobroutes.utils.render.*
 import noobroutes.utils.writeToClipboard

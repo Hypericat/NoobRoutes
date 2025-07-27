@@ -11,9 +11,9 @@ import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.LinearAnimation
-import noobroutes.utils.ColorUtil.brighterIf
-import noobroutes.utils.ColorUtil.darkerIf
-import noobroutes.utils.ColorUtil.saturationIf
+import noobroutes.utils.render.ColorUtil.brighterIf
+import noobroutes.utils.render.ColorUtil.darkerIf
+import noobroutes.utils.render.ColorUtil.saturationIf
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.circle
 import noobroutes.utils.render.roundedRectangle

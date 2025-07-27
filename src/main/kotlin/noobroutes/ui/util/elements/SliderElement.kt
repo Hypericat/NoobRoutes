@@ -10,7 +10,7 @@ import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.utils.ColorUtil.brighter
+import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.floor
 import noobroutes.utils.render.*
 import noobroutes.utils.round

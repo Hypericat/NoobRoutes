@@ -14,8 +14,8 @@ import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.utils.ColorUtil.brighter
-import noobroutes.utils.ColorUtil.darkerIf
+import noobroutes.utils.render.ColorUtil.brighter
+import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.*
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard

@@ -21,7 +21,7 @@ import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
-import noobroutes.utils.ColorUtil.darkerIf
+import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.*
 import kotlin.math.floor
 

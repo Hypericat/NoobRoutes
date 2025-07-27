@@ -44,7 +44,7 @@ class ColorSliderElement(
 
         if (dragging) {
             elementValue.hue = getMouseYPercentageInBounds(
-                ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
+                -ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
                 ColorElementsConstants.COLOR_SLIDER_HEIGHT, true
             )
             invokeValueChangeListeners()
@@ -54,8 +54,8 @@ class ColorSliderElement(
 
 
     private inline val isHovered get() = isAreaHovered(
-        ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF,
-        ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
+        -ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF,
+        -ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
         ColorElementsConstants.COLOR_SLIDER_WIDTH,
         ColorElementsConstants.COLOR_SLIDER_HEIGHT,
     )

@@ -7,8 +7,8 @@ import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.EaseInOut
-import noobroutes.utils.ColorUtil.darker
-import noobroutes.utils.ColorUtil.darkerIf
+import noobroutes.utils.render.ColorUtil.darker
+import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text

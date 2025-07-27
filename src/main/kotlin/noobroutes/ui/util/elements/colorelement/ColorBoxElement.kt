@@ -1,10 +1,11 @@
 package noobroutes.ui.util.elements.colorelement
 
 import net.minecraft.client.renderer.GlStateManager
+import noobroutes.Core.logger
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
-import noobroutes.utils.ColorUtil.hsbMax
+import noobroutes.utils.render.ColorUtil.hsbMax
 import noobroutes.utils.render.*
 
 class ColorBoxElement(
@@ -65,6 +66,7 @@ class ColorBoxElement(
     )
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (mouseButton != 0) return false
+        logger.info(isHovered)
         if (isHovered) {
             dragging = true
             return true

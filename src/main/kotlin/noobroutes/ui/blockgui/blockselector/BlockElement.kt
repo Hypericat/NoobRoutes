@@ -3,8 +3,8 @@ package noobroutes.ui.blockgui.blockselector
 import net.minecraft.block.Block
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.util.MouseUtils.isAreaHovered
-import noobroutes.utils.ColorUtil.darker
-import noobroutes.utils.ColorUtil.multiplyAlpha
+import noobroutes.utils.render.ColorUtil.darker
+import noobroutes.utils.render.ColorUtil.multiplyAlpha
 import noobroutes.utils.render.roundedRectangle
 
 abstract class BlockElement(var x: Int, var y: Int) {

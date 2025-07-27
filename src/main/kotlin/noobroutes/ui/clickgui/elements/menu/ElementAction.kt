@@ -8,7 +8,7 @@ import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
 import noobroutes.ui.util.MouseUtils
-import noobroutes.utils.ColorUtil.darker
+import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.TextPos
 import noobroutes.utils.render.roundedRectangle

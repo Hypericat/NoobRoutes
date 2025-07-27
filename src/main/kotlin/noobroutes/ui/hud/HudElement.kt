@@ -11,7 +11,7 @@ import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.hud.EditHUDGui.dragging
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.EaseInOut
-import noobroutes.utils.ColorUtil.withAlpha
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.endProfile
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.rectangleOutline

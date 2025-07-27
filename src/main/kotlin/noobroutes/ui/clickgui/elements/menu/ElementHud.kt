@@ -18,9 +18,9 @@ import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.LinearAnimation
-import noobroutes.utils.ColorUtil.brighter
-import noobroutes.utils.ColorUtil.darker
-import noobroutes.utils.ColorUtil.darkerIf
+import noobroutes.utils.render.ColorUtil.brighter
+import noobroutes.utils.render.ColorUtil.darker
+import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 

@@ -49,10 +49,10 @@ abstract class UiElement(var x: Float, var y: Float) {
         return mouseClicked(mouseButton)
     }
 
-    fun handleMouseReleased(mouseButton: Int): Boolean{
+    fun handleMouseReleased(): Boolean {
         if (!enabled || !visible) return false
-        if (uiChildren.any { it.handleMouseReleased(mouseButton) }) return true
-        return mouseClicked(mouseButton)
+        if (uiChildren.any { it.handleMouseReleased() }) return true
+        return mouseReleased()
     }
 
     fun handleKeyTyped(typedChar: Char, keyCode: Int): Boolean {
@@ -63,15 +63,15 @@ abstract class UiElement(var x: Float, var y: Float) {
 
     open fun draw() {}
 
-    open fun mouseClicked(mouseButton: Int): Boolean {
+    protected open fun mouseClicked(mouseButton: Int): Boolean {
         return false
     }
 
-    open fun mouseReleased(): Boolean {
+    protected open fun mouseReleased(): Boolean {
         return false
     }
 
-    open fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
+    protected open fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
         return false
     }
 

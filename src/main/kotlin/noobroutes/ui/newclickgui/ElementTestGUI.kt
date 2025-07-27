@@ -23,17 +23,17 @@ object ElementTestGUI : Screen() {
     }
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
-        testElements.forEach { it.mouseClicked(mouseButton) }
+        testElements.forEach { it.handleMouseClicked(mouseButton) }
     }
 
     override fun keyTyped(typedChar: Char, keyCode: Int) {
-        if (testElements.any { it.keyTyped(typedChar, keyCode) }) return
+        if (testElements.any { it.handleKeyTyped(typedChar, keyCode) }) return
         super.keyTyped(typedChar, keyCode)
     }
 
     override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
         if (state != 0) return
-        testElements.forEach { it.mouseReleased() }
+        testElements.forEach { it.handleMouseReleased() }
     }
 
 }

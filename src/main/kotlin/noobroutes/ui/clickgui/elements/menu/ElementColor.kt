@@ -17,10 +17,10 @@ import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.EaseInOut
-import noobroutes.utils.ColorUtil.brighter
-import noobroutes.utils.ColorUtil.darker
-import noobroutes.utils.ColorUtil.hsbMax
-import noobroutes.utils.ColorUtil.withAlpha
+import noobroutes.utils.render.ColorUtil.brighter
+import noobroutes.utils.render.ColorUtil.darker
+import noobroutes.utils.render.ColorUtil.hsbMax
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.Utils.COLOR_NORMALIZER
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.render.*

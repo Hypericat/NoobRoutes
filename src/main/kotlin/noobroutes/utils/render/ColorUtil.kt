@@ -1,7 +1,4 @@
-package noobroutes.utils
-
-import noobroutes.features.render.ClickGUIModule
-import noobroutes.utils.render.Color
+package noobroutes.utils.render
 
 object ColorUtil {
 

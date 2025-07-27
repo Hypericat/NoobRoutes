@@ -4,7 +4,7 @@ import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
-import noobroutes.utils.ColorUtil.withAlpha
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.*
 
 class AlphaSliderElement(
@@ -43,8 +43,8 @@ class AlphaSliderElement(
             GradientDirection.Up
         )
         circle(
-            ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF,
-            ColorElementsConstants.COLOR_SLIDER_HEIGHT - ColorElementsConstants.COLOR_SLIDER_HEIGHT * elementValue.alpha,
+            ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF,
+            ColorElementsConstants.COLOR_SLIDER_HEIGHT * (1f - elementValue.alpha),
             ColorElementsConstants.COLOR_SLIDER_CIRCLE_RADIUS,
             Color.Companion.TRANSPARENT,
             Color.Companion.WHITE,

@@ -8,7 +8,7 @@ import noobroutes.ui.util.elements.NumberBoxElement
 import noobroutes.ui.util.elements.TextBoxElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.TEXT_BOX_WIDTH
-import noobroutes.utils.ColorUtil.darker
+import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.Utils.COLOR_NORMALIZER
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Color.Companion.HEX_REGEX

@@ -16,7 +16,7 @@ import noobroutes.ui.Screen
 import noobroutes.ui.clickgui.ClickGUI.draw
 import noobroutes.ui.clickgui.elements.menu.ElementColor
 import noobroutes.ui.clickgui.util.HoverHandler
-import noobroutes.utils.ColorUtil.withAlpha
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.*
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11

@@ -29,20 +29,26 @@ class CubicBezierAnimation(duration: Long, val x1: Float, val y1: Float, val x2:
         }
     }
     override fun get(start: Float, end: Float, reverse: Boolean): Float {
-        if (!isAnimating()) return if (reverse) start else end
+        if (!isAnimating()) return if (reverse) end else start
 
-        val progress = if (reverse) end + (start - end) else start + (end - start)
-        val x = getPercent() * 0.01f
-        if (doCaching) {
-            val selector = (x * CALCULATION_INTERPOLATION_COUNT).toInt().coerceIn(0, INTERPOLATION_COUNT)
-            val interpolationProgress = x - (selector / INTERPOLATION_COUNT.toFloat())
-            val c = cache[selector]
-                ?: throw RuntimeException("Castrophic failure, failed to get cache at selector $selector, $cache")
-            return (c.y + c.dx * interpolationProgress) * progress
+        val progress = getPercent() * 0.01f
+        val x = if (reverse) 1f - progress else progress
+
+        val animationValue = if (doCaching) {
+            val selector = (x * CALCULATION_INTERPOLATION_COUNT).toInt().coerceIn(0, INTERPOLATION_COUNT - 1)
+            val interpolationProgress = (x * CALCULATION_INTERPOLATION_COUNT) - selector
+
+            val currentCache = cache[selector] ?: throw RuntimeException("Failed to get cache at selector $selector")
+            val nextCache = cache[selector + 1] ?: currentCache
+
+            // Linear interpolation between cached values
+            val y = currentCache.y + (nextCache.y - currentCache.y) * interpolationProgress
+            y
+        } else {
+            getCubicBezier(x)
         }
-        else {
-            return progress * getCubicBezier(x)
-        }
+
+        return start + (end - start) * animationValue
     }
 
     private fun bezier(t: Float, p0: Float, p1: Float, p2: Float, p3: Float): Float {

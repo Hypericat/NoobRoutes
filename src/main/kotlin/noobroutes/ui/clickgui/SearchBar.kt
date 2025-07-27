@@ -9,7 +9,7 @@ import noobroutes.ui.ColorPalette.moduleButtonColor
 import noobroutes.ui.clickgui.elements.menu.ElementTextField
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.utils.ColorUtil.withAlpha
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
 

@@ -11,7 +11,7 @@ import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.Screen
 import noobroutes.ui.blockgui.blockselector.BlockSelector
 import noobroutes.ui.util.MouseUtils.isAreaHovered
-import noobroutes.utils.ColorUtil.darkerIf
+import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.*
 
 

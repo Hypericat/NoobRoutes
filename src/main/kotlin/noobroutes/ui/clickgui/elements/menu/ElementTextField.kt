@@ -12,7 +12,7 @@ import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.utils.ColorUtil.brighter
+import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
 

@@ -9,7 +9,7 @@ import noobroutes.ui.blockgui.blockeditor.Element
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.EaseInOut
-import noobroutes.utils.ColorUtil.darkerIf
+import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle
