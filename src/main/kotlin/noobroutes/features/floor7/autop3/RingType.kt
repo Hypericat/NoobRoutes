@@ -1,24 +1,25 @@
 package noobroutes.features.floor7.autop3
 
 import noobroutes.features.floor7.autop3.rings.*
+import kotlin.reflect.KClass
 
-enum class RingType(val ringName: String, val clazz: Class<out Ring>, val commandGenerated: Boolean = true, val canSave: Boolean = true) {
-    BLINK("Blink", BlinkRing::class.java, commandGenerated = false),
-    BLINK_WAYPOINT("Blink_Waypoint", BlinkWaypoint::class.java, commandGenerated = false, canSave = false),
-    BOOM("Boom", BoomRing::class.java),
-    CLAMP("Clamp", ClampRing::class.java),
-    H_CLIP("HClip", HClipRing::class.java),
-    JUMP("Jump", JumpRing::class.java),
-    LAVA_CLIP("LavaClip", LavaClipRing::class.java),
-    MOTION("Motion", MotionRing::class.java),
-    SPEED("Speed", SpedRing::class.java),
-    STOP("Stop", StopRing::class.java),
-    WALK("Walk", WalkRing::class.java);
+enum class RingType(val ringName: String, val ringClass: KClass<out Ring>, val commandGenerated: Boolean = true, val canSave: Boolean = true) {
+    BLINK("Blink", BlinkRing::class, commandGenerated = true),
+    BLINK_WAYPOINT("Blink_Waypoint", BlinkWaypoint::class, commandGenerated = false, canSave = false),
+    BOOM("Boom", BoomRing::class),
+    CLAMP("Clamp", ClampRing::class),
+    H_CLIP("HClip", HClipRing::class),
+    JUMP("Jump", JumpRing::class),
+    LAVA_CLIP("LavaClip", LavaClipRing::class),
+    MOTION("Motion", MotionRing::class),
+    SPEED("Speed", SpedRing::class, commandGenerated = false),
+    STOP("Stop", StopRing::class),
+    WALK("Walk", WalkRing::class);
 
 
     companion object {
         fun getTypeFromName(name: String): RingType? {
-            return entries.firstOrNull {it.name == name}
+            return entries.firstOrNull {it.name.lowercase() == name.lowercase()}
         }
     }
 }

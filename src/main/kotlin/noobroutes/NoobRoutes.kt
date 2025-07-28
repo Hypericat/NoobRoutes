@@ -39,13 +39,14 @@ class NoobRoutes {
             NoobRoutesCommand(),
             AutoP3Command(),
             PathCommand(),
-            CpCommand(),
+            CopyCommand(),
             //AuraTestCommand(),
             //EtherwarpTestCommand(),
             AutoRouteCommand(),
             DynamicRouteCommand(),
             YawPitchCommand(),
-            BrushCommand()
+            BrushCommand(),
+            NoobCommand()
         ).forEach {
             ClientCommandHandler.instance.registerCommand(it)
         }

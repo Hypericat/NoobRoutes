@@ -92,6 +92,7 @@ fun getLook(yaw: Float = mc.thePlayer?.rotationYaw ?: 0f, pitch: Float = mc.theP
     )
 }
 
+
 /**
  * Returns true if the given position is being looked at by the player within the given range.
  * @param aabb The position to check
@@ -212,8 +213,13 @@ private fun isInterceptable3(start: Vec3, goal: Vec3, aabb: AxisAlignedBB): Bool
     } catch (_: Exception) { false }
 }
 
-fun isVecInAABB(vec: Vec3, aabb: AxisAlignedBB): Boolean =
-    vec.xCoord in aabb.minX..aabb.maxX && vec.yCoord in aabb.minY..aabb.maxY && vec.zCoord in aabb.minZ..aabb.maxZ
+fun Vec3.isVecInBounds(minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double): Boolean =
+    this.xCoord in minX..maxX && this.yCoord in minY..maxY && this.zCoord in minZ..maxZ
+
+//fun isVecInBounds(vec: Vec3, minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double): Boolean =
+//    vec.xCoord in minX..maxX && vec.yCoord in minY..maxY && vec.zCoord in minZ..maxZ
+
+
 
 /**
  * Checks if a Vec3 is within the YZ bounds of an axis-aligned bounding box (AABB).

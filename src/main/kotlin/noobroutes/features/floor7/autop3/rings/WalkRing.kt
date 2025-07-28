@@ -1,6 +1,7 @@
 package noobroutes.features.floor7.autop3.rings
 
 import noobroutes.features.floor7.autop3.AutoP3MovementHandler
+import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
@@ -9,9 +10,10 @@ import noobroutes.features.floor7.autop3.RingType
 class WalkRing(
     ringBase: RingBase,
 ) : Ring(ringBase, RingType.WALK) {
-
-    override fun generateRingFromArgs(args: Array<out String>): Ring? {
-        return if (args.any {it == "jump"}) JumpRing(generateRingBaseFromArgs(args), true) else WalkRing(generateRingBaseFromArgs(args))
+    companion object : CommandGenerated {
+        override fun generateRing(args: Array<out String>): Ring? {
+            return if (args.any {it == "jump"}) JumpRing(generateRingBaseFromArgs(args), true) else WalkRing(generateRingBaseFromArgs(args))
+        }
     }
 
     override fun doRing() {

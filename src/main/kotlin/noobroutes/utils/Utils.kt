@@ -25,6 +25,9 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.utils.render.Color
+import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
 import java.util.*
 import kotlin.math.*
@@ -89,6 +92,31 @@ object Utils {
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣦⣤⣤⣤⣶⣦⣿⣿⣶⣾⣿⣥⣤⣤⣬⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
     )
 
+    fun testFunctions(args: Array<out String>) {
+        if (args.size < 2) {
+            modMessage("Test: rel, relp")
+            return
+        }
+        
+        when (args[1].lowercase()) {
+            "relativepos", "relpos", "rel" -> {
+                val blockPos = DungeonUtils.currentRoom?.getRelativeCoords(mc.objectMouseOver.blockPos)  ?: return devMessage("Not in a room")
+                GuiScreen.setClipboardString("BlockPos(${blockPos.x}, ${blockPos.y}, ${blockPos.z})")
+                modMessage(blockPos)
+            }
+
+            "relativeplayerpos", "relppos", "relplayer", "playerrel", "relp" -> {
+                val pos = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector) ?: return
+                GuiScreen.setClipboardString("Vec3(${pos.xCoord}, ${pos.yCoord}, ${pos.zCoord})")
+                modMessage(pos)
+            }
+
+            else -> {
+                modMessage("All tests passed")
+            }
+        }
+    }
+
     var lastPlayerPos = Vec3(0.0, 0.0, 0.0)
     var lastPlayerSpeed = Vec3(0.0, 0.0, 0.0)
 
@@ -111,6 +139,14 @@ object Utils {
     val ItemStack?.ID: Int
         get() = Item.getIdFromItem(this?.item)
 
+}
+
+fun <T> Array<T>.requirement(req: Int): Boolean {
+    return requirement(req, this)
+}
+
+fun <T> requirement(req: Int, args: Array<T>): Boolean {
+    return args.size >= req
 }
 
 /**

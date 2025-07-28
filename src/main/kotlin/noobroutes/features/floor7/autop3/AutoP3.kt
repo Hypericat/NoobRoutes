@@ -10,6 +10,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.logger
 import noobroutes.config.DataManager
 import noobroutes.events.BossEventDispatcher
@@ -20,10 +21,13 @@ import noobroutes.features.Module
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.settings.impl.*
 import noobroutes.utils.Scheduler
+import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
@@ -56,7 +60,8 @@ object AutoP3: Module (
         if (!inF7Boss) return
 
         rings[route]?.forEachIndexed { i, ring ->
-            ring.renderRing()
+            ring.renderRing(if (ring.triggered) Color.RED else ringColor)
+
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = true, shadow = false)
 
             if (ring !is BlinkRing) return@forEachIndexed
@@ -70,17 +75,18 @@ object AutoP3: Module (
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
-        if (!inF7Boss) return
+    fun onMoveEntityWithHeading(event: TickEvent.ClientTickEvent) {
+        if (!event.isEnd || !inF7Boss) return
 
         rings[route]?.forEach { ring ->
             if(!inF7Boss || mc.thePlayer.isSneaking || editMode ) return
 
             if (ring.inRing()) {
                 if (ring.triggered) return@forEach
+                devMessage("running")
                 ring.run()
             }
-
+            else ring.runTriggeredLogic()
         }
     }
 
@@ -105,7 +111,7 @@ object AutoP3: Module (
             }
             modMessage("everyone leaped")
 
-            Scheduler.schedulePostMoveEntityWithHeadingTask {
+            Scheduler.schedulePostTickTask {
                 ring.doRing()
                 waitingRing = null
             }
@@ -118,7 +124,7 @@ object AutoP3: Module (
             if (!ring.term) return
 
             if (ring.inRing()) {
-                Scheduler.schedulePostMoveEntityWithHeadingTask {
+                Scheduler.schedulePostTickTask{
                     ring.doRing()
                     waitingRing = null
                 }
@@ -133,7 +139,7 @@ object AutoP3: Module (
 
         waitingRing?.let { ring ->
             if (ring.inRing()) {
-                Scheduler.schedulePostMoveEntityWithHeadingTask {
+                Scheduler.schedulePostTickTask{
                     ring.doRing()
                     waitingRing = null
                 }
@@ -148,6 +154,19 @@ object AutoP3: Module (
             BossEventDispatcher.currentTerminalPhase == TerminalPhase.S3 -> 3 //ee3
             else -> 4
         }
+    }
+
+    fun getClosestRingToPlayer(): Ring? {
+        return rings[route]?.minBy { it.coords.subtract(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0).distanceToPlayerSq }
+    }
+
+    fun addRing(ring: Ring){
+        rings.getOrPut(route) { mutableListOf() }.add(ring.apply { triggered = true })
+        modMessage("Added ${ring.ringName}")
+    }
+    fun deleteRing(ring: Ring){
+        rings[route]?.remove(ring)
+        modMessage("Deleted: ${ring.ringName}")
     }
 
     /*
@@ -204,7 +223,7 @@ object AutoP3: Module (
                     val ring = it.asJsonObject
                     val ringType = ring.get("type")?.asString ?: "Unknown"
                     val ringClass = RingType.getTypeFromName(ringType)
-                    val instance: Ring = ringClass?.clazz?.getDeclaredConstructor()?.newInstance() ?: return@forEach
+                    val instance: Ring = ringClass?.ringClass?.java?.getDeclaredConstructor()?.newInstance() ?: return@forEach
                     instance.coords = ring.get("coords").asVec3
                     instance.yaw = MathHelper.wrapAngleTo180_float(ring.get("yaw")?.asFloat ?: 0f)
                     instance.term = ring.get("term")?.asBoolean == true

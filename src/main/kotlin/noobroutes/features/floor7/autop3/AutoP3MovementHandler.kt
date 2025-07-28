@@ -4,10 +4,12 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.S08Event
 import noobroutes.utils.Utils
+import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
@@ -31,14 +33,14 @@ object AutoP3MovementHandler {
     private const val TICK2 = 1.99
 
     @SubscribeEvent //stolen from sy? (its just so good)
-    fun handleWalking(event: MoveEntityWithHeadingEvent.Post) {
+    fun handleWalking(event: TickEvent.ClientTickEvent) {
+        if (!event.isEnd || mc.thePlayer == null)
         if (mc.thePlayer?.onGround ?: return) {
             airTicks = 0
         }
         else airTicks++
 
-        val dir = direction ?: return Keyboard.enableRepeatEvents(true)
-        Keyboard.enableRepeatEvents(false)
+        val dir = direction ?: return
 
         if (mc.thePlayer.isInWater || mc.thePlayer.isInLava || motionTicks != -1) return
         val speed = mc.thePlayer.aiMoveSpeed.toDouble()
@@ -67,8 +69,8 @@ object AutoP3MovementHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW) //go after walking
-    fun doMotioning(event: MoveEntityWithHeadingEvent.Post) {
-        if (direction == null || motionTicks == -1) return;
+    fun doMotioning(event: TickEvent.ClientTickEvent) {
+        if (!event.isEnd || direction == null || motionTicks == -1) return;
 
         doMotionTick();
         motionTicks++

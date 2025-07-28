@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3.rings
 
 import com.google.gson.JsonObject
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
@@ -13,25 +14,30 @@ class BlinkRing(
     var packets: List<C04PacketPlayerPosition> = listOf(),
     var endYVelo: Double = 0.0
 ) : Ring(ringBase, RingType.BLINK) {
-    override fun generateRingFromArgs(args: Array<out String>): Ring? {
-        if (args.size < 3) {
-            modMessage("need a length arg (positive number)")
-            return null
-        }
 
-        val length = args[2].toIntOrNull()
-        if (length == null) {
-            modMessage("need a length arg (positive number)")
-            return null
-        }
+    companion object : CommandGenerated {
+        override fun generateRing(args: Array<out String>): Ring? {
+            if (args.size < 3) {
+                modMessage("need a length arg (positive number)")
+                return null
+            }
 
-        if (length < 1) {
-            modMessage("need a number greater than 0")
-            return null
-        }
+            val length = args[2].toIntOrNull()
+            if (length == null) {
+                modMessage("need a length arg (positive number)")
+                return null
+            }
 
-        return BlinkWaypoint(generateRingBaseFromArgs(args), length)
+            if (length < 1) {
+                modMessage("need a number greater than 0")
+                return null
+            }
+
+            return BlinkWaypoint(generateRingBaseFromArgs(args), length)
+        }
     }
+
+
 
 
     init {

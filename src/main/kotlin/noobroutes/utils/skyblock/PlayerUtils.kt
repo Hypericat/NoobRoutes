@@ -152,7 +152,8 @@ object PlayerUtils {
         mc.gameSettings.keyBindLeft,
         mc.gameSettings.keyBindRight,
         mc.gameSettings.keyBindBack,
-        mc.gameSettings.keyBindJump
+        mc.gameSettings.keyBindJump,
+        mc.gameSettings.keyBindSprint
     )
 
     inline val playerControlsKeycodes get() = keyBindings.map { it.keyCode}

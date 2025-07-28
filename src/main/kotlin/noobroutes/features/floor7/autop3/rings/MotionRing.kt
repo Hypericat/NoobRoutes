@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3.rings
 
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.AutoP3MovementHandler
+import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
@@ -13,18 +14,19 @@ class MotionRing(
     var far: Boolean = false,
     var scale: Float = 1f
 ) : Ring(ringBase, RingType.MOTION) {
-
-    override fun generateRingFromArgs(args: Array<out String>): Ring? {
-        if (args.size < 3) {
-            modMessage("need a scale arg (0-1)")
-            return null
+    companion object : CommandGenerated {
+        override fun generateRing(args: Array<out String>): Ring? {
+           if (args.size < 3) {
+               modMessage("need a scale arg (0-1)")
+               return null
+            }
+           val scale = args[2].toFloatOrNull()
+           if (scale == null) {
+               modMessage("need a scale arg (0-1)")
+               return null
+           }
+            return MotionRing(generateRingBaseFromArgs(args), getWalkFromArgs(args), scale)
         }
-        val scale = args[2].toFloatOrNull()
-        if (scale == null) {
-            modMessage("need a scale arg (0-1)")
-            return null
-        }
-        return MotionRing(generateRingBaseFromArgs(args), getWalkFromArgs(args), scale)
     }
 
     init {

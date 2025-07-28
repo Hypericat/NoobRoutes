@@ -1,5 +1,6 @@
 package noobroutes.features.floor7.autop3.rings
 
+import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
@@ -9,7 +10,6 @@ class SpedRing(
     ringBase: RingBase,
     var length: Int = 0
 ) : Ring(ringBase, RingType.SPEED) {
-
 
     init {
         addInt("length", {length}, {length = it})

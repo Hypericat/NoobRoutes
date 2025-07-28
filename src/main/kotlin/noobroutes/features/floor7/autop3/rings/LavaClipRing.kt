@@ -1,6 +1,7 @@
 package noobroutes.features.floor7.autop3.rings
 
 import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
@@ -14,18 +15,19 @@ class LavaClipRing(
     ringBase: RingBase,
     var length: Double = 0.0
 ) : Ring(ringBase, RingType.LAVA_CLIP) {
-
-    override fun generateRingFromArgs(args: Array<out String>): Ring? {
-        if (args.size < 3) {
-            modMessage("need a length arg")
-            return null
+    companion object : CommandGenerated {
+        override fun generateRing(args: Array<out String>): Ring? {
+            if (args.size < 3) {
+                modMessage("need a length arg")
+                return null
+            }
+            val endY = args[2].toDoubleOrNull()?.absoluteValue
+            if (endY == null) {
+                modMessage("need a length arg")
+                return null
+            }
+            return LavaClipRing(generateRingBaseFromArgs(args), endY)
         }
-        val endY = args[2].toDoubleOrNull()?.absoluteValue
-        if (endY == null) {
-            modMessage("need a length arg")
-            return null
-        }
-        return LavaClipRing(generateRingBaseFromArgs(args), endY)
     }
 
     init {

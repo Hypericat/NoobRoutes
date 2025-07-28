@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.BlockPos
 import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
@@ -15,14 +16,15 @@ class BoomRing(
     ringBase: RingBase,
     var block: BlockPos = BlockPos(0, 0, 0),
 ) : Ring(ringBase, RingType.BOOM) {
-    override fun generateRingFromArgs(args: Array<out String>): Ring? {
-        val block = mc.objectMouseOver.blockPos
-        if (isAir(block)) {
-            modMessage("must look at a block")
-            return null
+    companion object : CommandGenerated {
+        override fun generateRing(args: Array<out String>): Ring? {
+            val block = mc.objectMouseOver.blockPos
+            if (isAir(block)) {
+                modMessage("must look at a block")
+                return null
+            }
+            return BoomRing(generateRingBaseFromArgs(args), block)
         }
-        return BoomRing(generateRingBaseFromArgs(args), block)
-
     }
 
 

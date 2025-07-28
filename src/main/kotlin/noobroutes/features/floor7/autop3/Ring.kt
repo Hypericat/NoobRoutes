@@ -1,9 +1,7 @@
 package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonObject
-import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.rings.BlinkRing
@@ -18,6 +16,7 @@ import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 
 
 data class RingBase(
@@ -114,32 +113,6 @@ abstract class Ring(
         return obj
     }
 
-    open fun generateRingFromArgs(args: Array<out String>): Ring? {
-        return null
-    }
-
-    protected fun generateRingBaseFromArgs(args: Array<out String>): RingBase {
-        val diameterString = args.firstOrNull { RingBase.diameterRegex.matches(it) }
-        val diameter = diameterString?.let { RingBase.diameterRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
-        val heightString = args.firstOrNull { RingBase.heightRegex.matches(it) }
-        val height = heightString?.let { RingBase.heightRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
-        return RingBase(
-            mc.thePlayer.positionVector,
-            MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
-            args.any {it == "term"},
-            args.any { it == "leap" },
-            args.any {it == "left"},
-            args.any {it == "center"},
-            args.any {it == "rotate" || it == "look"},
-            diameter,
-            height
-        )
-    }
-
-    protected fun getWalkFromArgs(args: Array<out String>): Boolean {
-        return args.any {it == "walk"}
-    }
-
     protected open fun addPrimitiveRingData(obj: JsonObject){
         internalRingData.forEach { it.writeTo(obj) }
     }
@@ -175,7 +148,7 @@ abstract class Ring(
     }
 
 
-    fun renderRing() {
+    fun renderRing(color: Color) {
         val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
         RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), Color.GREEN, thickness = 3, depth = true)
         if (this.renderYawVector) Renderer.draw3DLine(
@@ -187,7 +160,7 @@ abstract class Ring(
                     this.coords.zCoord
                 )
             ),
-            Color.GREEN,
+            color
         )
     }
 
@@ -201,36 +174,74 @@ abstract class Ring(
         AutoP3MovementHandler.resetShit()
     }
 
-    fun inRing(): Boolean {
-        val ringAABB = AxisAlignedBB(coords.xCoord - diameter * 0.5, coords.yCoord, coords.zCoord - diameter * 0.5, coords.xCoord + diameter * 0.5, coords.yCoord + getRingHeight(), coords.zCoord + diameter * 0.5)
-        return ringAABB.isVecInside(mc.thePlayer.positionVector)
+    open fun runTriggeredLogic() {
+        triggered = false
     }
 
-    private fun getRingHeight(): Float {
-        return if (this is BlinkRing || center) 0f else height
+    fun inRing(): Boolean {
+        if (this is BlinkRing || center) return checkInBoundsWithSpecifiedHeight(height) && mc.thePlayer.onGround
+        return checkInBoundsWithSpecifiedHeight(height)
+    }
+
+    /**
+     * Checks whether the ring structure, defined by its center coordinates and dimensions,
+     * lies entirely within a bounding volume relative to the player's current position in the world.
+     *
+     * This method constructs an axis-aligned bounding box (AABB) around the ring using the provided
+     * `heightToUse` value for the vertical dimension and the ring's diameter for the horizontal dimensions.
+     * It then checks whether the player's position vector is within this box.
+     *
+     * The bounding box is centered horizontally at the specified `coords` (x, z), extending equally
+     * in both the negative and positive directions by half the `diameter`. Vertically, the box starts
+     * from the base y-coordinate of `coords.yCoord` and extends upward by `heightToUse`, allowing for
+     * flexible height configuration—useful for rings of varying vertical size or placement.
+     *
+     * This check is often used to determine whether the ring is still "active" or relevant based on the
+     * player's location—for example, when validating if the player is inside or near a structure, a goal
+     * region, or a visual effect boundary.
+     *
+     * @param heightToUse The height to apply when calculating the upper Y-bound of the bounding box.
+     *        This allows dynamic vertical bounds, independent of the ring’s default dimensions.
+     *
+     * @return true if the player’s position is within the calculated bounding box of the ring, false otherwise.
+     * gay
+     */ //////////////////////////////////////////////////////////////////////////////////////////////////
+    protected fun checkInBoundsWithSpecifiedHeight(heightToUse: Float): Boolean{
+        return mc.thePlayer.positionVector.isVecInBounds(coords.xCoord - diameter * 0.5, coords.yCoord, coords.zCoord - diameter * 0.5, coords.xCoord + diameter * 0.5, coords.yCoord + heightToUse, coords.zCoord + diameter * 0.5)
+    }
+    //////////////////////////////////////////////////////////////////////////////////////////////////////this was so bald
+
+    protected fun center() {
+        PlayerUtils.stopVelocity()
+        mc.thePlayer.isSprinting = false
+        PlayerUtils.unPressKeys()
+
+        Scheduler.schedulePostTickTask {
+            PlayerUtils.setPosition(coords.xCoord, coords.zCoord)
+            if (isAwait) await() else doRing()
+        }
+    }
+
+    protected fun await(){
+        PlayerUtils.stopVelocity()
+        AutoP3.waitingRing = this
     }
 
     fun run() {
         triggered = true
 
-        if (center) {
-            PlayerUtils.stopVelocity()
-            mc.thePlayer.isSprinting = false
-            PlayerUtils.unPressKeys()
-
-            Scheduler.schedulePostMoveEntityWithHeadingTask {
-                PlayerUtils.setPosition(coords.xCoord, coords.zCoord)
-                if (!isAwait) doRing()
-            }
-        }
-
         if (rotate) {
             RouteUtils.setRotation(yaw, 0f, true)
         }
 
+        if (center) {
+            center()
+            if (isAwait) await()
+            return
+        }
+
         if (isAwait) {
-            PlayerUtils.stopVelocity()
-            AutoP3.waitingRing = this
+            await()
             return
         }
 
