@@ -18,7 +18,7 @@ enum class RingType(
     JUMP("Jump", JumpRing::class),
     LAVA_CLIP("LavaClip", LavaClipRing::class, aliases = listOf("lava")),
     MOTION("Motion", MotionRing::class),
-    SPEED("Speed", SpedRing::class, commandGenerated = false, aliases = listOf("sped", "tickshift")),
+    SPEED("Speed", SpedRing::class, commandGenerated = true, aliases = listOf("sped", "tickshift")),
     STOP("Stop", StopRing::class),
     WALK("Walk", WalkRing::class);
 

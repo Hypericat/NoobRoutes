@@ -1,10 +1,15 @@
 package noobroutes.mixin;
 
 import net.minecraft.client.Minecraft;
+import noobroutes.Core;
 import noobroutes.events.impl.ClickEvent;
 import noobroutes.events.impl.InputEvent;
 import noobroutes.features.dungeon.brush.BrushModule;
+import noobroutes.features.floor7.autop3.AutoP3;
 import noobroutes.features.render.FreeCam;
+import noobroutes.utils.Utils;
+import noobroutes.utils.UtilsKt;
+import noobroutes.utils.skyblock.ChatUtilsKt;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +24,7 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 @Mixin(value = {Minecraft.class}, priority = 800)
 public class MixinMinecraft {
 
+
     @Inject(method = {"runTick"}, at = {@At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;dispatchKeypresses()V")})
     public void keyPresses(CallbackInfo ci) {
         if (Keyboard.getEventKeyState()) postAndCatch(new InputEvent.Keyboard((Keyboard.getEventKey() == 0) ? (Keyboard.getEventCharacter() + 256) : Keyboard.getEventKey()));
@@ -28,6 +34,14 @@ public class MixinMinecraft {
     public void mouseKeyPresses(CallbackInfo ci) {
         if (Mouse.getEventButtonState()) postAndCatch(new InputEvent.Mouse(Mouse.getEventButton()));
     }
+
+    @Inject(method = "runTick", at = @At("HEAD"), cancellable = true)
+    public void runTickCanceller$noobroutes(CallbackInfo ci) {
+        if (AutoP3.INSTANCE.getShouldFreeze()) {
+            ci.cancel();
+        }
+    }
+
 
     @Inject(method = "rightClickMouse", at = @At("HEAD"), cancellable = true)
     private void rightClickMouse(CallbackInfo ci) {

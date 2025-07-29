@@ -28,7 +28,9 @@ import noobroutes.features.settings.impl.*
 import noobroutes.ui.ColorPalette
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.Scheduler
+import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
+import noobroutes.utils.coerceMax
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.MovementRenderer
@@ -37,6 +39,7 @@ import noobroutes.utils.render.Renderer
 import noobroutes.utils.render.getTextHeight
 import noobroutes.utils.render.getTextWidth
 import noobroutes.utils.render.text
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
@@ -91,6 +94,8 @@ object AutoP3: Module (
     private var activeBlinkWaypoint: BlinkWaypoint? = null
     private var recordingPacketList = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
 
+    private var clear = 0
+
     private fun resetShit(worldChange: Boolean) {
         blinkSetRotation = null
         movementPackets = mutableListOf()
@@ -138,13 +143,6 @@ object AutoP3: Module (
                 ring.run()
             }
             else ring.runTriggeredLogic()
-        }
-
-        activeBlink?.let {
-            if (it.inRing()) {
-                it.doRing()
-            }
-            else activeBlink = null
         }
 
         if (recordingPacketList.isNotEmpty()) {
@@ -326,6 +324,18 @@ object AutoP3: Module (
         lastMovementedC03 = movementPackets.removeFirst()
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (mc.thePlayer == null || !event.isStart) return
+
+        activeBlink?.let {
+            if (it.inRing()) {
+                it.doRing()
+            }
+            else activeBlink = null
+        }
+    }
+
     fun setBlinkRotation(yaw: Float, pitch: Float) {
         blinkSetRotation = Pair(yaw, pitch)
     }
@@ -334,7 +344,18 @@ object AutoP3: Module (
         dontCancelNextC03 = true
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    var shouldFreeze = false
+        private set
+
+
+
+    @SubscribeEvent
+    fun noTicks(event: RenderWorldLastEvent) {
+        shouldFreeze =
+            !(!inF7Boss || !mc.thePlayer.onGround || mc.thePlayer.motionX != 0.0 || mc.thePlayer.motionZ != 0.0 || PlayerUtils.keyBindings.any { it.isKeyDown })
+    }
+
+    //@SubscribeEvent(priority = EventPriority.LOW)
     fun cancelC03s(event: PacketEvent.Send) {
         if (!inF7Boss || event.packet !is C03PacketPlayer) return
 
@@ -370,7 +391,15 @@ object AutoP3: Module (
         if (event.packet.isOnGround && !event.packet.isMoving && movementPackets.isEmpty()) {
             event.isCanceled = true
             if (cancelled < 400) cancelled++
+            clear = 0
+            return
         }
+        if (clear > 1) {
+            cancelled = 0
+            return
+        }
+        clear++
+
     }
 
     fun startRecording() {
@@ -395,16 +424,6 @@ object AutoP3: Module (
 
     fun setActiveBlinkWaypoint(ring: BlinkWaypoint?) {
         activeBlinkWaypoint = ring
-    }
-
-    @SubscribeEvent
-    fun removePackets(event: TickEvent.ClientTickEvent) {
-        if (!event.isStart || !BossEventDispatcher.inF7Boss) return
-        if (toReset <= 0) {
-            cancelled -= resetAmount.coerceAtMost(cancelled)
-            toReset = (resetInterval * 20).toInt()
-        }
-        toReset--
     }
 
     fun loadRings() {

@@ -11,7 +11,9 @@ import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.runOnMCThread
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.pow
 
@@ -91,6 +93,7 @@ class BlinkRing(
             return
         }
 
+        devMessage("doing Blink")
         doBlink()
     }
 

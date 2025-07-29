@@ -10,6 +10,7 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
+import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
@@ -168,6 +169,23 @@ object PlayerUtils {
     fun rePressKeys() {
         keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, Keyboard.isKeyDown(it.keyCode)) }
     }
+
+    val gameSpeedAccessor = mc as TimerFieldAccessor
+
+    fun setGameSpeed(speed: Float){
+        gameSpeedAccessor.timer.timerSpeed = speed
+        gameSpeedAccessor.timer.updateTimer()
+    }
+
+    fun resetGameSpeed(){
+        gameSpeedAccessor.timer.timerSpeed = 1f
+        gameSpeedAccessor.timer.updateTimer()
+    }
+
+    fun getGameSpeed(): Float {
+        return gameSpeedAccessor.timer.timerSpeed
+    }
+
 }
 
 sealed class ClickType {

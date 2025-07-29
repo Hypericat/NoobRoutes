@@ -120,6 +120,7 @@ object AutoP3MovementHandler {
         val keyCode = Keyboard.getEventKey()
         if (!PlayerUtils.keyBindings.map { it.keyCode }.contains(keyCode) && keyCode != mc.gameSettings.keyBindSneak.keyCode) return
 
+        PlayerUtils.stopVelocity()
         resetShit()
     }
 

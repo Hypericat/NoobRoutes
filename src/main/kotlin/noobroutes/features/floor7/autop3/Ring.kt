@@ -182,7 +182,7 @@ abstract class Ring(
     }
 
     fun inRing(): Boolean {
-        if (center || this is BlinkRing || this is BlinkWaypoint) return checkInBoundsWithSpecifiedHeight(height) && mc.thePlayer.onGround
+        if (center || this is BlinkRing || this is BlinkWaypoint) return checkInBoundsWithSpecifiedHeight(0f) && mc.thePlayer.onGround
         return checkInBoundsWithSpecifiedHeight(height)
     }
 
