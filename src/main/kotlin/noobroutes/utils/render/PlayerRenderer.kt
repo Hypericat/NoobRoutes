@@ -6,6 +6,8 @@ import net.minecraft.client.renderer.entity.RenderPlayer
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.MathHelper
 import noobroutes.Core.mc
+import noobroutes.utils.RotationUtils
+import noobroutes.utils.skyblock.PlayerUtils
 import org.lwjgl.opengl.GL11
 import kotlin.math.PI
 import kotlin.math.abs
@@ -23,11 +25,9 @@ class AnimationGenerator {
     private var swingStartTick = 0
 
     fun generateAnimationFromMovement(
-        currentX: Double, currentY: Double, currentZ: Double,
-        prevX: Double, prevY: Double, prevZ: Double,
-        partialTicks: Float,
-        tempPlayer: EntityOtherPlayerMP,
-        tickCount: Int = mc.theWorld.totalWorldTime.toInt()
+        currentX: Double, currentZ: Double,
+        prevX: Double, prevZ: Double,
+        tempPlayer: EntityOtherPlayerMP
 
     ) {
         val deltaX = currentX - prevX
@@ -35,58 +35,29 @@ class AnimationGenerator {
         val distanceMoved = sqrt(deltaX * deltaX + deltaZ * deltaZ).toFloat()
 
         // Generate walking animation
-        generateWalkingAnimation(distanceMoved, partialTicks, tempPlayer, tickCount)
-
-        // Generate idle animations
-        generateIdleAnimations(tempPlayer, tickCount, partialTicks)
+        generateWalkingAnimation(distanceMoved)
 
         // Copy to entity
-        applyAnimationToEntity(tempPlayer, partialTicks)
+        applyAnimationToEntity(tempPlayer)
     }
     private fun generateWalkingAnimation(
-        distanceMoved: Float,
-        partialTicks: Float,
-        tempPlayer: EntityOtherPlayerMP,
-        tickCount: Int
+        distanceMoved: Float
     ) {
-        // Minecraft's walking animation calculation
         val walkingSpeed = 0.6f
         val isMoving = distanceMoved > 0.001f
 
         if (isMoving) {
-            // Advance limb swing based on distance moved
-            // Minecraft uses distanceWalkedModified which accumulates
             lastLimbSwing += distanceMoved * walkingSpeed
-
-            // Increase swing amount when moving
             lastLimbSwingAmount = min(lastLimbSwingAmount + 0.15f, 1.0f)
         } else {
-            // Decrease swing amount when not moving
             lastLimbSwingAmount = max(lastLimbSwingAmount - 0.15f, 0.0f)
         }
 
-        // Clamp limb swing amount
         lastLimbSwingAmount = MathHelper.clamp_float(lastLimbSwingAmount, 0.0f, 1.0f)
     }
 
-    private fun generateIdleAnimations(
-        tempPlayer: EntityOtherPlayerMP,
-        tickCount: Int,
-        partialTicks: Float
-    ) {
-        // Generate subtle idle movements using sine waves
-        val time = (tickCount + partialTicks) * 0.1f
-
-        // Subtle head bob
-        val headBob = sin(time * 0.5f) * 0.5f
-        tempPlayer.rotationPitch += headBob
-
-        // Breathing-like animation (could affect model scaling if supported)
-        val breathingCycle = sin(time * 0.3f) * 0.02f + 1.0f
-    }
-
-    private fun generateArmSwingAnimation(tickCount: Int, partialTicks: Float): Float {
-        val swingDuration = 6 // ticks for full swing
+    private fun generateArmSwingAnimation(tickCount: Int): Float {
+        val swingDuration = 6
 
         if (isSwinging) {
             val swingTicks = tickCount - swingStartTick
@@ -95,47 +66,45 @@ class AnimationGenerator {
                 return 0f
             }
 
-            // Smooth swing progress (0 to 1 and back to 0)
             val progress = swingTicks.toFloat() / swingDuration.toFloat()
-            return sin(progress * PI.toFloat()) // Sine wave for smooth swing
+            return sin(progress * PI.toFloat())
         }
 
         return 0f
     }
 
-    private fun applyAnimationToEntity(tempPlayer: EntityOtherPlayerMP, partialTicks: Float) {
-        // Apply walking animation
+    private fun applyAnimationToEntity(tempPlayer: EntityOtherPlayerMP) {
         tempPlayer.limbSwing = lastLimbSwing
         tempPlayer.limbSwingAmount = lastLimbSwingAmount
         tempPlayer.prevLimbSwingAmount = max(0f, lastLimbSwingAmount - 0.15f)
 
-        // Apply arm swing
-        val swingProgress = generateArmSwingAnimation(mc.theWorld.totalWorldTime.toInt(), partialTicks)
+        val swingProgress = generateArmSwingAnimation(mc.theWorld.totalWorldTime.toInt())
         tempPlayer.swingProgress = swingProgress
         tempPlayer.prevSwingProgress = max(0f, swingProgress - 0.1f)
         tempPlayer.isSwingInProgress = swingProgress > 0f
 
-        // Set other animation-related properties
-        tempPlayer.onGround = true // Assume on ground for walking animation
+        tempPlayer.onGround = true
         tempPlayer.ticksExisted = mc.theWorld.totalWorldTime.toInt()
     }
 
-    // Trigger arm swing manually
     fun triggerArmSwing() {
         isSwinging = true
         swingStartTick = mc.theWorld.totalWorldTime.toInt()
     }
 }
 
-// Usage in your render function
 class MovementRenderer {
     private val animationGenerator = AnimationGenerator()
+
 
     fun renderPlayerAt(
         currentX: Double, currentY: Double, currentZ: Double,
         prevX: Double, prevY: Double, prevZ: Double,
         partialTicks: Float
     ) {
+
+        val (yaw, pitch) = RotationUtils.getYawAndPitchOrigin(prevX, prevY, prevZ, currentX, currentY + PlayerUtils.STAND_EYE_HEIGHT, currentZ)
+
         val xDiff = currentX - prevX
         val yDiff = currentY - prevY
         val zDiff = currentZ - prevZ
@@ -163,19 +132,16 @@ class MovementRenderer {
             val tempPlayer = EntityOtherPlayerMP(player.worldObj, player.gameProfile)
             tempPlayer.setPosition(0.0, 0.0, 0.0)
 
-            // Copy basic appearance
             for (i in 0..4) {
                 tempPlayer.setCurrentItemOrArmor(i, player.getEquipmentInSlot(i))
             }
-            tempPlayer.rotationYaw = player.rotationYaw
-            tempPlayer.rotationYawHead = player.rotationYawHead
-            tempPlayer.rotationPitch = player.rotationPitch
+            tempPlayer.rotationYaw = yaw
+            tempPlayer.rotationYawHead = yaw
+            tempPlayer.rotationPitch = pitch
 
-            // Generate animation from movement
             animationGenerator.generateAnimationFromMovement(
-                currentX, currentY, currentZ,
-                prevX, prevY, prevZ,
-                partialTicks,
+                currentX, currentZ,
+                prevX, prevZ,
                 tempPlayer
             )
 
@@ -190,7 +156,6 @@ class MovementRenderer {
     }
 }
 
-// Alternative: Simpler approach using just math functions
 fun generateSimpleWalkingAnimation(
     distanceMoved: Float,
     worldTime: Long,
@@ -201,36 +166,34 @@ fun generateSimpleWalkingAnimation(
     val isMoving = distanceMoved > 0.001f
 
     if (isMoving) {
-        // Walking animation using sine waves
+
         tempPlayer.limbSwing = time * 1.5f // Speed of leg swing
         tempPlayer.limbSwingAmount = min(1.0f, distanceMoved * 10f) // Intensity based on speed
 
-        // Add some arm swing when walking
+
         tempPlayer.swingProgress = abs(sin(time * 2f)) * 0.3f
         tempPlayer.isSwingInProgress = tempPlayer.swingProgress > 0.1f
     } else {
-        // Idle animation
-        tempPlayer.limbSwing = time * 0.2f // Slow idle movement
-        tempPlayer.limbSwingAmount = 0.1f // Minimal movement
+
+        tempPlayer.limbSwing = time * 0.2f
+        tempPlayer.limbSwingAmount = 0.1f
         tempPlayer.swingProgress = 0f
         tempPlayer.isSwingInProgress = false
     }
 
-    // Set previous values for smooth interpolation
+
     tempPlayer.prevLimbSwingAmount = tempPlayer.limbSwingAmount * 0.9f
     tempPlayer.prevSwingProgress = tempPlayer.swingProgress * 0.9f
 }
 
-// Even simpler: Just use time-based animation
 fun generateTimeBasedAnimation(tempPlayer: EntityOtherPlayerMP, partialTicks: Float) {
     val time = (System.currentTimeMillis() / 50f + partialTicks) // 50ms per tick
 
-    // Simple walking cycle
     tempPlayer.limbSwing = time * 0.6667f // Default walking speed
     tempPlayer.limbSwingAmount = 0.8f // Moderate swing amount
     tempPlayer.prevLimbSwingAmount = 0.7f
 
-    // Subtle arm movement
+
     tempPlayer.swingProgress = (sin(time * 2f) + 1f) * 0.1f // 0 to 0.2
     tempPlayer.prevSwingProgress = tempPlayer.swingProgress * 0.9f
 

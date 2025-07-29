@@ -1,6 +1,8 @@
 package noobroutes.features.floor7.autop3.rings
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.AutoP3
@@ -43,11 +45,18 @@ class BlinkRing(
         }
     }
 
-
-
-
     init {
         addDouble("endYVelo", {endYVelo}, {endYVelo = it})
+    }
+
+    override fun addRingData(obj: JsonObject) {
+        obj.apply {
+            add("packets", JsonArray().apply {
+                packets.forEach { packet ->
+                    add(JsonPrimitive("${packet.positionX}, ${packet.positionY}, ${packet.positionZ}, ${packet.isOnGround}"))
+                }
+            })
+        }
     }
 
     override fun loadRingData(obj: JsonObject) {

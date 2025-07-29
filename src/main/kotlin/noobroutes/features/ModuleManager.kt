@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.Core.logger
+import noobroutes.Core.mc
 import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
@@ -25,6 +26,7 @@ import noobroutes.features.render.RotationVisualizer
 import noobroutes.features.render.Trail
 import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.impl.KeybindSetting
+import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.capitalizeFirst
@@ -182,7 +184,7 @@ object ModuleManager {
 
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
-        if ((Core.mc.currentScreen != null ) || event.type != RenderGameOverlayEvent.ElementType.ALL || Core.mc.currentScreen == EditHUDGui) return
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL || mc.currentScreen == EditHUDGui || mc.currentScreen == ClickGUI) return
 
         profile("Noobroutes Hud") {
             for (i in 0 until huds.size) {
