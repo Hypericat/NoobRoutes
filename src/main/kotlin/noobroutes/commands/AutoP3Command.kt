@@ -29,7 +29,7 @@ class AutoP3Command: CommandBase() {
                 if (!args.requirement(2)) return modMessage("Rings: ${getCommandGeneratedRings()}")
                 val ringType = RingType.getTypeFromName(args[1])
                     ?: return modMessage("Rings: ${getCommandGeneratedRings()}")
-                val ring = (ringType.ringClass.companionObjectInstance as? CommandGenerated)?.generateRing(args) ?: return modMessage("Failed???")
+                val ring = (ringType.ringClass.companionObjectInstance as? CommandGenerated)?.generateRing(args) ?: return
                 AutoP3.addRing(ring)
             }
             "start" -> {

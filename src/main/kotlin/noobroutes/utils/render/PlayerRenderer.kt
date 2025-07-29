@@ -136,15 +136,23 @@ class MovementRenderer {
         prevX: Double, prevY: Double, prevZ: Double,
         partialTicks: Float
     ) {
+        val xDiff = currentX - prevX
+        val yDiff = currentY - prevY
+        val zDiff = currentZ - prevZ
+
+        val xPos = prevX + xDiff * partialTicks
+        val yPos = prevY + yDiff * partialTicks
+        val zPos = prevZ + zDiff * partialTicks
+
         val renderManager = mc.renderManager
         val player = mc.thePlayer
 
         GlStateManager.pushAttrib()
         GlStateManager.pushMatrix()
 
-        val renderX = currentX - renderManager.viewerPosX
-        val renderY = currentY - renderManager.viewerPosY
-        val renderZ = currentZ - renderManager.viewerPosZ
+        val renderX = xPos - renderManager.viewerPosX
+        val renderY = yPos - renderManager.viewerPosY
+        val renderZ = zPos - renderManager.viewerPosZ
 
         GlStateManager.translate(renderX, renderY, renderZ)
         GlStateManager.enableLighting()
@@ -228,6 +236,4 @@ fun generateTimeBasedAnimation(tempPlayer: EntityOtherPlayerMP, partialTicks: Fl
 
     tempPlayer.onGround = true
     tempPlayer.ticksExisted = (time).toInt()
-}
-
 }

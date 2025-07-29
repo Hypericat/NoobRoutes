@@ -30,6 +30,7 @@ import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Color
+import noobroutes.utils.render.MovementRenderer
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.render.getTextHeight
@@ -216,6 +217,7 @@ object AutoP3: Module (
     }
 
 
+    val movementRenderer = MovementRenderer()
     @SubscribeEvent
     fun renderMovement(event: RenderWorldLastEvent) {
         if(!inF7Boss || movementPackets.isEmpty() || !movementMode) return
@@ -223,14 +225,17 @@ object AutoP3: Module (
         val beforeFirst = lastMovementedC03
 
 
-        val xDiff = firstPacket.positionX - beforeFirst.positionX
-        val yDiff = firstPacket.positionY - beforeFirst.positionY
-        val zDiff = firstPacket.positionZ - beforeFirst.positionZ
 
-        val xPos = beforeFirst.positionX + xDiff * event.partialTicks
-        val yPos = beforeFirst.positionY + yDiff * event.partialTicks
-        val zPos = beforeFirst.positionZ + zDiff * event.partialTicks
 
+        movementRenderer.renderPlayerAt(
+            firstPacket.positionX,
+            firstPacket.positionY,
+            firstPacket.positionZ,
+            beforeFirst.positionX,
+            beforeFirst.positionY,
+            beforeFirst.positionZ,
+            event.partialTicks
+        )
         //Renderer.renderPlayerAt(xPos, yPos, zPos)
 /*
         Renderer.drawBox(
