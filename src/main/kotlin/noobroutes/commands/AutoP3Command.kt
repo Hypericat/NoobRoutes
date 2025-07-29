@@ -23,7 +23,7 @@ class AutoP3Command: CommandBase() {
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, Blink, Start, Restore, Load")
+        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, clearWaypoints, Start, Restore, Load")
         when (args[0].lowercase()) {
             "add" -> {
                 if (!args.requirement(2)) return modMessage("Rings: ${getCommandGeneratedRings()}")
@@ -39,6 +39,10 @@ class AutoP3Command: CommandBase() {
             "end" -> {
                 BossEventDispatcher.inF7Boss = false
                 modMessage("ended boss")
+            }
+            "clearwaypoints" -> {
+                AutoP3.setActiveBlinkWaypoint(null)
+                modMessage("cleared the waypoint")
             }
             "load" -> {
                 AutoP3.loadRings()
@@ -67,9 +71,9 @@ class AutoP3Command: CommandBase() {
     ): List<String?>? {
         return when (args.size) {
             0 -> getListOfStringsMatchingLastWord(args, listOf("ap3", "p3", "sigma69420autop3gamertime"))
-            1 -> getListOfStringsMatchingLastWord(args, listOf("add", "delete", "blink", "start", "restore", "load"))
+            1 -> getListOfStringsMatchingLastWord(args, listOf("add", "delete", "clearwaypoints", "start", "restore", "load"))
             2 -> when (args[1]) { //I hate the amount of nesting here
-                "add" -> getListOfStringsMatchingLastWord(args, RingType.entries.filter { it.commandGenerated }.map { it.ringName })
+                "add" -> getListOfStringsMatchingLastWord(args, RingType.entries.filter { it.commandGenerated }.map { it.ringName }.toList())
                 else -> null
             }
             else -> null

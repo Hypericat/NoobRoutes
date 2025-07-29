@@ -9,6 +9,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
@@ -90,6 +91,22 @@ object AutoP3: Module (
     private var activeBlinkWaypoint: BlinkWaypoint? = null
     private var recordingPacketList = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
 
+    private fun resetShit(worldChange: Boolean) {
+        blinkSetRotation = null
+        movementPackets = mutableListOf()
+        blinkMovementPacketSkip = false
+        activeBlink = null
+        activeBlinkWaypoint = null
+        recordingPacketList = mutableListOf()
+
+        if (!worldChange) return
+
+        dontCancelNextC03 = false
+        cancelled = 0
+        toReset = 0
+        blinksThisInstance = 0
+    }
+
     @SubscribeEvent
     fun renderRings(event: RenderWorldLastEvent) {
         if (!inF7Boss) return
@@ -103,9 +120,9 @@ object AutoP3: Module (
 
             val lastPacket = ring.packets.last()
 
-            ring.drawCylinderWithRingArgs(Vec3(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ), ringColor)
+            ring.drawCylinderWithRingArgs(Vec3(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ), Color.RED)
 
-            RenderUtils.drawGradient3DLine(ring.packets.map { Vec3(it.positionX, it.positionY + 0.03, it.positionZ) }, Color.GREEN, Color.RED, 1F, true)
+            RenderUtils.drawGradient3DLine(ring.packets.map { Vec3(it.positionX, it.positionY + 0.03, it.positionZ) }, ringColor, Color.RED, 1F, true)
         }
 
         activeBlinkWaypoint?.renderRing(Color.WHITE)
@@ -113,11 +130,11 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
-        if (!inF7Boss || mc.thePlayer.isSneaking || editMode) return
+        if (!inF7Boss || mc.thePlayer.isSneaking || editMode || movementPackets.isNotEmpty()) return
 
         rings[route]?.forEach { ring ->
             if (ring.inRing()) {
-                if (ring.triggered || movementPackets.isNotEmpty()) return@forEach
+                if (ring.triggered) return@forEach
                 ring.run()
             }
             else ring.runTriggeredLogic()
@@ -130,9 +147,33 @@ object AutoP3: Module (
             else activeBlink = null
         }
 
-        if (activeBlinkWaypoint?.inRing() == true && activeBlinkWaypoint?.triggered == false) {
-            startRecording()
+        if (recordingPacketList.isNotEmpty()) {
+            val blinkWaypoint = activeBlinkWaypoint ?: return handleMissingWaypoint()
+
+            val c04ToAdd = C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, mc.thePlayer.onGround)
+            if (c04ToAdd == recordingPacketList.last()) return
+
+            recordingPacketList.add(c04ToAdd)
+            modMessage("recording")
+
+            if (recordingPacketList.size >= blinkWaypoint.length) {
+                addRing(BlinkRing(blinkWaypoint.base, recordingPacketList, mc.thePlayer.motionY))
+                recordingPacketList = mutableListOf()
+            }
         }
+
+        activeBlinkWaypoint?.let {
+            if (it.inRing()) {
+                if (!it.triggered) startRecording()
+                it.triggered = true
+            }
+            else it.triggered = false
+        }
+    }
+
+    fun handleMissingWaypoint() {
+        modMessage("the blink waypoint was deleted while recording. dont do that shit. bad boy")
+        recordingPacketList = mutableListOf()
     }
 
     @SubscribeEvent
@@ -216,6 +257,20 @@ object AutoP3: Module (
         modMessage("Deleted: ${ring.ringName}")
     }
 
+    @SubscribeEvent
+    fun onS08(event: S08Event) {
+        resetShit(false)
+    }
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        resetShit(true)
+    }
+
+    @SubscribeEvent
+    fun onWorldUnload(event: WorldEvent.Unload) {
+        resetShit(true)
+    }
 
     val movementRenderer = MovementRenderer()
     @SubscribeEvent
@@ -279,7 +334,7 @@ object AutoP3: Module (
         dontCancelNextC03 = true
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun cancelC03s(event: PacketEvent.Send) {
         if (!inF7Boss || event.packet !is C03PacketPlayer) return
 
@@ -312,14 +367,14 @@ object AutoP3: Module (
             return
         }
 
-        if (event.packet.isOnGround && !event.packet.isMoving) {
+        if (event.packet.isOnGround && !event.packet.isMoving && movementPackets.isEmpty()) {
             event.isCanceled = true
             if (cancelled < 400) cancelled++
         }
     }
 
     fun startRecording() {
-
+        recordingPacketList.add(C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, mc.thePlayer.onGround))
     }
 
     fun getMaxBlinks(): Int {
@@ -338,7 +393,7 @@ object AutoP3: Module (
         activeBlink = ring
     }
 
-    fun setActiveBlinkWaypoint(ring: BlinkWaypoint) {
+    fun setActiveBlinkWaypoint(ring: BlinkWaypoint?) {
         activeBlinkWaypoint = ring
     }
 

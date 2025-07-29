@@ -38,7 +38,7 @@ class BlinkRing(
                 return null
             }
 
-            AutoP3.setActiveBlinkWaypoint(BlinkWaypoint(generateRingBaseFromArgs(args), length))
+            AutoP3.setActiveBlinkWaypoint(BlinkWaypoint(generateRingBaseFromArgs(args), length).apply { triggered = true })
             return null
         }
     }
@@ -67,6 +67,10 @@ class BlinkRing(
 
     override fun doRing() {
         super.doRing()
+
+        PlayerUtils.stopVelocity()
+        mc.thePlayer.isSprinting = false
+        PlayerUtils.unPressKeys()
 
         if (AutoP3.blinksThisInstance + packets.size > AutoP3.getMaxBlinks()) {
            doMovement()
