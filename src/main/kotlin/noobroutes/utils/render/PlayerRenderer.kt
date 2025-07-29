@@ -19,8 +19,6 @@ import kotlin.math.sqrt
 class AnimationGenerator {
     private var lastLimbSwing = 0f
     private var lastLimbSwingAmount = 0f
-    private var lastSwingProgress = 0f
-    private var lastTickCount = 0
     private var isSwinging = false
     private var swingStartTick = 0
 
@@ -33,11 +31,7 @@ class AnimationGenerator {
         val deltaX = currentX - prevX
         val deltaZ = currentZ - prevZ
         val distanceMoved = sqrt(deltaX * deltaX + deltaZ * deltaZ).toFloat()
-
-        // Generate walking animation
         generateWalkingAnimation(distanceMoved)
-
-        // Copy to entity
         applyAnimationToEntity(tempPlayer)
     }
     private fun generateWalkingAnimation(
@@ -95,7 +89,9 @@ class AnimationGenerator {
 
 class MovementRenderer {
     private val animationGenerator = AnimationGenerator()
-
+    var lastYaw: Float = 0f
+    var lastPitch: Float = 0f
+    private var lastBodyYaw: Float = 0f
 
     fun renderPlayerAt(
         currentX: Double, currentY: Double, currentZ: Double,
@@ -125,7 +121,15 @@ class MovementRenderer {
 
         GlStateManager.translate(renderX, renderY, renderZ)
         GlStateManager.enableLighting()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 0.8f)
+        GlStateManager.enableLight(0)
+        GlStateManager.enableLight(1)
+        GlStateManager.enableColorMaterial()
+        GlStateManager.enableAlpha()
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1f)
+        GlStateManager.enableBlend()
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1f)
+
 
         try {
             val playerRenderer = renderManager.getEntityRenderObject<EntityPlayer>(player) as RenderPlayer
@@ -135,9 +139,25 @@ class MovementRenderer {
             for (i in 0..4) {
                 tempPlayer.setCurrentItemOrArmor(i, player.getEquipmentInSlot(i))
             }
-            tempPlayer.rotationYaw = yaw
+            val targetBodyYaw = yaw
+            val bodyYawDiff = MathHelper.wrapAngleTo180_float(targetBodyYaw - lastBodyYaw)
+            val smoothedBodyYaw = lastBodyYaw + bodyYawDiff * 0.3f
+
+            tempPlayer.prevRotationYaw = lastYaw
+            tempPlayer.prevRotationYawHead = lastYaw
+
+
+            tempPlayer.prevRotationPitch = lastPitch
+
+            tempPlayer.rotationYaw = smoothedBodyYaw
+            tempPlayer.renderYawOffset = smoothedBodyYaw
+            tempPlayer.prevRenderYawOffset = lastBodyYaw
             tempPlayer.rotationYawHead = yaw
             tempPlayer.rotationPitch = pitch
+
+            lastPitch = pitch
+            lastYaw = yaw
+            lastBodyYaw = smoothedBodyYaw
 
             animationGenerator.generateAnimationFromMovement(
                 currentX, currentZ,
@@ -167,8 +187,8 @@ fun generateSimpleWalkingAnimation(
 
     if (isMoving) {
 
-        tempPlayer.limbSwing = time * 1.5f // Speed of leg swing
-        tempPlayer.limbSwingAmount = min(1.0f, distanceMoved * 10f) // Intensity based on speed
+        tempPlayer.limbSwing = time * 1.5f
+        tempPlayer.limbSwingAmount = min(1.0f, distanceMoved * 10f)
 
 
         tempPlayer.swingProgress = abs(sin(time * 2f)) * 0.3f
@@ -187,14 +207,14 @@ fun generateSimpleWalkingAnimation(
 }
 
 fun generateTimeBasedAnimation(tempPlayer: EntityOtherPlayerMP, partialTicks: Float) {
-    val time = (System.currentTimeMillis() / 50f + partialTicks) // 50ms per tick
+    val time = (System.currentTimeMillis() / 50f + partialTicks)
 
-    tempPlayer.limbSwing = time * 0.6667f // Default walking speed
-    tempPlayer.limbSwingAmount = 0.8f // Moderate swing amount
+    tempPlayer.limbSwing = time * 0.6667f
+    tempPlayer.limbSwingAmount = 0.8f
     tempPlayer.prevLimbSwingAmount = 0.7f
 
 
-    tempPlayer.swingProgress = (sin(time * 2f) + 1f) * 0.1f // 0 to 0.2
+    tempPlayer.swingProgress = (sin(time * 2f) + 1f) * 0.1f
     tempPlayer.prevSwingProgress = tempPlayer.swingProgress * 0.9f
 
     tempPlayer.onGround = true
