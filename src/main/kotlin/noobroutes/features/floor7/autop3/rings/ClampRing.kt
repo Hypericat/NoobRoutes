@@ -12,7 +12,7 @@ import noobroutes.utils.Utils.zPart
 
 
 class ClampRing(
-    ringBase: RingBase = RingBase(Vec3(0.0, 0.0, 0.0), 0f, false, false, false, false, false, 1f, 1f),
+    ringBase: RingBase = RingBase(),
     var walk: Boolean = false
 ) : Ring(ringBase, RingType.CLAMP) {
     companion object : CommandGenerated {

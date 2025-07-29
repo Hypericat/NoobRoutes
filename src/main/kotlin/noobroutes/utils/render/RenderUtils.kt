@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core
 import noobroutes.Core.mc
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.utils.Utils.COLOR_NORMALIZER
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13
@@ -127,7 +128,7 @@ object RenderUtils {
 
     fun Color.bind() {
         GlStateManager.resetColor()
-        GlStateManager.color(r / 255f, g / 255f, b / 255f, a / 255f)
+        GlStateManager.color(r * COLOR_NORMALIZER, g * COLOR_NORMALIZER, b * COLOR_NORMALIZER, a * COLOR_NORMALIZER)
     }
 
     /**

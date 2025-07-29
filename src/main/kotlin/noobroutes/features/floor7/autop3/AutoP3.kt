@@ -21,6 +21,7 @@ import noobroutes.events.impl.*
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.floor7.autop3.rings.BlinkRing
+import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.ColorPalette
@@ -38,7 +39,6 @@ import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
-import kotlin.properties.Delegates
 
 object AutoP3: Module (
     name = "AutoP3",
@@ -61,14 +61,14 @@ object AutoP3: Module (
     val walkBoost by SelectorSetting("Walk Boost", "none", arrayListOf("none", "normal", "big"), description = "how much of a boost to apply walking of edges. Non none values might lagback more").withDependency { editShit }
 
     private val blinkShit by DropdownSetting("Blink Settings", false)
-    private val maxBlink by NumberSetting("Max Blink", 150, 100, 400, description = "How many packets can be blinked on one instance").withDependency { blinkShit }
+    private val maxBlink by NumberSetting("Max Blink", 150, 0, 400, description = "How many packets can be blinked on one instance").withDependency { blinkShit }
     private val resetAmount by NumberSetting("Remove Amount", 50, 0, 200, description = "When removing packets from the counter how many to remove").withDependency { blinkShit }
-    private val resetInterval by NumberSetting("Remove Interval", 1.0, 5.0, 20.0,0.05, unit = "s" , description = "In what interval to remove packets from the counter").withDependency { blinkShit }
+    private val resetInterval by NumberSetting("Remove Interval", 5.0, 5.0, 20.0,0.05, unit = "s" , description = "In what interval to remove packets from the counter").withDependency { blinkShit }
     private val balanceHud by HudSetting("Balance Hud", 400f, 400f, 1f, false) {
         if (inF7Boss) text(cancelled.toString(), 1f, 1f, ColorPalette.text, 13f)
         getTextWidth("400", 13f) to getTextHeight("400", 13f)
     }.withDependency { blinkShit }
-    private val movementMode by DualSetting("Movement Mode", "Silent", "Playback", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
+    private val movementMode by DualSetting("Movement Mode","Playback", "Silent", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
 
 
     var waitingRing: Ring? = null
@@ -80,11 +80,14 @@ object AutoP3: Module (
     var cancelled = 0
     private var toReset = 0
     var blinksThisInstance = 0
-    private var movementPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
+    var movementPackets = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
     private lateinit var lastMovementedC03: C03PacketPlayer.C04PacketPlayerPosition
     private var blinkMovementPacketSkip = false
-    private var endY by Delegates.notNull<Double>()
+    private var endY = 0.0
+    private var activeBlink: BlinkRing? = null
 
+    private var activeBlinkWaypoint: BlinkWaypoint? = null
+    private var recordingPacketList = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
 
     @SubscribeEvent
     fun renderRings(event: RenderWorldLastEvent) {
@@ -103,20 +106,31 @@ object AutoP3: Module (
 
             RenderUtils.drawGradient3DLine(ring.packets.map { Vec3(it.positionX, it.positionY + 0.03, it.positionZ) }, Color.GREEN, Color.RED, 1F, true)
         }
+
+        activeBlinkWaypoint?.renderRing(Color.WHITE)
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
-        if (!inF7Boss) return
+        if (!inF7Boss || mc.thePlayer.isSneaking || editMode) return
 
         rings[route]?.forEach { ring ->
-            if(!inF7Boss || mc.thePlayer.isSneaking || editMode ) return
-
             if (ring.inRing()) {
-                if (ring.triggered) return@forEach
+                if (ring.triggered || movementPackets.isNotEmpty()) return@forEach
                 ring.run()
             }
             else ring.runTriggeredLogic()
+        }
+
+        activeBlink?.let {
+            if (it.inRing()) {
+                it.doRing()
+            }
+            else activeBlink = null
+        }
+
+        if (activeBlinkWaypoint?.inRing() == true && activeBlinkWaypoint?.triggered == false) {
+            startRecording()
         }
     }
 
@@ -142,7 +156,7 @@ object AutoP3: Module (
             modMessage("everyone leaped")
 
             Scheduler.schedulePostMoveEntityWithHeadingTask {
-                ring.doRing()
+                ring.maybeDoRing()
                 waitingRing = null
             }
         }
@@ -155,7 +169,7 @@ object AutoP3: Module (
 
             if (ring.inRing()) {
                 Scheduler.schedulePostMoveEntityWithHeadingTask{
-                    ring.doRing()
+                    ring.maybeDoRing()
                     waitingRing = null
                 }
             }
@@ -170,7 +184,7 @@ object AutoP3: Module (
         waitingRing?.let { ring ->
             if (ring.inRing()) {
                 Scheduler.schedulePostMoveEntityWithHeadingTask{
-                    ring.doRing()
+                    ring.maybeDoRing()
                     waitingRing = null
                 }
             }
@@ -208,6 +222,7 @@ object AutoP3: Module (
         val firstPacket = movementPackets.first()
         val beforeFirst = lastMovementedC03
 
+
         val xDiff = firstPacket.positionX - beforeFirst.positionX
         val yDiff = firstPacket.positionY - beforeFirst.positionY
         val zDiff = firstPacket.positionZ - beforeFirst.positionZ
@@ -215,6 +230,9 @@ object AutoP3: Module (
         val xPos = beforeFirst.positionX + xDiff * event.partialTicks
         val yPos = beforeFirst.positionY + yDiff * event.partialTicks
         val zPos = beforeFirst.positionZ + zDiff * event.partialTicks
+
+        //Renderer.renderPlayerAt(xPos, yPos, zPos)
+/*
         Renderer.drawBox(
             AxisAlignedBB(
                 xPos + 0.3,
@@ -224,11 +242,14 @@ object AutoP3: Module (
                 yPos + 1.8,
                 zPos - 0.3
             ), Color.Companion.GREEN, fillAlpha = 0, outlineWidth = 1.5F)
+
+ */
     }
 
     @SubscribeEvent
     fun movement(event: PacketEvent.Send) {
         if (movementPackets.isEmpty() || event.packet !is C03PacketPlayer) return
+
         if (blinkMovementPacketSkip) {
             blinkMovementPacketSkip = false
             return
@@ -236,6 +257,7 @@ object AutoP3: Module (
         event.isCanceled = true
         blinkMovementPacketSkip = true
         PacketUtils.sendPacket(movementPackets[0])
+
         if (!AutoP3.movementMode) mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)
         if (movementPackets.size == 1) {
             mc.thePlayer.motionY = endY
@@ -291,8 +313,32 @@ object AutoP3: Module (
         }
     }
 
+    fun startRecording() {
+
+    }
+
+    fun getMaxBlinks(): Int {
+        return maxBlink
+    }
+
+    fun setEndY(endYVelo: Double) {
+        endY = endYVelo
+    }
+
+    fun setLastMovementedC03(c04: C03PacketPlayer.C04PacketPlayerPosition) {
+        lastMovementedC03 = c04
+    }
+
+    fun setActiveBlink(ring: BlinkRing) {
+        activeBlink = ring
+    }
+
+    fun setActiveBlinkWaypoint(ring: BlinkWaypoint) {
+        activeBlinkWaypoint = ring
+    }
+
     @SubscribeEvent
-    fun resetter(event: TickEvent.ClientTickEvent) {
+    fun removePackets(event: TickEvent.ClientTickEvent) {
         if (!event.isStart || !BossEventDispatcher.inF7Boss) return
         if (toReset <= 0) {
             cancelled -= resetAmount.coerceAtMost(cancelled)

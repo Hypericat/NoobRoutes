@@ -29,6 +29,8 @@ data class RingBase(
     var rotate: Boolean,
     var diameter: Float,
     var height: Float) {
+    constructor() : this(Vec3(0.0, 0.0, 0.0), 0f, false, false, false, false, false, 1f, 1f)
+
     companion object {
         val diameterRegex = Regex("""d:(\d+)""")
         val heightRegex = Regex("""h:(\d+)""")
@@ -218,7 +220,7 @@ abstract class Ring(
 
         Scheduler.schedulePostMoveEntityWithHeadingTask {
             PlayerUtils.setPosition(coords.xCoord, coords.zCoord)
-            if (isAwait) await() else doRing()
+            if (isAwait) await() else maybeDoRing()
         }
     }
 
@@ -228,6 +230,7 @@ abstract class Ring(
     }
 
     fun run() {
+
         triggered = true
 
         if (rotate) {
@@ -245,6 +248,11 @@ abstract class Ring(
             return
         }
 
-        doRing()
+        maybeDoRing()
+    }
+
+    fun maybeDoRing() {
+        if (this !is BlinkRing) doRing()
+        else AutoP3.setActiveBlink(this)
     }
 }

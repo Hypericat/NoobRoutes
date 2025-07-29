@@ -13,7 +13,7 @@ import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
 
 class HClipRing(
-    ringBase: RingBase = RingBase(Vec3(0.0, 0.0, 0.0), 0f, false, false, false, false, false, 1f, 1f),
+    ringBase: RingBase = RingBase(),
     var walk: Boolean = false,
     var insta: Boolean = false
 ) : Ring(ringBase, RingType.H_CLIP) {

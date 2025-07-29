@@ -2,16 +2,20 @@ package noobroutes.features.floor7.autop3.rings
 
 import com.google.gson.JsonObject
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
-import net.minecraft.util.Vec3
+import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
+import noobroutes.utils.PacketUtils
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
+import kotlin.math.pow
 
 
 class BlinkRing(
-    ringBase: RingBase = RingBase(Vec3(0.0, 0.0, 0.0), 0f, false, false, false, false, false, 1f, 1f),
+    ringBase: RingBase = RingBase(),
     var packets: List<C04PacketPlayerPosition> = listOf(),
     var endYVelo: Double = 0.0
 ) : Ring(ringBase, RingType.BLINK) {
@@ -34,7 +38,8 @@ class BlinkRing(
                 return null
             }
 
-            return BlinkWaypoint(generateRingBaseFromArgs(args), length)
+            AutoP3.setActiveBlinkWaypoint(BlinkWaypoint(generateRingBaseFromArgs(args), length))
+            return null
         }
     }
 
@@ -63,79 +68,52 @@ class BlinkRing(
     override fun doRing() {
         super.doRing()
 
-
-    }
-/*
-    override fun ringCheckY(): Boolean {
-        return coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround
-    }
-
-
-    override fun addRingData(obj: JsonObject) {
-        obj.apply {
-            add("packets", JsonArray().apply {
-                packets.forEach { packet ->
-                    add(JsonPrimitive("${packet.positionX}, ${packet.positionY}, ${packet.positionZ}, ${packet.isOnGround}"))
-                }
-            })
+        if (AutoP3.blinksThisInstance + packets.size > AutoP3.getMaxBlinks()) {
+           doMovement()
+            return
         }
+
+        if (AutoP3.cancelled < packets.size) {
+            PlayerUtils.stopVelocity()
+            return
+        }
+
+        doBlink()
     }
 
-    override fun doRing() {
-        if (movementPackets.isNotEmpty()) return
-
-        AutoP3Utils.unPressKeys()
-
-        val canBlinkNow = System.currentTimeMillis() - lastBlink >= 500
-        val notEnoughPackets = cancelled < packets.size
-        val exceedsBlinkLimit = blinksInstance + packets.size > AutoP3.maxBlinks
-        val blinkDisabled = !AutoP3.blink
-
+    private fun doMovement() {
         val firstPacket = packets.first()
         val toFar = mc.thePlayer.getDistanceSq(firstPacket.positionX, firstPacket.positionY, firstPacket.positionZ) > ( PlayerUtils.getPlayerWalkSpeed() * 2.806).pow(2)
 
-        if (exceedsBlinkLimit || blinkDisabled) {
-            if (toFar && cancelled > 0) {
-                PacketUtils.sendPacket(C04PacketPlayerPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord, mc.thePlayer.onGround))
-                cancelled--
-            }
-            if (AutoP3.renderStyle == 3) modMessage("Moving", "§0[§6Yharim§0]§7 ")
-            movementPackets = packets.toMutableList()
-            mc.thePlayer.motionX = 0.0
-            mc.thePlayer.motionZ = 0.0
-            endY = endYVelo
-            lastBlink = System.currentTimeMillis()
-            resetTriggered()
-            return
-        }
-        
-        if (!canBlinkNow || (notEnoughPackets)) {
-            mc.thePlayer.motionX = 0.0
-            mc.thePlayer.motionZ = 0.0
-            return
+        if (toFar && AutoP3.cancelled > 0) {
+            PacketUtils.sendPacket(C04PacketPlayerPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord, mc.thePlayer.onGround))
+            AutoP3.cancelled--
         }
 
-        if (toFar && cancelled > 0) {
+        AutoP3.setLastMovementedC03(firstPacket)
+        AutoP3.movementPackets = packets.toMutableList()
+        PlayerUtils.stopVelocity()
+        AutoP3.setEndY(endYVelo)
+    }
+
+    private fun doBlink() {
+        val firstPacket = packets.first()
+        val toFar = mc.thePlayer.getDistanceSq(firstPacket.positionX, firstPacket.positionY, firstPacket.positionZ) > ( PlayerUtils.getPlayerWalkSpeed() * 2.806).pow(2)
+
+        if (toFar && AutoP3.cancelled > 0) {
             PacketUtils.sendPacket(C04PacketPlayerPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord, mc.thePlayer.onGround))
-            cancelled--
+            AutoP3.cancelled--
         }
-        
-        blinksInstance += packets.size
-        Blink.cancelled -= packets.size
-        lastBlink = System.currentTimeMillis()
+
+        AutoP3.blinksThisInstance += packets.size
+        AutoP3.cancelled -= packets.size
+
         packets.forEach { PacketUtils.sendPacket(it) }
+
         val lastPacket = packets.last()
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
-        AutoP3.isAligned = true
         mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
-        resetTriggered()
-        if (AutoP3.renderStyle == 3) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
-        else modMessage("§c§l$cancelled§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
-    }
 
-    private fun resetTriggered() {
-        Scheduler.schedulePreTickTask(60) { triggered = false }
+        modMessage("§c§l${AutoP3.cancelled}§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.getMaxBlinks() - AutoP3.blinksThisInstance} left on this instance)")
     }
-
- */
 }

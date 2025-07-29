@@ -8,7 +8,7 @@ import noobroutes.features.floor7.autop3.RingType
 
 
 class SpedRing(
-    ringBase: RingBase = RingBase(Vec3(0.0, 0.0, 0.0), 0f, false, false, false, false, false, 1f, 1f),
+    ringBase: RingBase = RingBase(),
     var length: Int = 0
 ) : Ring(ringBase, RingType.SPEED) {
 

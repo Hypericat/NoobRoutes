@@ -116,10 +116,9 @@ object AutoP3MovementHandler {
 
     @SubscribeEvent
     fun onKeyInput(event: InputEvent.KeyInputEvent) {
-        if (direction == null) return
+        if (direction == null || !Keyboard.getEventKeyState()) return
         val keyCode = Keyboard.getEventKey()
-        if (!PlayerUtils.keyBindings.map { it.keyCode }.contains(keyCode)) return
-        if (!Keyboard.getEventKeyState()) return
+        if (!PlayerUtils.keyBindings.map { it.keyCode }.contains(keyCode) && keyCode != mc.gameSettings.keyBindSneak.keyCode) return
 
         resetShit()
     }
