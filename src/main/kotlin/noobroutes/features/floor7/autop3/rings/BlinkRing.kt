@@ -58,6 +58,12 @@ class BlinkRing(
         }
         packets = packetsLoaded
     }
+
+    override fun doRing() {
+        super.doRing()
+
+
+    }
 /*
     override fun ringCheckY(): Boolean {
         return coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround
@@ -85,7 +91,7 @@ class BlinkRing(
         val blinkDisabled = !AutoP3.blink
 
         val firstPacket = packets.first()
-        val toFar = mc.thePlayer.getDistanceSq(firstPacket.positionX, firstPacket.positionY, firstPacket.positionZ) > (mc.thePlayer.capabilities.walkSpeed * 2.806).pow(2)
+        val toFar = mc.thePlayer.getDistanceSq(firstPacket.positionX, firstPacket.positionY, firstPacket.positionZ) > ( PlayerUtils.getPlayerWalkSpeed() * 2.806).pow(2)
 
         if (exceedsBlinkLimit || blinkDisabled) {
             if (toFar && cancelled > 0) {

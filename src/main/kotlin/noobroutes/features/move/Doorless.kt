@@ -141,7 +141,7 @@ object Doorless: Module(
             }
             clip2(dx, dz)
             if (!setSpeed) return@schedulePreTickTask
-            val speed = Core.mc.thePlayer.aiMoveSpeed.toDouble()
+            val speed = PlayerUtils.getPlayerWalkSpeed().toDouble()
             PlayerUtils.setMotion(
                 dx * 2.806 * speed,
                 dz * 2.806 * speed

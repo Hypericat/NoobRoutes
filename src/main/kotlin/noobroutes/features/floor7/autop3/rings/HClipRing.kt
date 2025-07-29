@@ -8,6 +8,7 @@ import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
 
 class HClipRing(
@@ -31,22 +32,22 @@ class HClipRing(
         if (insta) {
             if (mc.thePlayer.motionX != 0.0 || mc.thePlayer.motionZ != 0.0) return modMessage("must be not moving in x/z")
 
-            Scheduler.schedulePostMoveEntityWithHeadingTask { setMaxSpeed() }
+            setMaxSpeed()
 
-            if (walk) Scheduler.schedulePostMoveEntityWithHeadingTask(1) { AutoP3MovementHandler.setDirection(yaw) }
+            if (walk) Scheduler.schedulePostMoveEntityWithHeadingTask { AutoP3MovementHandler.setDirection(yaw) }
             return
         }
 
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
 
-        Scheduler.schedulePostMoveEntityWithHeadingTask(1) { setMaxSpeed() }
+        Scheduler.schedulePostMoveEntityWithHeadingTask { setMaxSpeed() }
 
-        if (walk) Scheduler.schedulePostMoveEntityWithHeadingTask(2) { AutoP3MovementHandler.setDirection(yaw) }
+        if (walk) Scheduler.schedulePostMoveEntityWithHeadingTask(1) { AutoP3MovementHandler.setDirection(yaw) }
     }
 
     private fun setMaxSpeed() {
-        mc.thePlayer.motionX = AutoP3MovementHandler.DEFAULT_SPEED * mc.thePlayer.aiMoveSpeed * Utils.xPart(yaw)
-        mc.thePlayer.motionZ = AutoP3MovementHandler.DEFAULT_SPEED * mc.thePlayer.aiMoveSpeed * Utils.zPart(yaw)
+        mc.thePlayer.motionX = AutoP3MovementHandler.DEFAULT_SPEED * PlayerUtils.getPlayerWalkSpeed() * Utils.xPart(yaw)
+        mc.thePlayer.motionZ = AutoP3MovementHandler.DEFAULT_SPEED * PlayerUtils.getPlayerWalkSpeed() * Utils.zPart(yaw)
     }
 }

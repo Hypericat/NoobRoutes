@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.RotationUtils.getYawAndPitch
@@ -59,6 +60,8 @@ object Auto4: Module(
             mc.thePlayer.rotationYaw = rotation.first
             mc.thePlayer.rotationPitch = rotation.second
         }
+
+        AutoP3.dontCancelNextC03()
         PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
 

@@ -145,6 +145,8 @@ object PlayerUtils {
         return rayTraceResult?.blockPos?.let { mc.theWorld.getBlockState(it).block }
     }
 
+    fun getPlayerWalkSpeed(): Float =
+        mc.thePlayer.capabilities.walkSpeed
 
     // Good boy
     inline val keyBindings get() =  listOf(

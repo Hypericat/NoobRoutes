@@ -40,6 +40,7 @@ class AutoP3Command: CommandBase() {
                 BossEventDispatcher.inF7Boss = false
                 modMessage("ended boss")
             }
+            else -> modMessage("Usages: Add, Delete, Blink, Start, Restore, Load")
         }
     }
 
@@ -52,7 +53,7 @@ class AutoP3Command: CommandBase() {
     }
 
     override fun getCommandAliases(): List<String?>? {
-        return listOf("p3", "sigma69420autop3gamertime")
+        return listOf("p3", "sigma69420autop3gamertime", "autop3", "autophase3", "autophasethree")
     }
 
     override fun addTabCompletionOptions(

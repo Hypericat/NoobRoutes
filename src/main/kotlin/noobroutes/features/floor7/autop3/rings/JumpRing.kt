@@ -6,6 +6,7 @@ import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
+import noobroutes.utils.Scheduler
 
 
 class JumpRing (
@@ -32,9 +33,9 @@ class JumpRing (
         }
 
         if (walk) {
-            AutoP3MovementHandler.setJumpingTrue()
             AutoP3MovementHandler.setDirection(yaw)
             AutoP3MovementHandler.setVelocity(AutoP3MovementHandler.DEFAULT_SPEED)
+            AutoP3MovementHandler.setJumpingTrue()
         }
     }
 }

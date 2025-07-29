@@ -55,7 +55,6 @@ object BlockGui : Screen() {
 
     override fun onGuiClosed() {
         mc.entityRenderer.stopUseShader()
-        AutoP3.saveRings()
         Config.save()
     }
 

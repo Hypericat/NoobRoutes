@@ -238,7 +238,7 @@ object Scheduler {
         if (scheduledPostMotionUpdateTasks.doTasks(event)) event.isCanceled = true
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun moveEntityWithHeadingPost(event: MoveEntityWithHeadingEvent.Post){
         if (scheduledPostMoveEntityWithHeadingTasks.doTasks(event)) event.isCanceled = true
     }

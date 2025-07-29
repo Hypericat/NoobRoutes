@@ -150,7 +150,7 @@ abstract class Ring(
 
     fun renderRing(color: Color) {
         val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
-        RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), Color.GREEN, thickness = 3, depth = true)
+        RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), color, thickness = 3, depth = true)
         if (this.renderYawVector) Renderer.draw3DLine(
             listOf(
                 this.coords.add(0.0, PlayerUtils.STAND_EYE_HEIGHT, 0.0),
@@ -216,7 +216,7 @@ abstract class Ring(
         mc.thePlayer.isSprinting = false
         PlayerUtils.unPressKeys()
 
-        Scheduler.schedulePostTickTask {
+        Scheduler.schedulePostMoveEntityWithHeadingTask {
             PlayerUtils.setPosition(coords.xCoord, coords.zCoord)
             if (isAwait) await() else doRing()
         }
@@ -231,7 +231,7 @@ abstract class Ring(
         triggered = true
 
         if (rotate) {
-            RouteUtils.setRotation(yaw, 0f, true)
+            AutoP3.setBlinkRotation(yaw, 0f)
         }
 
         if (center) {

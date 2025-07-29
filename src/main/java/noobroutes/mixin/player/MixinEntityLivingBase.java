@@ -1,6 +1,7 @@
 package noobroutes.mixin.player;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.EntityLivingBase;
 import noobroutes.events.impl.MoveEntityWithHeadingEvent;
 import noobroutes.features.move.QOL;
@@ -45,7 +46,9 @@ public abstract class MixinEntityLivingBase {
             at = @At("HEAD")
     )
     private void onMoveEntityWithHeadingPre(float strafe, float forward, CallbackInfo ci) {
-        if (this.isPlayer()) postAndCatch(new MoveEntityWithHeadingEvent.Pre());
+        if ((Object) this instanceof EntityPlayerSP) {
+            postAndCatch(new MoveEntityWithHeadingEvent.Pre());
+        }
     }
 
     @Inject(
@@ -53,6 +56,8 @@ public abstract class MixinEntityLivingBase {
             at = @At("TAIL")
     )
     private void onMoveEntityWithHeadingPost(float strafe, float forward, CallbackInfo ci) {
-        if (this.isPlayer()) postAndCatch(new MoveEntityWithHeadingEvent.Post());
+        if ((Object) this instanceof EntityPlayerSP) {
+            postAndCatch(new MoveEntityWithHeadingEvent.Post());
+        }
     }
 }

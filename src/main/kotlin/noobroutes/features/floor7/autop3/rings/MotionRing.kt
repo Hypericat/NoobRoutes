@@ -6,6 +6,8 @@ import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
+import noobroutes.utils.Scheduler
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 
 
@@ -41,6 +43,9 @@ class MotionRing(
             triggered = false
             return
         }
+        else mc.thePlayer.jump()
+
+        devMessage("${System.currentTimeMillis()}, motion ring")
 
         AutoP3MovementHandler.setDirection(yaw)
         AutoP3MovementHandler.setMotionTicks(0)

@@ -11,6 +11,7 @@ import noobroutes.events.impl.S08Event
 import noobroutes.utils.Utils
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 
@@ -29,13 +30,13 @@ object AutoP3MovementHandler {
 
     private const val DRAG = 0.9063338661881611
     private const val PUSH = 0.036901383361851
-    private const val TICK1 = 3.08
-    private const val TICK2 = 1.99
+    private const val TICK1 = 6.16
+    private const val TICK2 = 3.98
 
     @SubscribeEvent //stolen from sy? (its just so good)
-    fun handleWalking(event: TickEvent.ClientTickEvent) {
-        if (!event.isEnd || mc.thePlayer == null)
-        if (mc.thePlayer?.onGround ?: return) {
+    fun handleWalking(event: MoveEntityWithHeadingEvent.Post) {
+        if (mc.thePlayer == null) return
+        if (mc.thePlayer.onGround) {
             airTicks = 0
         }
         else airTicks++
@@ -43,7 +44,7 @@ object AutoP3MovementHandler {
         val dir = direction ?: return
 
         if (mc.thePlayer.isInWater || mc.thePlayer.isInLava || motionTicks != -1) return
-        val speed = mc.thePlayer.aiMoveSpeed.toDouble()
+        val speed = PlayerUtils.getPlayerWalkSpeed().toDouble()
 
         if (airTicks == 0) {
             var speedMultiplier = DEFAULT_SPEED
@@ -68,9 +69,9 @@ object AutoP3MovementHandler {
         mc.thePlayer.motionZ += movementFactor * Utils.zPart(dir)
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW) //go after walking
-    fun doMotioning(event: TickEvent.ClientTickEvent) {
-        if (!event.isEnd || direction == null || motionTicks == -1) return;
+    @SubscribeEvent()
+    fun doMotioning(event: MoveEntityWithHeadingEvent.Post) {
+        if (direction == null || motionTicks == -1) return;
 
         doMotionTick();
         motionTicks++
@@ -83,8 +84,9 @@ object AutoP3MovementHandler {
 
     private fun doMotionTick() {
         if (motionTicks == 0 && mc.thePlayer.onGround) {
-            mc.thePlayer.jump();
             setVelocity(TICK1 * scale)
+            devMessage("yeet")
+            devMessage("${System.currentTimeMillis()}, tick 0")
             return;
         }
 
@@ -95,6 +97,7 @@ object AutoP3MovementHandler {
         }
 
         if (motionTicks == 1) {
+            devMessage("${System.currentTimeMillis()}, tick 1")
             setVelocity(TICK2 * scale);
             lastSpeed = TICK2;
             return;
@@ -107,8 +110,8 @@ object AutoP3MovementHandler {
 
     fun setVelocity(velo: Double) {
         val dir = direction ?: return
-        mc.thePlayer.motionX = velo * mc.thePlayer.aiMoveSpeed * Utils.xPart(dir)
-        mc.thePlayer.motionZ = velo * mc.thePlayer.aiMoveSpeed * Utils.zPart(dir)
+        mc.thePlayer.motionX = velo * PlayerUtils.getPlayerWalkSpeed() * Utils.xPart(dir)
+        mc.thePlayer.motionZ = velo * PlayerUtils.getPlayerWalkSpeed() * Utils.zPart(dir)
     }
 
     @SubscribeEvent
