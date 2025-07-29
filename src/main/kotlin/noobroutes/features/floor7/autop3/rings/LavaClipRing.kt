@@ -1,5 +1,6 @@
 package noobroutes.features.floor7.autop3.rings
 
+import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
@@ -12,7 +13,7 @@ import kotlin.math.absoluteValue
 
 
 class LavaClipRing(
-    ringBase: RingBase,
+    ringBase: RingBase = RingBase(Vec3(0.0, 0.0, 0.0), 0f, false, false, false, false, false, 1f, 1f),
     var length: Double = 0.0
 ) : Ring(ringBase, RingType.LAVA_CLIP) {
     companion object : CommandGenerated {

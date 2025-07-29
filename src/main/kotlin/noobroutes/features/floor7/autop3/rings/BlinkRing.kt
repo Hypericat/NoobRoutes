@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3.rings
 
 import com.google.gson.JsonObject
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.util.Vec3
 import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
@@ -10,7 +11,7 @@ import noobroutes.utils.skyblock.modMessage
 
 
 class BlinkRing(
-    ringBase: RingBase,
+    ringBase: RingBase = RingBase(Vec3(0.0, 0.0, 0.0), 0f, false, false, false, false, false, 1f, 1f),
     var packets: List<C04PacketPlayerPosition> = listOf(),
     var endYVelo: Double = 0.0
 ) : Ring(ringBase, RingType.BLINK) {

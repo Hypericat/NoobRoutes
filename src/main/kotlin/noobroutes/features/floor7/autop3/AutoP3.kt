@@ -312,15 +312,15 @@ object AutoP3: Module (
                     val ringType = ring.get("type")?.asString ?: "Unknown"
                     val ringClass = RingType.getTypeFromName(ringType)
                     val instance: Ring = ringClass?.ringClass?.java?.getDeclaredConstructor()?.newInstance() ?: return@forEach
-                    instance.coords = ring.get("coords").asVec3
-                    instance.yaw = MathHelper.wrapAngleTo180_float(ring.get("yaw")?.asFloat ?: 0f)
-                    instance.term = ring.get("term")?.asBoolean == true
-                    instance.leap = ring.get("leap")?.asBoolean == true
-                    instance.center = ring.get("center")?.asBoolean == true
-                    instance.rotate = ring.get("rotate")?.asBoolean == true
-                    instance.left = ring.get("left")?.asBoolean == true
-                    instance.diameter = ring.get("diameter")?.asFloat ?: 1f
-                    instance.height = ring.get("height")?.asFloat ?: 1f
+                    instance.base.coords = ring.get("coords").asVec3
+                    instance.base.yaw = MathHelper.wrapAngleTo180_float(ring.get("yaw")?.asFloat ?: 0f)
+                    instance.base.term = ring.get("term")?.asBoolean == true
+                    instance.base.leap = ring.get("leap")?.asBoolean == true
+                    instance.base.center = ring.get("center")?.asBoolean == true
+                    instance.base.rotate = ring.get("rotate")?.asBoolean == true
+                    instance.base.left = ring.get("left")?.asBoolean == true
+                    instance.base.diameter = ring.get("diameter")?.asFloat ?: 1f
+                    instance.base.height = ring.get("height")?.asFloat ?: 1f
                     instance.loadRingData(ring)
                     ringsInJson.add(instance)
                 }

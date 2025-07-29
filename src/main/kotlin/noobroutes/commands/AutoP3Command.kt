@@ -40,6 +40,10 @@ class AutoP3Command: CommandBase() {
                 BossEventDispatcher.inF7Boss = false
                 modMessage("ended boss")
             }
+            "load" -> {
+                AutoP3.loadRings()
+                modMessage("loaded rings")
+            }
             else -> modMessage("Usages: Add, Delete, Blink, Start, Restore, Load")
         }
     }
