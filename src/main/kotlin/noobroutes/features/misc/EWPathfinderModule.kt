@@ -33,7 +33,7 @@ object EWPathfinderModule : Module(
     category = Category.MISC,
     description = "Etherwarp Pathfinder"
 ) {
-    val centerAngle by BooleanSetting("Center Angle", default = true, description = "Attempts to use angles closer to the center of the block.")
+    //val centerAngle by BooleanSetting("Center Angle", default = false, description = "Attempts to use angles closer to the center of the block.").withDependency { false } // Currently causes some routes to fail because floating point errors
     val perfectPathing by BooleanSetting("Perfect Pathing", false, description = "Finds only the most optimal path.")
     val displayDebug by BooleanSetting("Debug Display", false, description = "Shows pathfinder debug positions").withDependency { ClickGUIModule.devMode }
 
@@ -48,12 +48,16 @@ object EWPathfinderModule : Module(
     var bestHeuristic: Double = 0.0
 
     fun execute(target: BlockPos, singleUse: Boolean) {
+        execute(target, singleUse, null)
+    }
+
+    fun execute(target: BlockPos, singleUse: Boolean, runnable: Runnable?) {
         if (!this.enabled) {
             modMessage("Please enable Pathfinder!")
             return
         }
 
-        PathfinderExecutor.run(target, perfectPathing, yawStep, pitchStep, ewCost, heuristicThreshold, singleUse)
+        PathfinderExecutor.run(target, perfectPathing, yawStep, pitchStep, ewCost, heuristicThreshold, singleUse, runnable)
     }
 
     fun findCenteredVector(targetBlockPos: BlockPos, nodePos: Vec3) : Vec3? {
@@ -78,7 +82,7 @@ object EWPathfinderModule : Module(
                 val nodeVec3 = Vec3(node.pos.x.toDouble() + 0.5, node.pos.y.toDouble() + 1, node.pos.z + 0.5)
 
                 var targetVec3 : Vec3? = null
-                if (centerAngle)
+                if (false) // CenterAngle removed cause it bugged out with floating point errors and caused routing to fail
                     targetVec3 = findCenteredVector(lastNode.pos, nodeVec3)
 
                 if (targetVec3 == null) targetVec3 = getEtherPosFromOrigin(nodeVec3.add(

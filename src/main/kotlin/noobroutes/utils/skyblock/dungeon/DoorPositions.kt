@@ -1,6 +1,8 @@
 package noobroutes.utils.skyblock.dungeon
 
 import net.minecraft.util.BlockPos
+import noobroutes.utils.getSkull
+import noobroutes.utils.skullTexture
 import noobroutes.utils.skyblock.dungeon.tiles.RoomShape
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 
@@ -229,4 +231,11 @@ object DoorPositions {
     private const val WITHER_SKULL_ID = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2JjYmJmOTRkNjAzNzQzYTFlNzE0NzAyNmUxYzEyNDBiZDk4ZmU4N2NjNGVmMDRkY2FiNTFhMzFjMzA5MTRmZCJ9fX0="
     private const val BLOOD_SKULL_ID = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQ5ZDgwYjc5NDQyY2YxYTNhZmVhYTIzN2JkNmFkYWFhY2FiMGMyODgzMGZiMzZiNTcwNGNmNGQ5ZjU5MzdjNCJ9fX0="
 
+    fun isWitherDoor(doorPos: BlockPos) : Boolean {
+        return getSkull(doorPos.add(-2, 1, -2))?.skullTexture == WITHER_SKULL_ID
+    }
+
+    fun isBloodDoor(doorPos: BlockPos) : Boolean {
+        return getSkull(doorPos.add(-2, 1, -2))?.skullTexture == BLOOD_SKULL_ID
+    }
 }
