@@ -13,6 +13,7 @@ import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
 import noobroutes.features.ModuleManager
 import noobroutes.features.floor7.autop3.Blink
+import noobroutes.features.move.AutoPath
 import noobroutes.font.FontType
 import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.*
@@ -35,6 +36,8 @@ const val MODID = "@MOD_ID@"
 class NoobRoutes {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
+        AutoPath.onInitKeys();
+
         listOf(
             NoobRoutesCommand(),
             AutoP3Command(),
