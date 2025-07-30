@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
@@ -46,6 +47,7 @@ import noobroutes.utils.requirement
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
@@ -218,6 +220,18 @@ object AutoP3: Module (
                 waitingRing = null
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onLeap(event: PacketEvent.Receive) {
+        if (!inF7Boss || event.packet !is S08PacketPlayerPosLook || mc.thePlayer?.heldItem?.displayName?.contains("leap", ignoreCase = true) != true) return
+
+        mc.thePlayer.posX = event.packet.x
+        mc.thePlayer.posY = event.packet.y
+        mc.thePlayer.posZ = event.packet.z
+
+        val blinkRing = rings[route]?.find { it is BlinkRing && it.inRing() } ?: return
+        activeBlink = blinkRing as BlinkRing
     }
 
     @SubscribeEvent
