@@ -384,6 +384,13 @@ fun <T> Collection<T>.getSafe(index: Int?): T? {
         null
     }
 }
+fun <T> Collection<T>.lastSafe(): T? {
+    return try {
+        this.toList().last()
+    } catch (_: Exception) {
+        null
+    }
+}
 
 /**
  * Formats a time duration in milliseconds into a human-readable string.

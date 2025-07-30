@@ -26,6 +26,10 @@ class BlinkRing(
 
     companion object : CommandGenerated {
         override fun generateRing(args: Array<out String>): Ring? {
+            if (AutoP3.recordingPacketList.isNotEmpty()) {
+                modMessage("Why are you calling this while recording a blink")
+                return null
+            }
             if (args.size < 3) {
                 modMessage("need a length arg (positive number)")
                 return null

@@ -30,8 +30,11 @@ import noobroutes.utils.PacketUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
+import noobroutes.utils.addLast
 import noobroutes.utils.coerceMax
+import noobroutes.utils.getSafe
 import noobroutes.utils.json.JsonUtils.asVec3
+import noobroutes.utils.lastSafe
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.MovementRenderer
 import noobroutes.utils.render.RenderUtils
@@ -39,12 +42,15 @@ import noobroutes.utils.render.Renderer
 import noobroutes.utils.render.getTextHeight
 import noobroutes.utils.render.getTextWidth
 import noobroutes.utils.render.text
+import noobroutes.utils.requirement
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
-
+import java.util.Stack
+@Suppress("Unused")
 object AutoP3: Module (
     name = "AutoP3",
     Keyboard.KEY_NONE,
@@ -52,8 +58,20 @@ object AutoP3: Module (
     description = "schizo since version 0.0.1"
 ) {
     private var rings = mutableMapOf<String, MutableList<Ring>>()
+    private enum class RingAction{
+        Delete,
+        Add,
+        Edit,
+        ChangeActiveBlinkWaypoint,
+        AddBlink
+    }
+    private data class BlinkWaypointState(val state: BlinkWaypoint?, val previousState: BlinkWaypoint?)
+    private data class EditRingAction(val action: RingAction, val ring: Ring?, val route: String, val activeBlinkWaypointState: BlinkWaypointState? = null)
+    private val recentActionStack = Stack<EditRingAction>()
+    private val recentUndoActionStack = Stack<EditRingAction>()
 
-    private val route by StringSetting("Route", "", description = "Route to use")
+
+    val route by StringSetting("Route", "", description = "Route to use")
     private val ringColor by ColorSetting("Ring Color", Color.GREEN, false, description = "color of the rings")
 
     private val editShit by DropdownSetting("Edit Settings", false)
@@ -92,7 +110,8 @@ object AutoP3: Module (
     private var activeBlink: BlinkRing? = null
 
     private var activeBlinkWaypoint: BlinkWaypoint? = null
-    private var recordingPacketList = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
+    var recordingPacketList = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
+        private set
 
     private var clear = 0
 
@@ -123,7 +142,7 @@ object AutoP3: Module (
 
             if (ring !is BlinkRing) return@forEachIndexed
 
-            val lastPacket = ring.packets.last()
+            val lastPacket = ring.packets.lastSafe() ?: return@forEachIndexed
 
             ring.drawCylinderWithRingArgs(Vec3(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ), Color.RED)
 
@@ -152,7 +171,7 @@ object AutoP3: Module (
             if (c04ToAdd == recordingPacketList.last()) return
 
             recordingPacketList.add(c04ToAdd)
-            modMessage("recording")
+            modMessage("recording, ${recordingPacketList.size}")
 
             if (recordingPacketList.size >= blinkWaypoint.length) {
                 addRing(BlinkRing(blinkWaypoint.base, recordingPacketList, mc.thePlayer.motionY))
@@ -244,16 +263,7 @@ object AutoP3: Module (
         return rings[route]?.minBy { it.coords.subtract(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0).distanceToPlayerSq }
     }
 
-    fun addRing(ring: Ring){
-        rings.getOrPut(route) { mutableListOf() }.add(ring.apply { triggered = true })
-        saveRings()
-        modMessage("Added ${ring.ringName}")
-    }
-    fun deleteRing(ring: Ring){
-        rings[route]?.remove(ring)
-        saveRings()
-        modMessage("Deleted: ${ring.ringName}")
-    }
+
 
     @SubscribeEvent
     fun onS08(event: S08Event) {
@@ -355,7 +365,7 @@ object AutoP3: Module (
             !(!inF7Boss || !mc.thePlayer.onGround || mc.thePlayer.motionX != 0.0 || mc.thePlayer.motionZ != 0.0 || PlayerUtils.keyBindings.any { it.isKeyDown })
     }
 
-    //@SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun cancelC03s(event: PacketEvent.Send) {
         if (!inF7Boss || event.packet !is C03PacketPlayer) return
 
@@ -423,7 +433,116 @@ object AutoP3: Module (
     }
 
     fun setActiveBlinkWaypoint(ring: BlinkWaypoint?) {
+        recentActionStack.add(EditRingAction(RingAction.ChangeActiveBlinkWaypoint, null, route, BlinkWaypointState(ring, activeBlinkWaypoint)))
         activeBlinkWaypoint = ring
+    }
+
+    fun addRing(ring: Ring){
+        rings.getOrPut(route) { mutableListOf() }.add(ring.apply { triggered = true })
+        saveRings()
+        if (ring is BlinkRing) {
+            recentActionStack.add(EditRingAction(
+                RingAction.AddBlink,
+                ring,
+                route,
+                BlinkWaypointState(null, activeBlinkWaypoint)
+            ))
+            activeBlinkWaypoint = null
+            modMessage("Added Blink")
+
+        } else {
+            recentActionStack.add(EditRingAction(RingAction.Add, ring, route))
+            modMessage("Added ${ring.ringName}")
+        }
+        recentUndoActionStack.clear()
+    }
+
+    fun deleteRing(ring: Ring) {
+        recentActionStack.add(EditRingAction(RingAction.Delete, ring, route))
+        saveRings()
+        modMessage("Deleted: ${ring.ringName}")
+        rings[route]?.remove(ring)
+        recentUndoActionStack.clear()
+    }
+
+    fun redo() {
+        if (recentUndoActionStack.isEmpty()) return modMessage("Nothing to Redo")
+        val ringAction = recentUndoActionStack.pop()
+        when (ringAction.action) {
+            RingAction.Add -> {
+                rings[ringAction.route]?.add(ringAction.ring!!)
+                modMessage("Re-Added ${ringAction.ring!!.ringName}")
+            }
+            RingAction.Delete -> {
+                rings[ringAction.route]?.remove(ringAction!!.ring)
+                modMessage("Re-Removed ${ringAction.ring!!.ringName}")
+            }
+            RingAction.Edit -> {
+                //TODO
+            }
+            RingAction.ChangeActiveBlinkWaypoint -> {
+                activeBlinkWaypoint = ringAction.activeBlinkWaypointState?.state
+                if (ringAction.activeBlinkWaypointState?.state == null) {
+                    modMessage("Removed Blink Waypoint")
+                } else {
+                    modMessage("Re-Added Blink Waypoint")
+                }
+            }
+            RingAction.AddBlink -> {
+                rings[ringAction.route]?.add(ringAction.ring!!)
+                activeBlinkWaypoint = ringAction.activeBlinkWaypointState?.state
+                modMessage("Re-Added Blink")
+            }
+        }
+        recentActionStack.add(ringAction)
+    }
+
+    fun undo() {
+        if (recentActionStack.isEmpty()) return modMessage("Nothing to Undo")
+        val ringAction = recentActionStack.pop()
+        when (ringAction.action) {
+            RingAction.Edit -> {
+                //TODO
+            }
+            RingAction.Add -> {
+                rings[ringAction.route]?.remove(ringAction!!.ring)
+                modMessage("Removed ${ringAction.ring!!.ringName}")
+            }
+            RingAction.Delete -> {
+                rings[ringAction.route]?.add(ringAction.ring!!)
+                modMessage("Added back ${ringAction.ring!!.ringName}")
+            }
+            RingAction.ChangeActiveBlinkWaypoint -> {
+                activeBlinkWaypoint = ringAction.activeBlinkWaypointState?.previousState
+                if (ringAction.activeBlinkWaypointState?.previousState == null) {
+                    modMessage("Removed Blink Waypoint")
+                } else {
+                    modMessage("Re-Added Blink Waypoint")
+                }
+            }
+            RingAction.AddBlink -> {
+                rings[ringAction.route]?.remove(ringAction.ring)
+                activeBlinkWaypoint = ringAction.activeBlinkWaypointState?.previousState
+            }
+        }
+        recentUndoActionStack.add(ringAction)
+    }
+
+    fun handleDelete(args: Array<out String>) {
+        val ringList = rings[route]?.toMutableList()?.apply { activeBlinkWaypoint?.let { add(it) } }
+        if (ringList.isNullOrEmpty() ) return modMessage("No Rings to Delete")
+        val ring = if (args.requirement(2)) {
+            val index = args[1].toIntOrNull() ?: return modMessage("Invalid Index")
+            ringList.getSafe(index) ?: return modMessage("Index Out of Bounds")
+        } else {
+            ringList.minByOrNull { it.coords.distanceToPlayer } ?: return modMessage("No Rings to Delete")
+        }
+        if (ring is BlinkWaypoint) {
+            setActiveBlinkWaypoint(null)
+            modMessage("Deleted Blink Waypoint")
+            return
+        }
+        deleteRing(ring)
     }
 
     fun loadRings() {

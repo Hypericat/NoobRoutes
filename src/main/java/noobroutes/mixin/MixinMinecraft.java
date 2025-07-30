@@ -35,12 +35,6 @@ public class MixinMinecraft {
         if (Mouse.getEventButtonState()) postAndCatch(new InputEvent.Mouse(Mouse.getEventButton()));
     }
 
-    @Inject(method = "runTick", at = @At("HEAD"), cancellable = true)
-    public void runTickCanceller$noobroutes(CallbackInfo ci) {
-        if (AutoP3.INSTANCE.getShouldFreeze()) {
-            ci.cancel();
-        }
-    }
 
 
     @Inject(method = "rightClickMouse", at = @At("HEAD"), cancellable = true)

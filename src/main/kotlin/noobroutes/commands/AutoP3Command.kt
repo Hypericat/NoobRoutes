@@ -23,7 +23,7 @@ class AutoP3Command: CommandBase() {
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, clearWaypoints, Start, Restore, Load")
+        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, clearWaypoints, Start, Load, Undo, Redo")
         when (args[0].lowercase()) {
             "add" -> {
                 if (!args.requirement(2)) return modMessage("Rings: ${getCommandGeneratedRings()}")
@@ -31,6 +31,15 @@ class AutoP3Command: CommandBase() {
                     ?: return modMessage("Rings: ${getCommandGeneratedRings()}")
                 val ring = (ringType.ringClass.companionObjectInstance as? CommandGenerated)?.generateRing(args) ?: return
                 AutoP3.addRing(ring)
+            }
+            "delete" -> {
+                AutoP3.handleDelete(args)
+            }
+            "redo" -> {
+                AutoP3.redo()
+            }
+            "undo" -> {
+                AutoP3.undo()
             }
             "start" -> {
                 BossEventDispatcher.inF7Boss = true
@@ -48,7 +57,7 @@ class AutoP3Command: CommandBase() {
                 AutoP3.loadRings()
                 modMessage("loaded rings")
             }
-            else -> modMessage("Usages: Add, Delete, Blink, Start, Restore, Load")
+            else -> modMessage("Usages: Add, Delete, clearWaypoints, Start, Load, Undo, Redo")
         }
     }
 
