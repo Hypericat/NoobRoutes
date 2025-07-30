@@ -61,7 +61,6 @@ object AutoP3: Module (
     private enum class RingAction{
         Delete,
         Add,
-        Edit,
         ChangeActiveBlinkWaypoint,
         AddBlink
     }
@@ -477,9 +476,6 @@ object AutoP3: Module (
                 rings[ringAction.route]?.remove(ringAction!!.ring)
                 modMessage("Re-Removed ${ringAction.ring!!.ringName}")
             }
-            RingAction.Edit -> {
-                //TODO
-            }
             RingAction.ChangeActiveBlinkWaypoint -> {
                 activeBlinkWaypoint = ringAction.activeBlinkWaypointState?.state
                 if (ringAction.activeBlinkWaypointState?.state == null) {
@@ -501,9 +497,6 @@ object AutoP3: Module (
         if (recentActionStack.isEmpty()) return modMessage("Nothing to Undo")
         val ringAction = recentActionStack.pop()
         when (ringAction.action) {
-            RingAction.Edit -> {
-                //TODO
-            }
             RingAction.Add -> {
                 rings[ringAction.route]?.remove(ringAction!!.ring)
                 modMessage("Removed ${ringAction.ring!!.ringName}")
