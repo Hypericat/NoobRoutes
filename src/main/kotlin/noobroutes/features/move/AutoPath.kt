@@ -1,6 +1,5 @@
 package noobroutes.features.move
 
-import jdk.nashorn.internal.ir.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -31,7 +30,6 @@ import noobroutes.utils.skyblock.dungeon.DoorPositions.oneByOneSpots
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Door
 import org.lwjgl.input.Keyboard
 
 
@@ -76,21 +74,21 @@ object AutoPath: Module(
         updateLookDoorIndex();
     }
 
-    private fun getColor(pos: BlockPos) : Color {
+    private fun getDoorColor(pos: BlockPos, default: Color) : Color {
         if (DoorPositions.isWitherDoor(pos)) return Color.GRAY
         if (DoorPositions.isBloodDoor(pos)) return Color.RED
-        return doorNumberColor
+        return default;
     }
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         validDoors.forEachIndexed { index, pos ->
-            Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), if (index == validDoorLookIndex && selectionMode == 0) selectedDoorColor else getColor(pos), scale = 0.1f)
+            Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), if (index == validDoorLookIndex && selectionMode == 0) selectedDoorColor else getDoorColor(pos, doorNumberColor), scale = 0.1f)
         }
 
-        validBlocks.forEach {
-            Renderer.drawBlock(it.first, Color.RED, 3, 1, 0)
-            Renderer.drawBlock(it.second, Color.BLUE, 3, 1, 0)
+        validBlocks.forEachIndexed { index, it ->
+            Renderer.drawBlock(it.first, getDoorColor(validDoors[index], Color.GREEN), 3, 1, 0)
+            Renderer.drawBlock(it.second, DynamicRoute.dynColor, 3, 1, 0)
         }
     }
 
@@ -115,7 +113,7 @@ object AutoPath: Module(
         val eyePos: Vec3 = Minecraft.getMinecraft().thePlayer.getPositionEyes(1.0f);
         var bestDot: Double = Double.MIN_VALUE;
 
-        val box: AxisAlignedBB = AxisAlignedBB(BlockPos.ORIGIN, BlockPos.ORIGIN).expand(1.0, 1.0, 1.0); // Using a box so we can look anywhere inside the door frame (needed at close ranges)
+        val box: AxisAlignedBB = AxisAlignedBB(BlockPos.ORIGIN, BlockPos.ORIGIN).expand(2.0, 2.0, 2.0); // Using a box so we can look anywhere inside the door frame (needed at close ranges)
 
         for (i in 0..< validDoors.size) {
             val doorPos = validDoors[i].add(0.5, 2.0, 0.5);

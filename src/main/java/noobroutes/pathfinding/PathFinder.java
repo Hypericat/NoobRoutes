@@ -23,7 +23,6 @@ public class PathFinder {
     private final HashMap<Long, PathNode> cache;
     public static double NEW_NODE_COST = 100d;
     public final static double MIN_IMPROVEMENT = 1d;
-    public final static double THREAD_COUNT = 12;
 
     public static final float EYE_HEIGHT = (float) PlayerUtils.SNEAK_EYE_HEIGHT;
 

@@ -42,8 +42,9 @@ object PlayerUtils {
         }
     }
 
-    fun airClick(){
-        devMessage("Clicked: ${System.currentTimeMillis()}")
+    fun airClick(bl: Boolean = true){
+        if (bl)
+            devMessage("Clicked: ${System.currentTimeMillis()}")
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
     }
 
