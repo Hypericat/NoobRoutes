@@ -74,16 +74,6 @@ object AutoPath: Module(
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.isEnd) return
         updateLookDoorIndex();
-
-        if (resetBlockPos == null) return
-        if (!resetPos) {
-            resetBlockPos = null
-            return
-        }
-        if (!DynamicRoute.isInNode()) {
-            Minecraft.getMinecraft().thePlayer.setPosition(resetBlockPos!!.x.toDouble() + 0.5, Minecraft.getMinecraft().thePlayer.posY, resetBlockPos!!.z.toDouble() + 0.5)
-            resetBlockPos = null
-        }
     }
 
     private fun getColor(pos: BlockPos) : Color {
@@ -195,14 +185,18 @@ object AutoPath: Module(
         pathToDoor(--key)
     }
 
+    private fun resetPos(pos: BlockPos) {
+        if (!resetPos || !Minecraft.getMinecraft().thePlayer.onGround || DynamicRoute.isInNode()) return;
+        Minecraft.getMinecraft().thePlayer.setPosition(pos.x.toDouble() + 0.5, Minecraft.getMinecraft().thePlayer.posY, pos.z.toDouble() + 0.5)
+    }
+
     private fun pathToDoor(key: Int) {
         if (key >= validBlocks.size || key < 0) {
             devMessage("Invalid index for pathing!")
             return
         }
 
-        EWPathfinderModule.execute(validBlocks[key].second, true)
-        if (resetPos) resetBlockPos = BlockPos(Minecraft.getMinecraft().thePlayer.positionVector);
+        EWPathfinderModule.execute(validBlocks[key].second, true, if (resetPos) Runnable { resetPos(BlockPos(Minecraft.getMinecraft().thePlayer.positionVector)); } else null)
     }
 
     fun shouldCancelKey(keyCode: Int) : Boolean {
