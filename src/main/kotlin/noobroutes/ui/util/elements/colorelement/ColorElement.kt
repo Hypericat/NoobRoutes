@@ -61,9 +61,10 @@ class ColorElement(
     }
 
     init {
-        uiChildren.add(
+        addChild(
             ColorPopoutElement(0f, 0f, alphaEnabled, elementValue)
         )
+
     }
 
     override fun draw() {

@@ -1,6 +1,10 @@
 package noobroutes.ui.util
 
 import net.minecraft.client.renderer.GlStateManager
+import noobroutes.Core.logger
+import noobroutes.ui.util.elements.NumberBoxElement
+import noobroutes.utils.render.popStencil
+import noobroutes.utils.render.stencilRoundedRectangle
 
 
 abstract class UiElement(var x: Float, var y: Float) {
@@ -39,8 +43,21 @@ abstract class UiElement(var x: Float, var y: Float) {
         GlStateManager.pushMatrix()
         GlStateManager.translate(deltaX, deltaY, 1f)
         GlStateManager.scale(deltaScaleX, deltaScaleY, 1f)
+        if (stencilChildren) {
+            stencilRoundedRectangle(stencilX, stencilY, stencilWidth, stencilHeight, stencilRadius, stencilEdgeSoftness, stencilInverse)
+        }
         drawChildren()
+        if (stencilChildren) {
+            popStencil()
+            stencilChildren = false
+        }
         GlStateManager.popMatrix()
+    }
+
+    fun handleScroll(amount: Int): Boolean {
+        if (!enabled || !visible) return false
+        if (uiChildren.any { it.handleScroll(amount) }) return true
+        return onScroll(amount)
     }
 
     fun handleMouseClicked(mouseButton: Int): Boolean{
@@ -61,7 +78,11 @@ abstract class UiElement(var x: Float, var y: Float) {
         return keyTyped(typedChar, keyCode)
     }
 
-    open fun draw() {}
+    protected open fun onScroll(amount: Int): Boolean {
+        return false
+    }
+
+    protected open fun draw() {}
 
     protected open fun mouseClicked(mouseButton: Int): Boolean {
         return false
@@ -100,11 +121,31 @@ abstract class UiElement(var x: Float, var y: Float) {
         updateChildrenScale()
         GlStateManager.scale(x, y, 1f)
     }
+    var stencilChildren = false
+    var stencilX = 0f
+    var stencilY = 0f
+    var stencilWidth = 0f
+    var stencilHeight = 0f
+    var stencilRadius = 0f
+    var stencilEdgeSoftness = 0f
+    var stencilInverse = false
+
+    protected fun stencilChildren(x: Float, y: Float, w: Float, h: Float, radius: Number = 0f, edgeSoftness: Number = 0.5f, inverse: Boolean = false){
+        stencilChildren = true
+        stencilX = x
+        stencilY = y
+        stencilWidth = w
+        stencilHeight = h
+        stencilRadius = radius.toFloat()
+        stencilEdgeSoftness = edgeSoftness.toFloat()
+        stencilInverse = inverse
+    }
 
     protected fun updateChildrenTranslation(){
         uiChildren.forEach {
             it.xOrigin = this.xOrigin + deltaX
             it.yOrigin = this.yOrigin + deltaY
+            it.updateChildrenTranslation()
         }
     }
 
@@ -112,6 +153,7 @@ abstract class UiElement(var x: Float, var y: Float) {
         uiChildren.forEach {
             it.globalXScale = this.deltaScaleX * this.globalXScale
             it.globalYScale = this.deltaScaleY * this.globalYScale
+            it.updateChildrenScale()
         }
     }
 
@@ -128,6 +170,11 @@ abstract class UiElement(var x: Float, var y: Float) {
         return this.deltaScaleY * globalYScale
     }
 
+
+    private fun debugMouse(w: Float, h: Float){
+        logger.info("New Box, xOrigin: $xOrigin, yOrigin: $yOrigin")
+        logger.info("x: ${getEffectiveX() + x * getEffectiveXScale()}, y: ${getEffectiveY() + y * getEffectiveYScale()}, w: ${w * getEffectiveXScale()}, h: ${h * getEffectiveYScale()}| mouseX: ${MouseUtils.mouseX}, mouseY: ${MouseUtils.mouseY}")
+    }
 
     protected fun isAreaHovered(x: Float, y: Float, w: Float, h: Float): Boolean {
         return MouseUtils.isAreaHovered(

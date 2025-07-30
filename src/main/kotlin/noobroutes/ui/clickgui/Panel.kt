@@ -71,7 +71,6 @@ class Panel(
     }
 
     fun draw() {
-
         if (dragging) {
             x = floor(x2 + mouseX)
             y = floor(y2 + mouseY)

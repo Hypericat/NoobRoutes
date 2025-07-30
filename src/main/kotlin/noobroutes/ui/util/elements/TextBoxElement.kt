@@ -1,6 +1,7 @@
 package noobroutes.ui.util.elements
 
 import net.minecraft.client.gui.GuiScreen
+import noobroutes.Core.logger
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils.mouseX

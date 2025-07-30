@@ -66,7 +66,6 @@ class ColorBoxElement(
     )
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (mouseButton != 0) return false
-        logger.info(isHovered)
         if (isHovered) {
             dragging = true
             return true

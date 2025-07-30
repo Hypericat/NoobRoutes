@@ -55,7 +55,7 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
     implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT") { isTransitive = false }
 
-    implementation("gg.essential:loader-launchwrapper:1.1.3")
+    shadowImpl("gg.essential:loader-launchwrapper:1.1.3")
     compileOnly("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5")
 
     implementation("com.mojang:brigadier:1.2.9")

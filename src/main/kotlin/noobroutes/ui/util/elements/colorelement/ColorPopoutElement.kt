@@ -1,6 +1,7 @@
 package noobroutes.ui.util.elements.colorelement
 
 import net.minecraft.client.renderer.GlStateManager
+import noobroutes.Core.logger
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
@@ -87,9 +88,11 @@ class ColorPopoutElement(
         )
 
 
-        addChild(ColorBoxElement(0f, 0f, elementValue).apply { addValueChangeListener { parent?.updateChildren() } })
-        addChild(ColorSliderElement(0f, 0f, elementValue).apply { addValueChangeListener { parent?.updateChildren() } })
-        if (alphaEnabled) addChild(AlphaSliderElement(0f, 0f, elementValue).apply { addValueChangeListener { parent?.updateChildren() } })
+        addChild(ColorBoxElement(0f, 0f, elementValue).apply { addValueChangeListener {
+             updateColor()
+        } })
+        addChild(ColorSliderElement(0f, 0f, elementValue).apply { addValueChangeListener { updateColor() } })
+        if (alphaEnabled) addChild(AlphaSliderElement(0f, 0f, elementValue).apply { addValueChangeListener { updateColor() } })
     }
 
     fun updateColor(r: Int? = null, g: Int? = null, b: Int? = null, a: Float? = null, hue: Float? = null, saturation: Float? = null, brightness: Float? = null) {
