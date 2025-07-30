@@ -177,6 +177,13 @@ object AutoBr: Module(
             return
         }
         val name = args.drop(1).joinToString(" ").replace("_", " ")
+
+        if (name.equals("boss", ignoreCase = true)) {
+            snipeCoords = Vec2i(0, 0)
+            modMessage("sniping boss")
+            return
+        }
+
         val center = Dungeon.Info.uniqueRooms.find { name.equals(it.name, true) }?.center ?: return modMessage("no room found")
         val worldX = DungeonScan.startX + center.x * (DungeonScan.roomSize shr 1)
         val worldZ = DungeonScan.startZ + center.z * (DungeonScan.roomSize shr 1)

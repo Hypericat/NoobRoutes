@@ -41,7 +41,7 @@ class AutoP3Command: CommandBase() {
                     "start", "rat", "pickup", "restore", "test", "load", "snipe"
                 )
             )
-            2 -> if (args[0] == "snipe") getListOfStringsMatchingLastWord(args, Dungeon.Info.uniqueRooms.map { it.name.replace(" ", "_") }) else null
+            2 -> if (args[0] == "snipe") getListOfStringsMatchingLastWord(args, Dungeon.Info.uniqueRooms.map { it.name.replace(" ", "_") } + "Boss") else null
             else -> null
         }
     }

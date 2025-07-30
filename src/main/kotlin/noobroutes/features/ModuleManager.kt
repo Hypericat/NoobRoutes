@@ -22,7 +22,6 @@ import noobroutes.features.move.*
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.render.FreeCam
 import noobroutes.features.render.RotationVisualizer
-import noobroutes.features.render.TemporaryColorPalletModule
 import noobroutes.features.render.Trail
 import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.impl.KeybindSetting
@@ -89,7 +88,8 @@ object ModuleManager {
         AutoBr,
         AutoPath,
         EWPathfinderModule,
-        DynamicRoute
+        DynamicRoute,
+        ZealotAura
 
     )
 
