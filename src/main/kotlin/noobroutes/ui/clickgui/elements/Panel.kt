@@ -1,4 +1,4 @@
-package noobroutes.ui.newclickgui.elements
+package noobroutes.ui.clickgui.elements
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.features.Category
@@ -10,7 +10,6 @@ import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.moduleButtonColor
 import noobroutes.ui.ColorPalette.titlePanelColor
-import noobroutes.ui.clickgui.SearchBar.currentSearch
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
 import noobroutes.ui.util.UiElement
@@ -76,7 +75,7 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
 
     private fun getTotalHeight(offset: Float): Float {
         var y = offset
-        uiChildren.forEach { y += (it as ModuleButton).height }
+        uiChildren.forEach { y += (it as ModuleButton).getHeight() }
         return y
     }
 
@@ -112,7 +111,7 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
                 for (button in uiChildren) {
                     button.visible = true
                     button.updatePosition(0f, startY)
-                    startY += (button as ModuleButton).height
+                    startY += (button as ModuleButton).getHeight()
                 }
                 length = startY + 5f
             }
@@ -152,7 +151,7 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
     }
 
     override fun onScroll(amount: Int): Boolean {
-        if (isMouseOverExtended && currentSearch.isBlank()) {
+        if (isMouseOverExtended) {
             scrollTarget = (scrollTarget + amount).coerceIn(-length + scrollOffset + 72f, 0f)
             scrollAnimation.start(true)
             return true

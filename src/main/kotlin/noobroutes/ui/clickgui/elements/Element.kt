@@ -1,10 +1,7 @@
 package noobroutes.ui.clickgui.elements
 
-
 import noobroutes.features.settings.Setting
-import noobroutes.ui.clickgui.ClickGUI
-import noobroutes.ui.clickgui.util.HoverHandler
-import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.ui.util.UiElement
 
 /**
  * Renders all the modules.
@@ -15,53 +12,31 @@ import noobroutes.ui.util.MouseUtils.isAreaHovered
  * @author Stivais, Aton
  * @see [Element]
  */
-open class Element<S : Setting<*>>(val parent: ModuleButton, val setting: S, type: ElementType) {
+open class Element<S : Setting<*>>(val setting: S, val type: ElementType): UiElement(0f, 0f) {
 
     inline val name: String
         get () = setting.name
 
-    val w: Float
-        inline get() = parent.width
+    val w: Float = Panel.WIDTH
 
     var h: Float = when (type) {
         ElementType.SLIDER -> 55f
-
         else -> DEFAULT_HEIGHT
     }
 
     var extended = false
     var listening = false
 
-    val x: Float
-        inline get() = parent.x
-
-    var y: Float = 0f
-        get() = field + parent.y
 
     open val isHovered
         get() = isAreaHovered(x, y, w, h)
 
-    private val hoverHandler = HoverHandler(1250, 200)
-
-    open fun render(): Float {
-        hoverHandler.handle(x, y, w, h)
-        if (hoverHandler.percent() > 0) {
-            ClickGUI.setDescription(setting.description, x + w + 10f, y, hoverHandler)
-        }
-        draw()
-        return h
+    open fun getHeight(): Float {
+        return if (visible) h else 0f
     }
-
-    protected open fun draw() {}
-
-    open fun mouseClickedAnywhere(mouseButton: Int): Boolean = false
-
-    open fun mouseClicked(mouseButton: Int): Boolean = isAreaHovered(x, y, w, h)
-    open fun mouseReleased(state: Int) {}
-
-    open fun keyTyped(typedChar: Char, keyCode: Int): Boolean = false
 
     companion object {
         const val DEFAULT_HEIGHT = 32f
+        const val BORDER_OFFSET = 9f
     }
 }

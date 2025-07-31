@@ -2,11 +2,11 @@ package noobroutes.ui.blockgui.blockeditor.elements
 
 import net.minecraft.block.properties.PropertyEnum
 import net.minecraft.block.state.IBlockState
+import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.blockgui.blockeditor.BlockEditor
 import noobroutes.ui.blockgui.blockeditor.Element
-import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.render.ColorUtil.darkerIf
@@ -25,7 +25,7 @@ class ElementSelector(private val property: PropertyEnum<*>, val block: IBlockSt
         const val HEIGHT = 25f
         const val SCALE = 15f
     }
-    private inline val xLeftBound get() = BlockEditor.originX + x + TEXTOFFSET
+    private inline val xLeftBound get() = BlockEditor.originX + x + TEXT_OFFSET
     private inline val yBound get() = y + 30f
 
     private var extended = false

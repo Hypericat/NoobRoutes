@@ -1,11 +1,10 @@
 package noobroutes.ui.editUI.elements
 
 
+import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.editUI.EditUI
 import noobroutes.ui.editUI.Element
 import noobroutes.ui.util.MouseUtils.isAreaHovered
@@ -14,6 +13,7 @@ import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.brighterIf
 import noobroutes.utils.round
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
@@ -45,20 +45,20 @@ class ElementSlider(
 
     private val isHoveredBox: Boolean
         get() = isAreaHovered(
-            EditUI.originX + x + w - TEXTOFFSET - 30 - getTextWidth(getDisplay(), 16f),
+            EditUI.originX + x + w - TEXT_OFFSET - 30 - getTextWidth(getDisplay(), 16f),
             EditUI.originY + y + 5f,
             16f + getTextWidth(getDisplay(), 16f),
             21.5f
         )
 
-    private val handler = HoverHandler(0, 150)
+
     private val colorAnim = ColorAnimation(100)
 
     /** Used to make slider smoother and not jittery (doesn't change value.) */
     private var sliderPercentage: Float = ((valueDouble.round(round).toDouble() - min) / (max - min)).toFloat().coerceAtMost(1f)
 
     private inline val color: Color
-        get() = clickGUIColor.brighter(1 + handler.percent() / 200f)
+        get() = clickGUIColor.brighterIf(isHovered)
 
 
     private fun getDisplay(): String {
@@ -69,11 +69,10 @@ class ElementSlider(
     }
 
     override fun draw(x: Float, y: Float) {
-        handler.handle(x, y + 21.5f, w - 15f, 33.5f)
         val textWidth = getTextWidth(getDisplay(), 16f)
 
         roundedRectangle(
-            x + w - TEXTOFFSET - 30 - textWidth,
+            x + w - TEXT_OFFSET - 30 - textWidth,
             y,
             16f + textWidth,
             26.5f,
@@ -82,7 +81,7 @@ class ElementSlider(
             edgeSoftness = 1f
         )
         rectangleOutline(
-            x + w - TEXTOFFSET - 30 - textWidth,
+            x + w - TEXT_OFFSET - 30 - textWidth,
             y,
             16f + textWidth,
             26.5f,
@@ -96,25 +95,25 @@ class ElementSlider(
         )
 
         if (listening) {
-            sliderPercentage = ((mouseX + 10.6f - (x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f)
+            sliderPercentage = ((mouseX + 10.6f - (x + TEXT_OFFSET)) / (w - 15f)).coerceIn(0f, 1f)
             val diff = max - min
-            val newVal = min + ((mouseX + 10.6f - (x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f) * diff
+            val newVal = min + ((mouseX + 10.6f - (x + TEXT_OFFSET)) / (w - 15f)).coerceIn(0f, 1f) * diff
             setter(newVal)
         }
         //roundedRectangle(x + w - 4, y, 2, h, clickGUIColor.brighter(1.6f), 0f, edgeSoftness = 0)
 
-        text(name, x + TEXTOFFSET, y + 17.75f, textColor, 20f)
+        text(name, x + TEXT_OFFSET, y + 17.75f, textColor, 20f)
         text(
             getDisplay(),
-            x + w - TEXTOFFSET - 22 - textWidth,
+            x + w - TEXT_OFFSET - 22 - textWidth,
             y + 15.75f,
             textColor.darkerIf(isHoveredBox),
             16f
         )
 
         //draw slider
-        roundedRectangle(x + TEXTOFFSET, y + 37f, w - 30f, 7f, sliderBGColor, 3f)
-        roundedRectangle(x + TEXTOFFSET, y + 37f, sliderPercentage * (w - 30f), 7f, color, 3f)
+        roundedRectangle(x + TEXT_OFFSET, y + 37f, w - 30f, 7f, sliderBGColor, 3f)
+        roundedRectangle(x + TEXT_OFFSET, y + 37f, sliderPercentage * (w - 30f), 7f, color, 3f)
 
     }
 

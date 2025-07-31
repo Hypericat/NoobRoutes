@@ -1,25 +1,15 @@
 package noobroutes.ui.clickgui.elements.menu
-
-import noobroutes.features.render.ClickGUIModule
+import net.minecraft.client.renderer.GlStateManager
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.font.FontRenderer
-import noobroutes.ui.ColorPalette.buttonColor
-import noobroutes.ui.ColorPalette.clickGUIColor
+import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
-import noobroutes.ui.clickgui.elements.ModuleButton
-import noobroutes.ui.clickgui.util.HoverHandler
-import noobroutes.ui.util.MouseUtils.isAreaHovered
-import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.ui.util.animations.impl.LinearAnimation
-import noobroutes.utils.render.*
-import noobroutes.utils.render.ColorUtil.brighter
-import noobroutes.utils.render.ColorUtil.brighterIf
-import noobroutes.utils.render.ColorUtil.darker
-import noobroutes.utils.render.ColorUtil.darkerIf
+import noobroutes.ui.util.elements.SwitchElement
+import noobroutes.utils.render.roundedRectangle
+import noobroutes.utils.render.text
 
 /**
  * Renders all the modules.
@@ -30,63 +20,25 @@ import noobroutes.utils.render.ColorUtil.darkerIf
  * @author Stivais, Aton
  * @see [Element]
  */
-class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<BooleanSetting>(
-    parent, setting, ElementType.CHECK_BOX
+class ElementCheckBox(setting: BooleanSetting) : Element<BooleanSetting>(
+    setting, ElementType.CHECK_BOX
 ) {
-    private val colorAnim = ColorAnimation(250)
-    private val linearAnimation = LinearAnimation<Float>(200)
 
-    private val hover = HoverHandler(0, 150)
-
-    override val isHovered: Boolean get() =
-        if (!ClickGUIModule.switchType) isAreaHovered(x + w - 30f, y + 5f, 21f, 20f)
-        else isAreaHovered(x + w - 43f, y + 4f, 34f, 20f)
-
-        override fun draw() {
-            roundedRectangle(x, y, w, h, elementBackground)
-            text(name, x + TEXTOFFSET, y + h * 0.5, textColor, 12f, FontRenderer.REGULAR)
-
-            hover.handle(x + w - 43f, y + 4f, 34f, 20f)
-            val color = colorAnim.get(
-                clickGUIColor.darkerIf(hover.percent() > 0, 0.7f),
-                buttonColor.brighter(1.3f).brighterIf(hover.percent() > 0, 1.3f),
-                setting.enabled
-            )
-
-
-            if (!ClickGUIModule.switchType) {
-                //render check box
-                roundedRectangle(x + w - 30f, y + 5f, 21f, 20f, color, 5f)
-                rectangleOutline(x + w - 30f, y + 5f, 21f, 20f, clickGUIColor, 5f, 3f)
-            } else {
-                //render switch
-                roundedRectangle(x + w - 43f, y + 4f, 34f, 20f, buttonColor, 9f)
-
-                if (setting.enabled || linearAnimation.isAnimating()) roundedRectangle(x + w - 43f, y + 4f, linearAnimation.get(34f, 9f, setting.enabled), 20f, color, 9f)
-
-
-                if (isHovered) rectangleOutline(x + w - 43f, y + 4f, 34f, 20f, color.darker(.85f), 9f, 3f)
-                circle(x + w - linearAnimation.get(33f, 17f, !setting.enabled), y + 14f, 6f,
-                    Color(220, 220, 220).darkerIf(isHovered, 0.9f)
-                )
-            }
+    val switchElement = SwitchElement(1f, setting.enabled, w - SwitchElement.SWITCH_WIDTH_HALF - BORDER_OFFSET, h * 0.5f).apply {
+        addValueChangeListener {
+            setting.enabled = it
         }
-
-    //240 - 43
-    //197
-    //240 - 33
-    //207
-
-    override fun mouseClicked(mouseButton: Int): Boolean {
-        if (mouseButton == 0 && isHovered) {
-            if (colorAnim.start()) {
-                linearAnimation.start()
-                setting.enabled = !setting.enabled
-            }
-            return true
-        }
-        return false
     }
 
+    init {
+        addChild(switchElement)
+    }
 
+    override fun draw() {
+        GlStateManager.pushMatrix()
+        translate(x, y)
+        roundedRectangle(0f, 0f, w, h, elementBackground)
+        text(name, TEXT_OFFSET, h * 0.5, textColor, 12f, FontRenderer.REGULAR)
+        GlStateManager.popMatrix()
+    }
 }

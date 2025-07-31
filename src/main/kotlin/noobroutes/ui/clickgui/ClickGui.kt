@@ -1,14 +1,14 @@
-package noobroutes.ui.newclickgui
+package noobroutes.ui.clickgui
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.Screen
-import noobroutes.ui.newclickgui.elements.ClickGUIBase
+import noobroutes.ui.clickgui.elements.ClickGUIBase
 import noobroutes.ui.util.shader.GaussianBlurShader
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11
 import kotlin.math.sign
 
-object NewClickGui : Screen() {
+object ClickGui : Screen() {
     val base = ClickGUIBase()
     override fun draw() {
         GlStateManager.pushMatrix()

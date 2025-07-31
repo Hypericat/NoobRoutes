@@ -11,7 +11,7 @@ import noobroutes.utils.render.*
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
-class KeybindElement(override var elementValue: Keybinding, x: Float, y: Float, val xScale: Float, val yScale: Float) :
+class KeybindElement(override var elementValue: Keybinding, x: Float, y: Float, val xScale: Float, val yScale: Float, val alignment: TextAlign = TextAlign.Middle) :
     UiElement(x, y), ElementValue<Keybinding> {
 
     companion object {
@@ -49,16 +49,22 @@ class KeybindElement(override var elementValue: Keybinding, x: Float, y: Float, 
         val value = if (elementValue.key > 0) Keyboard.getKeyName(elementValue.key) ?: "Err"
         else if (elementValue.key < 0) Mouse.getButtonName(elementValue.key + 100)
         else "None"
-        GlStateManager.pushMatrix()
-        translate(x, y)
-        scale(xScale, yScale)
         val width = getTextWidth(value, 12f).coerceAtLeast(KEYBIND_MINIMUM_WIDTH) + KEYBIND_ADDITION_WIDTH
         val halfWidth = width * 0.5f
+        val xOffset = when (alignment) {
+            TextAlign.Left -> 0f
+            TextAlign.Middle -> -halfWidth
+            TextAlign.Right -> -width
+        }
+
+        GlStateManager.pushMatrix()
+        translate(x + xOffset, y)
+        scale(xScale, yScale)
 
         roundedRectangle(-halfWidth, -HALF_KEYBIND_HEIGHT, width, KEYBIND_HEIGHT, ColorPalette.buttonColor, 5f)
         if (listening || colorAnimation.isAnimating()) {
             rectangleOutline(
-                -halfWidth,
+                0f,
                 -HALF_KEYBIND_HEIGHT,
                 width,
                 KEYBIND_HEIGHT,
@@ -67,7 +73,7 @@ class KeybindElement(override var elementValue: Keybinding, x: Float, y: Float, 
                 3f
             )
         }
-        text(value, 0, 0, ColorPalette.textColor, 12f, align = TextAlign.Middle)
+        text(value, -xOffset, 0, ColorPalette.textColor, 12f, align = TextAlign.Middle)
         GlStateManager.popMatrix()
     }
 

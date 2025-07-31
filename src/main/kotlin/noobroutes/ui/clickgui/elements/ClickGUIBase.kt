@@ -1,4 +1,4 @@
-package noobroutes.ui.newclickgui.elements
+package noobroutes.ui.clickgui.elements
 
 import noobroutes.features.Category
 import noobroutes.ui.util.UiElement

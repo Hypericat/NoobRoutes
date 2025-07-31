@@ -4,19 +4,19 @@ package noobroutes.ui.blockgui.blockeditor.elements
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
 import noobroutes.features.dungeon.brush.BrushModule
+import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.blockgui.blockeditor.BlockEditor.originX
 import noobroutes.ui.blockgui.blockeditor.Element
-import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.brighterIf
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToInt
@@ -43,20 +43,20 @@ class ElementSlider(
 
     private val isHoveredBox: Boolean
         get() = isAreaHovered(
-            originX + x + w - TEXTOFFSET - 30 - getTextWidth(getDisplay(), 16f),
+            originX + x + w - TEXT_OFFSET - 30 - getTextWidth(getDisplay(), 16f),
              + y + 5f,
             16f + getTextWidth(getDisplay(), 16f),
             21.5f
         )
 
-    private val handler = HoverHandler(0, 150)
+
     private val colorAnim = ColorAnimation(100)
 
     /** Used to make slider smoother and not jittery (doesn't change value.) */
     private var sliderPercentage: Float = ((valueDouble - min) / (max - min)).toFloat().coerceAtMost(1f)
 
     private inline val color: Color
-        get() = clickGUIColor.brighter(1 + handler.percent() / 200f)
+        get() = clickGUIColor.brighterIf(isHovered)
 
 
     private fun getDisplay(): String {
@@ -67,11 +67,11 @@ class ElementSlider(
     }
 
     override fun draw() {
-        handler.handle(originX + x, y + 21.5f, w - 15f, 33.5f)
+
         val textWidth = getTextWidth(getDisplay(), 16f)
 
         roundedRectangle(
-            originX + x + w - TEXTOFFSET - 30 - textWidth,
+            originX + x + w - TEXT_OFFSET - 30 - textWidth,
             y,
             16f + textWidth,
             26.5f,
@@ -80,7 +80,7 @@ class ElementSlider(
             edgeSoftness = 1f
         )
         rectangleOutline(
-            originX + x + w - TEXTOFFSET - 30 - textWidth,
+            originX + x + w - TEXT_OFFSET - 30 - textWidth,
             y,
             16f + textWidth,
             26.5f,
@@ -94,7 +94,7 @@ class ElementSlider(
         )
 
         if (listening) {
-            val sliderCalculation = ((mouseX + 10.6f - (originX + x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f)
+            val sliderCalculation = ((mouseX + 10.6f - (originX + x + TEXT_OFFSET)) / (w - 15f)).coerceIn(0f, 1f)
             sliderPercentage = sliderCalculation
             val diff = max - min
             val newVal = min + sliderCalculation * diff
@@ -102,18 +102,18 @@ class ElementSlider(
         }
         //roundedRectangle(originX + x + w - 4, y + , 2, h, clickGUIColor.brighter(1.6f), 0f, edgeSoftness = 0)
 
-        text(name, originX + x + TEXTOFFSET, y + 17.75f, textColor, 20f)
+        text(name, originX + x + TEXT_OFFSET, y + 17.75f, textColor, 20f)
         text(
             getDisplay(),
-            originX + x + w - TEXTOFFSET - 22 - textWidth,
+            originX + x + w - TEXT_OFFSET - 22 - textWidth,
             y + 15.75f,
             textColor.darkerIf(isHoveredBox),
             16f
         )
 
         //draw slider
-        roundedRectangle(originX + x + TEXTOFFSET, y + 37f, w - 30f, 7f, sliderBGColor, 3f)
-        roundedRectangle(originX + x + TEXTOFFSET, y + 37f, sliderPercentage * (w - 30f), 7f, color, 3f)
+        roundedRectangle(originX + x + TEXT_OFFSET, y + 37f, w - 30f, 7f, sliderBGColor, 3f)
+        roundedRectangle(originX + x + TEXT_OFFSET, y + 37f, sliderPercentage * (w - 30f), 7f, color, 3f)
 
     }
 
@@ -142,7 +142,7 @@ class ElementSlider(
 
     override fun mouseReleased() {
         listening = false
-        val sliderCalculation = ((mouseX + 10.6f - (originX + x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f)
+        val sliderCalculation = ((mouseX + 10.6f - (originX + x + TEXT_OFFSET)) / (w - 15f)).coerceIn(0f, 1f)
         val diff = max - min
         val newVal = min + sliderCalculation * diff
         setter(newVal)

@@ -14,7 +14,6 @@ import noobroutes.events.EventDispatcher
 import noobroutes.features.ModuleManager
 import noobroutes.features.floor7.autop3.Blink
 import noobroutes.font.FontType
-import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.utils.*
 import noobroutes.utils.clock.Executor
 import noobroutes.utils.render.RenderUtils
@@ -57,7 +56,6 @@ class NoobRoutes {
             Renderer,
             RenderUtils2D,
             RenderUtils,
-            ClickGUI,
             AutoP3Utils,
             Blink,
             Scheduler,

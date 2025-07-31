@@ -1,209 +1,144 @@
 package noobroutes.ui.clickgui.elements
 
-import net.minecraft.client.renderer.texture.DynamicTexture
+import net.minecraft.client.renderer.GlStateManager
 import noobroutes.features.Module
-import noobroutes.features.render.ClickGUIModule
-import noobroutes.features.settings.impl.*
+import noobroutes.features.settings.impl.ActionSetting
+import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.features.settings.impl.ColorSetting
+import noobroutes.features.settings.impl.DropdownSetting
+import noobroutes.features.settings.impl.DualSetting
+import noobroutes.features.settings.impl.HudSetting
+import noobroutes.features.settings.impl.KeybindSetting
+import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.features.settings.impl.SelectorSetting
+import noobroutes.features.settings.impl.StringSetting
 import noobroutes.font.FontRenderer
+import noobroutes.ui.ColorPalette
 import noobroutes.ui.ColorPalette.clickGUIColor
-import noobroutes.ui.ColorPalette.moduleButtonColor
-import noobroutes.ui.clickgui.ClickGUI
-import noobroutes.ui.clickgui.Panel
-import noobroutes.ui.clickgui.elements.menu.*
-import noobroutes.ui.clickgui.util.HoverHandler
-import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.ui.clickgui.elements.menu.ElementAction
+import noobroutes.ui.clickgui.elements.menu.ElementCheckBox
+import noobroutes.ui.clickgui.elements.menu.ElementColor
+import noobroutes.ui.clickgui.elements.menu.ElementDropdown
+import noobroutes.ui.clickgui.elements.menu.ElementDual
+import noobroutes.ui.clickgui.elements.menu.ElementHud
+import noobroutes.ui.clickgui.elements.menu.ElementKeyBind
+import noobroutes.ui.clickgui.elements.menu.ElementSelector
+import noobroutes.ui.clickgui.elements.menu.ElementSlider
+import noobroutes.ui.clickgui.elements.menu.ElementTextField
+import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.EaseInOut
-import noobroutes.utils.render.*
+import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.darkerIf
-import noobroutes.utils.render.RenderUtils.loadBufferedImage
+import noobroutes.utils.render.TextAlign
+import noobroutes.utils.render.roundedRectangle
+import noobroutes.utils.render.text
 import kotlin.math.floor
 
-/**
- * Renders all the modules.
- *
- * Backend made by Aton, with some changes
- * Design mostly made by Stivais
- *
- * @author Stivais, Aton
- * @see [Element]
- */
-class ModuleButton(val module: Module, val panel: Panel) {
+class ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
 
-    val menuElements: ArrayList<Element<*>> = ArrayList()
-
-    val x: Float
-        inline get() = panel.x
-
-    var y: Float = 0f
-        get() = field + panel.y
-
-    private val colorAnim = ColorAnimation(150)
-
-    val color: Color
-        get() = colorAnim.get(clickGUIColor, Color.WHITE, module.enabled).darkerIf(isButtonHovered, 0.7f)
-
-    val width = Panel.WIDTH
-    val height = 32f
-
-    var extended = false
-
-    private val extendAnim = EaseInOut(250)
-    private val hoverHandler = HoverHandler(1000, 200)
-    private val bannableIcon = DynamicTexture(loadBufferedImage("/assets/ui/bannableIcon.png"))
-    private val fpsHeavyIcon = DynamicTexture(loadBufferedImage("/assets/ui/fpsHeavyIcon.png"))
-    private val newFeatureIcon = DynamicTexture(loadBufferedImage("/assets/ui/newFeatureIcon.png"))
-
+    companion object {
+        const val BUTTON_HEIGHT = 32f
+    }
 
     init {
         updateElements()
     }
 
+    private val extendAnim = EaseInOut(250)
+
+    private inline val UiElement.element get() = (this as Element<*>)
+
+    private val colorAnim = ColorAnimation(150)
+    val color: Color
+        get() = colorAnim.get(clickGUIColor, Color.WHITE, module.enabled).darkerIf(isButtonHovered, 0.7f)
+    var extended = false
+    val width = Panel.WIDTH
+
+    private val isButtonHovered: Boolean
+        get() = isAreaHovered(-Panel.BORDER_THICKNESS, 0f, width + Panel.DOUBLE_BORDER_THICKNESS, BUTTON_HEIGHT - 1)
+
+    fun getHeight(): Float {
+        return BUTTON_HEIGHT + floor(extendAnim.get(0f, getOptionsHeight(), !extended))
+    }
+
+
+    private fun getOptionsHeight(): Float {
+        var drawY = 0f
+        for (i in 0 until uiChildren.size) {
+            drawY += uiChildren[i].element.getHeight()
+        }
+        return drawY
+    }
+
+    override fun draw() {
+        GlStateManager.pushMatrix()
+        translate(0f, y)
+        roundedRectangle(0f, 0f, width, BUTTON_HEIGHT, ColorPalette.moduleButtonColor)
+        text(module.name, width * 0.5, BUTTON_HEIGHT * 0.5, color, 14f, FontRenderer.REGULAR, TextAlign.Middle)
+
+
+        val renderSettings = extendAnim.isAnimating() || extended
+
+        var drawY = BUTTON_HEIGHT
+        uiChildren.forEach {
+            it.visible = renderSettings
+            it.updatePosition(0f, drawY)
+            drawY += (it as Element<*>).getHeight()
+        }
+
+        scissorChildren(0f, 0f, width, drawY)
+        roundedRectangle(x /*- 2 */, y + BUTTON_HEIGHT, 2, drawY - BUTTON_HEIGHT, clickGUIColor.brighter(1.65f), edgeSoftness = 0f)
+
+
+        GlStateManager.popMatrix()
+    }
+
+    override fun mouseClicked(mouseButton: Int): Boolean {
+        if (!isButtonHovered) return false
+        if (mouseButton == 0) {
+            if (colorAnim.start()) module.toggle()
+            return true
+        }
+        if (mouseButton == 1) {
+            if (uiChildren.isEmpty()) return true
+            if (extendAnim.start()) extended = !extended
+            return true
+        }
+        return true
+    }
+
+
+
+
     fun updateElements() {
         var position = -1 // This looks weird, but it starts at -1 because it gets incremented before being used.
+        uiChildren.clear()
         for (setting in module.settings) {
             /** Don't show hidden settings */
             if (setting.shouldBeVisible) run addElement@{
                 position++
-                if (menuElements.any { it.setting === setting }) return@addElement
+                if (uiChildren.any { it.element.setting === setting }) return@addElement
                 val newElement = when (setting) {
-                    is BooleanSetting -> ElementCheckBox(this, setting)
-                    is NumberSetting -> ElementSlider(this, setting)
-                    is SelectorSetting -> ElementSelector(this, setting)
-                    is StringSetting -> ElementTextField(this, setting)
-                    is ColorSetting -> ElementColor(this, setting)
-                    is ActionSetting -> ElementAction(this, setting)
-                    is DualSetting -> ElementDual(this, setting)
-                    is HudSetting -> ElementHud(this, setting)
-                    is KeybindSetting -> ElementKeyBind(this, setting)
-                    is DropdownSetting -> ElementDropdown(this, setting)
+                    is BooleanSetting -> ElementCheckBox(setting)
+                    is NumberSetting -> ElementSlider(setting)
+                    is SelectorSetting -> ElementSelector(setting)
+                    is StringSetting -> ElementTextField(setting)
+                    is ColorSetting -> ElementColor(setting)
+                    is ActionSetting -> ElementAction(setting)
+                    is DualSetting -> ElementDual(setting)
+                    is HudSetting -> ElementHud(setting)
+                    is KeybindSetting -> ElementKeyBind(setting)
+                    is DropdownSetting -> ElementDropdown(setting)
                     else -> {
                         position--
                         return@addElement
                     }
                 }
-                menuElements.add(position, newElement)
+                addChild(newElement)
             } else {
-                menuElements.removeAll {
-                    it.setting === setting
-                }
             }
         }
-    }
-
-    fun draw(): Float {
-
-        var offs = height
-
-        hoverHandler.handle(x, y, width, height - 1)
-
-
-        if (hoverHandler.percent() > 0) {
-            ClickGUI.setDescription(module.description, x + width + 10f, y, hoverHandler)
-        }
-
-
-        roundedRectangle(x, y, width, height, moduleButtonColor)
-
-        text(module.name, x + width * 0.5, y + height * 0.5, color, 14f, FontRenderer.REGULAR, TextAlign.Middle)
-        val textWidth = getTextWidth(module.name, 18f)
-
-        if (textWidth < width - 80) {// too long text, not drawing symbol
-            if (module.tag == Module.TagType.RISKY) {
-                drawDynamicTexture(bannableIcon, x + width * 0.5 + textWidth * 0.5, y + 2f, 25f, 25f)
-            } else if (module.tag == Module.TagType.FPSTAX) {
-                drawDynamicTexture(fpsHeavyIcon, x + width * 0.5 + textWidth * 0.5, y, 35f, 35f)
-            } else if (module.tag == Module.TagType.NEW && ClickGUIModule.firstTimeOnVersion) {
-                drawDynamicTexture(newFeatureIcon, x + width * 0.5 + textWidth * 0.5, y, 35f, 35f)
-            }
-        }
-
-        if (!extendAnim.isAnimating() && !extended || menuElements.isEmpty()) {
-            return offs
-        }
-        var drawY = offs
-        offs = height + floor(extendAnim.get(0f, getSettingHeight(), !extended))
-
-        val scissor = scissor(x, y, width, offs)
-        for (i in 0 until menuElements.size) {
-            val currentY = drawY
-            menuElements[i].y = currentY
-            drawY += menuElements[i].render()
-        }
-        roundedRectangle(x, y + height, 2, drawY - height, clickGUIColor.brighter(1.65f), edgeSoftness = 0f)
-        resetScissor(scissor)
-
-
-        return offs
-    }
-
-    fun mouseClicked(mouseButton: Int): Boolean {
-        if (isButtonHovered) {
-            if (mouseButton == 0) {
-                if (colorAnim.start()) module.toggle()
-                return true
-            } else if (mouseButton == 1) {
-                if (menuElements.size > 0) {
-                    if (extendAnim.start()) extended = !extended
-                    if (!extended) {
-                        menuElements.forEach {
-                            it.listening = false
-                        }
-                    }
-                }
-                return true
-            }
-        } else if (isMouseUnderButton) {
-            for (i in menuElements.size - 1 downTo 0) {
-                if (menuElements[i].mouseClicked(mouseButton)) {
-                    updateElements()
-                    return true
-                }
-            }
-        }
-
-        return false
-    }
-
-    fun mouseClickedAnywhere(mouseButton: Int): Boolean {
-        for (i in menuElements.size - 1 downTo 0) {
-            if (menuElements[i].mouseClickedAnywhere(mouseButton)) {
-                updateElements()
-                return true
-            }
-        }
-        return false
-    }
-
-
-    fun mouseReleased(state: Int) {
-        if (extended) {
-            for (i in menuElements.size - 1 downTo 0) {
-                menuElements[i].mouseReleased(state)
-            }
-        }
-    }
-
-    fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
-        if (extended) {
-            for (i in menuElements.size - 1 downTo 0) {
-                if (menuElements[i].keyTyped(typedChar, keyCode)) return true
-            }
-        }
-        return false
-    }
-
-    private val isButtonHovered: Boolean
-        get() = isAreaHovered(x, y, width, height - 1)
-
-
-    private val isMouseUnderButton: Boolean
-        get() = extended && isAreaHovered(x, y + height, width)
-
-    private fun getSettingHeight(): Float {
-        var totalHeight = 0f
-        for (i in menuElements) totalHeight += i.h
-        return totalHeight
     }
 }

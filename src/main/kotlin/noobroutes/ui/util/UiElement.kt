@@ -5,8 +5,11 @@ import noobroutes.Core.logger
 import noobroutes.ui.util.elements.NumberBoxElement
 import noobroutes.ui.util.shader.GaussianBlurShader
 import noobroutes.utils.render.Color
+import noobroutes.utils.render.Scissor
 import noobroutes.utils.render.popStencil
+import noobroutes.utils.render.resetScissor
 import noobroutes.utils.render.roundedRectangle
+import noobroutes.utils.render.scissor
 import noobroutes.utils.render.stencil
 import noobroutes.utils.render.stencilRoundedRectangle
 
@@ -50,7 +53,14 @@ abstract class UiElement(var x: Float, var y: Float) {
         if (stencilChildren) {
             stencilRoundedRectangle(stencilX, stencilY, stencilWidth, stencilHeight, stencilRadius, stencilEdgeSoftness, stencilInverse)
         }
-        drawChildren()
+        val scissor = childrenScissor
+
+        if (scissor != null) {
+            val scissorTest = scissor(scissor.x.toFloat() + getEffectiveX(), scissor.y.toFloat() + getEffectiveY(), scissor.w.toFloat() * getEffectiveXScale(), scissor.h.toFloat() * getEffectiveYScale())
+            drawChildren()
+            resetScissor(scissorTest)
+        } else drawChildren()
+
         if (stencilChildren) {
             popStencil()
             stencilChildren = false
@@ -136,14 +146,20 @@ abstract class UiElement(var x: Float, var y: Float) {
         updateChildrenScale()
         GlStateManager.scale(x, y, 1f)
     }
-    var stencilChildren = false
-    var stencilX = 0f
-    var stencilY = 0f
-    var stencilWidth = 0f
-    var stencilHeight = 0f
-    var stencilRadius = 0f
-    var stencilEdgeSoftness = 0f
-    var stencilInverse = false
+    private var stencilChildren = false
+    private var stencilX = 0f
+    private var stencilY = 0f
+    private var stencilWidth = 0f
+    private var stencilHeight = 0f
+    private var stencilRadius = 0f
+    private var stencilEdgeSoftness = 0f
+    private var stencilInverse = false
+
+    private var childrenScissor: Scissor? = null
+
+    protected fun scissorChildren(x: Float, y: Float, w: Float, h: Float) {
+        childrenScissor = Scissor(x, y, w, h, 0)
+    }
 
     protected fun stencilChildren(x: Float, y: Float, w: Float, h: Float, radius: Number = 0f, edgeSoftness: Number = 0.5f, inverse: Boolean = false){
         stencilChildren = true

@@ -6,8 +6,8 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.AlwaysActive
 import noobroutes.features.settings.impl.*
-import noobroutes.ui.clickgui.ClickGUI
 import noobroutes.ui.hud.EditHUDGui
+import noobroutes.ui.clickgui.ClickGui
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.LocationUtils
 import org.lwjgl.input.Keyboard
@@ -91,7 +91,7 @@ object  ClickGUIModule: Module(
     }
 
     override fun onEnable() {
-        Core.display = ClickGUI
+        Core.display = ClickGui
         super.onEnable()
         toggle()
     }

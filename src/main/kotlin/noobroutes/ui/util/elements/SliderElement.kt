@@ -3,9 +3,8 @@ package noobroutes.ui.util.elements
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.logger
 import noobroutes.ui.ColorPalette
+import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.clickGUIColor
-import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
-import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.UiElement
@@ -13,6 +12,7 @@ import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.floor
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.brighterIf
 import noobroutes.utils.round
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
@@ -35,24 +35,22 @@ class SliderElement(
 ) : UiElement(x, y), ElementValue<Double> {
 
     override val elementValueChangeListeners = mutableListOf<(Double) -> Unit>()
-    private val handler = HoverHandler(0, 0)
     private val colorAnim = ColorAnimation(100)
     private var listeningText = false
     private var listeningTextField: String = ""
     var listening = false
 
     private inline val isHovered: Boolean
-        get() = isAreaHovered(x + TEXTOFFSET, y + SLIDER_VERTICAL_OFFSET - SLIDER_HEIGHT, w - TEXTOFFSET, SLIDER_HEIGHT * 3f)
+        get() = isAreaHovered(x + TEXT_OFFSET, y + SLIDER_VERTICAL_OFFSET - SLIDER_HEIGHT, w - TEXT_OFFSET, SLIDER_HEIGHT * 3f)
 
     private var sliderPercentage: Float = ((elementValue- min) / (max - min)).toFloat()
 
     private inline val color: Color
-        get() = clickGUIColor.brighter(1 + handler.percent() / 200f)
+        get() = clickGUIColor.brighterIf(isHovered)
 
 
     override fun draw() {
-        handler.handle(x + TEXTOFFSET, y + SLIDER_VERTICAL_OFFSET - SLIDER_HEIGHT, w - TEXTOFFSET, SLIDER_HEIGHT * 3f)
-        //need to impliment a text element here
+            //need to impliment a text element here
         /*
         drawSliderTextBox(
             getDisplay(),
@@ -68,11 +66,11 @@ class SliderElement(
         )
 
          */
-        drawSlider(x + TEXTOFFSET, SLIDER_VERTICAL_OFFSET, w - TEXTOFFSET, SLIDER_HEIGHT, sliderPercentage, color)
+        drawSlider(x + TEXT_OFFSET, SLIDER_VERTICAL_OFFSET, w - TEXT_OFFSET, SLIDER_HEIGHT, sliderPercentage, color)
         updateSlider()
         if (listening) {
             val diff = max - min
-            val newVal = min + ((mouseX - (x + TEXTOFFSET)) / (w - 15f)).coerceIn(0f, 1f) * diff
+            val newVal = min + ((mouseX - (x + TEXT_OFFSET)) / (w - 15f)).coerceIn(0f, 1f) * diff
             setValue(newVal)
         }
     }

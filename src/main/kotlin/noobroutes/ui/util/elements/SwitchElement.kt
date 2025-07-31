@@ -30,21 +30,14 @@ class SwitchElement(
     ) : UiElement(x, y), ElementValue<Boolean>  {
 
     companion object {
-        private const val SWITCH_WIDTH = 34f
-        private const val SWITCH_HEIGHT = 20f
-        private const val SWITCH_WIDTH_HALF = SWITCH_WIDTH * 0.5f
-        private const val SWITCH_HEIGHT_HALF = SWITCH_HEIGHT * 0.5f
-        private const val SWITCH_CIRCLE_RADIUS = 6f
-        private const val SWITCH_CIRCLE_OFFSET = SWITCH_CIRCLE_RADIUS * 1.5f
-        private const val SWITCH_CIRCLE_START = -SWITCH_WIDTH_HALF + SWITCH_CIRCLE_OFFSET
-        private const val SWITCH_CIRCLE_END = SWITCH_WIDTH_HALF - SWITCH_CIRCLE_OFFSET
-
-
-        //
-        //33
-        //34
-        //
-
+        const val SWITCH_WIDTH = 34f
+        const val SWITCH_HEIGHT = 20f
+        const val SWITCH_WIDTH_HALF = SWITCH_WIDTH * 0.5f
+        const val SWITCH_HEIGHT_HALF = SWITCH_HEIGHT * 0.5f
+        const val SWITCH_CIRCLE_RADIUS = 6f
+        const val SWITCH_CIRCLE_OFFSET = SWITCH_CIRCLE_RADIUS * 1.5f
+        const val SWITCH_CIRCLE_START = -SWITCH_WIDTH_HALF + SWITCH_CIRCLE_OFFSET
+        const val SWITCH_CIRCLE_END = SWITCH_WIDTH_HALF - SWITCH_CIRCLE_OFFSET
     }
 
     override val elementValueChangeListeners = mutableListOf<(Boolean) -> Unit>()

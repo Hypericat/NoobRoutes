@@ -2,10 +2,10 @@ package noobroutes.ui.editUI.elements
 
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.font.FontRenderer
+import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.editUI.EditUI
 import noobroutes.ui.editUI.Element
 import noobroutes.ui.util.MouseUtils.isAreaHovered
@@ -36,7 +36,7 @@ class ElementCheckBox(
         else isAreaHovered(EditUI.originX + x + width - 56f - xChange, EditUI.originY + y + 14f - 8, 47f + xChange, 20f + yChange)
 
     override fun draw(x: Float, y: Float) {
-        text(name, x + TEXTOFFSET, y + height / 2f, textColor, 20f, FontRenderer.REGULAR)
+        text(name, x + TEXT_OFFSET, y + height / 2f, textColor, 20f, FontRenderer.REGULAR)
 
         val color = colorAnim.get(
             clickGUIColor.darkerIf(isHovered, 0.7f),

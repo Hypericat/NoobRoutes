@@ -15,7 +15,7 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.ui.clickgui.ClickGui
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.render.Color
@@ -52,7 +52,7 @@ object BlinkKeybind: Module(
     }
 
     override fun onEnable() {
-        if (mc.currentScreen is ClickGUI) {
+        if (mc.currentScreen is ClickGui) {
             toggle()
             return modMessage("Enable using the Keybind")
         }
