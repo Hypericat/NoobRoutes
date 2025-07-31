@@ -14,18 +14,13 @@ class SpedRing(
     ringBase: RingBase = RingBase(),
     var length: Int = 0
 ) : Ring(ringBase, RingType.SPEED) {
-    companion object : CommandGenerated {
-        override fun generateRing(args: Array<out String>): Ring? {
-            return SpedRing(generateRingBaseFromArgs(args), 20)
-        }
-    }
 
     init {
         addInt("length", {length}, {length = it})
     }
 
     override fun doRing() {
-        if (length > AutoP3.cancelled || AutoP3.blinksThisInstance + length > AutoP3.getMaxBlinks()) return
+        /*if (length > AutoP3.cancelled || AutoP3.blinksThisInstance + length > AutoP3.getMaxBlinks()) return
 
         if (length < 1.0) {
             modMessage("Broken Speed Ring, cancelling execution")
@@ -34,7 +29,7 @@ class SpedRing(
         AutoP3.blinksThisInstance += length
         AutoP3.cancelled -= length
 
-        repeat(length ) { mc.runTick() }
+        repeat(length ) { mc.runTick() }*/
     }
 
 

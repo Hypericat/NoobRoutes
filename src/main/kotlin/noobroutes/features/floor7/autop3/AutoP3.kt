@@ -85,7 +85,8 @@ object AutoP3: Module (
     val walkBoost by SelectorSetting("Walk Boost", "none", arrayListOf("none", "normal", "big"), description = "how much of a boost to apply walking of edges. Non none values might lagback more").withDependency { editShit }
 
     private val blinkShit by DropdownSetting("Blink Settings", false)
-    private val maxBlink by NumberSetting("Max Blink", 150, 0, 400, description = "How many packets can be blinked on one instance").withDependency { blinkShit }
+    val blinkToggle by BooleanSetting("Blink Toggle", description = "main toggle for blink").withDependency { blinkShit }
+    private val maxBlink by NumberSetting("Max Blink", 150, 100, 400, description = "How many packets can be blinked on one instance").withDependency { blinkShit }
     private val resetAmount by NumberSetting("Remove Amount", 50, 0, 200, description = "When removing packets from the counter how many to remove").withDependency { blinkShit }
     private val resetInterval by NumberSetting("Remove Interval", 5.0, 5.0, 20.0,0.05, unit = "s" , description = "In what interval to remove packets from the counter").withDependency { blinkShit }
     private val balanceHud by HudSetting("Balance Hud", 400f, 400f, 1f, false) {
@@ -155,15 +156,7 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
-        if (!inF7Boss || mc.thePlayer.isSneaking || editMode || movementPackets.isNotEmpty()) return
-
-        rings[route]?.forEach { ring ->
-            if (ring.inRing()) {
-                if (ring.triggered) return@forEach
-                ring.run()
-            }
-            else ring.runTriggeredLogic()
-        }
+        if (!inF7Boss || editMode || movementPackets.isNotEmpty()) return
 
         if (recordingPacketList.isNotEmpty()) {
             val blinkWaypoint = activeBlinkWaypoint ?: return handleMissingWaypoint()
@@ -178,6 +171,16 @@ object AutoP3: Module (
                 addRing(BlinkRing(blinkWaypoint.base, recordingPacketList, mc.thePlayer.motionY))
                 recordingPacketList = mutableListOf()
             }
+        }
+
+        if (mc.thePlayer.isSneaking) return
+
+        rings[route]?.forEach { ring ->
+            if (ring.inRing()) {
+                if (ring.triggered) return@forEach
+                ring.run()
+            }
+            else ring.runTriggeredLogic()
         }
 
         activeBlinkWaypoint?.let {
@@ -349,7 +352,7 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (mc.thePlayer == null || !event.isStart) return
+        if (mc.thePlayer == null || !event.isStart || movementPackets.isNotEmpty()) return
 
         activeBlink?.let {
             if (it.inRing()) {
@@ -380,7 +383,7 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun cancelC03s(event: PacketEvent.Send) {
-        if (!inF7Boss || event.packet !is C03PacketPlayer) return
+        if (!inF7Boss || event.packet !is C03PacketPlayer || movementPackets.isNotEmpty()) return
 
         if (dontCancelNextC03) {
             dontCancelNextC03 = false

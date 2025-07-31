@@ -81,8 +81,8 @@ class AutoP3Command: CommandBase() {
         return when (args.size) {
             0 -> getListOfStringsMatchingLastWord(args, listOf("ap3", "p3", "sigma69420autop3gamertime"))
             1 -> getListOfStringsMatchingLastWord(args, listOf("add", "delete", "clearwaypoints", "start", "restore", "load"))
-            2 -> when (args[1]) { //I hate the amount of nesting here
-                "add" -> getListOfStringsMatchingLastWord(args, RingType.entries.filter { it.commandGenerated }.map { it.ringName }.toList())
+            2 -> when (args[0]) { //I hate the amount of nesting here
+                "add" -> getListOfStringsMatchingLastWord(args, RingType.entries.filter { it.commandGenerated }.map { it.ringName })
                 else -> null
             }
             else -> null

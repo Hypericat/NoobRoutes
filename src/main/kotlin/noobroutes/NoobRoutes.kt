@@ -14,7 +14,6 @@ import noobroutes.events.EventDispatcher
 import noobroutes.features.ModuleManager
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3MovementHandler
-import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.move.AutoPath
 import noobroutes.font.FontType
 import noobroutes.ui.clickgui.ClickGUI

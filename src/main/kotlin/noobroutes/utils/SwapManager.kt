@@ -103,7 +103,7 @@ object SwapManager {
                 if (skyblockID.any { it == itemName }) {
                     if (mc.thePlayer.inventory.currentItem != i) {
                         if (recentlySwapped) {
-                            modMessage("yo somethings wrong $itemName")
+                            modMessage("tried to swap to fast $itemName")
                             return SwapState.TOO_FAST
                         }
                         recentlySwapped = true
@@ -140,7 +140,7 @@ object SwapManager {
                 if (skyblockID.any { it == itemName }) {
                     if (mc.thePlayer.inventory.currentItem != i) {
                         if (recentlySwapped) {
-                            modMessage("yo somethings wrong $itemName")
+                            modMessage("tried to swap to fast $itemName")
                             return SwapState.TOO_FAST
                         }
                         recentlySwapped = true
@@ -176,7 +176,7 @@ object SwapManager {
                 if (itemName == id) {
                     if (mc.thePlayer.inventory.currentItem != i) {
                         if (recentlySwapped) {
-                            modMessage("yo somethings wrong $itemName")
+                            modMessage("tried to swap to fast $itemName")
                             return SwapState.TOO_FAST
                         }
                         recentlySwapped = true
