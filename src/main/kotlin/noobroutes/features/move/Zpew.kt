@@ -121,24 +121,27 @@ object Zpew : Module(
         lastY = y
         lastZ = z
         updatePosition = false
-        recentlySentC06s.add(SentC06(yaw, pitch, x, y, z, System.currentTimeMillis()))
-        if (dingdingding) PlayerUtils.playLoudSound(getSound(), volume.toFloat(), Zpew.pitch.toFloat())
-        if (sendTPCommand && LocationUtils.isSinglePlayer) { sendChatMessage("/tp $x $y $z")}
-        if (sendPacket) Scheduler.scheduleHighPreTickTask {
-            mc.netHandler.addToSendQueue(
-                C03PacketPlayer.C06PacketPlayerPosLook(
-                    x,
-                    y,
-                    z,
-                    yaw,
-                    pitch,
-                    mc.thePlayer.onGround
+
+        Scheduler.schedulePreTickTask {
+            recentlySentC06s.add(SentC06(yaw, pitch, x, y, z, System.currentTimeMillis()))
+            if (dingdingding) PlayerUtils.playLoudSound(getSound(), volume.toFloat(), Zpew.pitch.toFloat())
+            if (sendTPCommand && LocationUtils.isSinglePlayer) { sendChatMessage("/tp $x $y $z")}
+            if (sendPacket) Scheduler.scheduleHighPreTickTask {
+                mc.netHandler.addToSendQueue(
+                    C03PacketPlayer.C06PacketPlayerPosLook(
+                        x,
+                        y,
+                        z,
+                        yaw,
+                        pitch,
+                        mc.thePlayer.onGround
+                    )
                 )
-            )
-            mc.thePlayer.setPosition(x, y, z)
-            mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
+                mc.thePlayer.setPosition(x, y, z)
+                mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
+            }
+            updatePosition = true
         }
-        updatePosition = true
     }
 
 

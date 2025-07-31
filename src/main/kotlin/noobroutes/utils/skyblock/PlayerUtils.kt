@@ -161,6 +161,10 @@ object PlayerUtils {
     fun rePressKeys() {
         AutoP3Utils.keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, Keyboard.isKeyDown(it.keyCode)) }
     }
+
+    fun safeJump() {
+        if (mc.thePlayer.onGround) mc.thePlayer.jump()
+    }
 }
 
 sealed class ClickType {

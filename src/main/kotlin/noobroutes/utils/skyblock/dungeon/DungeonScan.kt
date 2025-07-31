@@ -3,6 +3,7 @@ package noobroutes.utils.skyblock.dungeon
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import noobroutes.Core.mc
+import noobroutes.features.dungeon.AutoBr
 import noobroutes.utils.equalsOneOf
 import noobroutes.utils.skyblock.dungeon.tiles.*
 
@@ -21,7 +22,11 @@ object DungeonScan {
     private var lastScanTime = 0L
     var isScanning = false
     var hasScanned = false
-    val shouldScan: Boolean get() = System.currentTimeMillis() - lastScanTime >= 250 && !isScanning && !hasScanned
+    val shouldScan: Boolean get() = System.currentTimeMillis() - lastScanTime >= shouldScanDelay() && !isScanning && !hasScanned
+
+    private fun shouldScanDelay(): Int {
+        return if (!AutoBr.enabled || AutoBr.hasRunStarted) 250 else 0
+    }
 
     fun scan() {
         isScanning = true

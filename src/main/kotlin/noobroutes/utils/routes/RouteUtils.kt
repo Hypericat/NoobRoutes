@@ -158,6 +158,13 @@ object RouteUtils {
                 mc.thePlayer.posY.floor() - clipDistance,
                 event.packet.z
             )
+            /*Scheduler.schedulePostTickTask {
+                mc.thePlayer.setPosition(
+                    event.packet.x,
+                    event.packet.y - clipDistance - 1,
+                    event.packet.z
+                )
+            }*/
             pearlSoundRegistered = false
             clipRegistered = false
         }

@@ -55,7 +55,7 @@ object AutoBr: Module(
 
     private var waitingForClip = false
 
-    private var hasRunStarted = false
+    var hasRunStarted = false
 
     private const val VERTICAL_TP_AMOUNT = 5
 
@@ -64,6 +64,9 @@ object AutoBr: Module(
     private var snipeCoords: Vec2i? = null
 
     private fun getFurthestDoor(): Vec2i {
+        val bloodDoor = Dungeon.Info.dungeonList.find { it is Door && it.type == DoorType.BLOOD }
+        if (bloodDoor != null) return Vec2i(bloodDoor.x, bloodDoor.z)
+
         val doors = Dungeon.Info.dungeonList.filter { it is Door && it.type == DoorType.WITHER }
         val furthest = doors.maxBy { getXZDistance(it.x.toDouble(), it.z.toDouble(), mc.thePlayer.posX, mc.thePlayer.posZ) }
         return Vec2i(furthest.x, furthest.z)
@@ -71,7 +74,7 @@ object AutoBr: Module(
 
     @SubscribeEvent
     fun onChat(event: ChatPacketEvent) {
-        if (event.message == "Starting in 4 seconds." && autoStartBrToggle) {
+        if (event.message == "Starting in 4 seconds." && autoStartBrToggle && !Dungeon.Info.uniqueRooms.any { it.name == "Blood" }) {
             testAutoPearl(true)
         }
         else if (event.message == "Starting in 1 second.") {
@@ -88,6 +91,7 @@ object AutoBr: Module(
         if (autoCommand && Dungeon.currentRoom?.name != "Entrance") return
 
         Scheduler.schedulePreTickTask {
+            setRotation(0f, 90f, silent)
             val clipDistance = mc.thePlayer.posY.toInt() - 62
 
             RouteUtils.pearlClip(clipDistance, silent)
@@ -97,7 +101,7 @@ object AutoBr: Module(
         Dungeon.Info.uniqueRooms.forEach { it.tiles }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true) //detect after pearlclip. I will extract some parts of this soon to make it less nested
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true) //detect after pearlclip
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook || !waitingForClip) return
         waitingForClip = false
@@ -105,9 +109,8 @@ object AutoBr: Module(
         Scheduler.schedulePreTickTask {
             val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
             if (state == SwapManager.SwapState.UNKNOWN || state == SwapManager.SwapState.TOO_FAST) return@schedulePreTickTask
-            setRotation(0f, 90f, silent)
 
-            Scheduler.schedulePreTickTask { repeat(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() } }
+            Scheduler.scheduleFrameTask { repeat(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() } }
 
             Scheduler.scheduleLowS08Task(VERTICAL_TP_AMOUNT - 1) {
                 tpOver(snipeCoords)
@@ -129,7 +132,7 @@ object AutoBr: Module(
 
             val yaw = RotationUtils.getYaw(coords)
             val distance = sqrt((mc.thePlayer.posX - coords.x).pow(2) + (mc.thePlayer.posZ - coords.z).pow(2))
-            val aotvNumber = round(distance * 0.08333333333333333333333333333333).toInt() // 1/12
+            val aotvNumber = round(distance * 0.08333333333333333).toInt() // 1/12
 
             setRotation(yaw, GO_STRAIGHT_ON_AOTV_PITCH, silent)
 
@@ -160,14 +163,18 @@ object AutoBr: Module(
     }
 
     private fun throwOtherPearls(isSnipe: Boolean) {
-        when {
-            isSnipe -> {
-                Scheduler.schedulePreTickTask(1) { PlayerUtils.airClick() }
-                Scheduler.schedulePreTickTask(3) { PlayerUtils.airClick() }
-            }
-            noWait -> Scheduler.schedulePreTickTask(1) { PlayerUtils.airClick() }
-            else -> Scheduler.scheduleLowS08Task(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() }
+        if (isSnipe) {
+            Scheduler.schedulePreTickTask(1) { PlayerUtils.airClick() }
+            Scheduler.schedulePreTickTask(3) { PlayerUtils.airClick() }
+            return
         }
+
+        if (noWait) {
+            Scheduler.schedulePreTickTask(1) { PlayerUtils.airClick() }
+            return
+        }
+
+        Scheduler.scheduleLowS08Task { PlayerUtils.airClick() }
     }
 
     fun snipeCommand(args: Array<out String>) {
