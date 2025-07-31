@@ -85,7 +85,7 @@ object AutoBr: Module(
 
     fun testAutoPearl(autoCommand: Boolean = false) {
 
-        if (autoCommand && Dungeon.currentRoom?.name != "Entrance") return
+        if (autoCommand && Dungeon.currentRoom?.name != "Entrance") return;
 
         Scheduler.schedulePreTickTask {
             val clipDistance = mc.thePlayer.posY.toInt() - 62

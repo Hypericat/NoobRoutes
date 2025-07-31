@@ -67,15 +67,17 @@ fun Vec3.bloomNormalize(): Vec3 {
  * Gets the eye height of the player
  * @return The eye height of the player
  */
-fun fastEyeHeight(): Float =
-    if (mc.thePlayer?.isSneaking == true) 1.54f else 1.62f
+fun fastEyeHeight(sneaking: Boolean = mc.thePlayer.isSneaking): Float =
+    if (sneaking) 1.54f else 1.62f
 
 /**
  * Gets the position of the player's eyes
  * @param pos The position to get the eyes of
  * @return The position of the player's eyes
  */
-fun getPositionEyes(pos: Vec3 = mc.thePlayer?.positionVector ?: Vec3(0.0, 0.0, 0.0)): Vec3 = Vec3(pos.xCoord, pos.yCoord + fastEyeHeight(), pos.zCoord)
+fun getPositionEyes(pos: Vec3 = mc.thePlayer?.positionVector ?: Vec3(0.0, 0.0, 0.0), sneaking: Boolean = mc.thePlayer.isSneaking) : Vec3 {
+    return Vec3(pos.xCoord, pos.yCoord + fastEyeHeight(sneaking), pos.zCoord)
+}
 
 /**
  * Gets a normalized vector of the player's look
@@ -348,6 +350,11 @@ fun Vec3.toDoubleArray(): DoubleArray =
  */
 fun BlockPos.toVec3(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): Vec3 =
     Vec3(this.x.toDouble() + x, this.y.toDouble() + y, this.z.toDouble() + z)
+
+
+fun BlockPos.hash(): Int {
+    return (this.y + this.z * 31) * 31 + this.x
+}
 
 /**
  * Turns a BlockPos into a centered Vec3.

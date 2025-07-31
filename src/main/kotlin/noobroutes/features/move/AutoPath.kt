@@ -21,6 +21,7 @@ import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DoorPositions
 import noobroutes.utils.skyblock.dungeon.DoorPositions.getDoorSpots
@@ -44,11 +45,11 @@ object AutoPath: Module(
     private val selectionMode by SelectorSetting("Selection Mode", "Rotation", arrayListOf("Rotation", "Alt Key"), false,"Either use Alt Key or Angle to Select Door")
     private val altKey by KeybindSetting("Alt Key", Keyboard.KEY_NONE, "Alt Key keybind", false).withDependency { this.selectionMode == 1}
     private val pathKey by KeybindSetting("Path Key", Keyboard.KEY_NONE, "Path to selected door", false).withDependency { this.selectionMode == 0}
-    private val doorNumberColor by ColorSetting("Door Number Color", description = "I wonder what this could possibly mean", default = Color.GREEN)
-    private val selectedDoorColor by ColorSetting("Selected Door Color", description = "I wonder what this could possibly mean", default = Color.ORANGE).withDependency { this.selectionMode == 0 }
+    private val doorNumberColor by ColorSetting("Door Number Color", description = "I wonder what this could possibly mean", default = Color.ORANGE)
+    private val selectedDoorColor by ColorSetting("Selected Door Color", description = "I wonder what this could possibly mean", default = Color.GREEN).withDependency { this.selectionMode == 0 }
 
     private const val DOOR_POS_BITMASK : Int = 0b111.inv();
-    private const val MIN_DOT_THRESHOLD : Double = 0.98;
+    private const val MIN_DOT_THRESHOLD : Double = 0.95;
     private var validDoors: MutableList<BlockPos> = mutableListOf();
     private var validBlocks: MutableList<Pair<BlockPos, BlockPos>> = mutableListOf();
 
@@ -98,7 +99,7 @@ object AutoPath: Module(
         validBlocks.clear();
     }
 
-    fun getClosestPointInBox(eye: Vec3, box: AxisAlignedBB): Vec3 {
+    private fun getClosestPointInBox(eye: Vec3, box: AxisAlignedBB): Vec3 {
         val x = eye.xCoord.coerceIn(box.minX, box.maxX)
         val y = eye.yCoord.coerceIn(box.minY, box.maxY)
         val z = eye.zCoord.coerceIn(box.minZ, box.maxZ)
@@ -113,7 +114,7 @@ object AutoPath: Module(
         val eyePos: Vec3 = Minecraft.getMinecraft().thePlayer.getPositionEyes(1.0f);
         var bestDot: Double = Double.MIN_VALUE;
 
-        val box: AxisAlignedBB = AxisAlignedBB(BlockPos.ORIGIN, BlockPos.ORIGIN).expand(2.0, 2.0, 2.0); // Using a box so we can look anywhere inside the door frame (needed at close ranges)
+        val box: AxisAlignedBB = AxisAlignedBB(BlockPos.ORIGIN, BlockPos.ORIGIN).expand(1.0, 1.0, 1.0); // Using a box so we can look anywhere inside the door frame (needed at close ranges)
 
         for (i in 0..< validDoors.size) {
             val doorPos = validDoors[i].add(0.5, 2.0, 0.5);
@@ -184,8 +185,11 @@ object AutoPath: Module(
     }
 
     private fun resetPos(pos: BlockPos) {
-        if (!resetPos || !Minecraft.getMinecraft().thePlayer.onGround || DynamicRoute.isInNode()) return;
+        if (!resetPos || !Minecraft.getMinecraft().thePlayer.onGround) return;
+        if (DynamicRoute.getInNodesWithoutUpdate().any {it.isValid(Minecraft.getMinecraft().thePlayer.positionVector, it.target)}) return; // Player is in a valid node
+
         Minecraft.getMinecraft().thePlayer.setPosition(pos.x.toDouble() + 0.5, Minecraft.getMinecraft().thePlayer.posY, pos.z.toDouble() + 0.5)
+        devMessage("Reset pos!")
     }
 
     private fun pathToDoor(key: Int) {
@@ -194,6 +198,8 @@ object AutoPath: Module(
             return
         }
 
+        PlayerUtils.unPressKeys();
+        PlayerUtils.stopVelocity();
         EWPathfinderModule.execute(validBlocks[key].second, true, if (resetPos) Runnable { resetPos(BlockPos(Minecraft.getMinecraft().thePlayer.positionVector)); } else null)
     }
 
