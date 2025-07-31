@@ -5,10 +5,11 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.Core.mc
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
 import noobroutes.font.FontType
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.ColorPalette.moduleButtonColor
+import noobroutes.ui.util.shader.GaussianBlurShader
 import noobroutes.ui.util.shader.RoundedRect
 import noobroutes.utils.coerceAlpha
 import noobroutes.utils.minus
@@ -113,21 +114,17 @@ fun circle(x: Number, y: Number, radius: Number, color: Color, borderColor: Colo
     }
 }
 
-fun drawTextWithSelection(text: String, selectionStart: Int, selectionEnd: Int, x: Number, y: Number, color: Color, size: Number, type: Int = Font.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font){
-
-}
-
-fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = Font.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font) {
-    fontType.font.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
+fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = FontRenderer.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font) {
+    FontRenderer.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
 }
 
 fun mcText(text: String, x: Number, y: Number, scale: Number, color: Color, shadow: Boolean = true, center: Boolean = true) {
     RenderUtils.drawText("$text§r", x.toFloat(), y.toFloat(), scale.toDouble(), color, shadow, center)
 }
 
-fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = Font.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font): Float {
+fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = FontRenderer.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font): Float {
     text(text, x, y, color, size, type, align, verticalAlign, shadow, fontType)
-    return getTextWidth(text, size, fontType)
+    return getTextWidth(text, size)
 }
 
 fun mcTextAndWidth(text: String, x: Number, y: Number, scale: Number, color: Color, shadow: Boolean = true, center: Boolean = true): Float {
@@ -137,11 +134,11 @@ fun mcTextAndWidth(text: String, x: Number, y: Number, scale: Number, color: Col
 
 fun getMCTextWidth(text: String) = mc.fontRendererObj.getStringWidth(text)
 
-fun getTextWidth(text: String, size: Float, fontType: FontType = ColorPalette.font) = fontType.font.getTextWidth(text, size)
+fun getTextWidth(text: String, size: Float) = FontRenderer.getTextWidth(text, size)
 
 fun getMCTextHeight() = mc.fontRendererObj.FONT_HEIGHT
 
-fun getTextHeight(text: String = "", size: Float, fontType: FontType = ColorPalette.font) = fontType.font.getTextHeight(text, size)
+fun getTextHeight(text: String = "", size: Float) = FontRenderer.getTextHeight(text, size)
 
 fun translate(x: Number, y: Number, z: Number = 1f) = GlStateManager.translate(x.toDouble(), y.toDouble(), z.toDouble())
 
@@ -209,6 +206,11 @@ fun stencilRoundedRectangle(x: Float, y: Float, w: Float, h: Float, radius: Numb
     stencilRoundedRectangle(x, y, w, h, radius, radius, radius, radius, edgeSoftness, inverse)
 }
 
+fun blurRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number){
+    stencil {roundedRectangle(x, y, w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
+    GaussianBlurShader.blurredBackground(x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat(), 8f)
+    popStencil()
+}
 
 //an int would probably be better, however, i am using a stack just in case it does more in the future
 private var stencilStack = Stack<Int>()
@@ -218,40 +220,30 @@ fun stencil(inverse: Boolean = false, mask: () -> Unit) {
     stencilStack.push(newStencilValue)
     GL11.glEnable(GL11.GL_STENCIL_TEST)
 
-
     if (stencilStack.peek() == 1) {
         GL11.glClearStencil(0)
         GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT)
     }
 
-
     GL11.glColorMask(false, false, false, false)
     GL11.glDepthMask(false)
     GL11.glStencilMask(0xFF)
+
     if (stencilStack.peek() > 1) {
-
         val previousStencilValue = stencilStack.peek() - 1
-
         GL11.glStencilFunc(GL11.GL_EQUAL, previousStencilValue, 0xFF)
-
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_INCR)
-
     } else {
-
         GL11.glStencilFunc(GL11.GL_ALWAYS, newStencilValue, 0xFF)
-
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
-
     }
 
     mask.invoke()
-
     GL11.glStencilFunc(GL11.GL_EQUAL, if (stencilStack.peek() > 1) newStencilValue else 0, 0xFF)
-
     GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
     GL11.glStencilMask(0xFF)
-    mask.invoke()
 
+    mask.invoke()
     GL11.glColorMask(true, true, true, true)
     GL11.glDepthMask(true)
     GL11.glStencilMask(0x00)
@@ -267,17 +259,16 @@ fun popStencil() {
 
     stencilStack.pop()
     if (stencilStack.isEmpty()) {
-        // If no more stencils, disable the test entirely
         GL11.glDisable(GL11.GL_STENCIL_TEST)
         GL11.glStencilFunc(GL11.GL_ALWAYS, 0, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
-        GL11.glStencilMask(0xFF) // Reset mask
+        GL11.glStencilMask(0xFF)
     } else {
-        // If there are still stencils on the stack, apply the previous one
+
         val previousStencilValue = stencilStack.peek()
         GL11.glStencilFunc(GL11.GL_EQUAL, previousStencilValue, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
-        GL11.glStencilMask(0x00) // Continue to disable writing unless re-entering a stencil
+        GL11.glStencilMask(0x00)
     }
 }
 
@@ -324,12 +315,12 @@ fun drawDynamicTexture(dynamicTexture: DynamicTexture, x: Number, y: Number, w: 
     GlStateManager.popMatrix()
 }
 
-fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = Font.REGULAR, shadow: Boolean = false, fontType: FontType = ColorPalette.font) {
-    fontType.font.wrappedText(text, x, y, w, color, size, type, shadow = shadow)
+fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = FontRenderer.REGULAR, shadow: Boolean = false, fontType: FontType = ColorPalette.font) {
+    FontRenderer.wrappedText(text, x, y, w, color, size, type, shadow = shadow)
 }
 
 fun wrappedTextBounds(text: String, width: Float, size: Float, fontType: FontType = ColorPalette.font): Pair<Float, Float> {
-    return fontType.font.wrappedTextBounds(text, width, size)
+    return FontRenderer.wrappedTextBounds(text, width, size)
 }
 
 enum class TextAlign {

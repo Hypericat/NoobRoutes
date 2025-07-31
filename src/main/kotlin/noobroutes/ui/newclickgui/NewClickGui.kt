@@ -3,6 +3,7 @@ package noobroutes.ui.newclickgui
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.Screen
 import noobroutes.ui.newclickgui.elements.ClickGUIBase
+import noobroutes.ui.util.shader.GaussianBlurShader
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11
 import kotlin.math.sign
@@ -12,9 +13,11 @@ object NewClickGui : Screen() {
     override fun draw() {
         GlStateManager.pushMatrix()
         GlStateManager.enableBlend()
-        GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA)
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
         scaleUI()
+        GaussianBlurShader.captureBackground()
         base.handleDraw()
+        GaussianBlurShader.cleanup()
         resetScale()
         GlStateManager.popMatrix()
     }

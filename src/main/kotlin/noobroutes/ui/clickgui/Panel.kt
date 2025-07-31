@@ -5,7 +5,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.Category
 import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.moduleButtonColor
 import noobroutes.ui.ColorPalette.textColor
@@ -16,10 +16,10 @@ import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
 import noobroutes.ui.util.animations.impl.LinearAnimation
-import noobroutes.utils.render.ColorUtil.brighter
-import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.brighter
+import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import noobroutes.utils.round
 import kotlin.math.floor
@@ -54,6 +54,7 @@ class Panel(
 
     var extended: Boolean = ClickGUIModule.panelExtended[category]!!.enabled
 
+
     private var length = 0f
 
     private var x2 = 0f
@@ -62,6 +63,7 @@ class Panel(
     private var scrollTarget = 0f
     private var scrollOffset = 0f
     private val scrollAnimation = LinearAnimation<Float>(200)
+
 
     init {
         for (module in modules.sortedByDescending { getTextWidth(it.name, 18f) }) {
@@ -110,7 +112,7 @@ class Panel(
 
         }
 
-        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT * 0.5f, textColor, 15f, type = Font.BOLD, TextAlign.Middle)
+        text(if (displayName == "Floor7") "Floor 7" else displayName, x + WIDTH * 0.3 + additionalOffset, y + HEIGHT * 0.5f, textColor, 15f, type = FontRenderer.BOLD, TextAlign.Middle)
 
         //draw Panel Line
         if (extended && moduleButtons.isNotEmpty()) roundedRectangle(x, y + HEIGHT - 2, WIDTH, 2, clickGUIColor.brighter(1.65f))

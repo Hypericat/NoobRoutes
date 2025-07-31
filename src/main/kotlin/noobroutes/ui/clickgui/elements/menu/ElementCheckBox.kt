@@ -2,7 +2,7 @@ package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.elementBackground
@@ -15,11 +15,11 @@ import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.LinearAnimation
+import noobroutes.utils.render.*
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.brighterIf
 import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.ColorUtil.darkerIf
-import noobroutes.utils.render.*
 
 /**
  * Renders all the modules.
@@ -44,7 +44,7 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) : Element<B
 
         override fun draw() {
             roundedRectangle(x, y, w, h, elementBackground)
-            text(name, x + TEXTOFFSET, y + h * 0.5, textColor, 12f, Font.REGULAR)
+            text(name, x + TEXTOFFSET, y + h * 0.5, textColor, 12f, FontRenderer.REGULAR)
 
             hover.handle(x + w - 43f, y + 4f, 34f, 20f)
             val color = colorAnim.get(

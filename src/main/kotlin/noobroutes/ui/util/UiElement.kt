@@ -3,7 +3,11 @@ package noobroutes.ui.util
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.logger
 import noobroutes.ui.util.elements.NumberBoxElement
+import noobroutes.ui.util.shader.GaussianBlurShader
+import noobroutes.utils.render.Color
 import noobroutes.utils.render.popStencil
+import noobroutes.utils.render.roundedRectangle
+import noobroutes.utils.render.stencil
 import noobroutes.utils.render.stencilRoundedRectangle
 
 
@@ -106,6 +110,17 @@ abstract class UiElement(var x: Float, var y: Float) {
     protected fun addChild(child: UiElement) {
         child.parent = this
         uiChildren.add(child)
+    }
+    protected fun blurRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number){
+        val effX = getEffectiveX()
+        val effY = getEffectiveY()
+        //GlStateManager.pushMatrix()
+        GlStateManager.translate(-effX, -effY, -1f)
+        stencil {roundedRectangle(effX + x.toFloat(),effY + y.toFloat(), w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
+        GaussianBlurShader.blurredBackground(effX + x.toFloat(), effY + y.toFloat(), w.toFloat(), h.toFloat(), 8f)
+        popStencil()
+        GlStateManager.translate(effX, effY, 1f)
+        //GlStateManager.popMatrix()
     }
 
 

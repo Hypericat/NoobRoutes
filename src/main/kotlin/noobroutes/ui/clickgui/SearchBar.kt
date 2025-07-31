@@ -2,15 +2,15 @@ package noobroutes.ui.clickgui
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.mc
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.moduleButtonColor
 import noobroutes.ui.clickgui.elements.menu.ElementTextField
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.withAlpha
 import org.lwjgl.input.Keyboard
 
 object SearchBar {
@@ -31,8 +31,8 @@ object SearchBar {
             rectangleOutline(-202f, -1f, 404f, 32f, color, 9f,3f)
         }
         if (currentSearch.isEmpty()) {
-            text("Search here...", 0f, 18f, Color.WHITE.withAlpha(0.5f), 18f, Font.REGULAR, TextAlign.Middle)
-        } else text(currentSearch, 0f, 12f, Color.WHITE, 18f, Font.REGULAR, TextAlign.Middle)
+            text("Search here...", 0f, 18f, Color.WHITE.withAlpha(0.5f), 18f, FontRenderer.REGULAR, TextAlign.Middle)
+        } else text(currentSearch, 0f, 12f, Color.WHITE, 18f, FontRenderer.REGULAR, TextAlign.Middle)
         translate(-mc.displayWidth * 0.25f, -mc.displayHeight * 0.25f + 200f)
         scale(scaleFactor, scaleFactor, 1f)
         GlStateManager.popMatrix()

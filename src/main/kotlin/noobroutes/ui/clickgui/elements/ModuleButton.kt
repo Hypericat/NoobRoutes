@@ -4,7 +4,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.Module
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.*
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.moduleButtonColor
 import noobroutes.ui.clickgui.ClickGUI
@@ -14,9 +14,9 @@ import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.EaseInOut
+import noobroutes.utils.render.*
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.darkerIf
-import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import kotlin.math.floor
 
@@ -106,7 +106,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
 
         roundedRectangle(x, y, width, height, moduleButtonColor)
 
-        text(module.name, x + width * 0.5, y + height * 0.5, color, 14f, Font.REGULAR, TextAlign.Middle)
+        text(module.name, x + width * 0.5, y + height * 0.5, color, 14f, FontRenderer.REGULAR, TextAlign.Middle)
         val textWidth = getTextWidth(module.name, 18f)
 
         if (textWidth < width - 80) {// too long text, not drawing symbol

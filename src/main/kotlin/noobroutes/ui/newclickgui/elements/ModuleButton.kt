@@ -12,7 +12,7 @@ import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.features.settings.impl.StringSetting
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.clickgui.elements.Element
@@ -56,14 +56,14 @@ class ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
     var height = 32f
         private set
     private val isButtonHovered: Boolean
-        get() = isAreaHovered(0f, 0f, width, height - 1)
+        get() = isAreaHovered(-Panel.BORDER_THICKNESS, 0f, width + Panel.DOUBLE_BORDER_THICKNESS, height - 1)
 
 
     override fun draw() {
         GlStateManager.pushMatrix()
         translate(0f, y)
         roundedRectangle(0f, 0f, width, height, ColorPalette.moduleButtonColor)
-        text(module.name, width * 0.5, height * 0.5, color, 14f, Font.REGULAR, TextAlign.Middle)
+        text(module.name, width * 0.5, height * 0.5, color, 14f, FontRenderer.REGULAR, TextAlign.Middle)
         GlStateManager.popMatrix()
     }
 

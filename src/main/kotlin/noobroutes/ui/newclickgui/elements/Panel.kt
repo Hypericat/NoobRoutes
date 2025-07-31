@@ -1,25 +1,25 @@
 package noobroutes.ui.newclickgui.elements
 
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.Core.logger
 import noobroutes.features.Category
 import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.moduleButtonColor
 import noobroutes.ui.ColorPalette.titlePanelColor
-import noobroutes.ui.clickgui.Panel
 import noobroutes.ui.clickgui.SearchBar.currentSearch
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
 import noobroutes.ui.util.UiElement
+import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.util.animations.impl.LinearAnimation
-import noobroutes.utils.capitalizeFirst
+import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.brighter
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.getTextWidth
 import noobroutes.utils.render.popStencil
@@ -34,6 +34,14 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
         const val WIDTH = 240f
         const val HEIGHT = 40f
         const val HALF_HEIGHT = HEIGHT * 0.5f
+        const val BORDER_THICKNESS = 3f
+        const val DOUBLE_BORDER_THICKNESS = BORDER_THICKNESS * 2f
+        const val HITBOX_WIDTH = WIDTH + DOUBLE_BORDER_THICKNESS
+        const val HITBOX_HEIGHT = HEIGHT + DOUBLE_BORDER_THICKNESS
+
+        const val BOTTOM_SEGMENT_HEIGHT = 10f
+        const val PANEL_RADIUS = 10f
+        const val HIGHLIGHT_THICKNESS = 2f
     }
 
     private var dragging = false
@@ -49,6 +57,9 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
     private var scrollOffset = 0f
     private val scrollAnimation = LinearAnimation<Float>(200)
     private val extendAnim = EaseInOut(250)
+    private val colorAnimation = ColorAnimation(200)
+    private inline val bottomSegmentColor get() = colorAnimation.get(titlePanelColor, moduleButtonColor, !extended)
+    private inline val separatorColor get() = colorAnimation.get(titlePanelColor.withAlpha(0f) , clickGUIColor.brighter(1.65f), !extended)
 
     init {
         for (module in modules.sortedByDescending { getTextWidth(it.name, 18f) }) {
@@ -58,10 +69,10 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
     }
 
 
-    private inline val isHovered get() = isAreaHovered(0f, 0f, WIDTH, HEIGHT)
+    private inline val isHovered get() = isAreaHovered(-BORDER_THICKNESS, -BORDER_THICKNESS, HITBOX_WIDTH, HITBOX_HEIGHT)
 
     private val isMouseOverExtended
-        get() = extended && isAreaHovered(0f, 0f, WIDTH, length.coerceAtLeast(HEIGHT))
+        get() = extended && isAreaHovered(-BORDER_THICKNESS, -BORDER_THICKNESS, HITBOX_WIDTH, length.coerceAtLeast(HEIGHT) + DOUBLE_BORDER_THICKNESS)
 
     private fun getTotalHeight(offset: Float): Float {
         var y = offset
@@ -74,21 +85,25 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
     override fun draw() {
         GlStateManager.pushMatrix()
         scrollOffset = scrollAnimation.get(scrollOffset, scrollTarget).round(0).toFloat()
-
+        val offset = floor(extendAnim.get(0f, getTotalHeight(scrollOffset), !extended))
         if (dragging) {
             updatePosition(floor(x2 + mouseX), floor(y2 + mouseY))
         }
         translate(x, y)
+        blurRoundedRectangle(-BORDER_THICKNESS, -BORDER_THICKNESS, WIDTH + DOUBLE_BORDER_THICKNESS, offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT + DOUBLE_BORDER_THICKNESS, PANEL_RADIUS, PANEL_RADIUS, PANEL_RADIUS, PANEL_RADIUS, 0.5f)
+
+        stencilRoundedRectangle(0f, 0f, WIDTH, offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT, 10f, 0.5f, true)
+        roundedRectangle(-BORDER_THICKNESS, -BORDER_THICKNESS, WIDTH + DOUBLE_BORDER_THICKNESS, offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT + DOUBLE_BORDER_THICKNESS, titlePanelColor, 10f, 0.5f)
+        popStencil()
+
 
         roundedRectangle(
             0f, 0f, WIDTH, HEIGHT,
-            titlePanelColor, titlePanelColor, titlePanelColor,
-            0f, 10f, 10f, 0f, 0f, 0.5f
+            titlePanelColor, Color.TRANSPARENT, Color.TRANSPARENT,
+            0f, PANEL_RADIUS, PANEL_RADIUS, 0f, 0f, 0.5f
         )
-        text(name, TEXT_OFFSET, HALF_HEIGHT, ColorPalette.textColor, 16f, Font.BOLD,TextAlign.Left)
-        if (extended) roundedRectangle(0f, HEIGHT - 2, WIDTH, 2f, clickGUIColor.brighter(1.65f))
-//floor(extendAnim.get(0f, getSettingHeight(), !extended))
-        val offset = floor(extendAnim.get(0f, getTotalHeight(scrollOffset), !extended))
+        text(name, TEXT_OFFSET, HALF_HEIGHT, ColorPalette.textColor, 16f, FontRenderer.BOLD,TextAlign.Left)
+
         stencilChildren(0f, HEIGHT, WIDTH, offset)
         var startY = scrollOffset + HEIGHT
 
@@ -101,21 +116,19 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
                 }
                 length = startY + 5f
             }
-            roundedRectangle(
-                0f, offset + HEIGHT, WIDTH, 10f, moduleButtonColor, moduleButtonColor, moduleButtonColor,
-                0f, 0f, 0f, 10f, 10f, 0.5f
-            )
-
-
+            roundedRectangle(-BORDER_THICKNESS, HEIGHT - HIGHLIGHT_THICKNESS, WIDTH + DOUBLE_BORDER_THICKNESS, HIGHLIGHT_THICKNESS, separatorColor)
         } else {
             uiChildren.forEach {
                 it.visible = false
             }
-            roundedRectangle(
-                0f, offset + HEIGHT, WIDTH, 10f, titlePanelColor, titlePanelColor, titlePanelColor,
-                0f, 0f, 0f, 10f, 10f, 0.5f
-            )
         }
+
+
+        roundedRectangle(
+            0f, offset + HEIGHT, WIDTH, BOTTOM_SEGMENT_HEIGHT, bottomSegmentColor, bottomSegmentColor, bottomSegmentColor,
+            0f, 0f, 0f, PANEL_RADIUS, PANEL_RADIUS, 0.5f
+        )
+
 
         GlStateManager.popMatrix()
     }
@@ -129,7 +142,10 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
             return true
         }
         if (mouseButton == 1) {
-            if (extendAnim.start()) extended = !extended
+            if (extendAnim.start()) {
+                extended = !extended
+                colorAnimation.start()
+            }
             return true
         }
         return false

@@ -1,7 +1,7 @@
 package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.settings.impl.DropdownSetting
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
@@ -33,7 +33,7 @@ class ElementDropdown(parent: ModuleButton, setting: DropdownSetting) : Element<
 
     override fun draw() {
         roundedRectangle(x, y, w, h, elementBackground)
-        text(name, x + TEXTOFFSET, y + h  * 0.5f, textColor, 12f, Font.REGULAR)
+        text(name, x + TEXTOFFSET, y + h  * 0.5f, textColor, 12f, FontRenderer.REGULAR)
 
         val rotation = linearAnimation.get(90f, 0f  , !setting.value)
         drawArrow(x + w - 12f, y + 16, rotation, scale = 0.8f)

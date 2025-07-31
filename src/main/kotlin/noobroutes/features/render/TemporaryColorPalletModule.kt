@@ -4,6 +4,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.ColorSetting
+import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.font.FontType
 import noobroutes.ui.ColorPalette
@@ -27,7 +28,7 @@ object TemporaryColorPalletModule : Module(
     @SubscribeEvent
     fun onTick(tickEvent: TickEvent.ClientTickEvent) {
         if (tickEvent.isEnd) return
-
+        ColorPalette.defaultPalette.font = FontType.entries[font]
     }
 
 

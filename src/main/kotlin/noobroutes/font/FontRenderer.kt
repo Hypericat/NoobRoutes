@@ -1,34 +1,57 @@
-package noobroutes.font.fonts
+package noobroutes.font
 
 import gg.essential.elementa.font.FontRenderer
 import gg.essential.universal.UMatrixStack
 import noobroutes.font.EssentialFont
-import noobroutes.font.Font
+import noobroutes.ui.ColorPalette
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.TextPos
 import kotlin.math.max
 
-object ManropeFont : Font {
-    private lateinit var fontRenderer: FontRenderer
+
+typealias EssentialFont = gg.essential.elementa.font.data.Font
+@Suppress("Unused")
+object FontRenderer {
+    private val fonts = mutableMapOf<FontType, FontRenderer>()
+    private inline val fontRenderer: FontRenderer get() = fonts[ColorPalette.font]!!
+
+    const val REGULAR = 1
+    const val BOLD = 2
 
 
-    override fun init() {
-        fontRenderer = FontRenderer(
+    fun init() {
+        fonts[FontType.MANROPE] = FontRenderer(
             EssentialFont.fromResource("/assets/fonts/manrope/Regular"),
             EssentialFont.fromResource("/assets/fonts/manrope/SemiBold")
         )
+        fonts[FontType.NUNITO] = FontRenderer(
+            EssentialFont.fromResource("/assets/fonts/nunito/Regular"),
+            EssentialFont.fromResource("/assets/fonts/nunito/SemiBold")
+        )
+        fonts[FontType.ODIN] = FontRenderer(
+            EssentialFont.fromResource("/assets/fonts/odin/Regular"),
+            EssentialFont.fromResource("/assets/fonts/odin/SemiBold")
+        )
+        fonts[FontType.LEXEND] = FontRenderer(
+            EssentialFont.fromResource("/assets/fonts/lexend/Regular"),
+            EssentialFont.fromResource("/assets/fonts/lexend/SemiBold")
+        )
+        fonts[FontType.MANUFACTURING_CONSENT] = FontRenderer(
+            EssentialFont.fromResource("/assets/fonts/manufacturingconsent/Regular"),
+            EssentialFont.fromResource("/assets/fonts/manufacturingconsent/SemiBold")
+        )
     }
 
-    override fun xOrigin(text: String, x: Float, align: TextAlign, scale: Float): Float {
+    fun xOrigin(text: String, x: Float, align: TextAlign, scale: Float): Float {
         return when (align) {
             TextAlign.Left -> x
-            TextAlign.Right -> x - OdinFont.getTextWidth(text, scale)
-            TextAlign.Middle -> x - OdinFont.getTextWidth(text, scale) * 0.5f
+            TextAlign.Right -> x - getTextWidth(text, scale)
+            TextAlign.Middle -> x - getTextWidth(text, scale) * 0.5f
         }
     }
 
-    override fun text(text: String, x: Float, y: Float, color: Color, scale: Float, align: TextAlign, verticalAlign: TextPos, shadow: Boolean, type: Int) {
+    fun text(text: String, x: Float, y: Float, color: Color, scale: Float, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, type: Int = REGULAR) {
         if (color.isTransparent) return
         val drawX = when (align) {
             TextAlign.Left -> x
@@ -42,20 +65,20 @@ object ManropeFont : Font {
             TextPos.Bottom -> y - getTextHeight(text, scale)
         }
 
-        val typeText = if (type == Font.BOLD) "§l$text" else text
+        val typeText = if (type == BOLD) "§l$text" else text
 
         fontRenderer.drawString(UMatrixStack.Compat.get(), typeText, color.javaColor, drawX, drawY, 1f, scale, shadow)
     }
 
-    override fun getTextWidth(text: String, size: Float): Float {
+    fun getTextWidth(text: String, size: Float): Float {
         return fontRenderer.getStringWidth(text, size)
     }
 
-    override fun getTextHeight(text: String, size: Float): Float {
+    fun getTextHeight(text: String = "M", size: Float): Float {
         return fontRenderer.getStringHeight(text, size)
     }
 
-    override fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int, shadow: Boolean) {
+    fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = REGULAR, shadow: Boolean = false) {
         if (color.isTransparent) return
 
         val words = text.split(" ")
@@ -74,7 +97,7 @@ object ManropeFont : Font {
         text(line, x, currentHeight , color, size, type = type, shadow = shadow)
     }
 
-    override fun wrappedTextBounds(text: String, width: Float, size: Float): Pair<Float, Float> {
+    fun wrappedTextBounds(text: String, width: Float, size: Float): Pair<Float, Float> {
         val words = text.split(" ")
         var line = ""
         var lines = 1

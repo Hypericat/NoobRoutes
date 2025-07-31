@@ -2,7 +2,7 @@ package noobroutes.ui.clickgui.elements.menu
 
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.settings.impl.ColorSetting
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.elementBackground
@@ -17,13 +17,13 @@ import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.EaseInOut
+import noobroutes.utils.Utils.COLOR_NORMALIZER
+import noobroutes.utils.equalsOneOf
+import noobroutes.utils.render.*
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.ColorUtil.hsbMax
 import noobroutes.utils.render.ColorUtil.withAlpha
-import noobroutes.utils.Utils.COLOR_NORMALIZER
-import noobroutes.utils.equalsOneOf
-import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.bind
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import org.lwjgl.input.Keyboard
@@ -62,7 +62,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         hover.handle(x + w - 41, y, 31.5f, 19f)
 
         roundedRectangle(x, y, w, h, elementBackground)
-        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, Font.REGULAR)
+        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, FontRenderer.REGULAR)
         roundedRectangle(x + w - 40f, y + 9, 31f, 19f, color.brighter(1 + hover.percent() / 500f), 5f)
         rectangleOutline(x + w - 40f, y + 9, 31f, 19f, color.darker().withAlpha(1f), 5f, 1.5f)
 
@@ -107,7 +107,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
 
         val stringWidth = getTextWidth(hexString, 12f)
         roundedRectangle(x + w * 0.5 - stringWidth * 0.5 - 12, y + 260, stringWidth + 24, 22f, buttonColor, 5f)
-        text(hexString, x + w * 0.5, y + 271, Color.WHITE, 12f, Font.REGULAR, TextAlign.Middle, TextPos.Middle)
+        text(hexString, x + w * 0.5, y + 271, Color.WHITE, 12f, FontRenderer.REGULAR, TextAlign.Middle, TextPos.Middle)
 
         if (listeningForString || colorAnim.isAnimating()) {
             val color = colorAnim.get(clickGUIColor, buttonColor, listeningForString)

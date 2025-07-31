@@ -9,15 +9,15 @@ import noobroutes.Core.display
 import noobroutes.config.Config
 import noobroutes.features.Category
 import noobroutes.features.render.ClickGUIModule
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.Screen
 import noobroutes.ui.clickgui.ClickGUI.draw
 import noobroutes.ui.clickgui.elements.menu.ElementColor
 import noobroutes.ui.clickgui.util.HoverHandler
-import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.withAlpha
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11
 import kotlin.math.sign
@@ -168,7 +168,7 @@ object ClickGUI : Screen() {
                 x, y, area.first + 7, (area.second + 9),
                 buttonColor.withAlpha((hoverHandler!!.percent() / 100f).coerceIn(0f, 0.8f)), 5f
             )
-            wrappedText(text!!, x + 7f, y + 12f, 300f, textColor, 12f, Font.REGULAR)
+            wrappedText(text!!, x + 7f, y + 12f, 300f, textColor, 12f, FontRenderer.REGULAR)
             if (hoverHandler!!.percent() == 0) {
                 text = null
                 hoverHandler = null

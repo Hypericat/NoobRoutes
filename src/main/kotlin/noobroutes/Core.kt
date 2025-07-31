@@ -15,6 +15,7 @@ import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.routes.AutoRoute
 import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.ui.util.shader.GaussianBlurShader
 import noobroutes.ui.util.shader.RoundedRect
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger

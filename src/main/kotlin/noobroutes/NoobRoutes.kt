@@ -80,9 +80,7 @@ class NoobRoutes {
         }
         //this is probably done already by other mods, but it wasn't in the dev env, so I am doing it here
         FontRenderer.initShaders()
-        FontType.entries.forEach {
-            it.font.init()
-        }
+        noobroutes.font.FontRenderer.init()
     }
 
     @Mod.EventHandler

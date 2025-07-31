@@ -3,7 +3,7 @@ package noobroutes.ui.clickgui.elements.menu
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.HudSetting
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.elementBackground
@@ -18,10 +18,10 @@ import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.LinearAnimation
+import noobroutes.utils.render.*
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.ColorUtil.darkerIf
-import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 
 
@@ -53,7 +53,7 @@ class ElementHud(parent: ModuleButton, setting: HudSetting) : Element<HudSetting
 
     override fun draw() {
         roundedRectangle(x, y, w, h, elementBackground)
-        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, Font.REGULAR)
+        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, FontRenderer.REGULAR)
 
         var offset = 30f
         if (setting.displayToggle) {
