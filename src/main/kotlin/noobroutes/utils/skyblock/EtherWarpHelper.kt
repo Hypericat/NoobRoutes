@@ -80,10 +80,10 @@ object EtherWarpHelper {
      * @param pitch The pitch angle representing the player's vertical viewing direction.
      * @return An `EtherPos` representing the calculated position in the "ether" or `EtherPos.NONE` if the player is not present.
      */
-    fun getEtherPosOrigin(pos: Vec3, yaw: Float, pitch: Float, distance: Double = 61.0, returnEnd: Boolean = false): EtherPos {
+    fun getEtherPosOrigin(pos: Vec3, yaw: Float, pitch: Float, distance: Double = 61.0, returnEnd: Boolean = false, sneaking: Boolean = mc.thePlayer.isSneaking): EtherPos {
         mc.thePlayer ?: return EtherPos.NONE
 
-        val startPos: Vec3 = getPositionEyes(pos)
+        val startPos: Vec3 = getPositionEyes(pos, sneaking)
         val endPos = getLook(yaw = yaw, pitch = pitch).normalize().multiply(factor = distance).add(startPos)
 
         return traverseVoxels(startPos, endPos).takeUnless { it == EtherPos.NONE && returnEnd } ?: EtherPos(true, endPos.toBlockPos())

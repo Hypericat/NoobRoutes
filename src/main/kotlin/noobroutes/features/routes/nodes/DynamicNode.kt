@@ -6,15 +6,15 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.util.Vec3
 import noobroutes.features.routes.DynamicRoute
-import noobroutes.utils.RotationUtils
-import noobroutes.utils.SwapManager
+import noobroutes.utils.*
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
-import noobroutes.utils.add
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.routes.RouteUtils
+import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.absoluteValue
 
@@ -25,12 +25,11 @@ class DynamicNode(
 ) : Node(
     pos
 ){
-
-
     private var prevState: IBlockState? = null;
 
     override fun run() {
         val angles = RotationUtils.getYawAndPitch(target, true)
+
         var state = SwapManager.swapFromSBId(DynamicRoute.extraDebug, "ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.UNKNOWN && Minecraft.getMinecraft().isSingleplayer) state = SwapManager.swapFromId(
             Item.getIdFromItem(Items.diamond_shovel))
@@ -40,10 +39,45 @@ class DynamicNode(
             return
         }
         RouteUtils.lastRoute = System.currentTimeMillis()
-        RouteUtils.setRotation(angles.first,angles.second, isSilent())
+        RouteUtils.setRotation(angles.first, angles.second, isSilent())
         stopWalk()
         PlayerUtils.unSneak()
         RouteUtils.ether()
+    }
+
+    fun isValid(pos: Vec3, target: Vec3) : Boolean {
+        val angles = RotationUtils.getYawAndPitch(target, true)
+        val targetEtherBlock = EtherWarpHelper.getEtherPosOrigin(
+            pos.flooredVec().add(0.5, 0.0, 0.5),
+            angles.first,
+            angles.second,
+            61.0, // Maybe calculate distance if it would save time
+            sneaking = true
+        )
+
+        if (!targetEtherBlock.succeeded) return false;
+
+        val etherBlock = EtherWarpHelper.getEtherPosOrigin(
+            pos,
+            angles.first,
+            angles.second,
+            61.0, // Maybe calculate distance if it would save time
+            sneaking = true
+        )
+
+        //if (etherBlock.succeeded) {
+        //    devMessage("Ether success!")
+        //    devMessage("Ether end : " + etherBlock.pos)
+        //    devMessage("Ether target : " + target.toBlockPos())
+        //    devMessage("Ether yaw : " + angles.first)
+        //    devMessage("Ether pitch : " + angles.second)
+        //} else {
+        //    devMessage("Ether fail!")
+        //    devMessage("Ether target : " + target.toBlockPos())
+        //    devMessage("Ether yaw : " + angles.first)
+        //    devMessage("Ether pitch : " + angles.second)
+        //}
+        return etherBlock.succeeded && etherBlock.pos!!.hash() == targetEtherBlock.pos!!.hash();
     }
 
     fun setPrevState(state: IBlockState) {

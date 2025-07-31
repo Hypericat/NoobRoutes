@@ -1,6 +1,5 @@
 package noobroutes.features.move
 
-import jdk.nashorn.internal.ir.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -22,6 +21,7 @@ import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DoorPositions
 import noobroutes.utils.skyblock.dungeon.DoorPositions.getDoorSpots
@@ -31,7 +31,6 @@ import noobroutes.utils.skyblock.dungeon.DoorPositions.oneByOneSpots
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.tiles.Door
 import org.lwjgl.input.Keyboard
 
 
@@ -46,11 +45,11 @@ object AutoPath: Module(
     private val selectionMode by SelectorSetting("Selection Mode", "Rotation", arrayListOf("Rotation", "Alt Key"), false,"Either use Alt Key or Angle to Select Door")
     private val altKey by KeybindSetting("Alt Key", Keyboard.KEY_NONE, "Alt Key keybind", false).withDependency { this.selectionMode == 1}
     private val pathKey by KeybindSetting("Path Key", Keyboard.KEY_NONE, "Path to selected door", false).withDependency { this.selectionMode == 0}
-    private val doorNumberColor by ColorSetting("Door Number Color", description = "I wonder what this could possibly mean", default = Color.GREEN)
-    private val selectedDoorColor by ColorSetting("Selected Door Color", description = "I wonder what this could possibly mean", default = Color.ORANGE).withDependency { this.selectionMode == 0 }
+    private val doorNumberColor by ColorSetting("Door Number Color", description = "I wonder what this could possibly mean", default = Color.ORANGE)
+    private val selectedDoorColor by ColorSetting("Selected Door Color", description = "I wonder what this could possibly mean", default = Color.GREEN).withDependency { this.selectionMode == 0 }
 
     private const val DOOR_POS_BITMASK : Int = 0b111.inv();
-    private const val MIN_DOT_THRESHOLD : Double = 0.98;
+    private const val MIN_DOT_THRESHOLD : Double = 0.95;
     private var validDoors: MutableList<BlockPos> = mutableListOf();
     private var validBlocks: MutableList<Pair<BlockPos, BlockPos>> = mutableListOf();
 
@@ -76,21 +75,21 @@ object AutoPath: Module(
         updateLookDoorIndex();
     }
 
-    private fun getColor(pos: BlockPos) : Color {
+    private fun getDoorColor(pos: BlockPos, default: Color) : Color {
         if (DoorPositions.isWitherDoor(pos)) return Color.GRAY
         if (DoorPositions.isBloodDoor(pos)) return Color.RED
-        return doorNumberColor
+        return default;
     }
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         validDoors.forEachIndexed { index, pos ->
-            Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), if (index == validDoorLookIndex && selectionMode == 0) selectedDoorColor else getColor(pos), scale = 0.1f)
+            Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), if (index == validDoorLookIndex && selectionMode == 0) selectedDoorColor else getDoorColor(pos, doorNumberColor), scale = 0.1f)
         }
 
-        validBlocks.forEach {
-            Renderer.drawBlock(it.first, Color.RED, 3, 1, 0)
-            Renderer.drawBlock(it.second, Color.BLUE, 3, 1, 0)
+        validBlocks.forEachIndexed { index, it ->
+            Renderer.drawBlock(it.first, getDoorColor(validDoors[index], Color.GREEN), 3, 1, 0)
+            Renderer.drawBlock(it.second, DynamicRoute.dynColor, 3, 1, 0)
         }
     }
 
@@ -100,7 +99,7 @@ object AutoPath: Module(
         validBlocks.clear();
     }
 
-    fun getClosestPointInBox(eye: Vec3, box: AxisAlignedBB): Vec3 {
+    private fun getClosestPointInBox(eye: Vec3, box: AxisAlignedBB): Vec3 {
         val x = eye.xCoord.coerceIn(box.minX, box.maxX)
         val y = eye.yCoord.coerceIn(box.minY, box.maxY)
         val z = eye.zCoord.coerceIn(box.minZ, box.maxZ)
@@ -186,8 +185,11 @@ object AutoPath: Module(
     }
 
     private fun resetPos(pos: BlockPos) {
-        if (!resetPos || !Minecraft.getMinecraft().thePlayer.onGround || DynamicRoute.isInNode()) return;
+        if (!resetPos || !Minecraft.getMinecraft().thePlayer.onGround) return;
+        if (DynamicRoute.getInNodesWithoutUpdate().any {it.isValid(Minecraft.getMinecraft().thePlayer.positionVector, it.target)}) return; // Player is in a valid node
+
         Minecraft.getMinecraft().thePlayer.setPosition(pos.x.toDouble() + 0.5, Minecraft.getMinecraft().thePlayer.posY, pos.z.toDouble() + 0.5)
+        devMessage("Reset pos!")
     }
 
     private fun pathToDoor(key: Int) {
@@ -196,6 +198,8 @@ object AutoPath: Module(
             return
         }
 
+        PlayerUtils.unPressKeys();
+        PlayerUtils.stopVelocity();
         EWPathfinderModule.execute(validBlocks[key].second, true, if (resetPos) Runnable { resetPos(BlockPos(Minecraft.getMinecraft().thePlayer.positionVector)); } else null)
     }
 

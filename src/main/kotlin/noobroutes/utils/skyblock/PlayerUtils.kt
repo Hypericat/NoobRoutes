@@ -10,6 +10,7 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
+import noobroutes.features.routes.DynamicRoute
 import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.Color
@@ -42,8 +43,9 @@ object PlayerUtils {
         }
     }
 
-    fun airClick(){
-        devMessage("Clicked: ${System.currentTimeMillis()}")
+    fun airClick(bl: Boolean = true){
+        if (bl)
+            devMessage("Clicked: ${System.currentTimeMillis()}")
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
     }
 
@@ -55,7 +57,7 @@ object PlayerUtils {
         mc.thePlayer.motionZ = z
     }
 
-    inline val movementKeysPressed: Boolean get() = playerControlsKeycodes.any { Keyboard.isKeyDown(it) } && mc.currentScreen == null
+    inline val movementKeysPressed: Boolean get() = (mc.thePlayer.moveForward != 0.0f || mc.thePlayer.moveStrafing != 0.0f || mc.thePlayer.movementInput.jump) && mc.currentScreen == null
 
 
 

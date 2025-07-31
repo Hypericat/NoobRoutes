@@ -88,7 +88,7 @@ object AutoBr: Module(
 
     fun testAutoPearl(autoCommand: Boolean = false) {
 
-        if (autoCommand && Dungeon.currentRoom?.name != "Entrance") return
+        if (autoCommand && Dungeon.currentRoom?.name != "Entrance") return;
 
         Scheduler.schedulePreTickTask {
             setRotation(0f, 90f, silent)

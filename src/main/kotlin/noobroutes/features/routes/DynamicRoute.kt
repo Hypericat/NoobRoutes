@@ -19,12 +19,15 @@ import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.utils.IBlockStateUtils.setProperty
+import noobroutes.utils.RotationUtils
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 import noobroutes.utils.routes.RouteUtils.lastRoute
 import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
+import scala.collection.parallel.ParIterableLike.Min
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 
@@ -75,9 +78,14 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
         }
     }
 
+    @Synchronized
+    fun getInNodesWithoutUpdate(): List<DynamicNode> {
+        return nodes.filter { it.isInNode(Minecraft.getMinecraft().thePlayer.positionVector) }
+    }
+
 
     @Synchronized
-    private fun inNodes(): MutableList<DynamicNode> {
+    fun inNodes(): MutableList<DynamicNode> {
         return nodes.filter { it.updateNodeState() }.toMutableList()
     }
 
@@ -108,7 +116,12 @@ object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp R
 
         if (!AutoRoute.canRoute) return
 
-        val node = inNodes().firstOrNull() ?: return
+        val node = inNodes().firstOrNull()?: return;
+
+        if (!node.isValid(Minecraft.getMinecraft().thePlayer.positionVector, node.target)) {
+            //devMessage("Pos not valid!");
+            return;
+        }
 
         lastRoute = System.currentTimeMillis()
         node.run()
