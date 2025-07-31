@@ -6,11 +6,7 @@ import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.CubicBezierAnimation
-import noobroutes.utils.render.TextAlign
-import noobroutes.utils.render.popStencil
-import noobroutes.utils.render.roundedRectangle
-import noobroutes.utils.render.stencilRoundedRectangle
-import noobroutes.utils.render.text
+import noobroutes.utils.render.*
 
 class SelectorElement(
     x: Float,

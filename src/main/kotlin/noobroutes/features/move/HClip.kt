@@ -11,9 +11,9 @@ import noobroutes.features.settings.NotPersistent
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import kotlin.math.atan2
@@ -64,13 +64,13 @@ object HClip: Module(
         if (mc.thePlayer == null) return
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
-        AutoP3Utils.unPressKeys()
+        PlayerUtils.unPressKeys()
         Scheduler.scheduleC03Task {
-            val speed = mc.thePlayer.capabilities.walkSpeed * 2.806
+            val speed = PlayerUtils.getPlayerWalkSpeed() * 2.806
             val renderEntity = mc.renderViewEntity
             mc.thePlayer.motionX = speed * Utils.xPart(renderEntity.rotationYawHead + yawChange())
             mc.thePlayer.motionZ = speed * Utils.zPart(renderEntity.rotationYawHead + yawChange())
-            AutoP3Utils.rePressKeys()
+            PlayerUtils.rePressKeys()
         }
         if (!shouldSpam) toggle()
     }

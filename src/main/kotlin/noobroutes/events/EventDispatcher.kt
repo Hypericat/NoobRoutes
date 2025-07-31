@@ -19,7 +19,6 @@ import noobroutes.Core.scope
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.*
 import noobroutes.utils.*
-import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.dungeonItemDrops
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons

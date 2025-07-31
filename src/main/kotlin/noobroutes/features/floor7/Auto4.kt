@@ -8,14 +8,11 @@ import net.minecraft.network.play.server.S22PacketMultiBlockChange
 import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.floor7.autop3.Blink
-import noobroutes.features.floor7.autop3.Blink.rotSkip
+import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.RotationUtils.getYawAndPitch
 import noobroutes.utils.Scheduler
@@ -59,20 +56,17 @@ object Auto4: Module(
 
     private fun shoot(block: BlockPos) {
         val rotation = getRotation(block)
-        if (!silent || Blink.cancelled == 0) {
+        if (!silent) {
             mc.thePlayer.rotationYaw = rotation.first
             mc.thePlayer.rotationPitch = rotation.second
         }
-        if (Blink.cancelled >= 1) {
-            rotSkip = true
-            PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
-            Blink.cancelled--
-            PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
-        }
-        else Scheduler.scheduleLowestPreTickTask(1) {
-            rotSkip = true
-            PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
-        }
+
+        AutoP3.dontCancelNextC03()
+        PacketUtils.sendPacket(C05PacketPlayerLook(rotation.first, rotation.second, mc.thePlayer.onGround))
+        PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+
+        Scheduler.scheduleC03Task(0, true) //cancel next c03
+
         shotBlocks.add(block)
     }
 
@@ -85,13 +79,5 @@ object Auto4: Module(
             }
         }
         return getYawAndPitch(block.x.toDouble() + 0.5, block.y.toDouble() + 1.1, block.z.toDouble() + 0.5)
-    }
-
-
-
-    //Why tf is this a thing, it is so ass, kys
-    //@SubscribeEvent
-    fun onKey(event: InputEvent) {
-        if (shotBlocks.size in 1..8) AutoP3Utils.unPressKeys()
     }
 }

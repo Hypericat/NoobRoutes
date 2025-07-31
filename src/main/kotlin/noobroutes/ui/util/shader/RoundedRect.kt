@@ -3,12 +3,10 @@ package noobroutes.ui.util.shader
 import gg.essential.elementa.components.UIBlock
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.shader.*
-import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.logger
 import noobroutes.utils.Utils.COLOR_NORMALIZER
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils.createLegacyShader
-import org.lwjgl.opengl.GL11
 
 object RoundedRect {
     fun initShaders() {

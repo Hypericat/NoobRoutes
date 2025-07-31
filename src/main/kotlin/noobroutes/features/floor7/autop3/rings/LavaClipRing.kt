@@ -2,28 +2,34 @@ package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
-import noobroutes.features.floor7.autop3.AutoP3
+import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
+import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.features.move.LavaClip
-import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.Scheduler
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
+import kotlin.math.absoluteValue
 
-@RingType("LavaClip")
+
 class LavaClipRing(
-    coords: Vec3 = Vec3(0.0, 0.0, 0.0),
-    yaw: Float = 0f,
-    term: Boolean = false,
-    leap: Boolean = false,
-    left: Boolean = false,
-    center: Boolean = false,
-    rotate: Boolean = false,
-    diameter: Float = 1f,
-    height: Float = 1f,
+    ringBase: RingBase = RingBase(),
     var length: Double = 0.0
-) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
+) : Ring(ringBase, RingType.LAVA_CLIP) {
+    companion object : CommandGenerated {
+        override fun generateRing(args: Array<out String>): Ring? {
+            if (args.size < 3) {
+                modMessage("need a length arg")
+                return null
+            }
+            val endY = args[2].toDoubleOrNull()?.absoluteValue
+            if (endY == null) {
+                modMessage("need a length arg")
+                return null
+            }
+            return LavaClipRing(generateRingBaseFromArgs(args), endY)
+        }
+    }
 
     init {
         addDouble("length", {length}, {length = it})
@@ -31,9 +37,8 @@ class LavaClipRing(
 
 
     override fun doRing() {
-        AutoP3Utils.unPressKeys()
         super.doRing()
-        if (AutoP3.renderStyle == 3) modMessage("Vclipping", "§0[§6Yharim§0]§7 ")
+
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
         LavaClip.ringClip = length
@@ -41,7 +46,7 @@ class LavaClipRing(
         LavaClip.onEnable()
     }
 
-    private fun resetTriggered() {
+    private fun resetTriggered() {//TODO: make actual good logic
         triggered = true
         Scheduler.schedulePreTickTask(60) { triggered = false }
     }

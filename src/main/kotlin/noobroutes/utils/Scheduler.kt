@@ -72,36 +72,36 @@ object Scheduler {
 
 
     @Throws(IndexOutOfBoundsException::class)
-    fun schedulePreTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun schedulePreTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledPreTickTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun schedulePreMotionUpdateTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun schedulePreMotionUpdateTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledPreMotionUpdateTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
     @Throws(IndexOutOfBoundsException::class)
-    fun scheduleLowPreMotionUpdateTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun scheduleLowPreMotionUpdateTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledLowPreMotionUpdateTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun schedulePostMotionUpdateTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun schedulePostMotionUpdateTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledPostMotionUpdateTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun scheduleSoundTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun scheduleSoundTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledSoundTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun scheduleFrameTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun scheduleFrameTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledFrameTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
@@ -110,73 +110,73 @@ object Scheduler {
 
 
     @Throws(IndexOutOfBoundsException::class)
-    fun schedulePostTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun schedulePostTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledPostTickTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
     @Throws(IndexOutOfBoundsException::class)
-    fun scheduleHighPreTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun scheduleHighPreTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledHighPreTickTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
 
     @Throws(IndexOutOfBoundsException::class)
-    fun scheduleHighPostTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun scheduleHighPostTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledHighPostTickTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun scheduleLowestPreTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun scheduleLowestPreTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledLowestPreTickTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun scheduleLowestPostTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun scheduleLowestPostTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledLowestPostTickTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun schedulePrePlayerTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun schedulePrePlayerTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledPrePlayerTickTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun schedulePostPlayerTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun schedulePostPlayerTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledPostPlayerTickTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun schedulePostMoveEntityWithHeadingTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun schedulePostMoveEntityWithHeadingTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledPostMoveEntityWithHeadingTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun scheduleLowS08Task(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun scheduleLowS08Task(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledLowS08Tasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun schedulePlayerLivingUpdateTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun schedulePlayerLivingUpdateTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledPlayerLivingUpdateTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun scheduleC03Task( ticks: Int = 0, cancel: Boolean = false, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun scheduleC03Task( ticks: Int = 0, cancel: Boolean = false, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledC03Tasks.add(Task({ p -> callback(p) }, ticks, priority, cancel))
     }
 
     @Throws(IndexOutOfBoundsException::class)
-    fun scheduleLowestC03Task( ticks: Int = 0, cancel: Boolean = false, priority: Int = 0, callback: (Any?) -> Unit) {
+    fun scheduleLowestC03Task( ticks: Int = 0, cancel: Boolean = false, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledLowestC03Tasks.add(Task({ p -> callback(p) }, ticks, priority, cancel))
     }
@@ -271,7 +271,7 @@ object Scheduler {
         if (scheduledPostMotionUpdateTasks.doTasks(event)) event.isCanceled = true
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun moveEntityWithHeadingPost(event: MoveEntityWithHeadingEvent.Post){
         if (scheduledPostMoveEntityWithHeadingTasks.doTasks(event)) event.isCanceled = true
     }

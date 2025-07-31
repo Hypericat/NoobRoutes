@@ -6,15 +6,7 @@ import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.UiElement
-import noobroutes.utils.render.Color
-import noobroutes.utils.render.TextAlign
-import noobroutes.utils.render.getTextHeight
-import noobroutes.utils.render.getTextWidth
-import noobroutes.utils.render.popStencil
-import noobroutes.utils.render.rectangleOutline
-import noobroutes.utils.render.roundedRectangle
-import noobroutes.utils.render.stencilRoundedRectangle
-import noobroutes.utils.render.text
+import noobroutes.utils.render.*
 
 
 //implement copy and paste

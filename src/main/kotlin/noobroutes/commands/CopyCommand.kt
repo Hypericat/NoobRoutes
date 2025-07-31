@@ -10,7 +10,7 @@ import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.StringSelection
 
 
-class CpCommand: CommandBase() {
+class CopyCommand: CommandBase() {
     override fun getCommandName(): String {
         return "copy"
     }

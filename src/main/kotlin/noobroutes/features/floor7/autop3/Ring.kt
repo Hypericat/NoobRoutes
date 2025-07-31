@@ -1,16 +1,12 @@
 package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonObject
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
-import noobroutes.events.impl.MotionUpdateEvent
-import noobroutes.features.floor7.autop3.AutoP3.depth
-import noobroutes.features.floor7.autop3.AutoP3.renderStyle
-import noobroutes.features.floor7.autop3.AutoP3.silentLook
+import noobroutes.features.floor7.autop3.rings.BlinkRing
+import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
 import noobroutes.utils.*
-import noobroutes.utils.AutoP3Utils.ringColors
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
 import noobroutes.utils.json.JsonUtils.addProperty
@@ -19,16 +15,12 @@ import noobroutes.utils.json.syncdata.*
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
-import kotlin.math.pow
-import kotlin.math.sin
 
-@Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class RingType(val name: String, val aliases: Array<String> = [])
 
-abstract class Ring(
+data class RingBase(
     var coords: Vec3 = Vec3(mc.thePlayer?.posX ?: 0.0, mc.thePlayer?.posY ?: 0.0, mc.thePlayer?.posZ ?: 0.0),
     var yaw: Float,
     var term: Boolean,
@@ -37,16 +29,78 @@ abstract class Ring(
     var center: Boolean,
     var rotate: Boolean,
     var diameter: Float,
-    var height: Float
+    var height: Float) {
+    constructor() : this(Vec3(0.0, 0.0, 0.0), 0f, false, false, false, false, false, 1f, 1f)
+
+    companion object {
+        val diameterRegex = Regex("""d:(\d+)""")
+        val heightRegex = Regex("""h:(\d+)""")
+    }
+}
+
+abstract class Ring(
+    val base: RingBase,
+    val type: RingType
 ) {
+    inline val ringName get() = type.ringName
+
+    inline var coords: Vec3
+        get() = base.coords
+        set(value) {base.coords = value}
+    inline var yaw: Float
+        get() = base.yaw
+        set(value) {base.yaw = value}
+    inline var term: Boolean
+        get() = base.term
+        set(value) {
+            if (value) {
+                base.left = false
+                base.leap = false
+            }
+            base.term = value
+        }
+    inline var leap: Boolean
+        get() = base.leap
+        set(value) {
+            if (value) {
+                base.term = false
+                base.left = false
+            }
+            base.leap = value
+        }
+    inline var left: Boolean
+        get() = base.left
+        set(value) {
+            if (value) {
+                base.term = false
+                base.leap = false
+            }
+            base.left = value
+        }
+    inline var center: Boolean
+        get() = base.center
+        set(value) {base.center = value}
+    inline var rotate: Boolean
+        get() = base.rotate
+        set(value) {base.rotate = value}
+    inline var diameter: Float
+        get() = base.diameter
+        set(value) {base.diameter = value}
+    inline var height: Float
+        get() = base.height
+        set(value) {base.height = value}
+
+    inline val isAwait: Boolean
+        get() = (term || leap || left)
+
+
     var renderYawVector = false
     var triggered = false
-    val type = javaClass.getAnnotation(RingType::class.java)?.name ?: "Unknown"
     val internalRingData = mutableListOf<SyncData>()
 
     fun getAsJsonObject(): JsonObject{
         val obj = JsonObject().apply {
-            addProperty("type", type)
+            addProperty("type", type.ringName)
             addProperty("coords", coords)
             addProperty("yaw", yaw)
             if (term) addProperty("term", true)
@@ -65,7 +119,6 @@ abstract class Ring(
     protected open fun addPrimitiveRingData(obj: JsonObject){
         internalRingData.forEach { it.writeTo(obj) }
     }
-
 
     open fun loadRingData(obj: JsonObject){
         internalRingData.forEach { it.readFrom(obj) }
@@ -97,22 +150,10 @@ abstract class Ring(
         internalRingData.add(SyncLong(name, getter, setter))
     }
 
-    fun renderRing() {
+
+    fun renderRing(color: Color) {
         val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
-        val topOffset = (0.48 * sin(System.currentTimeMillis().toDouble() * 0.0033333334)) + 0.5
-        val bottomOffset = 1 - topOffset
-        when (renderStyle) {
-            0 -> {
-                drawCylinderWithRingArgs(offsetCoords.add(0.0, topOffset * height, 0.0), Color.GREEN) //moving ring 1
-                drawCylinderWithRingArgs(offsetCoords.add(0.0, bottomOffset * height, 0.0), Color.GREEN) //moving ring 2
-                drawCylinderWithRingArgs(offsetCoords, Color.DARK_GRAY) //bottom static
-                drawCylinderWithRingArgs(offsetCoords.add(0.0, 0.5 * height, 0.0), Color.GREEN) // middle static
-                drawCylinderWithRingArgs(offsetCoords.add(0.0, height.toDouble(), 0.0), Color.DARK_GRAY) //bottom static
-            }
-            1 -> drawCylinderWithRingArgs(offsetCoords, Color.GREEN)
-            2 -> RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), Color.GREEN, thickness = 3, depth = depth)
-            3 -> Renderer.drawCylinder(this.coords, diameter * 0.5, diameter * 0.5, -0.01, 24, 1, 90, 0, 0, ringColors.getOrDefault(this.type, Color(255, 0, 255)), depth = depth)
-        }
+        RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), color, thickness = 3, depth = true)
         if (this.renderYawVector) Renderer.draw3DLine(
             listOf(
                 this.coords.add(0.0, PlayerUtils.STAND_EYE_HEIGHT, 0.0),
@@ -122,55 +163,97 @@ abstract class Ring(
                     this.coords.zCoord
                 )
             ),
-            Color.GREEN,
+            color
         )
     }
 
-    private fun drawCylinderWithRingArgs(drawCoords: Vec3, color: Color) {
-        Renderer.drawCylinder(drawCoords, diameter * 0.5, diameter * 0.5, 0.01, AutoP3.ringSlices, 1, 90, 0, 0, color, depth = depth)
+    fun drawCylinderWithRingArgs(drawCoords: Vec3, color: Color) {
+        Renderer.drawCylinder(drawCoords, diameter * 0.5, diameter * 0.5, 0.01, 24, 1, 90, 0, 0, color, depth = true)
     }
-
-    private fun loadInternalRingData(obj: JsonObject){
-        internalRingData.forEach { it.readFrom(obj) }
-    }
-
 
     open fun addRingData(obj: JsonObject) {}
 
     open fun doRing() {
+        AutoP3MovementHandler.resetShit()
     }
 
-    fun inRing(playerCoords: Vec3): Boolean {
-        return (coords.xCoord - playerCoords.xCoord).pow(2) + (coords.zCoord - playerCoords.zCoord).pow(2) <= (diameter * 0.5).pow(2)
+    open fun runTriggeredLogic() {
+        triggered = false
     }
 
-    open fun ringCheckY(): Boolean {
-        return (coords.yCoord <= mc.thePlayer.posY && coords.yCoord + height > mc.thePlayer.posY && !center) || (center && coords.yCoord == mc.thePlayer.posY && mc.thePlayer.onGround)
+    fun inRing(): Boolean {
+        if (center || this is BlinkRing || this is BlinkWaypoint) return checkInBoundsWithSpecifiedHeight(0f) && mc.thePlayer.onGround
+        return checkInBoundsWithSpecifiedHeight(height)
     }
 
-    fun doRingArgs() {
+    /**
+     * Checks whether the ring structure, defined by its center coordinates and dimensions,
+     * lies entirely within a bounding volume relative to the player's current position in the world.
+     *
+     * This method constructs an axis-aligned bounding box (AABB) around the ring using the provided
+     * `heightToUse` value for the vertical dimension and the ring's diameter for the horizontal dimensions.
+     * It then checks whether the player's position vector is within this box.
+     *
+     * The bounding box is centered horizontally at the specified `coords` (x, z), extending equally
+     * in both the negative and positive directions by half the `diameter`. Vertically, the box starts
+     * from the base y-coordinate of `coords.yCoord` and extends upward by `heightToUse`, allowing for
+     * flexible height configuration—useful for rings of varying vertical size or placement.
+     *
+     * This check is often used to determine whether the ring is still "active" or relevant based on the
+     * player's location—for example, when validating if the player is inside or near a structure, a goal
+     * region, or a visual effect boundary.
+     *
+     * @param heightToUse The height to apply when calculating the upper Y-bound of the bounding box.
+     *        This allows dynamic vertical bounds, independent of the ring’s default dimensions.
+     *
+     * @return true if the player’s position is within the calculated bounding box of the ring, false otherwise.
+     * gay
+     */ //////////////////////////////////////////////////////////////////////////////////////////////////
+    protected fun checkInBoundsWithSpecifiedHeight(heightToUse: Float): Boolean{
+        return mc.thePlayer.positionVector.isVecInBounds(coords.xCoord - diameter * 0.5, coords.yCoord, coords.zCoord - diameter * 0.5, coords.xCoord + diameter * 0.5, coords.yCoord + heightToUse, coords.zCoord + diameter * 0.5)
+    }
+    //////////////////////////////////////////////////////////////////////////////////////////////////////this was so bald
+
+    protected fun center() {
+        PlayerUtils.stopVelocity()
+        mc.thePlayer.isSprinting = false
+        PlayerUtils.unPressKeys()
+
+        Scheduler.schedulePostMoveEntityWithHeadingTask {
+            PlayerUtils.setPosition(coords.xCoord, coords.zCoord)
+            if (isAwait) await() else maybeDoRing()
+        }
+    }
+
+    protected fun await(){
+        PlayerUtils.stopVelocity()
+        AutoP3.waitingRing = this
+    }
+
+    fun run() {
+
+        triggered = true
+
         if (rotate) {
-            if (!silentLook) Scheduler.schedulePostTickTask { mc.thePlayer.rotationYaw = yaw }
-            Blink.rotate = yaw
+            AutoP3.setBlinkRotation(yaw, 0f)
         }
 
-        if (renderStyle == 3) {
-            Scheduler.schedulePostTickTask { mc.thePlayer.rotationYaw = yaw }
-            val javaRandom = java.util.Random()
-            val gaussian = javaRandom.nextGaussian().toFloat()
-            val scaled = gaussian * (15)
-            Scheduler.schedulePostTickTask { mc.thePlayer.rotationPitch = scaled.coerceIn(-45f, 45f) + 10f }
+        if (center) {
+            center()
+            if (isAwait) await()
+            return
         }
 
-        if (center && (mc.thePlayer.onGround || System.currentTimeMillis() - Blink.lastBlink < 100)) {
-
-            AutoP3Utils.unPressKeys()
-
-            Scheduler.schedulePostMoveEntityWithHeadingTask {
-                mc.thePlayer.setPosition(coords.xCoord, mc.thePlayer.posY, coords.zCoord)
-                PlayerUtils.stopVelocity()
-            }
-            AutoP3.isAligned = true
+        if (isAwait) {
+            await()
+            return
         }
+
+        maybeDoRing()
+    }
+
+    fun maybeDoRing() {
+        if (this !is BlinkRing) doRing()
+        else AutoP3.setActiveBlink(this)
     }
 }

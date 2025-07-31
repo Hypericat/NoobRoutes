@@ -6,7 +6,6 @@ import noobroutes.ui.ColorPalette
 import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
 import noobroutes.ui.clickgui.util.ColorUtil.brighter
 import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
-import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils.isAreaHovered

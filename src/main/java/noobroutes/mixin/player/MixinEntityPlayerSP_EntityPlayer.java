@@ -40,9 +40,6 @@ public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
     }
 
 
-
-
-
     @Inject(method = "onUpdate",
             at = @At(
                     value = "INVOKE",

@@ -12,6 +12,8 @@ import noobroutes.commands.*
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
 import noobroutes.features.ModuleManager
+import noobroutes.features.floor7.autop3.AutoP3
+import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.floor7.autop3.Blink
 import noobroutes.features.move.AutoPath
 import noobroutes.font.FontType
@@ -42,13 +44,14 @@ class NoobRoutes {
             NoobRoutesCommand(),
             AutoP3Command(),
             PathCommand(),
-            CpCommand(),
+            CopyCommand(),
             //AuraTestCommand(),
             //EtherwarpTestCommand(),
             AutoRouteCommand(),
             DynamicRouteCommand(),
             YawPitchCommand(),
-            BrushCommand()
+            BrushCommand(),
+            NoobCommand()
         ).forEach {
             ClientCommandHandler.instance.registerCommand(it)
         }
@@ -61,8 +64,6 @@ class NoobRoutes {
             RenderUtils2D,
             RenderUtils,
             ClickGUI,
-            AutoP3Utils,
-            Blink,
             Scheduler,
             PacketUtils,
             NettyS2DPacketInterceptor,
@@ -77,7 +78,8 @@ class NoobRoutes {
             SecretUtils,
             RouteUtils,
             Dungeon,
-            DungeonUtils
+            DungeonUtils,
+            AutoP3MovementHandler
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }
@@ -99,7 +101,7 @@ class NoobRoutes {
         File(mc.mcDataDir, "config/noobroutes").takeIf { !it.exists() }?.mkdirs()
         Core.loadComplete()
         ModuleManager.addModules()
-
+        AutoP3.loadRings()
     }
 
 }

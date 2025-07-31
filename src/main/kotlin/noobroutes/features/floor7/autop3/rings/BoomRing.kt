@@ -2,36 +2,40 @@ package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
-import noobroutes.features.floor7.autop3.AutoP3
+import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
+import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AuraManager
-import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
+import noobroutes.utils.isAir
 import noobroutes.utils.skyblock.modMessage
 
-@RingType("Boom")
+
 class BoomRing(
-    coords: Vec3 = Vec3(0.0, 0.0, 0.0),
-    yaw: Float = 0f,
-    term: Boolean = false,
-    leap: Boolean = false,
-    left: Boolean = false,
-    center: Boolean = false,
-    rotate: Boolean = false,
-    diameter: Float = 1f,
-    height: Float = 1f,
+    ringBase: RingBase = RingBase(),
     var block: BlockPos = BlockPos(0, 0, 0),
-) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
+) : Ring(ringBase, RingType.BOOM) {
+    companion object : CommandGenerated {
+        override fun generateRing(args: Array<out String>): Ring? {
+            val block = mc.objectMouseOver.blockPos
+            if (isAir(block)) {
+                modMessage("must look at a block")
+                return null
+            }
+            return BoomRing(generateRingBaseFromArgs(args), block)
+        }
+    }
+
 
     init {
         addBlockPos("block", {block}, {block = it})
     }
 
     override fun doRing() {
-        super.doRing()
-        if (AutoP3.renderStyle == 3) modMessage("Exploding", "§0[§6Yharim§0]§7 ")
         SwapManager.swapFromName("TNT")
-        Scheduler.schedulePreTickTask(1) { AuraManager.auraBlock(block, force = true) }
+        AuraManager.auraBlock(block, force = true)
+        //Scheduler.schedulePreTickTask(1) { AuraManager.auraBlock(block, force = true) }
     }
 }

@@ -1,26 +1,14 @@
 package noobroutes.ui.util.elements.colorelement
 
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.clickgui.util.ColorUtil.hsbMax
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
-import noobroutes.ui.util.elements.TextBoxElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.TEXT_BOX_THICKNESS
 import noobroutes.utils.render.Color
-import noobroutes.utils.render.GradientDirection
 import noobroutes.utils.render.RenderUtils
-import noobroutes.utils.render.TextAlign
-import noobroutes.utils.render.circle
-import noobroutes.utils.render.drawDynamicTexture
-import noobroutes.utils.render.drawHSBBox
-import noobroutes.utils.render.gradientRect
-import noobroutes.utils.render.popStencil
 import noobroutes.utils.render.roundedRectangle
-import noobroutes.utils.render.stencilRoundedRectangle
 
 class ColorElement(
     x: Float,

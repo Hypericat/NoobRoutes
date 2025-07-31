@@ -2,18 +2,10 @@ package noobroutes.ui.util.elements.colorelement
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.clickgui.util.ColorUtil.hsbMax
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
-import noobroutes.utils.render.Color
-import noobroutes.utils.render.GradientDirection
-import noobroutes.utils.render.circle
-import noobroutes.utils.render.drawDynamicTexture
-import noobroutes.utils.render.drawHSBBox
-import noobroutes.utils.render.gradientRect
-import noobroutes.utils.render.popStencil
-import noobroutes.utils.render.stencilRoundedRectangle
+import noobroutes.utils.render.*
 
 class ColorBoxElement(
     x: Float, y: Float,

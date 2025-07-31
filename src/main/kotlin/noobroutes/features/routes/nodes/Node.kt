@@ -3,7 +3,7 @@ package noobroutes.features.routes.nodes
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
-import noobroutes.utils.AutoP3Utils.walking
+import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
@@ -36,7 +36,7 @@ abstract class Node(
     }
 
     protected fun stopWalk(){
-        walking = false
+        AutoP3MovementHandler.resetShit()
         PlayerUtils.unPressKeys()
     }
 

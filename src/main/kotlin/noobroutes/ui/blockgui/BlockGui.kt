@@ -8,7 +8,6 @@ import noobroutes.config.Config
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.ui.Screen
-import noobroutes.ui.blockgui.blockeditor.BlockEditor
 import noobroutes.ui.blockgui.blockselector.BlockSelector
 import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
@@ -56,7 +55,6 @@ object BlockGui : Screen() {
 
     override fun onGuiClosed() {
         mc.entityRenderer.stopUseShader()
-        AutoP3.saveRings()
         Config.save()
     }
 

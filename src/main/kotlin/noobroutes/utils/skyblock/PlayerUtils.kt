@@ -10,8 +10,7 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
-import noobroutes.features.routes.DynamicRoute
-import noobroutes.utils.AutoP3Utils
+import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
@@ -55,6 +54,10 @@ object PlayerUtils {
     fun setMotion(x: Double, z: Double){
         mc.thePlayer.motionX = x
         mc.thePlayer.motionZ = z
+    }
+
+    fun setPosition(x: Double, z: Double){
+        mc.thePlayer.setPosition(x, mc.thePlayer.posY, z)
     }
 
     inline val movementKeysPressed: Boolean get() = (mc.thePlayer.moveForward != 0.0f || mc.thePlayer.moveStrafing != 0.0f || mc.thePlayer.movementInput.jump) && mc.currentScreen == null
@@ -144,29 +147,50 @@ object PlayerUtils {
         return rayTraceResult?.blockPos?.let { mc.theWorld.getBlockState(it).block }
     }
 
+    fun getPlayerWalkSpeed(): Float =
+        mc.thePlayer.capabilities.walkSpeed
 
+    // Good boy
     inline val keyBindings get() =  listOf(
         mc.gameSettings.keyBindForward,
         mc.gameSettings.keyBindLeft,
         mc.gameSettings.keyBindRight,
         mc.gameSettings.keyBindBack,
-        mc.gameSettings.keyBindJump
+        mc.gameSettings.keyBindJump,
+        mc.gameSettings.keyBindSprint
     )
 
     inline val playerControlsKeycodes get() = keyBindings.map { it.keyCode}
 
     fun unPressKeys() {
         Keyboard.enableRepeatEvents(false)
-        AutoP3Utils.keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
+        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
     }
 
     fun rePressKeys() {
-        AutoP3Utils.keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, Keyboard.isKeyDown(it.keyCode)) }
+        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, Keyboard.isKeyDown(it.keyCode)) }
+    }
+
+    val gameSpeedAccessor = mc as TimerFieldAccessor
+
+    fun setGameSpeed(speed: Float){
+        gameSpeedAccessor.timer.timerSpeed = speed
+        gameSpeedAccessor.timer.updateTimer()
     }
 
     fun safeJump() {
         if (mc.thePlayer.onGround) mc.thePlayer.jump()
     }
+
+    fun resetGameSpeed(){
+        gameSpeedAccessor.timer.timerSpeed = 1f
+        gameSpeedAccessor.timer.updateTimer()
+    }
+
+    fun getGameSpeed(): Float {
+        return gameSpeedAccessor.timer.timerSpeed
+    }
+
 }
 
 sealed class ClickType {

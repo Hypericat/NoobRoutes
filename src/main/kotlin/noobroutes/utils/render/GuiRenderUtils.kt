@@ -17,7 +17,7 @@ import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import noobroutes.utils.times
 import org.lwjgl.opengl.Display
 import org.lwjgl.opengl.GL11
-import java.util.Stack
+import java.util.*
 
 val matrix = UMatrixStack.Compat
 val scaleFactor get() = ScaledResolution(mc).scaleFactor.toFloat()

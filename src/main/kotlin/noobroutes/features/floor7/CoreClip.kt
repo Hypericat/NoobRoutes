@@ -14,7 +14,6 @@ import noobroutes.utils.BlockUtils.removeHitbox
 import noobroutes.utils.BlockUtils.restoreHitbox
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.isAir
-import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import org.lwjgl.input.Keyboard
 import kotlin.math.abs
 

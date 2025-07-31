@@ -10,7 +10,6 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.utils.Utils.ID
 import noobroutes.utils.Utils.isEnd
-import noobroutes.utils.Utils.isStart
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.skyblockID
@@ -80,8 +79,7 @@ object SwapManager {
                 }
             }
         }
-        if (AutoP3.renderStyle == 3 && name == "TNT") modMessage("Unable to find Infinityboom TNT in your hotbar", "§0[§6Yharim§0]§7 ")
-        else modMessage("$name not found.")
+        modMessage("$name not found.")
         return SwapState.UNKNOWN
     }
 

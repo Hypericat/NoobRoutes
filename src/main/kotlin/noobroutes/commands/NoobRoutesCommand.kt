@@ -4,7 +4,6 @@ import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import noobroutes.Core.display
 import noobroutes.ui.clickgui.ClickGUI
-import noobroutes.ui.newclickgui.ElementTestGUI
 
 class NoobRoutesCommand : CommandBase() {
     override fun getCommandName(): String {

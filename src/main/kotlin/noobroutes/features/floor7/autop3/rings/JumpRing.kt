@@ -2,42 +2,41 @@ package noobroutes.features.floor7.autop3.rings
 
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
-import noobroutes.features.floor7.autop3.AutoP3
+import noobroutes.features.floor7.autop3.AutoP3MovementHandler
+import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
+import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
-import noobroutes.utils.AutoP3Utils
-import noobroutes.utils.skyblock.devMessage
-import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.Scheduler
 
-@RingType("Jump")
+
 class JumpRing (
-    coords: Vec3 = Vec3(0.0, 0.0, 0.0),
-    yaw: Float = 0f,
-    term: Boolean = false,
-    leap: Boolean = false,
-    left: Boolean = false,
-    center: Boolean = false,
-    rotate: Boolean = false,
-    diameter: Float = 1f,
-    height: Float = 1f,
-    var walk: Boolean = false
-) : Ring(coords, yaw, term, leap, left, center, rotate, diameter, height) {
-
+    ringBase: RingBase = RingBase(),
+    var walk: Boolean = false,
+) : Ring(ringBase, RingType.JUMP) {
+    companion object : CommandGenerated {
+        override fun generateRing(args: Array<out String>): Ring? {
+            return JumpRing(generateRingBaseFromArgs(args), getWalkFromArgs(args))
+        }
+    }
 
     init {
         addBoolean("walk", {walk}, {walk = it})
     }
 
     override fun doRing() {
-        AutoP3Utils.unPressKeys()
         super.doRing()
-        if (AutoP3.renderStyle == 3) modMessage("Jumping", "§0[§6Yharim§0]§7 ")
+
         if (mc.thePlayer.onGround) mc.thePlayer.jump()
-        else return
+        else {
+            triggered = false
+            return
+        }
+
         if (walk) {
-            AutoP3Utils.jumping = true
-            AutoP3Utils.startWalk(yaw)
-            devMessage("boing")
+            AutoP3MovementHandler.setDirection(yaw)
+            AutoP3MovementHandler.setVelocity(AutoP3MovementHandler.DEFAULT_SPEED)
+            AutoP3MovementHandler.setJumpingTrue()
         }
     }
 }
