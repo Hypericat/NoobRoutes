@@ -7,6 +7,8 @@ import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.BossEventDispatcher
+import noobroutes.events.impl.MotionUpdateEvent
+import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
@@ -45,11 +47,9 @@ object CoreClip: Module(
         return posZ in CORE_Z_EDGE1 ..CORE_Z_EDGE2 && posZ != SLIGHTLY_IN1 && posZ != SLIGHTLY_IN2
     }
 
-    @SubscribeEvent()
-    fun noInWall(event: PacketEvent.Send) {
-        if (event.packet !is C03PacketPlayer || !BossEventDispatcher.inF7Boss || doorOpen) return
-
-        if (abs(MIDDLE_CORE_BLOCK.z - mc.thePlayer.posZ) > 5 || mc.thePlayer.isSneaking || !mc.thePlayer.onGround) {
+    @SubscribeEvent
+    fun onMovePre(event: MoveEntityWithHeadingEvent.Pre) {
+        if (abs(MIDDLE_CORE_BLOCK.z - mc.thePlayer.posZ) > 3 || mc.thePlayer.isSneaking || !mc.thePlayer.onGround || doorOpen || !BossEventDispatcher.inF7Boss) {
             Blocks.gold_block.restoreHitbox()
             Blocks.barrier.restoreHitbox()
         }
@@ -57,22 +57,24 @@ object CoreClip: Module(
             Blocks.gold_block.removeHitbox()
             Blocks.barrier.removeHitbox()
         }
+    }
 
-        if (!event.packet.isMoving) return
+    @SubscribeEvent
+    fun onMovePost(event: MoveEntityWithHeadingEvent.Post) {
+        Blocks.gold_block.restoreHitbox()
+        Blocks.barrier.restoreHitbox()
+    }
 
-        if (inDoor(event.packet.positionZ)) inDoorTicks++ else inDoorTicks = 0
+    @SubscribeEvent()
+    fun noInWall(event: MotionUpdateEvent.Pre) {
+        if (!BossEventDispatcher.inF7Boss || doorOpen) return
 
-        if (event.packet.positionY != CORE_Y || !inDoor(event.packet.positionZ)) return
+        if (inDoor(event.z)) inDoorTicks++ else inDoorTicks = 0
 
-        event.isCanceled = true
+        if (event.y != CORE_Y || inDoorTicks == 0) return
 
-        val goatedZ = listOf(SLIGHTLY_IN1, SLIGHTLY_IN2).minBy { abs(it - if (inDoorTicks == 1) mc.thePlayer.prevPosZ else event.packet.positionZ) }
+        val goatedZ = listOf(SLIGHTLY_IN1, SLIGHTLY_IN2).minBy { abs(it - if (inDoorTicks == 1) mc.thePlayer.prevPosZ else event.z) }
 
-        if (event.packet.rotating) {
-            PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.positionX, event.packet.positionY, goatedZ, event.packet.yaw, event.packet.pitch, event.packet.isOnGround))
-        }
-        else {
-            PacketUtils.sendPacket(C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, goatedZ, event.packet.isOnGround))
-        }
+        event.z = goatedZ
     }
 }

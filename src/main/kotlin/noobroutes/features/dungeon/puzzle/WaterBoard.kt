@@ -13,8 +13,10 @@ import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.floor7.autop3.AutoP3MovementHandler
+import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.*
 import noobroutes.utils.routes.RouteUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.modMessage
@@ -24,6 +26,8 @@ import java.nio.charset.StandardCharsets
 
 object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, description = "Automatic Waterboard Solver") {
     private var waterSolutions: JsonObject
+
+    private val silent by BooleanSetting("Silent", description = "use silent roations")
 
     init {
         val isr = WaterBoard::class.java.getResourceAsStream("/waterSolutions.json")?.let { InputStreamReader(it, StandardCharsets.UTF_8) }
@@ -38,6 +42,12 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
     private var openedWaterTicks = -1
     private var tickCounter = 0
     private var c08Delay = System.currentTimeMillis()
+
+    private var expectedSpot: Vec2? = null
+
+    private var doChest = false
+    private var didChest = false
+
 
     fun scan(optimized: Boolean) = with (DungeonUtils.currentRoom) {
         if (this?.name != "Water Board" || patternIdentifier != -1) return@with
@@ -70,13 +80,12 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
         }
     }
 
-    private var lastSpot = Vec3(0.0,0.0,0.0)
-
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || didChest) return
         if (patternIdentifier == -1 || solutions.isEmpty() || DungeonUtils.currentRoomName != "Water Board" || mc.thePlayer.posY != 59.0) return
         val room = DungeonUtils.currentRoom ?: return
+
         val solutionList = solutions
             .flatMap { (lever, times) -> times.drop(lever.i).map { Pair(lever, it) } }
             .sortedBy { (lever, time) -> time + if (lever == LeverBlock.WATER) 0.01 else 0.0 }
@@ -85,6 +94,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
             doChest()
             return
         }
+
         val (firstLever, time) = first
         val relativeFirst = firstLever.relativePosition
         val expectedZRelative = when (relativeFirst.zCoord) {
@@ -92,14 +102,18 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
             5.0, 10.0 -> 6
             else -> return
         }
+
         val etherwarpBlock = room.getRealCoords(0, 58, expectedZRelative)
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != etherwarpBlock) {
-            if (System.currentTimeMillis() - c08Delay < 200 || mc.thePlayer.positionVector == lastSpot) return
+            if (System.currentTimeMillis() - c08Delay < 200 || expectedSpot != null) return
             val realSpot = Vec3(etherwarpBlock.x + 0.5, etherwarpBlock.y + 1.03, etherwarpBlock.z + 0.5)
-            AutoP3MovementHandler.setDirection(RotationUtils.getYawAndPitch(realSpot).first)
-            lastSpot = mc.thePlayer.positionVector
+            devMessage("tp")
+            RouteUtils.etherwarpToVec3(realSpot, silent = silent)
+            expectedSpot = Vec2(realSpot.xCoord, realSpot.zCoord)
             return
         }
+
+        expectedSpot = null
 
         val timeRemaining = openedWaterTicks + (time * 20).toInt() - tickCounter
         if ((firstLever != LeverBlock.WATER && timeRemaining <= 0) || (firstLever == LeverBlock.WATER && openedWaterTicks == -1) || (firstLever == LeverBlock.WATER && timeRemaining <= 0)) {
@@ -110,19 +124,18 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
         }
     }
 
-    private var doChest = false
-    private var didChest = false
-
     fun doChest() {
         val room = DungeonUtils.currentRoom ?: return
         val aboveChest = room.getRealCoords(0, 58, -7)
+
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != aboveChest) {
-            if (System.currentTimeMillis() - c08Delay < 200 || mc.thePlayer.positionVector == lastSpot) return
+            if (System.currentTimeMillis() - c08Delay < 200 || expectedSpot != null) return
             val realSpot = Vec3(aboveChest.x + 0.5, aboveChest.y + 1.1, aboveChest.z + 0.5)
-            RouteUtils.etherwarpToVec3(realSpot)
-            lastSpot = mc.thePlayer.positionVector
+            RouteUtils.etherwarpToVec3(realSpot, silent = silent)
+            expectedSpot = Vec2(realSpot.xCoord, realSpot.zCoord)
             return
         }
+
         val chest = room.getRealCoords(BlockPos(0 ,56, -7))
         if ((doors.map{room.getRealCoords(it)}.any{!isAir(it)}) || mc.theWorld.getBlockState(chest).block != Blocks.chest) return
         AuraManager.auraBlock(chest)
@@ -152,6 +165,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
         tickCounter = 0
         doChest = false
         didChest = false
+        expectedSpot = null
     }
 
     @SubscribeEvent

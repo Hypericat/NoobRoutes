@@ -149,8 +149,8 @@ object RouteUtils {
                 event.packet.x,
                 mc.thePlayer.posY.floor() - clipDistance,
                 event.packet.z
-            )
-            /*Scheduler.schedulePostTickTask {
+            )/*
+            Scheduler.schedulePostTickTask {
                 mc.thePlayer.setPosition(
                     event.packet.x,
                     event.packet.y - clipDistance - 1,

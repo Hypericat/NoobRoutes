@@ -87,8 +87,6 @@ object AutoP3: Module (
     private val blinkShit by DropdownSetting("Blink Settings", false)
     val blinkToggle by BooleanSetting("Blink Toggle", description = "main toggle for blink").withDependency { blinkShit }
     private val maxBlink by NumberSetting("Max Blink", 150, 100, 400, description = "How many packets can be blinked on one instance").withDependency { blinkShit }
-    private val resetAmount by NumberSetting("Remove Amount", 50, 0, 200, description = "When removing packets from the counter how many to remove").withDependency { blinkShit }
-    private val resetInterval by NumberSetting("Remove Interval", 5.0, 5.0, 20.0,0.05, unit = "s" , description = "In what interval to remove packets from the counter").withDependency { blinkShit }
     private val balanceHud by HudSetting("Balance Hud", 400f, 400f, 1f, false) {
         if (inF7Boss) text(cancelled.toString(), 1f, 1f, ColorPalette.text, 13f)
         getTextWidth("400", 13f) to getTextHeight("400", 13f)

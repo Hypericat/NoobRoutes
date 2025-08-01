@@ -16,6 +16,7 @@ import noobroutes.features.dungeon.AutoBr
 import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.features.dungeon.puzzle.IceFill
 import noobroutes.features.dungeon.puzzle.TicTacToe
+import noobroutes.features.dungeon.puzzle.WaterBoard
 import noobroutes.features.dungeon.puzzle.Weirdos
 import noobroutes.features.floor7.*
 import noobroutes.features.floor7.autop3.AutoP3
@@ -92,6 +93,8 @@ object ModuleManager {
         AutoPath,
         EWPathfinderModule,
         DynamicRoute,
+        ZealotAura,
+        WaterBoard,
         ZealotAura,
         IceFill
 
