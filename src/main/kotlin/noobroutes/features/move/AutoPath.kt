@@ -50,14 +50,13 @@ object AutoPath: Module(
 
     private const val DOOR_POS_BITMASK : Int = 0b111.inv();
     private const val MIN_DOT_THRESHOLD : Double = 0.95;
+
     private var validDoors: MutableList<BlockPos> = mutableListOf();
     private var validBlocks: MutableList<Pair<BlockPos, BlockPos>> = mutableListOf();
 
     private var validDoorLookIndex: Int = -1;
 
-
     private var validKeys: HashSet<Int>? = null;
-    private var resetBlockPos: BlockPos? = null
 
     fun onInitKeys() {
         validKeys = HashSet()

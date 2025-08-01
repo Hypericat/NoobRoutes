@@ -14,6 +14,7 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.dungeon.AutoBr
 import noobroutes.features.dungeon.brush.BrushModule
+import noobroutes.features.dungeon.puzzle.IceFill
 import noobroutes.features.dungeon.puzzle.TicTacToe
 import noobroutes.features.dungeon.puzzle.Weirdos
 import noobroutes.features.floor7.*
@@ -91,7 +92,8 @@ object ModuleManager {
         AutoPath,
         EWPathfinderModule,
         DynamicRoute,
-        ZealotAura
+        ZealotAura,
+        IceFill
 
     )
 

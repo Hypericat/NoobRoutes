@@ -1,5 +1,9 @@
 package noobroutes.utils
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.Lister.Pack
+import jdk.nashorn.internal.ir.Block
+import net.minecraft.block.state.IBlockState
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
@@ -7,10 +11,14 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
+import net.minecraft.init.Blocks
 import net.minecraft.inventory.Container
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.network.INetHandler
+import net.minecraft.network.Packet
+import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
@@ -22,11 +30,14 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.Core.logger
 import noobroutes.Core.mc
+import noobroutes.INetwork
+import noobroutes.IS23
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
 import java.util.*
@@ -162,6 +173,7 @@ fun writeToClipboard(text: String, successMessage: String = "§aCopied to clipbo
 fun isOnBlock(vec3: Vec3): Boolean {
     return vec3.add(0.5, 1.0, 0.5).distanceTo(mc.thePlayer.positionVector) < 0.1
 }
+
 fun isOnBlock(pos: BlockPos): Boolean {
     return isOnBlock(pos.toVec3())
 }
@@ -184,6 +196,7 @@ inline val String?.noControlCodes: String
 fun String.containsOneOf(vararg options: String, ignoreCase: Boolean = false): Boolean {
     return options.any { this.contains(it, ignoreCase) }
 }
+
 fun <E> MutableList<E>.coerceMax(max: Int): MutableList<E> {
     if (this.size > max) {
         this.subList(max, this.size).clear()
@@ -432,6 +445,16 @@ fun romanToInt(s: String): Int {
         }
         result + (romanMap[s.last()] ?: 0)
     }
+}
+
+fun simulateClientReceivePacket(packet: Packet<*>) {
+    (Minecraft.getMinecraft().netHandler.networkManager as INetwork).receive(packet as Packet<INetHandler>);
+}
+
+fun setClientSideBlockPacket(blockPos: BlockPos, blockState: IBlockState) {
+    val packet = S23PacketBlockChange();
+    (packet as IS23).setBlock(blockPos, blockState)
+    simulateClientReceivePacket(packet);
 }
 
 
