@@ -130,7 +130,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
 
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != aboveChest) {
             if (System.currentTimeMillis() - c08Delay < 200 || expectedSpot != null) return
-            val realSpot = Vec3(aboveChest.x + 0.5, aboveChest.y + 1.1, aboveChest.z + 0.5)
+            val realSpot = Vec3(aboveChest.x + 0.5, aboveChest.y + 1.03, aboveChest.z + 0.5)
             RouteUtils.etherwarpToVec3(realSpot, silent = silent)
             expectedSpot = Vec2(realSpot.xCoord, realSpot.zCoord)
             return

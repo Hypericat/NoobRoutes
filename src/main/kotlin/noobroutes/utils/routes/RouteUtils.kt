@@ -1,7 +1,6 @@
 package noobroutes.utils.routes
 
 import com.google.gson.JsonArray
-import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.client.C0BPacketEntityAction
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
@@ -143,20 +142,20 @@ object RouteUtils {
     @SubscribeEvent
     fun onPacket(event: PacketEvent.Receive) {
         if (clipRegistered && event.packet is S08PacketPlayerPosLook) {
-            event.isCanceled = true
+            /*event.isCanceled = true
             PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
             mc.thePlayer.setPosition(
                 event.packet.x,
                 mc.thePlayer.posY.floor() - clipDistance,
                 event.packet.z
-            )/*
-            Scheduler.schedulePostTickTask {
+            )*/
+            Scheduler.schedulePreTickTask {
                 mc.thePlayer.setPosition(
                     event.packet.x,
                     event.packet.y - clipDistance - 1,
                     event.packet.z
                 )
-            }*/
+            }
             pearlSoundRegistered = false
             clipRegistered = false
         }

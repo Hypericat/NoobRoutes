@@ -7,8 +7,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.PacketEvent
-import noobroutes.events.impl.RoomEnterEvent
-import noobroutes.events.impl.S08Event
 import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
@@ -30,7 +28,9 @@ import noobroutes.utils.skyblock.dungeon.DungeonScan
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Door
 import noobroutes.utils.skyblock.dungeon.tiles.DoorType
+import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 import kotlin.math.round
@@ -44,12 +44,11 @@ object AutoBr: Module(
 ) {
     private val autoStartBrToggle by BooleanSetting("Main Toggle", default = true, description = "u also need the module enabled for the snipe command")
     private val goOn1Delay by NumberSetting("go on delay", 13, 0, 20, description = "how long to wait before u actually go down (ticks)").withDependency { autoStartBrToggle }
-    private val noWait by BooleanSetting("faster pearls", description = "pearls diffrently, might be faster")
     private val silent by BooleanSetting("silent", description = "do silent rotations")
 
     private val snipeTick by NumberSetting("Snipe Tick", 1, 0, 40, description = "how to align with the server ticks")
 
-    private val BLOOD_MIDDLE_COORDS = BlockPos(0, 99, 0)
+    private val BLOOD_MIDDLE_COORDS = BlockPos(0, 70, 0)
 
     private const val GO_STRAIGHT_ON_AOTV_PITCH = 4f
 
@@ -106,7 +105,7 @@ object AutoBr: Module(
         if (event.packet !is S08PacketPlayerPosLook || !waitingForClip) return
         waitingForClip = false
 
-        Scheduler.schedulePreTickTask {
+        Scheduler.schedulePreTickTask(1) {
             val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
             if (state == SwapManager.SwapState.UNKNOWN || state == SwapManager.SwapState.TOO_FAST) return@schedulePreTickTask
 
@@ -136,7 +135,7 @@ object AutoBr: Module(
 
             setRotation(yaw, GO_STRAIGHT_ON_AOTV_PITCH, silent)
 
-            Scheduler.schedulePreTickTask { repeat(aotvNumber) { PlayerUtils.airClick() } }
+            Scheduler.scheduleFrameTask{ repeat(aotvNumber) { PlayerUtils.airClick() } }
 
             if (coords == getFurthestDoor()) return@schedulePreTickTask
 
@@ -148,14 +147,16 @@ object AutoBr: Module(
 
     private fun tpUp(isSnipe: Boolean) {
         Scheduler.schedulePreTickTask {
-            setRotation(null, -90f, silent)
+
+            setRotation(0f, -90f, silent)
+
+            Scheduler.scheduleFrameTask { repeat(VERTICAL_TP_AMOUNT + if (isSnipe) 2 else 1) { PlayerUtils.airClick() } }
 
             Scheduler.schedulePreTickTask {
-                repeat(VERTICAL_TP_AMOUNT + if (isSnipe) 2 else 0) { PlayerUtils.airClick() } //make sure u reach the room, might be higher
-
                 SwapManager.swapFromName("pearl")
+                setRotation(0f, -90f, silent)
 
-                RouteUtils.rightClick()
+                Scheduler.scheduleFrameTask { PlayerUtils.airClick() }
 
                 throwOtherPearls(isSnipe)
             }
@@ -166,11 +167,6 @@ object AutoBr: Module(
         if (isSnipe) {
             Scheduler.schedulePreTickTask(1) { PlayerUtils.airClick() }
             Scheduler.schedulePreTickTask(3) { PlayerUtils.airClick() }
-            return
-        }
-
-        if (noWait) {
-            Scheduler.schedulePreTickTask(1) { PlayerUtils.airClick() }
             return
         }
 

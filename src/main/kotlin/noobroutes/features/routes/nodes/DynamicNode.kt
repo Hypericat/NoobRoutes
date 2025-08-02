@@ -14,7 +14,6 @@ import noobroutes.utils.render.Renderer
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.absoluteValue
 

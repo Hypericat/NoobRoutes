@@ -4,6 +4,7 @@ package noobroutes.utils
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
+import net.minecraft.util.BlockPos
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
