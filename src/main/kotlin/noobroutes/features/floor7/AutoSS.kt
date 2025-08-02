@@ -5,26 +5,30 @@ import net.minecraft.block.Block
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C03PacketPlayer
+import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.BlockPos
+import net.minecraft.util.EnumFacing
 import net.minecraft.util.Timer
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.logger
 import noobroutes.events.impl.BlockChangeEvent
 import noobroutes.events.impl.ChatPacketEvent
+import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.render.ClickGUIModule.devMode
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.RotationUtils.getYawAndPitch
@@ -57,7 +61,6 @@ object AutoSS : Module(
     private val forceDevice by BooleanSetting("Force Device", false, description = "").withDependency {devMode}
     private val resetSSKeybind by KeybindSetting("Reset SS", Keyboard.KEY_NONE, "Resets AutoSS on press").onPress { resetKey() }
 
-    private val i1Mode by SelectorSetting("i1 mode", "tickshift", arrayListOf("tickshift", "c03", "c08"), false, description = "how to i1, tickshift slows and speeds up game, c03 only sends c03 and c08 packets, c08 only sends c08 packets")
     private val i1Keybind by KeybindSetting("i1 test", Keyboard.KEY_NONE, "tries to i1 on press").onPress { tryI1() }
     private val i1ClickAmount by NumberSetting("i1 clicks", 24, 9, 36, 3, description = "how often i1 should click (triple of 3 man i1)")
     private val useMousePos by BooleanSetting("use mouse pos", false, description = "")
@@ -77,7 +80,6 @@ object AutoSS : Module(
     }
 
     private var timesToClickI1 = 0
-    var dontCancel = false
     private var skip = 0
 
     var lastClickAdded = System.currentTimeMillis()
@@ -100,7 +102,6 @@ object AutoSS : Module(
         doingSS = false
         clicked = false
         skip = 0
-        dontCancel = false
         timesToClickI1 = 0
         devMessage("Reset!")
     }
@@ -124,22 +125,8 @@ object AutoSS : Module(
                 return@Thread
             }
 
-            when (i1Mode) {
-                0 -> { //tickshift
-                    Thread.sleep(49)
-                    dontCancel = true
-                    timesToClickI1 = i1ClickAmount
-                }
-                1, 2 -> { //the others
-                    dontCancel = true
-                    repeat(i1ClickAmount) {
-                        if (it % 3 == 0) Thread.sleep(50)
-                        if (i1Mode == 1) PacketUtils.sendPacket(C03PacketPlayer(mc.thePlayer.onGround))
-                        clickStartButton()
-                    }
-                    dontCancel = false
-                }
-            }
+            Thread.sleep(49)
+            timesToClickI1 = i1ClickAmount
 
         }.start()
     }
@@ -153,33 +140,39 @@ object AutoSS : Module(
     fun onClientTick(event: TickEvent.ClientTickEvent) {
         if (mc.thePlayer == null || timesToClickI1 < 3 || event.isEnd) return
 
+        AutoP3.dontCancelNextC03()
+
         if (skip > 0) {
+            AutoP3.dontCancelNextC03()
             skip--
             return
         }
 
         skip = 2
-        clickStartButton()
+        punchStartButton()
         repeat(2) {
+            AutoP3.dontCancelNextC03()
             mc.runTick()
-            clickStartButton()
+            AutoP3.dontCancelNextC03()
+            punchStartButton()
         }
 
         timesToClickI1 -= 3
     }
 
-    fun clickStartButton() {
-        if (!useMousePos) clickButton(110, 121, 91)
-        else clickButton(mc.objectMouseOver.blockPos.x, mc.objectMouseOver.blockPos.y, mc.objectMouseOver.blockPos.z)
+    fun punchStartButton() {
+        if (!useMousePos) punchButton(110, 121, 91)
+        else punchButton(mc.objectMouseOver.blockPos.x, mc.objectMouseOver.blockPos.y, mc.objectMouseOver.blockPos.z)
     }
 
-
+    fun punchButton(x: Int, y: Int, z: Int) {
+        PacketUtils.sendPacket(C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK, BlockPos(x, y, z), EnumFacing.WEST))
+    }
 
     private fun resetKey(){
         sendCommand("pc SS Broke")
         start()
     }
-
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {

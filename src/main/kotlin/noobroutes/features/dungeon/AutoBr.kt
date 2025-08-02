@@ -16,6 +16,7 @@ import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
+import noobroutes.utils.Vec2
 import noobroutes.utils.Vec2i
 import noobroutes.utils.isAir
 import noobroutes.utils.routes.RouteUtils
@@ -44,11 +45,15 @@ object AutoBr: Module(
 ) {
     private val autoStartBrToggle by BooleanSetting("Main Toggle", default = true, description = "u also need the module enabled for the snipe command")
     private val goOn1Delay by NumberSetting("go on delay", 13, 0, 20, description = "how long to wait before u actually go down (ticks)").withDependency { autoStartBrToggle }
+    private val preLoadDelay by NumberSetting("Preload Delay", 0, 0, 20, description = "delay for preloading the map")
     private val silent by BooleanSetting("silent", description = "do silent rotations")
+    private val noWait by BooleanSetting("Low Ping Pearls", default = false, description = "for ling ping players. makes pearls work")
 
     private val snipeTick by NumberSetting("Snipe Tick", 1, 0, 40, description = "how to align with the server ticks")
 
     private val BLOOD_MIDDLE_COORDS = BlockPos(0, 70, 0)
+
+    private val MIDDLE_MAP_COORDS = Vec2i(-104, -104)
 
     private const val GO_STRAIGHT_ON_AOTV_PITCH = 4f
 
@@ -74,12 +79,13 @@ object AutoBr: Module(
     @SubscribeEvent
     fun onChat(event: ChatPacketEvent) {
         if (event.message == "Starting in 4 seconds." && autoStartBrToggle && !Dungeon.Info.uniqueRooms.any { it.name == "Blood" }) {
-            testAutoPearl(true)
+            Scheduler.scheduleServerTickTask(preLoadDelay) { testAutoPearl(true) }
         }
         else if (event.message == "Starting in 1 second.") {
             serverTickCount = 20
-            Scheduler.schedulePreTickTask(goOn1Delay) {
+            Scheduler.scheduleServerTickTask(goOn1Delay) {
                 hasRunStarted = true
+                if (!Dungeon.Info.uniqueRooms.any { it.name == "Blood" }) return@scheduleServerTickTask
                 if (autoStartBrToggle) testAutoPearl(true)
             }
         }
@@ -109,7 +115,7 @@ object AutoBr: Module(
             val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
             if (state == SwapManager.SwapState.UNKNOWN || state == SwapManager.SwapState.TOO_FAST) return@schedulePreTickTask
 
-            Scheduler.scheduleFrameTask { repeat(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() } }
+            Scheduler.schedulePostTickTask { Scheduler.scheduleFrameTask { repeat(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() } } }
 
             Scheduler.scheduleLowS08Task(VERTICAL_TP_AMOUNT - 1) {
                 tpOver(snipeCoords)
@@ -124,7 +130,7 @@ object AutoBr: Module(
 
             val coords = when {
                 otherCoords != null -> otherCoords
-                !hasRunStarted -> getFurthestDoor()
+                !hasRunStarted -> MIDDLE_MAP_COORDS
                 bloodRoom != null -> bloodRoom.getRealCoords(BLOOD_MIDDLE_COORDS).toVec2i()
                 else -> return@schedulePreTickTask modMessage("smth went wrong , probably couldnt find blood")
             }
@@ -135,9 +141,9 @@ object AutoBr: Module(
 
             setRotation(yaw, GO_STRAIGHT_ON_AOTV_PITCH, silent)
 
-            Scheduler.scheduleFrameTask{ repeat(aotvNumber) { PlayerUtils.airClick() } }
+            Scheduler.schedulePostTickTask { Scheduler.scheduleFrameTask { repeat(aotvNumber) { PlayerUtils.airClick() } } }
 
-            if (coords == getFurthestDoor()) return@schedulePreTickTask
+            if (coords == MIDDLE_MAP_COORDS) return@schedulePreTickTask
 
             Scheduler.scheduleLowS08Task(aotvNumber - 1) {
                 tpUp(otherCoords != null)
@@ -150,15 +156,19 @@ object AutoBr: Module(
 
             setRotation(0f, -90f, silent)
 
-            Scheduler.scheduleFrameTask { repeat(VERTICAL_TP_AMOUNT + if (isSnipe) 2 else 1) { PlayerUtils.airClick() } }
-
             Scheduler.schedulePreTickTask {
-                SwapManager.swapFromName("pearl")
-                setRotation(0f, -90f, silent)
 
-                Scheduler.scheduleFrameTask { PlayerUtils.airClick() }
+                Scheduler.schedulePostTickTask { Scheduler.scheduleFrameTask { repeat(VERTICAL_TP_AMOUNT + if (isSnipe) 2 else 1) { PlayerUtils.airClick() } } }
 
-                throwOtherPearls(isSnipe)
+                Scheduler.schedulePreTickTask {
+                    SwapManager.swapFromName("pearl")
+
+                    setRotation(0f, -90f, silent)
+
+                    Scheduler.schedulePostTickTask { Scheduler.scheduleFrameTask { PlayerUtils.airClick() } }
+
+                    throwOtherPearls(isSnipe)
+                }
             }
         }
     }
@@ -167,6 +177,11 @@ object AutoBr: Module(
         if (isSnipe) {
             Scheduler.schedulePreTickTask(1) { PlayerUtils.airClick() }
             Scheduler.schedulePreTickTask(3) { PlayerUtils.airClick() }
+            return
+        }
+
+        if (noWait) {
+            Scheduler.schedulePreTickTask(1) { PlayerUtils.airClick() }
             return
         }
 

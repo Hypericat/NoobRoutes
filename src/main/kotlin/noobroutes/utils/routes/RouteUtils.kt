@@ -81,7 +81,8 @@ object RouteUtils {
         }
         pearlSoundRegistered = true
         setRotation(null, 90f, silent)
-        rightClick()
+        Scheduler.schedulePostTickTask { rightClick() }
+        //rightClick()
     }
 
     @SubscribeEvent
@@ -141,7 +142,7 @@ object RouteUtils {
 
     @SubscribeEvent
     fun onPacket(event: PacketEvent.Receive) {
-        if (clipRegistered && event.packet is S08PacketPlayerPosLook) {
+        if (clipRegistered && event.packet is S08PacketPlayerPosLook && !event.isCanceled) {
             /*event.isCanceled = true
             PacketUtils.sendPacket(C06PacketPlayerPosLook(event.packet.x, event.packet.y, event.packet.z, event.packet.yaw, event.packet.pitch, false))
             mc.thePlayer.setPosition(
