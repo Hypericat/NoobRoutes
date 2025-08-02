@@ -3,20 +3,21 @@ package noobroutes.features.render
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.features.Module
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.impl.ColorSetting
-import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.font.FontType
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.util.elements.TextBoxElement
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 
-object TemporaryColorPalletModule : Module(
-    "ColorPallet",
-    description = "Temporary color pallet module, if this is still in during a non-beta release, spam wadey."
+
+object ColorPaletteModule : Module(
+    "Color Palette",
+    description = "why are you looking at this, this shouldn't be available for the end user"
 ) {
 
+    @DevOnly
     val text by ColorSetting("Text", Color(205, 214, 244), description = "")
     val subText by ColorSetting("subText", Color(166, 173, 200), description = "")
     val elementPrimary by ColorSetting("elementPrimary", Color(75, 75, 204), description = "")

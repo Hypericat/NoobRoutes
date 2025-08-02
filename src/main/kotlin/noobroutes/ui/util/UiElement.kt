@@ -2,7 +2,6 @@ package noobroutes.ui.util
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.logger
-import noobroutes.ui.util.elements.NumberBoxElement
 import noobroutes.ui.util.shader.GaussianBlurShader
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Scissor
@@ -19,6 +18,7 @@ abstract class UiElement(var x: Float, var y: Float) {
     protected val uiChildren = mutableListOf<UiElement>()
     var visible = true
     var enabled = true
+
     protected var xOrigin = 0f
     protected var yOrigin = 0f
     private var globalXScale = 1f
@@ -28,8 +28,30 @@ abstract class UiElement(var x: Float, var y: Float) {
     private var deltaScaleX = 1f
     private var deltaScaleY = 1f
 
-    protected fun drawChildren(){
-        uiChildren.forEach { it.handleDraw() }
+    private var cachedEffectiveX = 0f
+    private var cachedEffectiveY = 0f
+    private var cachedEffectiveXScale = 1f
+    private var cachedEffectiveYScale = 1f
+    private var refreshEffectiveValues = true
+
+    private data class StencilState(
+        var active: Boolean = false,
+        var x: Float = 0f,
+        var y: Float = 0f,
+        var width: Float = 0f,
+        var height: Float = 0f,
+        var radius: Float = 0f,
+        var edgeSoftness: Float = 0f,
+        var inverse: Boolean = false
+    )
+
+    private val stencilState = StencilState()
+    private var childrenScissor: Scissor? = null
+
+    protected open fun doDrawChildren(){
+        for (i in uiChildren.indices) {
+            uiChildren[i].doHandleDraw()
+        }
     }
 
     open fun updateChildren(){}
@@ -39,75 +61,91 @@ abstract class UiElement(var x: Float, var y: Float) {
         val deltaY = y - this.y
         this.x = x
         this.y = y
-        uiChildren.forEach {
-            it.updatePosition(it.x + deltaX, it.y + deltaY)
+        for (i in uiChildren.indices) {
+            val child = uiChildren[i]
+            child.updatePosition(child.x + deltaX, child.y + deltaY)
         }
     }
 
-    fun handleDraw(){
+    open fun doHandleDraw() {
         if (!visible) return
+
         draw()
         GlStateManager.pushMatrix()
-        GlStateManager.translate(deltaX, deltaY, 1f)
+        GlStateManager.translate(deltaX, deltaY, 0f)
         GlStateManager.scale(deltaScaleX, deltaScaleY, 1f)
-        if (stencilChildren) {
-            stencilRoundedRectangle(stencilX, stencilY, stencilWidth, stencilHeight, stencilRadius, stencilEdgeSoftness, stencilInverse)
+
+        if (stencilState.active) {
+            stencilRoundedRectangle(
+                stencilState.x, stencilState.y, stencilState.width, stencilState.height,
+                stencilState.radius, stencilState.edgeSoftness, stencilState.inverse
+            )
         }
-        val scissor = childrenScissor
-
-        if (scissor != null) {
-            val scissorTest = scissor(scissor.x.toFloat() + getEffectiveX(), scissor.y.toFloat() + getEffectiveY(), scissor.w.toFloat() * getEffectiveXScale(), scissor.h.toFloat() * getEffectiveYScale())
-            drawChildren()
+        childrenScissor?.let { scissor ->
+            val scissorTest = scissor(
+                scissor.x.toFloat() + getEffectiveX(),
+                scissor.y.toFloat() + getEffectiveY(),
+                scissor.w.toFloat() * getEffectiveXScale(),
+                scissor.h.toFloat() * getEffectiveYScale()
+            )
+            doDrawChildren()
             resetScissor(scissorTest)
-        } else drawChildren()
+        } ?: doDrawChildren()
 
-        if (stencilChildren) {
+        if (stencilState.active) {
             popStencil()
-            stencilChildren = false
+            stencilState.active = false
         }
         GlStateManager.popMatrix()
     }
 
     fun handleScroll(amount: Int): Boolean {
         if (!enabled || !visible) return false
-        if (uiChildren.any { it.handleScroll(amount) }) return true
+
+        for (i in uiChildren.indices) {
+            if (uiChildren[i].handleScroll(amount)) return true
+        }
         return onScroll(amount)
     }
 
     fun handleMouseClicked(mouseButton: Int): Boolean{
         if (!enabled || !visible) return false
-        if (uiChildren.any { it.handleMouseClicked(mouseButton) }) return true
+
+        for (i in uiChildren.indices) {
+            if (uiChildren[i].handleMouseClicked(mouseButton)) return true
+        }
         return mouseClicked(mouseButton)
     }
 
     fun handleMouseReleased(): Boolean {
         if (!enabled || !visible) return false
-        if (uiChildren.any { it.handleMouseReleased() }) return true
+
+        for (i in uiChildren.indices) {
+            if (uiChildren[i].handleMouseReleased()) return true
+        }
         return mouseReleased()
     }
 
-    fun handleKeyTyped(typedChar: Char, keyCode: Int): Boolean {
+    open fun doHandleKeyTyped(typedChar: Char, keyCode: Int): Boolean {
         if (!enabled || !visible) return false
-        if (uiChildren.any { it.handleKeyTyped(typedChar, keyCode) }) return true
+
+        for (i in uiChildren.indices) {
+            if (uiChildren[i].doHandleKeyTyped(typedChar, keyCode)) return true
+        }
         return keyTyped(typedChar, keyCode)
     }
 
-    protected open fun onScroll(amount: Int): Boolean {
-        return false
-    }
-
+    protected open fun onScroll(amount: Int): Boolean = false
     protected open fun draw() {}
+    protected open fun mouseClicked(mouseButton: Int): Boolean = false
+    protected open fun mouseReleased(): Boolean = false
+    protected open fun keyTyped(typedChar: Char, keyCode: Int): Boolean = false
 
-    protected open fun mouseClicked(mouseButton: Int): Boolean {
-        return false
-    }
-
-    protected open fun mouseReleased(): Boolean {
-        return false
-    }
-
-    protected open fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
-        return false
+    protected fun addChildren(vararg children: UiElement) {
+        children.forEach {
+            it.parent = this
+        }
+        uiChildren.addAll(children)
     }
 
     protected fun addChildren(children: Collection<UiElement>) {
@@ -121,88 +159,114 @@ abstract class UiElement(var x: Float, var y: Float) {
         child.parent = this
         uiChildren.add(child)
     }
+
     protected fun blurRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number){
         val effX = getEffectiveX()
         val effY = getEffectiveY()
-        //GlStateManager.pushMatrix()
+
         GlStateManager.translate(-effX, -effY, -1f)
-        stencil {roundedRectangle(effX + x.toFloat(),effY + y.toFloat(), w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
+        stencil {
+            roundedRectangle(effX + x.toFloat(),effY + y.toFloat(), w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)
+        }
         GaussianBlurShader.blurredBackground(effX + x.toFloat(), effY + y.toFloat(), w.toFloat(), h.toFloat(), 8f)
         popStencil()
         GlStateManager.translate(effX, effY, 1f)
-        //GlStateManager.popMatrix()
+
     }
 
 
     protected fun translate(x: Float, y: Float){
         deltaX = x * globalXScale
         deltaY = y * globalYScale
+        refreshEffectiveValues = true
         updateChildrenTranslation()
-        GlStateManager.translate(x, y, 1f)
+        GlStateManager.translate(x, y, 0f)
     }
     protected fun scale(x: Float, y: Float){
         this.deltaScaleX = x
         this.deltaScaleY = y
+        refreshEffectiveValues = true
         updateChildrenScale()
         GlStateManager.scale(x, y, 1f)
     }
-    private var stencilChildren = false
-    private var stencilX = 0f
-    private var stencilY = 0f
-    private var stencilWidth = 0f
-    private var stencilHeight = 0f
-    private var stencilRadius = 0f
-    private var stencilEdgeSoftness = 0f
-    private var stencilInverse = false
-
-    private var childrenScissor: Scissor? = null
 
     protected fun scissorChildren(x: Float, y: Float, w: Float, h: Float) {
         childrenScissor = Scissor(x, y, w, h, 0)
     }
 
     protected fun stencilChildren(x: Float, y: Float, w: Float, h: Float, radius: Number = 0f, edgeSoftness: Number = 0.5f, inverse: Boolean = false){
-        stencilChildren = true
-        stencilX = x
-        stencilY = y
-        stencilWidth = w
-        stencilHeight = h
-        stencilRadius = radius.toFloat()
-        stencilEdgeSoftness = edgeSoftness.toFloat()
-        stencilInverse = inverse
-    }
-
-    protected fun updateChildrenTranslation(){
-        uiChildren.forEach {
-            it.xOrigin = this.xOrigin + deltaX
-            it.yOrigin = this.yOrigin + deltaY
-            it.updateChildrenTranslation()
+        stencilState.apply {
+            active = true
+            this.x = x
+            this.y = y
+            width = w
+            height = h
+            this.radius = radius.toFloat()
+            this.edgeSoftness = edgeSoftness.toFloat()
+            this.inverse = inverse
         }
     }
 
+    protected fun updateChildrenTranslation(){
+        val newXOrigin = xOrigin + deltaX
+        val newYOrigin = yOrigin + deltaY
+
+        for (i in uiChildren.indices) {
+            val child = uiChildren[i]
+            child.xOrigin = newXOrigin
+            child.yOrigin = newYOrigin
+            child.refreshEffectiveValues = true
+            child.updateChildrenTranslation()
+        }
+    }
+
+    fun setGlobalScale(x: Float, y: Float){
+        globalXScale = x
+        globalYScale = y
+    }
+
     protected fun updateChildrenScale(){
-        uiChildren.forEach {
-            it.globalXScale = this.deltaScaleX * this.globalXScale
-            it.globalYScale = this.deltaScaleY * this.globalYScale
-            it.updateChildrenScale()
+        val newXScale = deltaScaleX * globalXScale
+        val newYScale = deltaScaleY * globalYScale
+
+        for (i in uiChildren.indices) {
+            val child = uiChildren[i]
+            child.globalXScale = newXScale
+            child.globalYScale = newYScale
+            child.refreshEffectiveValues = true
+            child.updateChildrenScale()
+        }
+    }
+
+    private fun updateEffectiveValues() {
+        if (refreshEffectiveValues) {
+            cachedEffectiveX = xOrigin + deltaX
+            cachedEffectiveY = yOrigin + deltaY
+            cachedEffectiveXScale = deltaScaleX * globalXScale
+            cachedEffectiveYScale = deltaScaleY * globalYScale
+            refreshEffectiveValues = false
         }
     }
 
     open fun getEffectiveX(): Float {
-        return this.xOrigin + deltaX
+        updateEffectiveValues()
+        return cachedEffectiveX
     }
     open fun getEffectiveY(): Float {
-        return this.yOrigin + this.deltaY
+        updateEffectiveValues()
+        return cachedEffectiveY
     }
     open fun getEffectiveXScale(): Float {
-        return this.deltaScaleX * globalXScale
+        updateEffectiveValues()
+        return cachedEffectiveXScale
     }
     open fun getEffectiveYScale(): Float {
-        return this.deltaScaleY * globalYScale
+        updateEffectiveValues()
+        return cachedEffectiveYScale
     }
 
 
-    private fun debugMouse(w: Float, h: Float){
+    protected fun debugMouse(w: Float, h: Float){
         logger.info("New Box, xOrigin: $xOrigin, yOrigin: $yOrigin")
         logger.info("x: ${getEffectiveX() + x * getEffectiveXScale()}, y: ${getEffectiveY() + y * getEffectiveYScale()}, w: ${w * getEffectiveXScale()}, h: ${h * getEffectiveYScale()}| mouseX: ${MouseUtils.mouseX}, mouseY: ${MouseUtils.mouseY}")
     }

@@ -1,6 +1,6 @@
 import dev.architectury.pack200.java.Pack200Adapter
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 /*
     Requirements: Gradle java version is 20
     Project Java version 1.8
@@ -16,18 +16,21 @@ plugins {
     kotlin("jvm") version "2.0.0-Beta1"
 }
 
+blossom {
+    replaceToken("@VER@", version)
+    replaceToken("@MOD_ID@", modId)
+    replaceToken("@DEV_MODE@", true)
+}
+
 group = "noobroutes"
 
 version = project.findProperty("version") as String
 val modId = project.findProperty("modid") as String
+val isDevBuild = !project.hasProperty("prod")
+
 
 val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
-}
-
-blossom {
-    replaceToken("@VER@", version)
-    replaceToken("@MOD_ID@", modId)
 }
 
 
@@ -55,7 +58,7 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
     implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT") { isTransitive = false }
 
-    shadowImpl("gg.essential:loader-launchwrapper:1.1.3")
+    implementation("gg.essential:loader-launchwrapper:1.1.3")
     compileOnly("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5")
 
     implementation("com.mojang:brigadier:1.2.9")
@@ -94,11 +97,9 @@ kotlin.jvmToolchain(8)
 tasks {
     processResources {
         inputs.property("version", version)
-
         filesMatching("mcmod.info") {
             expand(inputs.properties)
         }
-
         dependsOn(compileJava)
     }
 
@@ -117,16 +118,20 @@ tasks {
 
     remapJar {
         input.set(shadowJar.get().archiveFile)
+        if (isDevBuild) archiveClassifier.set("dev") else archiveClassifier.set("")
     }
 
     shadowJar {
         destinationDirectory.set(layout.buildDirectory.dir("archiveJars"))
         archiveBaseName.set("NoobRoutes")
-        archiveClassifier.set("dev")
+        archiveClassifier.set("gay")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(shadowImpl)
+        exclude("META-INF/versions/**")
         mergeServiceFiles()
     }
+
+
 }
 
 tasks.withType<KotlinCompile> {

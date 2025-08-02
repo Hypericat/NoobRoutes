@@ -25,6 +25,8 @@ class KeybindElement(override var elementValue: Keybinding, x: Float, y: Float, 
 
     var listening = false
 
+
+
     private inline val isHovered get() = isHoveredKeybind(
         elementValue.key,
     )
@@ -36,13 +38,12 @@ class KeybindElement(override var elementValue: Keybinding, x: Float, y: Float, 
         val width = (getTextWidth(value, 12f).coerceAtLeast(KEYBIND_MINIMUM_WIDTH) + KEYBIND_ADDITION_WIDTH)
 
         return isAreaHovered(
-            -width * 0.5f,
+            0f,
             -KEYBIND_HEIGHT * 0.5f,
             width,
             KEYBIND_HEIGHT
         )
     }
-
 
     private val colorAnimation = ColorAnimation(100)
     override fun draw() {
@@ -50,10 +51,9 @@ class KeybindElement(override var elementValue: Keybinding, x: Float, y: Float, 
         else if (elementValue.key < 0) Mouse.getButtonName(elementValue.key + 100)
         else "None"
         val width = getTextWidth(value, 12f).coerceAtLeast(KEYBIND_MINIMUM_WIDTH) + KEYBIND_ADDITION_WIDTH
-        val halfWidth = width * 0.5f
         val xOffset = when (alignment) {
             TextAlign.Left -> 0f
-            TextAlign.Middle -> -halfWidth
+            TextAlign.Middle -> -width * 0.5f
             TextAlign.Right -> -width
         }
 
@@ -61,7 +61,7 @@ class KeybindElement(override var elementValue: Keybinding, x: Float, y: Float, 
         translate(x + xOffset, y)
         scale(xScale, yScale)
 
-        roundedRectangle(-halfWidth, -HALF_KEYBIND_HEIGHT, width, KEYBIND_HEIGHT, ColorPalette.buttonColor, 5f)
+        roundedRectangle(0f, -HALF_KEYBIND_HEIGHT, width, KEYBIND_HEIGHT, ColorPalette.buttonColor, 5f)
         if (listening || colorAnimation.isAnimating()) {
             rectangleOutline(
                 0f,
@@ -73,7 +73,7 @@ class KeybindElement(override var elementValue: Keybinding, x: Float, y: Float, 
                 3f
             )
         }
-        text(value, -xOffset, 0, ColorPalette.textColor, 12f, align = TextAlign.Middle)
+        text(value, width * 0.5f, 0f, ColorPalette.textColor, 12f, align = TextAlign.Middle)
         GlStateManager.popMatrix()
     }
 

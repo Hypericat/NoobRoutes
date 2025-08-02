@@ -27,7 +27,7 @@ object FontRenderer {
         )
         fonts[FontType.NUNITO] = FontRenderer(
             EssentialFont.fromResource("/assets/fonts/nunito/Regular"),
-            EssentialFont.fromResource("/assets/fonts/nunito/SemiBold")
+            EssentialFont.fromResource("/assets/fonts/nunito/Bold")
         )
         fonts[FontType.ODIN] = FontRenderer(
             EssentialFont.fromResource("/assets/fonts/odin/Regular"),

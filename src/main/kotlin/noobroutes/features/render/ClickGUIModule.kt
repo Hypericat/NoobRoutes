@@ -30,6 +30,7 @@ object  ClickGUIModule: Module(
         true,
         description = "Shows you a notification in chat when you toggle an option with a keybind."
     )
+
     val color by ColorSetting(
         "Gui Color",
         Color(57, 191, 60),
@@ -60,6 +61,11 @@ object  ClickGUIModule: Module(
     val panelX = mutableMapOf<Category, NumberSetting<Float>>()
     val panelY = mutableMapOf<Category, NumberSetting<Float>>()
     val panelExtended = mutableMapOf<Category, BooleanSetting>()
+    var searchBarX = NumberSetting<Float>("", 0f, hidden = true, description = "")
+        private set
+    var searchBarY = NumberSetting<Float>("", 0f, hidden = true, description = "")
+        private set
+
 
     init {
         execute(250) {
@@ -84,6 +90,19 @@ object  ClickGUIModule: Module(
             )
             }.enabled = true
         }
+        val searchIncrement = 10f + 260f * Category.entries.size
+        searchBarX = NumberSetting<Float>(
+            "searchBarX",
+            default = searchIncrement,
+            hidden = true,
+            description = ""
+        ).apply { value = searchIncrement }
+        searchBarY = NumberSetting<Float>(
+            "searchBarY",
+            default = 10f,
+            hidden = true,
+            description = ""
+        ).apply { value = 10f }
     }
 
     override fun onKeybind() {

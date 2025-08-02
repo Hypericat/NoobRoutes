@@ -5,6 +5,7 @@ import net.minecraftforge.common.MinecraftForge
 import noobroutes.Core
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.AlwaysActive
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.NotPersistent
 import noobroutes.features.settings.Setting
 import noobroutes.features.settings.impl.HudSetting
@@ -29,6 +30,9 @@ abstract class Module(
     toggled: Boolean = false,
 ) {
 
+    @Transient
+    val devOnly = this::class.hasAnnotation<DevOnly>()
+
     var enabled: Boolean = toggled
         private set
 
@@ -52,7 +56,7 @@ abstract class Module(
     val alwaysActive = this::class.hasAnnotation<AlwaysActive>()
 
     @Transient
-    val notPersistent = this::class.hasAnnotation<NotPersistent>()
+    var notPersistent = this::class.hasAnnotation<NotPersistent>()
 
     init {
         if (alwaysActive) {

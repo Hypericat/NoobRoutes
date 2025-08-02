@@ -20,15 +20,16 @@ import noobroutes.utils.render.text
  * @author Stivais, Aton
  * @see [Element]
  */
-class ElementCheckBox(setting: BooleanSetting) : Element<BooleanSetting>(
+class ElementSwitch(setting: BooleanSetting) : Element<BooleanSetting>(
     setting, ElementType.CHECK_BOX
 ) {
 
-    val switchElement = SwitchElement(1f, setting.enabled, w - SwitchElement.SWITCH_WIDTH_HALF - BORDER_OFFSET, h * 0.5f).apply {
-        addValueChangeListener {
-            setting.enabled = it
+    val switchElement =
+        SwitchElement(1f, setting.enabled, w - SwitchElement.SWITCH_WIDTH_HALF - BORDER_OFFSET, h * 0.5f).apply {
+            addValueChangeListener {
+                setting.enabled = it
+            }
         }
-    }
 
     init {
         addChild(switchElement)
@@ -36,7 +37,7 @@ class ElementCheckBox(setting: BooleanSetting) : Element<BooleanSetting>(
 
     override fun draw() {
         GlStateManager.pushMatrix()
-        translate(x, y)
+        GlStateManager.translate(x, y, 0f)
         roundedRectangle(0f, 0f, w, h, elementBackground)
         text(name, TEXT_OFFSET, h * 0.5, textColor, 12f, FontRenderer.REGULAR)
         GlStateManager.popMatrix()

@@ -21,7 +21,7 @@ import noobroutes.features.move.*
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.render.FreeCam
 import noobroutes.features.render.RotationVisualizer
-import noobroutes.features.render.TemporaryColorPalletModule
+import noobroutes.features.render.ColorPaletteModule
 import noobroutes.features.render.Trail
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.ui.hud.EditHUDGui
@@ -84,7 +84,7 @@ object ModuleManager {
         FreeCam,
         QOL,
         BarPhase,
-        TemporaryColorPalletModule
+        ColorPaletteModule
     )
 
     init {

@@ -27,7 +27,7 @@ class ElementKeyBind(setting: KeybindSetting) :
 
     val keybind = KeybindElement(setting.value, w - BORDER_OFFSET, h * 0.5f, 1f, 1f, TextAlign.Right).apply {
         addValueChangeListener {
-            setting.value = it
+            setting.value.key = it.key
         }
     }
     init {
@@ -37,7 +37,8 @@ class ElementKeyBind(setting: KeybindSetting) :
 
     override fun draw() {
         GlStateManager.pushMatrix()
-        roundedRectangle(x, y, w, h, elementBackground)
+        GlStateManager.translate(x, y, 0f)
+        roundedRectangle(0f, 0f, w, h, elementBackground)
         text(name,  x + TEXT_OFFSET, h * 0.5f, textColor, 12f, FontRenderer.REGULAR)
         GlStateManager.popMatrix()
     }

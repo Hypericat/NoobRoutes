@@ -11,10 +11,10 @@ abstract class Animation<T>(private var duration: Long) {
     private var animating = false
     private val clock = Clock(duration)
 
-    fun start(bypass: Boolean = false): Boolean {
+    fun start(bypass: Boolean = false, percentage: Int = 0): Boolean {
         if (!animating || bypass) {
             animating = true
-            clock.update()
+            clock.setTime(System.currentTimeMillis() - (clock.delay * percentage * 0.01).toLong())
             return true
         }
         return false

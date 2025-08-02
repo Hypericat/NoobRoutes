@@ -23,6 +23,7 @@ class NumberBoxElement(
     boxColor: Color,
     maxCharacters: Int,
     boxType: TextBoxType,
+    boxThickness: Float = 3f,
     val roundTo: Int,
     val min: Double,
     val max: Double,
@@ -43,8 +44,10 @@ class NumberBoxElement(
         boxColor,
         maxCharacters,
         boxType,
+        boxThickness,
         if (roundTo == 0) this.elementValue.toInt().toString() else this.elementValue.toString(),
-        numberKeyWhiteList
+        numberKeyWhiteList,
+        ""
     ).apply {
         addValueChangeListener {
             textUnlisten(it)

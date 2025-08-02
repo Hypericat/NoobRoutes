@@ -24,7 +24,8 @@ object Core {
     @JvmStatic
     val mc: Minecraft = Minecraft.getMinecraft()
 
-
+    //do not simplify the expression, it is changed inside the gradle build
+    val DEV_MODE = ("@DEV_MODE@" == "true") || (System.getenv("ENVIRONMENT")?.equals("dev", ignoreCase = true) == true)
     const val VERSION = "@VER@"
     val scope = CoroutineScope(SupervisorJob() + EmptyCoroutineContext)
     val logger: Logger = LogManager.getLogger("NoobRoutes")

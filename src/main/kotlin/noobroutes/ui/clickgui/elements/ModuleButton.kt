@@ -1,7 +1,10 @@
 package noobroutes.ui.clickgui.elements
 
 import net.minecraft.client.renderer.GlStateManager
+import noobroutes.Core
+import noobroutes.Core.logger
 import noobroutes.features.Module
+import noobroutes.features.settings.Setting
 import noobroutes.features.settings.impl.ActionSetting
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
@@ -16,7 +19,7 @@ import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.clickgui.elements.menu.ElementAction
-import noobroutes.ui.clickgui.elements.menu.ElementCheckBox
+import noobroutes.ui.clickgui.elements.menu.ElementSwitch
 import noobroutes.ui.clickgui.elements.menu.ElementColor
 import noobroutes.ui.clickgui.elements.menu.ElementDropdown
 import noobroutes.ui.clickgui.elements.menu.ElementDual
@@ -27,13 +30,19 @@ import noobroutes.ui.clickgui.elements.menu.ElementSlider
 import noobroutes.ui.clickgui.elements.menu.ElementTextField
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.ColorAnimation
+import noobroutes.ui.util.animations.impl.CubicBezierAnimation
 import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.TextAlign
+import noobroutes.utils.render.popStencil
+import noobroutes.utils.render.resetScissor
 import noobroutes.utils.render.roundedRectangle
+import noobroutes.utils.render.scissor
+import noobroutes.utils.render.stencilRoundedRectangle
 import noobroutes.utils.render.text
+import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 
 class ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
@@ -46,7 +55,7 @@ class ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
         updateElements()
     }
 
-    private val extendAnim = EaseInOut(250)
+    private val extendAnim = CubicBezierAnimation(250, 0.4, 0, 0.2, 1)
 
     private inline val UiElement.element get() = (this as Element<*>)
 
@@ -72,13 +81,12 @@ class ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
         return drawY
     }
 
-    override fun draw() {
+    override fun doHandleDraw() {
+        if (!visible) return
         GlStateManager.pushMatrix()
         translate(0f, y)
         roundedRectangle(0f, 0f, width, BUTTON_HEIGHT, ColorPalette.moduleButtonColor)
         text(module.name, width * 0.5, BUTTON_HEIGHT * 0.5, color, 14f, FontRenderer.REGULAR, TextAlign.Middle)
-
-
         val renderSettings = extendAnim.isAnimating() || extended
 
         var drawY = BUTTON_HEIGHT
@@ -88,11 +96,21 @@ class ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
             drawY += (it as Element<*>).getHeight()
         }
 
-        scissorChildren(0f, 0f, width, drawY)
-        roundedRectangle(x /*- 2 */, y + BUTTON_HEIGHT, 2, drawY - BUTTON_HEIGHT, clickGUIColor.brighter(1.65f), edgeSoftness = 0f)
 
+
+
+        val scissor = scissor(x + getEffectiveX(), BUTTON_HEIGHT + getEffectiveY(), width * getEffectiveXScale(), (drawY - BUTTON_HEIGHT) * extendAnim.get(0f, 1f, !extended) * getEffectiveYScale())
+        //stencilRoundedRectangle(x, BUTTON_HEIGHT, width, (drawY - BUTTON_HEIGHT) * extendAnim.get(0f, 1f, !extended))
+        doDrawChildren()
+        roundedRectangle(x, BUTTON_HEIGHT, 2, drawY - BUTTON_HEIGHT, clickGUIColor.brighter(1.65f), edgeSoftness = 0f)
+        //popStencil()
+        resetScissor(scissor)
 
         GlStateManager.popMatrix()
+    }
+
+    override fun draw() {
+
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {
@@ -113,15 +131,22 @@ class ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
 
 
     fun updateElements() {
-        var position = -1 // This looks weird, but it starts at -1 because it gets incremented before being used.
         uiChildren.clear()
         for (setting in module.settings) {
             /** Don't show hidden settings */
             if (setting.shouldBeVisible) run addElement@{
-                position++
                 if (uiChildren.any { it.element.setting === setting }) return@addElement
+                if (setting.devOnly && !Core.DEV_MODE) {
+                    logger.info("devmode: ${setting.name}")
+                    setting.reset()
+                    if (setting is KeybindSetting) {
+                        setting.value.key = Keyboard.KEY_NONE
+                    }
+                    return@addElement
+                }
+
                 val newElement = when (setting) {
-                    is BooleanSetting -> ElementCheckBox(setting)
+                    is BooleanSetting -> ElementSwitch(setting)
                     is NumberSetting -> ElementSlider(setting)
                     is SelectorSetting -> ElementSelector(setting)
                     is StringSetting -> ElementTextField(setting)
@@ -131,10 +156,7 @@ class ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
                     is HudSetting -> ElementHud(setting)
                     is KeybindSetting -> ElementKeyBind(setting)
                     is DropdownSetting -> ElementDropdown(setting)
-                    else -> {
-                        position--
-                        return@addElement
-                    }
+                    else -> return@addElement
                 }
                 addChild(newElement)
             } else {

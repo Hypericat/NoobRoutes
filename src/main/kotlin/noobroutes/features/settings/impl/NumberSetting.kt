@@ -9,8 +9,8 @@ import kotlin.math.round
  * Setting that lets you pick a number between a range.
  * @author Stivais, Aton
  */
-@Suppress("UNCHECKED_CAST")
-class NumberSetting<E>(
+    @Suppress("UNCHECKED_CAST")
+    class NumberSetting<E>(
         name: String,
         override val default: E = 1.0 as E, // hey it works
         min: Number = -10000,
@@ -19,13 +19,17 @@ class NumberSetting<E>(
         hidden: Boolean = false,
         description: String,
         val unit: String = "",
-) : noobroutes.features.settings.Setting<E>(name, hidden, description),
-    noobroutes.features.settings.Saving where E : Number, E : Comparable<E> {
+    ) : noobroutes.features.settings.Setting<E>(name, hidden, description),
+        noobroutes.features.settings.Saving where E : Number, E : Comparable<E> {
 
-    override var value: E = default
-        set(value) {
-            field = roundToIncrement(value).coerceIn(min, max) as E
-        }
+        override var value: E = default
+            set(value) {
+                field = roundToIncrement(value).coerceIn(min, max) as E
+            }
+
+    fun setValueFromNumber(number: Number) {
+        value = (roundToIncrement(number).coerceIn(min, max) as E)
+    }
 
     /**
      * The amount a setting should increment.

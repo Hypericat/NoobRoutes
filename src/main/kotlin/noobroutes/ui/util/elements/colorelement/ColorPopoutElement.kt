@@ -36,6 +36,7 @@ class ColorPopoutElement(
                     ColorPalette.textColor,
                     3,
                     TextBoxElement.TextBoxType.GAP,
+                    3f,
                     0,
                     0.0,
                     255.0,
@@ -71,6 +72,7 @@ class ColorPopoutElement(
                 12f, TextAlign.Middle, 5f, 6f,
                 ColorPalette.textColor, if (alphaEnabled) 8 else 6,
                 TextBoxElement.TextBoxType.GAP,
+                3f,
                 elementValue.hex,
             ).apply {
                 addValueChangeListener {

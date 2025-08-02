@@ -30,7 +30,7 @@ class ElementColor(setting: ColorSetting) :
 
     override fun draw() {
         GlStateManager.pushMatrix()
-        translate(x, y)
+        GlStateManager.translate(x, y, 0f)
         roundedRectangle(0f, 0f, w, h, elementBackground)
         text(name, TEXT_OFFSET,  18f, textColor, 12f, FontRenderer.REGULAR)
         GlStateManager.popMatrix()

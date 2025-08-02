@@ -1,6 +1,7 @@
 package noobroutes.ui.clickgui.elements
 
 import net.minecraft.client.renderer.GlStateManager
+import noobroutes.Core
 import noobroutes.features.Category
 import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
@@ -26,6 +27,7 @@ import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.stencilRoundedRectangle
 import noobroutes.utils.render.text
 import noobroutes.utils.round
+import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 
 class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule.panelX[category]!!.value, ClickGUIModule.panelY[category]!!.value) {
@@ -41,6 +43,13 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
         const val BOTTOM_SEGMENT_HEIGHT = 10f
         const val PANEL_RADIUS = 10f
         const val HIGHLIGHT_THICKNESS = 2f
+    }
+
+    fun updatingModuleButtons(){
+        uiChildren.forEach {
+            (it as ModuleButton).updateElements()
+        }
+
     }
 
     private var dragging = false
@@ -63,6 +72,12 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
     init {
         for (module in modules.sortedByDescending { getTextWidth(it.name, 18f) }) {
             if (module.category != this@Panel.category) continue
+            if (module.devOnly && !Core.DEV_MODE) {
+                if (module.enabled) module.onDisable()
+                module.keybinding?.key = Keyboard.KEY_NONE
+                module.notPersistent = true
+                continue
+            }
             addChild(ModuleButton(0f, module))
         }
     }
@@ -80,8 +95,7 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
     }
 
 
-
-    override fun draw() {
+    override fun doHandleDraw() {
         GlStateManager.pushMatrix()
         scrollOffset = scrollAnimation.get(scrollOffset, scrollTarget).round(0).toFloat()
         val offset = floor(extendAnim.get(0f, getTotalHeight(scrollOffset), !extended))
@@ -103,25 +117,27 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
         )
         text(name, TEXT_OFFSET, HALF_HEIGHT, ColorPalette.textColor, 16f, FontRenderer.BOLD,TextAlign.Left)
 
-        stencilChildren(0f, HEIGHT, WIDTH, offset)
-        var startY = scrollOffset + HEIGHT
+
 
         if (extended || extendAnim.isAnimating()) {
+            stencilRoundedRectangle(0f, HEIGHT, WIDTH, offset)
+            var startY = scrollOffset + HEIGHT
             if (uiChildren.isNotEmpty()) {
                 for (button in uiChildren) {
                     button.visible = true
                     button.updatePosition(0f, startY)
+                    button.doHandleDraw()
                     startY += (button as ModuleButton).getHeight()
                 }
                 length = startY + 5f
             }
+            popStencil()
             roundedRectangle(-BORDER_THICKNESS, HEIGHT - HIGHLIGHT_THICKNESS, WIDTH + DOUBLE_BORDER_THICKNESS, HIGHLIGHT_THICKNESS, separatorColor)
         } else {
             uiChildren.forEach {
                 it.visible = false
             }
         }
-
 
         roundedRectangle(
             0f, offset + HEIGHT, WIDTH, BOTTOM_SEGMENT_HEIGHT, bottomSegmentColor, bottomSegmentColor, bottomSegmentColor,
@@ -151,12 +167,10 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
     }
 
     override fun onScroll(amount: Int): Boolean {
-        if (isMouseOverExtended) {
-            scrollTarget = (scrollTarget + amount).coerceIn(-length + scrollOffset + 72f, 0f)
-            scrollAnimation.start(true)
-            return true
-        }
-        return false
+        if (!isMouseOverExtended) return false
+        scrollTarget = (scrollTarget + amount).coerceIn((-length + scrollOffset + 72f).coerceAtMost(0f), 0f)
+        scrollAnimation.start(true)
+        return true
     }
 
 

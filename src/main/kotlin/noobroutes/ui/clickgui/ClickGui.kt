@@ -1,8 +1,11 @@
 package noobroutes.ui.clickgui
 
 import net.minecraft.client.renderer.GlStateManager
+import noobroutes.config.Config
+import noobroutes.features.render.ClickGUIModule
 import noobroutes.ui.Screen
 import noobroutes.ui.clickgui.elements.ClickGUIBase
+import noobroutes.ui.clickgui.elements.SearchBar
 import noobroutes.ui.util.shader.GaussianBlurShader
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11
@@ -15,9 +18,9 @@ object ClickGui : Screen() {
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
         scaleUI()
-        GaussianBlurShader.captureBackground()
-        base.handleDraw()
-        GaussianBlurShader.cleanup()
+        if (ClickGUIModule.blur) GaussianBlurShader.captureBackground()
+        base.doHandleDraw()
+        if (ClickGUIModule.blur) GaussianBlurShader.cleanup()
         resetScale()
         GlStateManager.popMatrix()
     }
@@ -32,13 +35,21 @@ object ClickGui : Screen() {
     }
 
     override fun keyTyped(typedChar: Char, keyCode: Int) {
-        base.handleKeyTyped(typedChar, keyCode)
+        if (base.doHandleKeyTyped(typedChar, keyCode)) return
         super.keyTyped(typedChar, keyCode)
     }
 
     override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
         if (state != 0) return
         base.handleMouseReleased()
+    }
+    override fun initGui() {
+        base.onGuiInit()
+    }
+
+    override fun onGuiClosed() {
+        SearchBar.onGuiClosed()
+        Config.save()
     }
 
 }

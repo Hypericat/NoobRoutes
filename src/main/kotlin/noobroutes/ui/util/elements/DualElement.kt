@@ -35,7 +35,7 @@ class DualElement(
 
     private inline val isLeftHovered: Boolean
         get() = isAreaHovered(
-            DUAL_ELEMENT_HALF_WIDTH,
+            -DUAL_ELEMENT_HALF_WIDTH,
             -DUAL_ELEMENT_HALF_HEIGHT,
             DUAL_ELEMENT_HALF_WIDTH,
             DUAL_ELEMENT_HEIGHT

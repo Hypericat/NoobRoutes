@@ -1,6 +1,7 @@
 package noobroutes.ui.util.elements
 
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.logger
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.util.ElementValue
@@ -31,8 +32,11 @@ class TextBoxElement(
     val boxColor: Color,
     var maxCharacters: Int,
     val boxType: TextBoxType,
+    val boxThickness: Float = 3f,
     override var elementValue: String,
-    val keyWhiteList: List<Int>
+    val keyWhiteList: List<Int>,
+    val placeHolder: String = "",
+    val verticalAlign: TextPos = TextPos.Middle
 ) : UiElement(x, y), ElementValue<String> {
     constructor(
         name: String,
@@ -47,18 +51,21 @@ class TextBoxElement(
         boxColor: Color,
         maxCharacters: Int,
         boxType: TextBoxType,
-        elementValue: String
-    ) : this(name, x, y, minWidth, h, textScale, textAlign, radius, textPadding, boxColor, maxCharacters, boxType, elementValue, defaultWhiteList)
+        boxThickness: Float = 3f,
+        elementValue: String,
+        placeHolder: String = "",
+        verticalAlign: TextPos = TextPos.Middle
+    ) : this(name, x, y, minWidth, h, textScale, textAlign, radius, textPadding, boxColor, maxCharacters, boxType, boxThickness, elementValue, defaultWhiteList, placeHolder, verticalAlign)
 
     enum class TextBoxType{
         GAP,
-        NORMAL
+        NORMAL,
+        NO_BOX
     }
 
     override val elementValueChangeListeners = mutableListOf<(String) -> Unit>()
 
     companion object {
-        const val TEXT_BOX_THICKNESS = 3f
         const val TEXT_BOX_GAP_TEXT_MULTIPLIER = 0.1f
 
         private fun stringWidth(text: String, scale: Float, min: Float, textPadding: Float): Float {
@@ -119,7 +126,6 @@ class TextBoxElement(
     private inline val controlHeld get() = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)
     private inline val shiftHeld get() = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
     override fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
-        if (super.keyTyped(typedChar, keyCode)) return true
         if (!listening) return false
         resetCursorBlink()
         when (keyCode) {
@@ -309,6 +315,7 @@ class TextBoxElement(
         when (boxType) {
             TextBoxType.NORMAL -> drawTextBox()
             TextBoxType.GAP -> drawTextBoxWithGapTitle()
+            TextBoxType.NO_BOX -> drawTextBoxNoBox()
         }
         if (!listening) return
 
@@ -404,10 +411,10 @@ class TextBoxElement(
         val end = maxSelection
         val start = minSelection
 
-        if (start in 0 until end && end <= charHitboxes.size) {
+        if (start >= 0 && end <= elementValue.length && start < end) {
             val selectionStartX = textX + getTextWidth(elementValue.substring(0, start), textScale) + getPadding()
             val selectedText = elementValue.substring(start, end)
-            val selectionWidth = getTextWidth(selectedText, textScale)
+            val selectionWidth = getTextWidth(selectedText, textScale * 0.97f)
 
             roundedRectangle(
                 selectionStartX,
@@ -431,13 +438,18 @@ class TextBoxElement(
     fun getTextOrigin(): Pair<Float, Float> {
         val width = stringWidth(elementValue, textScale, minWidth, textPadding)
         val textWidth = getTextWidth(elementValue, textScale)
+        val boxOffset = when (textAlign) {
+            TextAlign.Left -> 0f
+            TextAlign.Middle -> -width * 0.5f
+            TextAlign.Right -> -width
+        }
 
         val textOrigin = when (textAlign) {
             TextAlign.Right -> width - textWidth
             TextAlign.Middle -> width * 0.5f - textWidth * 0.5f
             TextAlign.Left -> 0f
-                }
-        return (x + textOrigin) to (y + h * 0.5f)
+        }
+        return (x + textOrigin + boxOffset) to (y + h * 0.5f)
     }
 
     private fun drawCursor(textX: Float){
@@ -465,15 +477,28 @@ class TextBoxElement(
     }
 
     private fun drawTextBoxWithGapTitle() {
-        val width = stringWidth(elementValue, textScale, minWidth, textPadding)
+        GlStateManager.pushMatrix()
+        val displayString = elementValue.ifBlank { placeHolder }
+        val width = stringWidth(displayString, textScale, minWidth, textPadding)
         val nameWidth = getTextWidth(name, textScale) + textPadding
         val nameOrigin = when (textAlign) {
             TextAlign.Right -> width * 0.75f
             TextAlign.Middle -> width * 0.5f
             TextAlign.Left -> width * 0.25f
         }
-        stencilRoundedRectangle(x + nameOrigin - nameWidth * 0.5f, y, nameWidth, TEXT_BOX_THICKNESS, 0f, 0.5f, true)
-        rectangleOutline(x, y, width, h, boxColor, radius, TEXT_BOX_THICKNESS)
+
+        val boxOffset = when (textAlign) {
+            TextAlign.Left -> 0f
+            TextAlign.Middle -> -width * 0.5f
+            TextAlign.Right -> -width
+        }
+
+
+        translate(boxOffset, 0f)
+
+
+        stencilRoundedRectangle(x + nameOrigin - nameWidth * 0.5f, y, nameWidth, boxThickness, 0f, 0.5f, true)
+        rectangleOutline(x, y, width, h, boxColor, radius, boxThickness)
         popStencil()
 
         val textOrigin = when (textAlign) {
@@ -482,19 +507,52 @@ class TextBoxElement(
             TextAlign.Left -> textPadding
         }
         text(name, x + nameOrigin, y + fontHeight * TEXT_BOX_GAP_TEXT_MULTIPLIER, ColorPalette.textColor, textScale, align = TextAlign.Middle)
-        text(elementValue, x + textOrigin, y + h * 0.5f, ColorPalette.textColor, textScale, align = textAlign)
+        text(displayString, x + textOrigin, y + h * 0.5f, ColorPalette.textColor, textScale, align = textAlign, verticalAlign = verticalAlign)
+        GlStateManager.popMatrix()
     }
     private fun drawTextBox(){
-        val width = stringWidth(elementValue, textScale, minWidth, textPadding)
-        rectangleOutline(x, y, width, h, boxColor, radius, TEXT_BOX_THICKNESS)
+        GlStateManager.pushMatrix()
+        val displayString = elementValue.ifBlank { placeHolder }
+        val width = stringWidth(displayString, textScale, minWidth, textPadding)
+
+        val boxOffset = when (textAlign) {
+            TextAlign.Left -> 0f
+            TextAlign.Middle -> -width * 0.5f
+            TextAlign.Right -> -width
+        }
+        translate(boxOffset, 0f)
+
+        rectangleOutline(x, y, width, h, boxColor, radius, boxThickness)
 
         val textOrigin = when (textAlign) {
             TextAlign.Right -> width - textPadding
             TextAlign.Middle -> width * 0.5f
             TextAlign.Left -> textPadding
         }
-        text(elementValue, x + textOrigin, y + h * 0.5f, ColorPalette.textColor, textScale, align = textAlign)
+        text(displayString, x + textOrigin, y + h * 0.5f, ColorPalette.textColor, textScale, align = textAlign, verticalAlign = verticalAlign)
+        GlStateManager.popMatrix()
     }
+    private fun drawTextBoxNoBox(){
+        GlStateManager.pushMatrix()
+        val displayString = elementValue.ifBlank { placeHolder }
+        val width = stringWidth(displayString, textScale, minWidth, textPadding)
+
+        val boxOffset = when (textAlign) {
+            TextAlign.Left -> 0f
+            TextAlign.Middle -> -width * 0.5f
+            TextAlign.Right -> -width
+        }
+        translate(boxOffset, 0f)
+
+        val textOrigin = when (textAlign) {
+            TextAlign.Right -> width - textPadding
+            TextAlign.Middle -> width * 0.5f
+            TextAlign.Left -> textPadding
+        }
+        text(displayString, x + textOrigin, y + h * 0.5f, ColorPalette.textColor, textScale, align = textAlign, verticalAlign = verticalAlign)
+        GlStateManager.popMatrix()
+    }
+
 
     fun resetSelection(){
         listeningTextSelection = false
