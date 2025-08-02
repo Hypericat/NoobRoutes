@@ -19,6 +19,7 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 package noobroutes.mixin;
 
 import net.minecraft.client.settings.KeyBinding;
+import noobroutes.features.dungeon.puzzle.IceFill;
 import noobroutes.features.move.AutoPath;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,7 +37,16 @@ public class MixinKeybinding {
 
     @Inject(method = "isPressed", at = @At("HEAD"), cancellable = true)
     private void isPressed(CallbackInfoReturnable<Boolean> cir) {
-        if (AutoPath.INSTANCE.shouldCancelKey(keyCode))  {
+        if (AutoPath.INSTANCE.shouldCancelKey(keyCode) || IceFill.INSTANCE.shouldCancelKey(keyCode))  {
+            cir.setReturnValue(false);
+            this.pressed = false;
+            this.pressTime = 0;
+        }
+    }
+
+    @Inject(method = "isKeyDown", at = @At("HEAD"), cancellable = true)
+    private void isKeyDown(CallbackInfoReturnable<Boolean> cir) {
+        if (IceFill.INSTANCE.shouldCancelKey(keyCode))  {
             cir.setReturnValue(false);
             this.pressed = false;
             this.pressTime = 0;
