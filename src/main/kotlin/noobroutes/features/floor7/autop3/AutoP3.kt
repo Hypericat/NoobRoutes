@@ -332,6 +332,8 @@ object AutoP3: Module (
     fun movement(event: PacketEvent.Send) {
         if (movementPackets.isEmpty() || event.packet !is C03PacketPlayer) return
 
+        activeBlink = null
+
         if (blinkMovementPacketSkip) {
             blinkMovementPacketSkip = false
             return

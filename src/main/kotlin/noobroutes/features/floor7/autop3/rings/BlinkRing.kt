@@ -88,7 +88,7 @@ class BlinkRing(
         PlayerUtils.unPressKeys()
 
         if (!AutoP3.blinkToggle || AutoP3.blinksThisInstance + packets.size > AutoP3.getMaxBlinks()) {
-           doMovement()
+            doMovement()
             return
         }
 

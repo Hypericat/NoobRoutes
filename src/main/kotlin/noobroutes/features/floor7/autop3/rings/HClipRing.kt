@@ -1,6 +1,5 @@
 package noobroutes.features.floor7.autop3.rings
 
-import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.floor7.autop3.CommandGenerated
@@ -39,8 +38,7 @@ class HClipRing(
             return
         }
 
-        mc.thePlayer.motionX = 0.0
-        mc.thePlayer.motionZ = 0.0
+        PlayerUtils.stopVelocity()
 
         Scheduler.schedulePostMoveEntityWithHeadingTask { setMaxSpeed() }
 

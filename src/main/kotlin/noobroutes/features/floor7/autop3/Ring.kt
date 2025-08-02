@@ -227,6 +227,7 @@ abstract class Ring(
 
     protected fun await(){
         PlayerUtils.stopVelocity()
+        AutoP3MovementHandler.resetShit()
         AutoP3.waitingRing = this
     }
 

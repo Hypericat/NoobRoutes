@@ -15,6 +15,7 @@ import noobroutes.features.Module
 import noobroutes.features.settings.NotPersistent
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.Scheduler
+import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.text
@@ -35,7 +36,7 @@ object LavaClip: Module(
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (mc.thePlayer == null) return
-        if (event.phase != TickEvent.Phase.END) return
+        if (event.isEnd) return
 
         if (customInLavaCheck()) {
             cancelS12 = true
