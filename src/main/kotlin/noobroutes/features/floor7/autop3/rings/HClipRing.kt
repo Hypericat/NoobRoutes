@@ -19,7 +19,8 @@ class HClipRing(
 ) : Ring(ringBase, RingType.H_CLIP) {
     companion object : CommandGenerated {
         override fun generateRing(args: Array<out String>): Ring? {
-            return HClipRing(generateRingBaseFromArgs(args), getWalkFromArgs(args))
+            val insta = args.any {it == "insta"}
+            return HClipRing(generateRingBaseFromArgs(args), getWalkFromArgs(args), insta)
         }
     }
 
