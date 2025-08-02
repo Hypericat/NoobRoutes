@@ -31,6 +31,7 @@ import noobroutes.utils.skyblock.dungeon.DoorPositions.oneByOneSpots
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 
 
@@ -57,6 +58,7 @@ object AutoPath: Module(
     private var validDoorLookIndex: Int = -1;
 
     private var validKeys: HashSet<Int>? = null;
+    private var activePath: Boolean = false;
 
     fun onInitKeys() {
         validKeys = HashSet()
@@ -96,6 +98,7 @@ object AutoPath: Module(
     fun onWorldUnload(event: WorldEvent.Unload) {
         validDoors.clear();
         validBlocks.clear();
+        activePath = false;
     }
 
     private fun getClosestPointInBox(eye: Vec3, box: AxisAlignedBB): Vec3 {
@@ -197,9 +200,22 @@ object AutoPath: Module(
             return
         }
 
+        if (activePath) {
+            modMessage("Maybe wait for the previous path to finish!")
+            return
+        }
+
+        //devMessage("Pathing!")
+
         PlayerUtils.unPressKeys();
         PlayerUtils.stopVelocity();
-        EWPathfinderModule.execute(validBlocks[key].second, true, if (resetPos) Runnable { resetPos(BlockPos(Minecraft.getMinecraft().thePlayer.positionVector)); } else null)
+        // Dont run again if we currently have a thread
+        activePath = true;
+
+        EWPathfinderModule.execute(validBlocks[key].second, true) {
+            if (resetPos) resetPos(BlockPos(Minecraft.getMinecraft().thePlayer.positionVector));
+            activePath = false;
+        }
     }
 
     fun shouldCancelKey(keyCode: Int) : Boolean {

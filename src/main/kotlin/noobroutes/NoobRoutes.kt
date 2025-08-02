@@ -103,4 +103,9 @@ class NoobRoutes {
         AutoP3.loadRings()
     }
 
+    // TODO
+    // Map Renderer to click on rooms to snipe / path to
+    
+
+
 }

@@ -120,7 +120,8 @@ public class PathFinder {
 
     private synchronized void finishNode(PathNode node) {
         if (!processing.contains(node.hashCode())) {
-            System.err.println("Found node not in processing!");
+            //System.err.println("Found node not in processing!");
+            return;
         }
         processing.remove(node.hashCode());
     }

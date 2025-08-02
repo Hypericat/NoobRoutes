@@ -1,5 +1,6 @@
 package noobroutes.features.move
 
+import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
@@ -13,6 +14,7 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.BossEventDispatcher.inBoss
+import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
@@ -24,6 +26,7 @@ import noobroutes.utils.Utils.ID
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import scala.collection.parallel.ParIterableLike.Min
 import kotlin.math.floor
 
 object Zpew : Module(
@@ -37,6 +40,7 @@ object Zpew : Module(
 
     private val sendPacket by BooleanSetting("Send Packet", description = "You send a C06 Packet, aka, it is actual zpew")
     private val sendTPCommand by BooleanSetting("Send Tp Command", description = "Used for Single Player")
+    private val hideFuckingTeleports by BooleanSetting("Hide Tp Messages", description = "Hides the fucking annoying tp messages").withDependency { Minecraft.getMinecraft().isSingleplayer && sendTPCommand }
     private val zpewOffset by BooleanSetting("Offset", description = "Offsets your position onto the block instead of 0.05 blocks above it")
     private val dingdingding by BooleanSetting("dingdingding", false, description = "")
 
@@ -197,6 +201,13 @@ object Zpew : Module(
 
     private fun isWithinTolerance(n1: Float, n2: Float, tolerance: Double = 1e-4): Boolean {
         return kotlin.math.abs(n1 - n2) < tolerance
+    }
+
+
+    @SubscribeEvent
+    fun onChatMessage(event: ChatPacketEvent) {
+        if (!hideFuckingTeleports || !Minecraft.getMinecraft().isSingleplayer || !sendTPCommand) return;
+        if (event.message.startsWith("Teleported " + Minecraft.getMinecraft().thePlayer.name)) event.isCanceled = true;
     }
 
 
