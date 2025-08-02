@@ -5,6 +5,8 @@ import com.google.gson.reflect.TypeToken
 import com.sun.xml.internal.bind.v2.runtime.reflect.Lister.Pack
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
+import net.minecraft.client.settings.GameSettings
+import net.minecraft.client.settings.KeyBinding
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.util.BlockPos
@@ -21,6 +23,8 @@ import noobroutes.features.Module
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.features.settings.impl.Keybinding
+import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
@@ -31,10 +35,13 @@ import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.Sys
+import org.lwjgl.input.Keyboard
+import scala.reflect.internal.StdAttachments.PlainAttachment
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
@@ -44,12 +51,15 @@ object IceFill: Module(
     description = "Does Icefill"
 ) {
 
-    private val simulate by BooleanSetting("Simulate", default = false, description = "Simulates Ice Fill in singleplayer").withDependency { ClickGUIModule.devMode }
+    private val simulate by BooleanSetting("Simulate", default = false, description = "Simulates Ice Fill in singleplayer");
+    private val ping by NumberSetting("Simulation Tick Delay", default = 0, description = "Adds x ticks of delay to simulation", min = 0, max = 50).withDependency { simulate }
     private val packetMode by BooleanSetting("Packet Mode", default = false, description = "Scary")
+
+    private var canceledKeys: List<KeyBinding>? = null;
 
     private var pathing: Boolean = false;
     private var stairTicks: Int = -1;
-    private val startBlockPosRoom: BlockPos = BlockPos(0, 69, -8)
+    private val startBlockPosRoom: BlockPos = BlockPos(0, 69, 8)
 
     private var currentPatterns: ArrayList<Vec3> = ArrayList()
     private var representativeFloors: List<List<List<Int>>>
@@ -68,6 +78,19 @@ object IceFill: Module(
             System.err.println(e.toString())
             representativeFloors = emptyList()
         }
+
+        val settings: GameSettings = Minecraft.getMinecraft().gameSettings;
+        val list: MutableList<KeyBinding> = mutableListOf();
+        list.add(settings.keyBindSneak)
+        list.add(settings.keyBindJump)
+        list.add(settings.keyBindForward)
+        list.add(settings.keyBindBack)
+        list.add(settings.keyBindRight)
+        list.add(settings.keyBindLeft)
+        list.add(settings.keyBindAttack)
+        list.add(settings.keyBindUseItem)
+        list.add(settings.keyBindSprint)
+        canceledKeys = list;
     }
 
     @SubscribeEvent
@@ -84,13 +107,20 @@ object IceFill: Module(
 
     @SubscribeEvent
     fun onRoomEnter(event: RoomEnterEvent) {
-        if (event.room == null) {
-            return
-        }
-        if (event.room.name != "Ice Fill" || currentPatterns.isNotEmpty()) return
-
-        scanAllFloors(event.room.getRealCoords(startBlockPosRoom.up()).toVec3(), event.room.rotation)
         pathing = false;
+
+        if (event.room == null || event.room.name != "Ice Fill" || currentPatterns.isNotEmpty()) return
+        scanAllFloors(event.room.getRealCoords(startBlockPosRoom.up()).toVec3(), event.room.rotation)
+    }
+
+    override fun onEnable() {
+        super.onEnable()
+        this.pathing = false;
+    }
+
+    override fun onDisable() {
+        super.onDisable()
+        this.pathing = false;
     }
 
     private fun scanAllFloors(pos: Vec3, rotation: Rotations) {
@@ -103,7 +133,7 @@ object IceFill: Module(
                     isAir(BlockPos(startPosition).add(transform(floorHeight[patternIndex][0].toDouble(), floorHeight[patternIndex][1].toDouble(), rotation))) &&
                     !isAir(BlockPos(startPosition).add(transform(floorHeight[patternIndex][2].toDouble(), floorHeight[patternIndex][3].toDouble(), rotation)))
                 ) {
-                    modMessage("Section $floorIndex scan took ${(System.nanoTime() - startTime) / 1000000.0}ms pattern: $patternIndex")
+                    //modMessage("Section $floorIndex scan took ${(System.nanoTime() - startTime) / 1000000.0}ms pattern: $patternIndex")
 
                     (IceFillFloors.IceFillFloors[floorIndex][patternIndex]).toMutableList().let {
                         currentPatterns.addAll(it.map { startPosition.addVec(x = 0.5, y = 0.1, z = 0.5).add(transformTo(it, rotation)) })
@@ -112,6 +142,7 @@ object IceFill: Module(
                 }
             }
             modMessage("§cFailed to scan floor $floorIndex")
+            //modMessage("§c" + "startpos : " + startPosition)
         }
     }
 
@@ -139,20 +170,27 @@ object IceFill: Module(
     @SubscribeEvent
     fun onSetBlock(event: BlockChangeEvent) {
         if (DungeonUtils.currentRoom == null || DungeonUtils.currentRoom!!.name != "Ice Fill") return
-        val room: UniqueRoom = DungeonUtils.currentRoom!!;
+
         val newBlock: IBlockState = event.update
         if (newBlock.block != Blocks.packed_ice || event.pos != Minecraft.getMinecraft().thePlayer.positionVector.toBlockPos().down()) return; // Check that the block is under the player
 
-        if (!pathing) {
-            if (event.pos != room.getRealCoords(startBlockPosRoom)) return; // Check for start block
-            pathing = true;
+        if (!Minecraft.getMinecraft().thePlayer.onGround) {
+            Scheduler.schedulePreTickTask(1) {
+                onSetBlock(event) // Schedule for next tick
+            }
+            return
         }
+        if (!pathing) {
+            modMessage("Solving Ice Fill!")
+        }
+        pathing = true;
         handleNextIndex(event.pos)
     }
 
     private fun handleNextIndex(lastPos: BlockPos) {
         stairTicks = -1;
-        if (currentPatterns.isEmpty() || !Minecraft.getMinecraft().thePlayer.onGround) return
+        if (currentPatterns.isEmpty()) return
+
         var index: Int = currentPatterns.indexOfFirst { it.toBlockPos().down() == lastPos }
         if (index == -1) {
             pathing = false; // Invalid block
@@ -161,18 +199,23 @@ object IceFill: Module(
 
         if (++index >= currentPatterns.size) {
             // Index out of bounds reached end
-            pathing = false
+            pathing = false;
             return
         }
 
         PlayerUtils.unPressKeys();
         PlayerUtils.stopVelocity();
 
-        val newPos: Vec3 = currentPatterns[index];
+        val newPos: Vec3 = currentPatterns[index].subtract(0.0, 1.0, 0.0);
 
-        if (newPos.toBlockPos().y - 1 != lastPos.y) {
+        if (newPos.toBlockPos().y != lastPos.y) {
             stairTicks = 2;
             return
+        }
+
+        if (Minecraft.getMinecraft().theWorld.getBlockState(newPos.toBlockPos()).block == Blocks.packed_ice) {
+            this.pathing = false;
+            modMessage("Stopped Ice Fill!")
         }
 
         Minecraft.getMinecraft().thePlayer.setPosition(newPos.xCoord, Minecraft.getMinecraft().thePlayer.posY, newPos.zCoord)
@@ -182,37 +225,66 @@ object IceFill: Module(
         Scheduler.scheduleC03Task(0, true) {  }
     }
 
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if (event.isStart && pathing && Minecraft.getMinecraft().thePlayer != null) {
-            if (PlayerUtils.movementKeysPressed && stairTicks <= 0) {
-                pathing = false; // Disable
-                return
-            }
+        if (Minecraft.getMinecraft().thePlayer == null) return
+        val playerBlock: BlockPos = Minecraft.getMinecraft().thePlayer.positionVector.toBlockPos().down();
 
-            if (stairTicks-- > 0 ) {
-                if (DungeonUtils.currentRoom != null) {
-                    val vel: Vec2 = transform(1.0, 0.0, DungeonUtils.currentRoom!!.rotation);
-                    Minecraft.getMinecraft().thePlayer.setVelocity(vel.x, Minecraft.getMinecraft().thePlayer.motionY, vel.z)
-                }
-            } else {
-                PlayerUtils.stopVelocity();
-            }
+        if (event.isEnd) {
+            if (simulate && Minecraft.getMinecraft().isSingleplayer) simulate();
+            return
         }
 
+        // Event.start
+        if (pathing) {
+            handleVelocity()
+            return
+        }
 
-        if (event.isEnd || !simulate || Minecraft.getMinecraft().thePlayer == null || !Minecraft.getMinecraft().isSingleplayer) return
-            val pos: BlockPos = Minecraft.getMinecraft().thePlayer.positionVector.toBlockPos().down();
-            if (Minecraft.getMinecraft().theWorld.getBlockState(pos).block == Blocks.ice) {
-                Scheduler.schedulePreTickTask((Math.random() * 3).toInt() + 8) {
-                    if (Minecraft.getMinecraft().theWorld.getBlockState(pos).block == Blocks.ice)
-                        setClientSideBlockPacket(pos, Blocks.packed_ice.defaultState)
-                }
-            }
+        if (DungeonUtils.currentRoom != null && DungeonUtils.currentRoom!!.name == "Ice Fill" &&
+            Minecraft.getMinecraft().theWorld.getBlockState(playerBlock).block == Blocks.ice &&
+            playerBlock == DungeonUtils.currentRoom!!.getRealCoords(startBlockPosRoom)) {
+
+            PlayerUtils.unPressKeys();
+            PlayerUtils.stopVelocity()
+        }
     }
 
+    private fun handleVelocity() {
+        if (stairTicks-- == 0) { // Stop velocity after going up stair
+            PlayerUtils.stopVelocity()
+            return
+        }
+
+        if (stairTicks <= -1 || DungeonUtils.currentRoom == null) return
+        val vel: Vec2 = transform(1.0, 0.0, DungeonUtils.currentRoom!!.rotation);
+        Minecraft.getMinecraft().thePlayer.setVelocity(vel.x, Minecraft.getMinecraft().thePlayer.motionY, vel.z)
+    }
+
+    private fun simulate() {
+        val pos: BlockPos = Minecraft.getMinecraft().thePlayer.positionVector.toBlockPos().down();
+        if (Minecraft.getMinecraft().theWorld.getBlockState(pos).block != Blocks.ice) return
+
+        if (ping < 1) {
+            setClientSideBlockPacket(pos, Blocks.packed_ice.defaultState)
+            return
+        }
+
+        Scheduler.schedulePreTickTask(ping) {
+            if (Minecraft.getMinecraft().theWorld.getBlockState(pos).block == Blocks.ice)
+                setClientSideBlockPacket(pos, Blocks.packed_ice.defaultState)
+        }
+    }
+
+    fun shouldCancelKey(keycode: Int) : Boolean {
+        if (canceledKeys!!.any { it.keyCode == keycode })
+            return this.enabled && Minecraft.getMinecraft().thePlayer != null && pathing && DungeonUtils.currentRoom != null && DungeonUtils.currentRoom!!.name == "Ice Fill";
+        return false;
+    }
 }
 
+
+
 // TODO
-// make pathing be able to start from anywhere (adjust fail safe)
-// stop velocity / keys upon walk over ice block client side dont wait for packet
+// clean up code
