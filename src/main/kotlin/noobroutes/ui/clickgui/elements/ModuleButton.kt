@@ -100,10 +100,8 @@ class ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
 
 
         val scissor = scissor(x + getEffectiveX(), BUTTON_HEIGHT + getEffectiveY(), width * getEffectiveXScale(), (drawY - BUTTON_HEIGHT) * extendAnim.get(0f, 1f, !extended) * getEffectiveYScale())
-        //stencilRoundedRectangle(x, BUTTON_HEIGHT, width, (drawY - BUTTON_HEIGHT) * extendAnim.get(0f, 1f, !extended))
         doDrawChildren()
         roundedRectangle(x, BUTTON_HEIGHT, 2, drawY - BUTTON_HEIGHT, clickGUIColor.brighter(1.65f), edgeSoftness = 0f)
-        //popStencil()
         resetScissor(scissor)
 
         GlStateManager.popMatrix()

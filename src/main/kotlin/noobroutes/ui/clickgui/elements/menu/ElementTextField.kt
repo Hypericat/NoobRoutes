@@ -7,7 +7,7 @@ import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
-import noobroutes.ui.util.elements.TextBoxElement
+import noobroutes.ui.util.elements.textElements.TextBoxElement
 import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle

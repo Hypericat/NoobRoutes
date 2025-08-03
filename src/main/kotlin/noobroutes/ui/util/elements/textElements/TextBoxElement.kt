@@ -1,21 +1,28 @@
-package noobroutes.ui.util.elements
+package noobroutes.ui.util.elements.textElements
 
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.Core.logger
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.util.ElementValue
-import noobroutes.ui.util.MouseUtils.mouseX
+import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.clock.Clock
-import noobroutes.utils.render.*
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.ColorUtil.withAlpha
+import noobroutes.utils.render.TextAlign
+import noobroutes.utils.render.TextPos
+import noobroutes.utils.render.getTextHeight
+import noobroutes.utils.render.getTextWidth
+import noobroutes.utils.render.popStencil
+import noobroutes.utils.render.rectangleOutline
+import noobroutes.utils.render.roundedRectangle
+import noobroutes.utils.render.stencilRoundedRectangle
+import noobroutes.utils.render.text
 import noobroutes.utils.writeToClipboard
 import org.lwjgl.input.Keyboard
 import kotlin.math.max
 import kotlin.math.min
-
 
 //implement copy and paste
 //make it so you can add custom string filters
@@ -176,7 +183,8 @@ class TextBoxElement(
                 if (controlHeld) {
                     GuiScreen.getClipboardString()?.let {
                         var filteredText = it.filter { char ->
-                            Keyboard.getKeyIndex(char.uppercase()) in keyWhiteList || (char == ' ' && keyWhiteList.contains(Keyboard.KEY_SPACE))
+                            Keyboard.getKeyIndex(char.uppercase()) in keyWhiteList || (char == ' ' && keyWhiteList.contains(
+                                Keyboard.KEY_SPACE))
                         }
                         if (hasSelection) {
                             removeSelectionFromString()
@@ -299,8 +307,8 @@ class TextBoxElement(
         return index
     }
 
-    private inline val minSelection get() =  min(selectionStart, selectionEnd)
-    private inline val maxSelection get() =  max(selectionStart, selectionEnd)
+    private inline val minSelection get() = min(selectionStart, selectionEnd)
+    private inline val maxSelection get() = max(selectionStart, selectionEnd)
     val cursorClock = Clock(1000)
     var lastClickedXPosition: Float = 0f
     var listeningTextSelection = false
@@ -321,7 +329,7 @@ class TextBoxElement(
 
         val (textX, textY) = getTextOrigin()
         if (listeningTextSelection) {
-            val cursorIndex = getCursorIndexFromX(mouseX - (xOrigin + textX) * getEffectiveXScale())
+            val cursorIndex = getCursorIndexFromX(MouseUtils.mouseX - (xOrigin + textX) * getEffectiveXScale())
             if (cursorIndex != selectionEnd) resetCursorBlink()
             selectionEnd = cursorIndex
             insertionCursor = selectionEnd
@@ -373,9 +381,9 @@ class TextBoxElement(
         activeTextBoxElement = this
         listening = true
         val (textX, textY) = getTextOrigin()
-        lastClickedXPosition = mouseX
+        lastClickedXPosition = MouseUtils.mouseX
         generateCharacterHitboxes()
-        selectionStart = getCursorIndexFromX(mouseX - (xOrigin + textX) * getEffectiveXScale())
+        selectionStart = getCursorIndexFromX(MouseUtils.mouseX - (xOrigin + textX) * getEffectiveXScale())
         selectionEnd = selectionStart
         insertionCursor = selectionStart
         listeningTextSelection = true
@@ -467,10 +475,21 @@ class TextBoxElement(
                 insertionCursorOrigin
             }
             else -> {
-                insertionCursorOrigin + getTextWidth(elementValue.substring(0, insertionCursor.coerceAtMost(elementValue.length - 1)), textScale)
+                insertionCursorOrigin + getTextWidth(
+                    elementValue.substring(
+                        0,
+                        insertionCursor.coerceAtMost(elementValue.length - 1)
+                    ), textScale
+                )
             }
         }
-        roundedRectangle(insertionCursorX + textX, y + h * 0.5f - textHeight * 0.5f, 2f, textHeight, Color.WHITE)
+        roundedRectangle(
+            insertionCursorX + textX,
+            y + h * 0.5f - textHeight * 0.5f,
+            2f,
+            textHeight,
+            Color.Companion.WHITE
+        )
     }
     private fun resetCursorBlink(){
         cursorClock.setTime(System.currentTimeMillis() + 500L)
@@ -497,17 +516,32 @@ class TextBoxElement(
         translate(boxOffset, 0f)
 
 
-        stencilRoundedRectangle(x + nameOrigin - nameWidth * 0.5f, y, nameWidth, boxThickness, 0f, 0.5f, true)
+        //stencilRoundedRectangle(x + nameOrigin - nameWidth * 0.5f, y, nameWidth, boxThickness, 0f, 0.5f, true)
         rectangleOutline(x, y, width, h, boxColor, radius, boxThickness)
-        popStencil()
+        //popStencil()
 
         val textOrigin = when (textAlign) {
             TextAlign.Right -> width - textPadding
             TextAlign.Middle -> width * 0.5f
             TextAlign.Left -> textPadding
         }
-        text(name, x + nameOrigin, y + fontHeight * TEXT_BOX_GAP_TEXT_MULTIPLIER, ColorPalette.textColor, textScale, align = TextAlign.Middle)
-        text(displayString, x + textOrigin, y + h * 0.5f, ColorPalette.textColor, textScale, align = textAlign, verticalAlign = verticalAlign)
+        text(
+            name,
+            x + nameOrigin,
+            y + fontHeight * TEXT_BOX_GAP_TEXT_MULTIPLIER,
+            ColorPalette.textColor,
+            textScale,
+            align = TextAlign.Middle
+        )
+        text(
+            displayString,
+            x + textOrigin,
+            y + h * 0.5f,
+            ColorPalette.textColor,
+            textScale,
+            align = textAlign,
+            verticalAlign = verticalAlign
+        )
         GlStateManager.popMatrix()
     }
     private fun drawTextBox(){
@@ -529,7 +563,15 @@ class TextBoxElement(
             TextAlign.Middle -> width * 0.5f
             TextAlign.Left -> textPadding
         }
-        text(displayString, x + textOrigin, y + h * 0.5f, ColorPalette.textColor, textScale, align = textAlign, verticalAlign = verticalAlign)
+        text(
+            displayString,
+            x + textOrigin,
+            y + h * 0.5f,
+            ColorPalette.textColor,
+            textScale,
+            align = textAlign,
+            verticalAlign = verticalAlign
+        )
         GlStateManager.popMatrix()
     }
     private fun drawTextBoxNoBox(){
@@ -549,7 +591,15 @@ class TextBoxElement(
             TextAlign.Middle -> width * 0.5f
             TextAlign.Left -> textPadding
         }
-        text(displayString, x + textOrigin, y + h * 0.5f, ColorPalette.textColor, textScale, align = textAlign, verticalAlign = verticalAlign)
+        text(
+            displayString,
+            x + textOrigin,
+            y + h * 0.5f,
+            ColorPalette.textColor,
+            textScale,
+            align = textAlign,
+            verticalAlign = verticalAlign
+        )
         GlStateManager.popMatrix()
     }
 

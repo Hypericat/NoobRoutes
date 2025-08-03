@@ -1,16 +1,16 @@
-package noobroutes.ui.util.elements
+package noobroutes.ui.util.elements.textElements
 
-import noobroutes.Core.logger
+import noobroutes.Core
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
-import noobroutes.ui.util.elements.TextBoxElement.TextBoxType
+import noobroutes.ui.util.elements.textElements.NumberBoxElement.Companion.numberKeyWhiteList
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.round
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 
-class NumberBoxElement(
+class AccessorBasedNumberBoxElement(
     val name: String,
     x: Float,
     y: Float,
@@ -22,14 +22,18 @@ class NumberBoxElement(
     textPadding: Float,
     boxColor: Color,
     maxCharacters: Int,
-    boxType: TextBoxType,
+    boxType: TextBoxElement.TextBoxType,
     boxThickness: Float = 3f,
     val roundTo: Int,
     val min: Double,
     val max: Double,
-    override var elementValue: Double,
-) : UiElement(x, y), ElementValue<Double> {
-    override val elementValueChangeListeners = mutableListOf<(Double) -> Unit>()
+    val getter: () -> Number,
+    val setter: (Double) -> Unit
+) : UiElement(x, y) {
+
+    inline var elementValue
+        get() = getter.invoke().toDouble()
+        set(value) {setter(value)}
 
     val textBox = TextBoxElement(
         name,
@@ -60,47 +64,22 @@ class NumberBoxElement(
         )
     }
 
-    companion object {
-        val numberKeyWhiteList = listOf(
-            Keyboard.KEY_0,
-            Keyboard.KEY_1,
-            Keyboard.KEY_2,
-            Keyboard.KEY_3,
-            Keyboard.KEY_4,
-            Keyboard.KEY_5,
-            Keyboard.KEY_6,
-            Keyboard.KEY_7,
-            Keyboard.KEY_8,
-            Keyboard.KEY_9,
-            Keyboard.KEY_NUMPAD0,
-            Keyboard.KEY_NUMPAD1,
-            Keyboard.KEY_NUMPAD2,
-            Keyboard.KEY_NUMPAD3,
-            Keyboard.KEY_NUMPAD4,
-            Keyboard.KEY_NUMPAD5,
-            Keyboard.KEY_NUMPAD6,
-            Keyboard.KEY_NUMPAD7,
-            Keyboard.KEY_NUMPAD8,
-            Keyboard.KEY_NUMPAD9,
-            Keyboard.KEY_MINUS,
-            Keyboard.KEY_PERIOD
-        )
-    }
+
     private fun textUnlisten(text: String) {
         if (text.isEmpty()) {
-            setValue(min)
+            elementValue = min
             updateTextBoxValue()
             return
         }
-        setValue(
+        elementValue =
             try {
                 text.toDouble().round(roundTo).toDouble()
             } catch (e: NumberFormatException) {
                 modMessage("Invalid number! Defaulting to previous value.")
-                logger.error(text, e)
+                Core.logger.error(text, e)
                 elementValue
             }
-        )
+
         updateTextBoxValue()
     }
     fun updateTextBoxValue() {

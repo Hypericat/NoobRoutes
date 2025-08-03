@@ -23,7 +23,7 @@ import noobroutes.ui.util.MouseUtils.mouseY
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.CubicBezierAnimation
 import noobroutes.ui.util.animations.impl.LinearAnimation
-import noobroutes.ui.util.elements.TextBoxElement
+import noobroutes.ui.util.elements.textElements.TextBoxElement
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.withAlpha

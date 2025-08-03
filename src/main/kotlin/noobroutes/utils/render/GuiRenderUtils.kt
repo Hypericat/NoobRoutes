@@ -212,15 +212,15 @@ fun blurRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Numbe
     popStencil()
 }
 
-//an int would probably be better, however, i am using a stack just in case it does more in the future
-private var stencilStack = Stack<Int>()
+data class Stencil(val layer: Int, val inverse: Boolean)
+private var stencilStack = Stack<Stencil>()
 
 fun stencil(inverse: Boolean = false, mask: () -> Unit) {
-    val newStencilValue = if (stencilStack.isEmpty()) 1 else stencilStack.peek() + 1
-    stencilStack.push(newStencilValue)
+    val newStencilValue = if (stencilStack.isEmpty()) 1 else stencilStack.peek().layer + 1
+    stencilStack.push(Stencil(newStencilValue, inverse))
     GL11.glEnable(GL11.GL_STENCIL_TEST)
 
-    if (stencilStack.peek() == 1) {
+    if (stencilStack.peek().layer == 1) {
         GL11.glClearStencil(0)
         GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT)
     }
@@ -229,8 +229,8 @@ fun stencil(inverse: Boolean = false, mask: () -> Unit) {
     GL11.glDepthMask(false)
     GL11.glStencilMask(0xFF)
 
-    if (stencilStack.peek() > 1) {
-        val previousStencilValue = stencilStack.peek() - 1
+    if (stencilStack.peek().layer > 1) {
+        val previousStencilValue = stencilStack.peek().layer - 1
         GL11.glStencilFunc(GL11.GL_EQUAL, previousStencilValue, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_INCR)
     } else {
@@ -239,7 +239,7 @@ fun stencil(inverse: Boolean = false, mask: () -> Unit) {
     }
 
     mask.invoke()
-    GL11.glStencilFunc(GL11.GL_EQUAL, if (stencilStack.peek() > 1) newStencilValue else 0, 0xFF)
+    GL11.glStencilFunc(GL11.GL_EQUAL, if (stencilStack.peek().layer > 1) newStencilValue else 0, 0xFF)
     GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
     GL11.glStencilMask(0xFF)
 
@@ -263,12 +263,21 @@ fun popStencil() {
         GL11.glStencilFunc(GL11.GL_ALWAYS, 0, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
         GL11.glStencilMask(0xFF)
+        GL11.glColorMask(true, true, true, true)
+        GL11.glDepthMask(true)
     } else {
+        val previousLevel = stencilStack.peek()
 
-        val previousStencilValue = stencilStack.peek()
-        GL11.glStencilFunc(GL11.GL_EQUAL, previousStencilValue, 0xFF)
-        GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
+        GL11.glColorMask(true, true, true, true)
+        GL11.glDepthMask(true)
         GL11.glStencilMask(0x00)
+
+        GL11.glStencilFunc(
+            if (previousLevel.inverse) GL11.GL_NOTEQUAL else GL11.GL_EQUAL,
+            previousLevel.layer,
+            0xFF
+        )
+        GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
     }
 }
 

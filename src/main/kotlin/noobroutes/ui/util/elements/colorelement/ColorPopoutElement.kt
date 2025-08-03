@@ -5,8 +5,8 @@ import noobroutes.Core.logger
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
-import noobroutes.ui.util.elements.NumberBoxElement
-import noobroutes.ui.util.elements.TextBoxElement
+import noobroutes.ui.util.elements.textElements.NumberBoxElement
+import noobroutes.ui.util.elements.textElements.TextBoxElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.TEXT_BOX_WIDTH
 import noobroutes.utils.render.ColorUtil.darker
@@ -128,21 +128,6 @@ class ColorPopoutElement(
         val width = ColorElementsConstants.COLOR_POPOUT_WIDTH + if (alphaEnabled) ColorElementsConstants.COLOR_POPOUT_ALPHA_WIDTH else 0f
         val topRX = width * -0.5f
         val topRY = ColorElementsConstants.COLOR_POPOUT_HEIGHT * -0.5f
-        roundedRectangle(
-            topRX,
-            topRY,
-            width,
-            ColorElementsConstants.COLOR_POPOUT_HEIGHT,
-            ColorPalette.elementBackground,
-            ColorPalette.elementBackground.darker(0.7f),
-            Color.Companion.TRANSPARENT,
-            5f,
-            10f,
-            10f,
-            10f,
-            10f,
-            0.5f
-        )
         for (i in 0..2) {
             uiChildren[i].updatePosition(
                 topRX + ColorElementsConstants.COLOR_POPOUT_GAP * (i + 1) + ColorElementsConstants.TEXT_BOX_WIDTH_WITH_GAP * i,

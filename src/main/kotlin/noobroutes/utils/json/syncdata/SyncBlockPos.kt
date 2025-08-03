@@ -19,7 +19,4 @@ class SyncBlockPos(
     override fun readFrom(obj: JsonObject) {
         if (obj.has(key)) setter(obj.get(key).asBlockPos)
     }
-
-
-
 }
