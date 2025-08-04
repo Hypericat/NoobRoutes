@@ -33,7 +33,7 @@ public class MixinS23PacketBlockChange implements IS23 {
     @Shadow private BlockPos blockPosition;
 
     @Unique
-    public void setBlock(BlockPos pos, IBlockState state) {
+    public void noobRoutes$setBlock(BlockPos pos, IBlockState state) {
         this.blockState = state;
         this.blockPosition = pos;
     }

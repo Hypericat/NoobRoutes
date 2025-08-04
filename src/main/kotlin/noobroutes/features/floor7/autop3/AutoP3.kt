@@ -71,9 +71,9 @@ object AutoP3: Module (
     private val recentActionStack = Stack<EditRingAction>()
     private val recentUndoActionStack = Stack<EditRingAction>()
 
-
     val route by StringSetting("Route", "", description = "Route to use")
     private val ringColor by ColorSetting("Ring Color", Color.GREEN, false, description = "color of the rings")
+
 
     private val editShit by DropdownSetting("Edit Settings", false)
     private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes").withDependency { editShit }
@@ -91,6 +91,7 @@ object AutoP3: Module (
         if (inF7Boss) text(cancelled.toString(), 1f, 1f, ColorPalette.text, 13f)
         getTextWidth("400", 13f) to getTextHeight("400", 13f)
     }.withDependency { blinkShit }
+    private val cancelC05s by BooleanSetting("Cancel C05s", default = false, description = "Allows the cancelling of rotation packets.")
     private val movementMode by DualSetting("Movement Mode","Playback", "Silent", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
 
 
@@ -154,6 +155,7 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
+        devMessage("MoveEntityWithHeadingEvent")
         if (!inF7Boss || editMode || movementPackets.isNotEmpty()) return
 
         if (recordingPacketList.isNotEmpty()) {
