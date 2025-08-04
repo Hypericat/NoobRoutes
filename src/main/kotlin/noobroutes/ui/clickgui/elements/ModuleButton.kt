@@ -45,7 +45,7 @@ import noobroutes.utils.render.text
 import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 
-class ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
+class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
 
     companion object {
         const val BUTTON_HEIGHT = 32f
@@ -87,29 +87,32 @@ class ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
         translate(0f, y)
         roundedRectangle(0f, 0f, width, BUTTON_HEIGHT, ColorPalette.moduleButtonColor)
         text(module.name, width * 0.5, BUTTON_HEIGHT * 0.5, color, 14f, FontRenderer.REGULAR, TextAlign.Middle)
-        val renderSettings = extendAnim.isAnimating() || extended
 
-        var drawY = BUTTON_HEIGHT
-        uiChildren.forEach {
-            it.visible = renderSettings
-            it.updatePosition(0f, drawY)
-            drawY += (it as Element<*>).getHeight()
+        if (!extendAnim.isAnimating() && !extended) {
+            for (i in uiChildren.indices) {
+                uiChildren[i].visible = false
+            }
+            GlStateManager.popMatrix()
+            return
         }
 
-
-
+        var drawY = BUTTON_HEIGHT
+        for (i in uiChildren.indices) {
+            uiChildren[i].apply {
+                visible = true
+                updatePosition(0f, drawY)
+                drawY += (this as Element<*>).getHeight()
+            }
+        }
 
         val scissor = scissor(x + getEffectiveX(), BUTTON_HEIGHT + getEffectiveY(), width * getEffectiveXScale(), (drawY - BUTTON_HEIGHT) * extendAnim.get(0f, 1f, !extended) * getEffectiveYScale())
-        doDrawChildren()
         roundedRectangle(x, BUTTON_HEIGHT, 2, drawY - BUTTON_HEIGHT, clickGUIColor.brighter(1.65f), edgeSoftness = 0f)
+        doDrawChildren()
         resetScissor(scissor)
 
         GlStateManager.popMatrix()
     }
 
-    override fun draw() {
-
-    }
 
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (!isButtonHovered) return false
@@ -131,11 +134,9 @@ class ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
     fun updateElements() {
         uiChildren.clear()
         for (setting in module.settings) {
-            /** Don't show hidden settings */
             if (setting.shouldBeVisible) run addElement@{
                 if (uiChildren.any { it.element.setting === setting }) return@addElement
                 if (setting.devOnly && !Core.DEV_MODE) {
-                    logger.info("devmode: ${setting.name}")
                     setting.reset()
                     if (setting is KeybindSetting) {
                         setting.value.key = Keyboard.KEY_NONE

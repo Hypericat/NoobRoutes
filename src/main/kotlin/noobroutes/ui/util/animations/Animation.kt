@@ -1,5 +1,6 @@
 package noobroutes.ui.util.animations
 
+import noobroutes.Core.logger
 import noobroutes.utils.clock.Clock
 
 /**
@@ -12,9 +13,12 @@ abstract class Animation<T>(private var duration: Long) {
     private val clock = Clock(duration)
 
     fun start(bypass: Boolean = false, percentage: Int = 0): Boolean {
+        if (animating) {
+            updateIsAnimating()
+        }
         if (!animating || bypass) {
             animating = true
-            clock.setTime(System.currentTimeMillis() - (clock.delay * percentage * 0.01).toLong())
+            clock.setTime(System.currentTimeMillis() - (duration * percentage * 0.01).toLong())
             return true
         }
         return false
@@ -22,8 +26,8 @@ abstract class Animation<T>(private var duration: Long) {
 
     fun getPercent(): Int {
         return if (animating) {
-            val percent = (clock.getTime() / duration.toDouble() * 100).toInt()
-            if (percent > 100) animating = false
+            val percent = (clock.getTime() / duration.toDouble() * 100).toInt().coerceAtMost(100)
+            if (percent == 100) animating = false
             percent
         } else {
             100
@@ -31,7 +35,16 @@ abstract class Animation<T>(private var duration: Long) {
     }
 
     fun isAnimating(): Boolean {
-        return animating
+        if (animating) {
+            updateIsAnimating()
+            return animating
+        }
+        return false
+    }
+    fun updateIsAnimating(){
+        if (clock.getTime() >= duration) {
+            animating = false
+        }
     }
 
     abstract fun get(start: T, end: T, reverse: Boolean = false): T

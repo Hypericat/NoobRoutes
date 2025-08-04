@@ -66,8 +66,8 @@ class ElementColor(setting: ColorSetting) :
         addChildren(
             TextBoxElement(
                 "HEX",
-                COLOR_POPOUT_GAP,
-                0f,
+                COLOR_POPOUT_GAP + (Panel.WIDTH - COLOR_POPOUT_GAP * 2f) * 0.5f,
+                TEXT_BOX_HEIGHT * 2f + COLOR_POPOUT_GAP,
                 Panel.WIDTH - COLOR_POPOUT_GAP * 2f,
                 TEXT_BOX_HEIGHT,
                 12f, TextAlign.Middle, 5f, 6f,
@@ -95,6 +95,7 @@ class ElementColor(setting: ColorSetting) :
 
 
     override fun doHandleDraw() {
+        if (!visible) return
         GlStateManager.pushMatrix()
         translate(x, y)
         roundedRectangle(0f, 0f, w, getHeight(), elementBackground)
@@ -115,7 +116,7 @@ class ElementColor(setting: ColorSetting) :
             0.5f
         )
         if (extended || extendAnimation.isAnimating()) {
-            stencilRoundedRectangle(0f, 0f, w, getHeight())
+            stencilRoundedRectangle(0f, 0f, w, getHeight(), 5f, 5f, 5f, 5f, 0.5f, false)
             for (i in uiChildren.indices) {
                 uiChildren[i].apply {
                     visible = true

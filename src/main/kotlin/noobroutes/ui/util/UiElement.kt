@@ -112,7 +112,9 @@ abstract class UiElement(var x: Float, var y: Float) {
         if (!enabled || !visible) return false
 
         for (i in uiChildren.indices) {
-            if (uiChildren[i].handleMouseClicked(mouseButton)) return true
+            if (uiChildren[i].handleMouseClicked(mouseButton)) {
+                return true
+            }
         }
         return mouseClicked(mouseButton)
     }

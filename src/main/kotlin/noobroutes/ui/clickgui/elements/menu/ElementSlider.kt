@@ -63,7 +63,7 @@ class ElementSlider(setting: NumberSetting<*>) :
     val numberBoxElement = NumberBoxElement(
         "",
         w - BORDER_OFFSET,
-        Y_PADDING - TEXT_BOX_HEIGHT * 0.5f,
+        Y_PADDING - TEXT_BOX_HEIGHT * 0.5f + 6f,
         NUMBER_BOX_MIN_WIDTH,
         TEXT_BOX_HEIGHT,
         12f,

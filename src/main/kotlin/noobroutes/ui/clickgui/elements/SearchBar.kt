@@ -263,7 +263,7 @@ object SearchBar : UiElement(ClickGUIModule.searchBarX.value, ClickGUIModule.sea
         if (mouseButton != 0) return false
         if (searchExtended && searchTextBox.elementValue.isBlank()) {
             searchExtendedAnimation.start(bypass = true)
-            searchExtended = false
+            closeTextBox()
         }
 
         if (!isHovered) return false

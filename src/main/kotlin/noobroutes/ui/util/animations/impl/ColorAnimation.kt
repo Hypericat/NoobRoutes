@@ -1,5 +1,6 @@
 package noobroutes.ui.util.animations.impl
 
+import noobroutes.utils.Utils.COLOR_NORMALIZER
 import noobroutes.utils.render.Color
 
 // TODO: fix it
@@ -24,7 +25,7 @@ class ColorAnimation(duration: Long) {
             anim.get(start.r, end.r, reverse),
             anim.get(start.g, end.g, reverse),
             anim.get(start.b, end.b, reverse),
-            anim.get(start.a, end.a, reverse) / 255f,
+            anim.get(start.a, end.a, reverse) * COLOR_NORMALIZER,
         )
     }
 

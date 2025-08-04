@@ -514,12 +514,6 @@ class TextBoxElement(
 
 
         translate(boxOffset, 0f)
-
-
-        //stencilRoundedRectangle(x + nameOrigin - nameWidth * 0.5f, y, nameWidth, boxThickness, 0f, 0.5f, true)
-        rectangleOutline(x, y, width, h, boxColor, radius, boxThickness)
-        //popStencil()
-
         val textOrigin = when (textAlign) {
             TextAlign.Right -> width - textPadding
             TextAlign.Middle -> width * 0.5f
@@ -542,6 +536,12 @@ class TextBoxElement(
             align = textAlign,
             verticalAlign = verticalAlign
         )
+
+        stencilRoundedRectangle(x + nameOrigin - nameWidth * 0.5f, y, nameWidth, boxThickness, 0f, 0.5f, true)
+        rectangleOutline(x, y, width, h, boxColor, radius, boxThickness)
+        popStencil()
+
+
         GlStateManager.popMatrix()
     }
     private fun drawTextBox(){

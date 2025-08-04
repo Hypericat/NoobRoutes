@@ -18,6 +18,7 @@ import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import noobroutes.utils.times
 import org.lwjgl.opengl.Display
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL45
 import java.util.Stack
 
 val matrix = UMatrixStack.Compat
@@ -212,15 +213,15 @@ fun blurRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Numbe
     popStencil()
 }
 
-data class Stencil(val layer: Int, val inverse: Boolean)
-private var stencilStack = Stack<Stencil>()
+private data class StencilState(val value: Int, val inverse: Boolean)
+private var stencilStack = Stack<StencilState>()
 
 fun stencil(inverse: Boolean = false, mask: () -> Unit) {
-    val newStencilValue = if (stencilStack.isEmpty()) 1 else stencilStack.peek().layer + 1
-    stencilStack.push(Stencil(newStencilValue, inverse))
-    GL11.glEnable(GL11.GL_STENCIL_TEST)
+    val newStencilValue = if (stencilStack.isEmpty()) 1 else stencilStack.peek().value + 1
+    stencilStack.push(StencilState(newStencilValue, inverse))
 
-    if (stencilStack.peek().layer == 1) {
+    GL11.glEnable(GL11.GL_STENCIL_TEST)
+    if (newStencilValue == 1) {
         GL11.glClearStencil(0)
         GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT)
     }
@@ -229,9 +230,9 @@ fun stencil(inverse: Boolean = false, mask: () -> Unit) {
     GL11.glDepthMask(false)
     GL11.glStencilMask(0xFF)
 
-    if (stencilStack.peek().layer > 1) {
-        val previousStencilValue = stencilStack.peek().layer - 1
-        GL11.glStencilFunc(GL11.GL_EQUAL, previousStencilValue, 0xFF)
+    if (newStencilValue > 1) {
+        val previousState = stencilStack.elementAt(stencilStack.size - 2)
+        GL11.glStencilFunc(GL11.GL_EQUAL, previousState.value, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_INCR)
     } else {
         GL11.glStencilFunc(GL11.GL_ALWAYS, newStencilValue, 0xFF)
@@ -239,15 +240,15 @@ fun stencil(inverse: Boolean = false, mask: () -> Unit) {
     }
 
     mask.invoke()
-    GL11.glStencilFunc(GL11.GL_EQUAL, if (stencilStack.peek().layer > 1) newStencilValue else 0, 0xFF)
+
+    GL11.glStencilFunc(GL11.GL_EQUAL, if (newStencilValue > 1) newStencilValue else 0, 0xFF)
     GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
     GL11.glStencilMask(0xFF)
-
     mask.invoke()
+
     GL11.glColorMask(true, true, true, true)
     GL11.glDepthMask(true)
     GL11.glStencilMask(0x00)
-
     GL11.glStencilFunc(if (inverse) GL11.GL_NOTEQUAL else GL11.GL_EQUAL, newStencilValue, 0xFF)
     GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
 }
@@ -258,28 +259,22 @@ fun popStencil() {
     }
 
     stencilStack.pop()
+
     if (stencilStack.isEmpty()) {
         GL11.glDisable(GL11.GL_STENCIL_TEST)
         GL11.glStencilFunc(GL11.GL_ALWAYS, 0, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
         GL11.glStencilMask(0xFF)
-        GL11.glColorMask(true, true, true, true)
-        GL11.glDepthMask(true)
     } else {
-        val previousLevel = stencilStack.peek()
-
-        GL11.glColorMask(true, true, true, true)
-        GL11.glDepthMask(true)
-        GL11.glStencilMask(0x00)
-
-        GL11.glStencilFunc(
-            if (previousLevel.inverse) GL11.GL_NOTEQUAL else GL11.GL_EQUAL,
-            previousLevel.layer,
-            0xFF
-        )
+        val previousState = stencilStack.peek()
+        val stencilFunc = if (previousState.inverse) GL11.GL_NOTEQUAL else GL11.GL_EQUAL
+        GL11.glStencilFunc(stencilFunc, previousState.value, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
+        GL11.glStencilMask(0x00)
     }
 }
+
+
 
 
 fun resetScissor(scissor: Scissor) {
@@ -287,6 +282,7 @@ fun resetScissor(scissor: Scissor) {
     GL11.glScissor(nextScissor.x.toInt(), nextScissor.y.toInt(), nextScissor.w.toInt(), nextScissor.h.toInt())
     GL11.glDisable(GL11.GL_SCISSOR_TEST)
     scissorList.removeLast()
+
 }
 
 fun drawArrow(xpos: Float, ypos: Float, rotation: Float = 90f, scale: Float = 1f, color: Color = Color.WHITE) {

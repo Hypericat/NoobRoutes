@@ -1,5 +1,6 @@
 package noobroutes.ui.clickgui.elements.menu
 
+import noobroutes.Core.logger
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.TEXT_OFFSET

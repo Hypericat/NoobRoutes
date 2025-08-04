@@ -14,15 +14,14 @@ import kotlin.math.sign
 object ClickGui : Screen() {
     val base = ClickGUIBase()
     override fun draw() {
-        GlStateManager.pushMatrix()
+        scaleUI()
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-        scaleUI()
+
         if (ClickGUIModule.blur) GaussianBlurShader.captureBackground()
         base.doHandleDraw()
         if (ClickGUIModule.blur) GaussianBlurShader.cleanup()
         resetScale()
-        GlStateManager.popMatrix()
     }
 
     override fun onScroll(amount: Int) {
