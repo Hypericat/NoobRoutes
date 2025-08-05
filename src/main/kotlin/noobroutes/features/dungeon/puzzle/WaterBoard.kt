@@ -90,13 +90,16 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
             .flatMap { (lever, times) -> times.drop(lever.i).map { Pair(lever, it) } }
             .sortedBy { (lever, time) -> time + if (lever == LeverBlock.WATER) 0.01 else 0.0 }
         val first = solutionList.firstOrNull()
+
         if (first == null) {
             doChest()
             return
         }
 
         val (firstLever, time) = first
+
         val relativeFirst = firstLever.relativePosition
+
         val expectedZRelative = when (relativeFirst.zCoord) {
             -5.0, 0.0 -> relativeFirst.zCoord.toInt()
             5.0, 10.0 -> 6
@@ -104,12 +107,8 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
         }
 
         val etherwarpBlock = room.getRealCoords(0, 58, expectedZRelative)
-        if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != etherwarpBlock) {
-            if (System.currentTimeMillis() - c08Delay < 200 || expectedSpot != null) return
-            val realSpot = Vec3(etherwarpBlock.x + 0.5, etherwarpBlock.y + 1.03, etherwarpBlock.z + 0.5)
-            devMessage("tp")
-            RouteUtils.etherwarpToVec3(realSpot, silent = silent)
-            expectedSpot = Vec2(realSpot.xCoord, realSpot.zCoord)
+        if (mc.thePlayer.positionVector.subtract(0.0,1.0,0.0).toBlockPos() != etherwarpBlock) {
+            etherWarpToWbBlock(etherwarpBlock)
             return
         }
 
@@ -129,17 +128,22 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
         val aboveChest = room.getRealCoords(0, 58, -7)
 
         if (mc.thePlayer.positionVector.subtract(Vec3(0.0,1.0,0.0)).toBlockPos() != aboveChest) {
-            if (System.currentTimeMillis() - c08Delay < 200 || expectedSpot != null) return
-            val realSpot = Vec3(aboveChest.x + 0.5, aboveChest.y + 1.03, aboveChest.z + 0.5)
-            RouteUtils.etherwarpToVec3(realSpot, silent = silent)
-            expectedSpot = Vec2(realSpot.xCoord, realSpot.zCoord)
+            etherWarpToWbBlock(aboveChest)
             return
         }
 
         val chest = room.getRealCoords(BlockPos(0 ,56, -7))
+
         if ((doors.map{room.getRealCoords(it)}.any{!isAir(it)}) || mc.theWorld.getBlockState(chest).block != Blocks.chest) return
         AuraManager.auraBlock(chest)
         didChest = true
+    }
+
+    private fun etherWarpToWbBlock(block: BlockPos) {
+        val realBlock = Vec3(block.x + 0.5, block.y + 1.03, block.z + 0.5)
+        if (System.currentTimeMillis() - c08Delay < 200 || expectedSpot != null) return
+        RouteUtils.etherwarpToVec3(realBlock, silent = silent)
+        expectedSpot = Vec2(realBlock.xCoord, realBlock.zCoord)
     }
 
     @SubscribeEvent

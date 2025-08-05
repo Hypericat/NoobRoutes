@@ -4,35 +4,25 @@ package noobroutes.features.floor7
 import net.minecraft.block.Block
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.BlockPos
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.Timer
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.logger
 import noobroutes.events.impl.BlockChangeEvent
 import noobroutes.events.impl.ChatPacketEvent
-import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.render.ClickGUIModule.devMode
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.RotationUtils.getYawAndPitch
-import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.clock.Executor
 import noobroutes.utils.clock.Executor.Companion.register
 import noobroutes.utils.render.Color
@@ -63,24 +53,18 @@ object AutoSS : Module(
 
     private val i1Keybind by KeybindSetting("i1 test", Keyboard.KEY_NONE, "tries to i1 on press").onPress { tryI1() }
     private val i1ClickAmount by NumberSetting("i1 clicks", 24, 9, 36, 3, description = "how often i1 should click (triple of 3 man i1)")
-    private val useMousePos by BooleanSetting("use mouse pos", false, description = "")
+    private val i1Delay by NumberSetting("i1 delay", 42, 5, 60, description = "how long to wait beetween click bursts")
+    private val i1People by NumberSetting("i1 fake people", 2, 0, 5, description = "how many extra people it should click for")
 
     private val autoStart by BooleanSetting("Autostart", true, description = "Automatically starts autoSS")
     private val autoStartDelay by NumberSetting("Autostart delay", 125.0, 50.0, 200.0, 1.0, unit = "ms", description = "The delay used for starting autoSS")
     private val dontCheck by BooleanSetting("Faster SS?", false, description = "idk what this means")
     private val sendSSBroke by BooleanSetting("Send SS Broke", description = "If The player hits the restart SS Keybind")
 
-
-
-
-
-
     init {
         ssLoop()
     }
 
-    private var timesToClickI1 = 0
-    private var skip = 0
 
     var lastClickAdded = System.currentTimeMillis()
     var next = false
@@ -101,72 +85,34 @@ object AutoSS : Module(
         doneFirst = false
         doingSS = false
         clicked = false
-        skip = 0
-        timesToClickI1 = 0
         devMessage("Reset!")
     }
 
 
     private fun tryI1() {
-        if (timesToClickI1 != 0 || (mc as TimerFieldAccessor).timer.timerSpeed != 1f) return
-
         val startButton: BlockPos = BlockPos(110, 121, 91)
-        if (mc.thePlayer.getDistanceSqToCenter(startButton) > 25 && !useMousePos) return modMessage("too far")
+        if (mc.thePlayer.getDistanceSqToCenter(startButton) > 25) return modMessage("too far")
 
-        setAndUpdateTimer(0f)
 
         Thread{
-            Thread.sleep((i1ClickAmount * 1.2 * 50).toLong()) //sleep for a bit more then needed
-
-            setAndUpdateTimer(20f)
-
             if (i1ClickAmount % 3 != 0) {
                 modMessage("invalid click amount")
                 return@Thread
             }
 
-            Thread.sleep(49)
-            timesToClickI1 = i1ClickAmount
+            var i1ClicksLeft = i1ClickAmount
 
+            while (i1ClicksLeft > 2) {
+                repeat(i1People) {clickStartButton()}
+                Thread.sleep(i1Delay.toLong())
+                i1ClicksLeft -= 3
+            }
+            if (i1ClicksLeft != 0) modMessage("smth went very wrong")
         }.start()
     }
 
-    private fun setAndUpdateTimer(speed: Float) {
-        (mc as TimerFieldAccessor).timer = Timer(speed)
-        (mc as TimerFieldAccessor).timer.updateTimer()
-    }
-
-    @SubscribeEvent
-    fun onClientTick(event: TickEvent.ClientTickEvent) {
-        if (mc.thePlayer == null || timesToClickI1 < 3 || event.isEnd) return
-
-        AutoP3.dontCancelNextC03()
-
-        if (skip > 0) {
-            AutoP3.dontCancelNextC03()
-            skip--
-            return
-        }
-
-        skip = 2
-        punchStartButton()
-        repeat(2) {
-            AutoP3.dontCancelNextC03()
-            mc.runTick()
-            AutoP3.dontCancelNextC03()
-            punchStartButton()
-        }
-
-        timesToClickI1 -= 3
-    }
-
-    fun punchStartButton() {
-        if (!useMousePos) punchButton(110, 121, 91)
-        else punchButton(mc.objectMouseOver.blockPos.x, mc.objectMouseOver.blockPos.y, mc.objectMouseOver.blockPos.z)
-    }
-
-    fun punchButton(x: Int, y: Int, z: Int) {
-        PacketUtils.sendPacket(C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK, BlockPos(x, y, z), EnumFacing.WEST))
+    fun clickStartButton() {
+        clickButton(110, 121, 91)
     }
 
     private fun resetKey(){

@@ -181,21 +181,22 @@ object Zpew : Module(
 
         if (dingdingding) PlayerUtils.playLoudSound(getSound(), volume.toFloat(), Zpew.pitch.toFloat())
         if (sendTPCommand && LocationUtils.isSinglePlayer) { sendChatMessage("/tp $x $y $z")}
-        if (sendPacket) Scheduler.scheduleHighPreTickTask {
-            mc.netHandler.addToSendQueue(
+        if (sendPacket) Scheduler.schedulePreTickTask(1) {
+            PacketUtils.sendPacket(
                 C03PacketPlayer.C06PacketPlayerPosLook(
                     x,
                     y,
                     z,
                     yaw,
                     pitch,
-                    mc.thePlayer.onGround
+                    false
                 )
             )
             if (zpewOffset) y -= (0.05 - (if (y == 32.05) 0.00001 else 0.0))
             mc.thePlayer.setPosition(x, y, z)
             mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
         }
+
         updatePosition = true
     }
 

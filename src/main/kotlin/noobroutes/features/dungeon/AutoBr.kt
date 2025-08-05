@@ -1,7 +1,13 @@
 package noobroutes.features.dungeon
 
+import net.minecraft.block.BlockColored
+import net.minecraft.client.Minecraft
+import net.minecraft.init.Blocks
+import net.minecraft.item.EnumDyeColor
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
+import net.minecraft.util.Vec3
+import net.minecraft.util.Vec3i
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -12,7 +18,9 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.utils.IBlockStateUtils.setProperty
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
@@ -21,16 +29,19 @@ import noobroutes.utils.Vec2i
 import noobroutes.utils.isAir
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.routes.RouteUtils.setRotation
+import noobroutes.utils.setBlock
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonScan
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Door
 import noobroutes.utils.skyblock.dungeon.tiles.DoorType
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.toBlockPos
 import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
@@ -49,11 +60,25 @@ object AutoBr: Module(
     private val silent by BooleanSetting("silent", description = "do silent rotations")
     private val noWait by BooleanSetting("Low Ping Pearls", default = false, description = "for ling ping players. makes pearls work")
 
+    private val keyBind1 by KeybindSetting("test 1", Keyboard.KEY_NONE, "tests smth").onPress { goToHopper() }
+
+    private val keyBind2 by KeybindSetting("test 2", Keyboard.KEY_NONE, "tests smth").onPress { clipOut() }
+
+
     private val snipeTick by NumberSetting("Snipe Tick", 1, 0, 40, description = "how to align with the server ticks")
 
     private val BLOOD_MIDDLE_COORDS = BlockPos(0, 70, 0)
 
     private val MIDDLE_MAP_COORDS = Vec2i(-104, -104)
+
+    private val BAR_COORDS = BlockPos(-14, 73, 11)
+    private val BAR_COORDS_SIDE = Vec3(-13.5, 73.5, 11.0)
+
+    private val OTHER_BAR_COORDS =  BlockPos(-14, 73, 10)
+    private val OTHER_OTHER_BAR_COORDS = BlockPos(-14, 74, 10)
+
+    private val CLIP_SPOT_IN = Vec3(-14.2624, 74.0, 11.0)
+    private val CLIP_SPOT_OUT = Vec3(-15.8, 74.0, 11.0)
 
     private const val GO_STRAIGHT_ON_AOTV_PITCH = 4f
 
@@ -67,6 +92,55 @@ object AutoBr: Module(
 
     private var snipeCoords: Vec2i? = null
 
+    private fun goToHopper() {
+        val room = Dungeon.currentRoom ?: return
+        if (room.name != "Entrance") return
+
+        Scheduler.schedulePreTickTask {
+            val offset = when {
+                mc.theWorld.getBlockState(room.getRealCoords(BAR_COORDS)).block == Blocks.iron_bars -> Vec3(0.0, 0.0, 0.0)
+                mc.theWorld.getBlockState(room.getRealCoords(OTHER_OTHER_BAR_COORDS)).block == Blocks.iron_bars -> Vec3(0.0, 1.0, -1.0)
+                mc.theWorld.getBlockState(room.getRealCoords(OTHER_BAR_COORDS)).block == Blocks.iron_bars -> Vec3(0.0, 0.0, -1.0)
+                else -> return@schedulePreTickTask modMessage("Couldn't get Entrance type")
+            }
+
+            RouteUtils.etherwarpToRelativeVec3(BAR_COORDS_SIDE.add(offset), Dungeon.currentRoom!!, silent)
+        }
+    }
+
+    private fun clipOut() {
+        val room = Dungeon.currentRoom ?: return
+
+        val offset = when {
+            mc.theWorld.getBlockState(room.getRealCoords(BAR_COORDS)).block == Blocks.iron_bars -> Vec3(0.0, 0.0, 0.0)
+            mc.theWorld.getBlockState(room.getRealCoords(OTHER_OTHER_BAR_COORDS)).block == Blocks.iron_bars -> Vec3(0.0, 1.0, -1.0)
+            mc.theWorld.getBlockState(room.getRealCoords(OTHER_BAR_COORDS)).block == Blocks.iron_bars -> Vec3(0.0, 0.0, -1.0)
+            else -> return modMessage("Couldn't get Entrance type")
+        }
+
+        Scheduler.schedulePreTickTask {
+            if (room.name != "Entrance" || room.getRelativeCoords(mc.thePlayer.positionVector).toBlockPos().down() != BAR_COORDS.add(offset)) return@schedulePreTickTask
+
+            val spot1 = room.getRealCoords(CLIP_SPOT_IN.add(offset))
+            PlayerUtils.setPosition(spot1.xCoord, spot1.zCoord)
+
+            Scheduler.schedulePreTickTask {
+                if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+                setRotation(0f, 90f, silent)
+
+                val spot2 = room.getRealCoords(CLIP_SPOT_OUT.add(offset))
+                PlayerUtils.setPosition(spot2.xCoord, spot2.zCoord)
+
+                Scheduler.schedulePostTickTask { Scheduler.scheduleFrameTask { repeat(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() } } }
+
+                Scheduler.scheduleLowS08Task(VERTICAL_TP_AMOUNT - 1) {
+                    tpOver(snipeCoords)
+                    snipeCoords = null
+                }
+            }
+        }
+    }
+
     private fun getFurthestDoor(): Vec2i {
         val bloodDoor = Dungeon.Info.dungeonList.find { it is Door && it.type == DoorType.BLOOD }
         if (bloodDoor != null) return Vec2i(bloodDoor.x, bloodDoor.z)
@@ -79,19 +153,24 @@ object AutoBr: Module(
     @SubscribeEvent
     fun onChat(event: ChatPacketEvent) {
         if (event.message == "Starting in 4 seconds." && autoStartBrToggle && !Dungeon.Info.uniqueRooms.any { it.name == "Blood" }) {
-            Scheduler.scheduleServerTickTask(preLoadDelay) { testAutoPearl(true) }
+            goToHopper()
+            Scheduler.scheduleLowS08Task { clipOut() }
+            //Scheduler.scheduleServerTickTask(preLoadDelay) { testAutoPearl(true) }
         }
         else if (event.message == "Starting in 1 second.") {
             serverTickCount = 20
+
+            goToHopper()
             Scheduler.scheduleServerTickTask(goOn1Delay) {
                 hasRunStarted = true
                 if (!Dungeon.Info.uniqueRooms.any { it.name == "Blood" }) return@scheduleServerTickTask
-                if (autoStartBrToggle) testAutoPearl(true)
+                //if (autoStartBrToggle) testAutoPearl(true)
+                if (autoStartBrToggle) clipOut()
             }
         }
     }
 
-    fun testAutoPearl(autoCommand: Boolean = false) {
+    private fun testAutoPearl(autoCommand: Boolean = false) {
 
         if (autoCommand && Dungeon.currentRoom?.name != "Entrance") return;
 
@@ -248,5 +327,9 @@ object AutoBr: Module(
             }
         }
         return true
+    }
+
+    private fun BlockPos.add(vec3: Vec3): BlockPos {
+        return this.add(vec3.xCoord, vec3.yCoord, vec3.zCoord)
     }
 }

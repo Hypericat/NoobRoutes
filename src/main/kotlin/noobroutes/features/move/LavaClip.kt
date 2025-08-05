@@ -36,13 +36,13 @@ object LavaClip: Module(
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (mc.thePlayer == null) return
-        if (event.isEnd) return
+        if (!event.isEnd) return
 
         if (customInLavaCheck()) {
             cancelS12 = true
             val clipDistance = if (ringClip != null) ringClip else lavaDistance.toDouble()
             if (clipDistance == null) return
-            Scheduler.schedulePreTickTask {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - clipDistance, mc.thePlayer.posZ)}
+            mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - clipDistance, mc.thePlayer.posZ)
         }
     }
 
@@ -75,6 +75,6 @@ object LavaClip: Module(
     }
 
     fun customInLavaCheck(): Boolean {
-        return mc.thePlayer.worldObj.isMaterialInBB(mc.thePlayer.getEntityBoundingBox().expand(-1.0E-4, -1.0E-4, -1.0E-4), Material.lava)
+        return mc.thePlayer.worldObj.isMaterialInBB(mc.thePlayer.entityBoundingBox.expand(-1.0E-4, -1.0E-4, -1.0E-4), Material.lava)
     }
 }
