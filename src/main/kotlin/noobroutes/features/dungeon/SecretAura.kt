@@ -58,9 +58,7 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
         val sqEssence = essenceRange * essenceRange;
         val sqChest = chestRange * chestRange;
 
-        val blocks =  getBlockPosWithinAABB(box);
-        //System.out.println("size : " + blocks.size)
-        for (pos in blocks) {
+        for (pos in getBlockPosWithinAABB(box)) {
             if (clickedBlocks.contains(pos)) continue
 
             val currentBlock = mc.theWorld.getBlockState(pos).block
