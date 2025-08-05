@@ -69,6 +69,10 @@ object Utils {
 
     inline val TickEvent.isStart get() = this.phase == TickEvent.Phase.START
     inline val TickEvent.isEnd get() = this.phase == TickEvent.Phase.END
+    inline val TickEvent.isNotStart get() = this.phase == TickEvent.Phase.END
+    inline val TickEvent.isNotEnd get() = this.phase == TickEvent.Phase.START
+
+
 
     val rat = listOf(
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿",
@@ -263,6 +267,9 @@ fun Long.floor(): Long {
     return this
 }
 
+fun Double.ceilToInt(): Int {
+    return ceil(this).toInt()
+}
 
 
 /**

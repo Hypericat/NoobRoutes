@@ -15,10 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static noobroutes.utils.UtilsKt.postAndCatch;
 
 
-@Mixin(value = EntityLivingBase.class, priority = 1500)
+@Mixin(value = EntityLivingBase.class, priority = 9000)
 public abstract class MixinEntityLivingBase {
 
     @Shadow protected abstract boolean isPlayer();
+
 
     @ModifyConstant(
             method = "jump",
