@@ -59,6 +59,19 @@ fun isBlock(blockPos: BlockPos, vararg blocks: Block): Boolean {
     return blocks.any {it == block}
 }
 
+// Dont fucking call this on big AABBs you will fucking nuke performance
+fun getBlockPosWithinAABB(aabb: AxisAlignedBB) : List<BlockPos> {
+    val blocks: MutableList<BlockPos> = mutableListOf();
+    for (x in aabb.minX.toInt()..aabb.maxX.toInt()) {
+        for (y in aabb.minY.toInt()..aabb.maxY.toInt()) {
+            for (z in aabb.minZ.toInt()..aabb.maxZ.toInt()) {
+                blocks.add(BlockPos(x, y, z))
+            }
+        }
+    }
+    return blocks;
+}
+
 
 /**
  * Checks if the block at the specified `BlockPos` is a gold block in the Minecraft world.

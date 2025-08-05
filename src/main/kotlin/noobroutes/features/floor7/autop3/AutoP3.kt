@@ -155,7 +155,7 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
-        devMessage("MoveEntityWithHeadingEvent")
+        //devMessage("MoveEntityWithHeadingEvent") Kys wadey
         if (!inF7Boss || editMode || movementPackets.isNotEmpty()) return
 
         if (recordingPacketList.isNotEmpty()) {
