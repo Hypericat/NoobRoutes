@@ -18,6 +18,7 @@ import noobroutes.utils.skyblock.unformattedName
 
 /**
  * Modified CGA code
+ * Thank you CGA for ratting Lux
  */
 object SwapManager {
     var recentlySwapped = false
@@ -35,8 +36,6 @@ object SwapManager {
     fun onTickEnd(event: TickEvent.ClientTickEvent){
         if (event.isEnd) recentlySwapped = false
     }
-
-
 
     fun getItemSlot(item: String, ignoreCase: Boolean = true): Int? =
         mc.thePlayer?.inventory?.mainInventory?.indexOfFirst { it?.unformattedName?.contains(item, ignoreCase) == true }.takeIf { it != -1 }

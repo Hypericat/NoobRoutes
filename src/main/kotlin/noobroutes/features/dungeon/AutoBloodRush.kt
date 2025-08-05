@@ -24,7 +24,6 @@ import noobroutes.utils.IBlockStateUtils.setProperty
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
-import noobroutes.utils.Vec2
 import noobroutes.utils.Vec2i
 import noobroutes.utils.isAir
 import noobroutes.utils.routes.RouteUtils
@@ -32,14 +31,12 @@ import noobroutes.utils.routes.RouteUtils.setRotation
 import noobroutes.utils.setBlock
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonScan
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Door
 import noobroutes.utils.skyblock.dungeon.tiles.DoorType
-import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.toBlockPos
 import noobroutes.utils.toVec3
@@ -48,7 +45,7 @@ import kotlin.math.pow
 import kotlin.math.round
 import kotlin.math.sqrt
 
-object AutoBr: Module(
+object AutoBloodRush: Module(
     name = "Auto Br",
     Keyboard.KEY_NONE,
     category = Category.DUNGEON,

@@ -1,7 +1,5 @@
 package noobroutes.utils
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister.Pack
-import jdk.nashorn.internal.ir.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -11,7 +9,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
-import net.minecraft.init.Blocks
 import net.minecraft.inventory.Container
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.Item
@@ -43,7 +40,6 @@ import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.modMessage
 import java.util.*
@@ -79,6 +75,10 @@ object Utils {
 
     inline val TickEvent.isStart get() = this.phase == TickEvent.Phase.START
     inline val TickEvent.isEnd get() = this.phase == TickEvent.Phase.END
+    inline val TickEvent.isNotStart get() = this.phase == TickEvent.Phase.END
+    inline val TickEvent.isNotEnd get() = this.phase == TickEvent.Phase.START
+
+
 
     val rat = listOf(
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿",
@@ -273,6 +273,9 @@ fun Long.floor(): Long {
     return this
 }
 
+fun Double.ceilToInt(): Int {
+    return ceil(this).toInt()
+}
 
 
 /**
@@ -453,13 +456,14 @@ fun romanToInt(s: String): Int {
     }
 }
 
+
 fun simulateClientReceivePacket(packet: Packet<*>) {
     (Minecraft.getMinecraft().netHandler.networkManager as INetwork).receive(packet as Packet<INetHandler>);
 }
 
 fun setClientSideBlockPacket(blockPos: BlockPos, blockState: IBlockState) {
     val packet = S23PacketBlockChange();
-    (packet as IS23).setBlock(blockPos, blockState)
+    (packet as IS23).`noobRoutes$setBlock`(blockPos, blockState)
     simulateClientReceivePacket(packet);
 }
 

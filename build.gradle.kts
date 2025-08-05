@@ -49,6 +49,9 @@ dependencies {
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     implementation(kotlin("stdlib-jdk8"))
 
 
@@ -56,7 +59,7 @@ dependencies {
     implementation("org.spongepowered:mixin:0.7.11-SNAPSHOT") { isTransitive = false }
 
     implementation("gg.essential:loader-launchwrapper:1.1.3")
-    compileOnly("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5")
+    implementation("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5")
     implementation("com.mojang:brigadier:1.2.9")
 }
 

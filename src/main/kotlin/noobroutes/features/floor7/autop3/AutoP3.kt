@@ -6,7 +6,6 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S18PacketEntityTeleport
-import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -24,15 +23,16 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
+import noobroutes.features.floor7.autop3.rings.HClipRing
+import noobroutes.features.floor7.autop3.rings.LavaClipRing
+import noobroutes.features.move.HClip
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.ColorPalette
+import noobroutes.ui.editUI.EditUI
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.Scheduler
-import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.Utils.isStart
-import noobroutes.utils.addLast
-import noobroutes.utils.coerceMax
 import noobroutes.utils.getSafe
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.lastSafe
@@ -47,7 +47,6 @@ import noobroutes.utils.requirement
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
@@ -71,9 +70,9 @@ object AutoP3: Module (
     private val recentActionStack = Stack<EditRingAction>()
     private val recentUndoActionStack = Stack<EditRingAction>()
 
-
     val route by StringSetting("Route", "", description = "Route to use")
     private val ringColor by ColorSetting("Ring Color", Color.GREEN, false, description = "color of the rings")
+
 
     private val editShit by DropdownSetting("Edit Settings", false)
     private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes").withDependency { editShit }
@@ -91,6 +90,7 @@ object AutoP3: Module (
         if (inF7Boss) text(cancelled.toString(), 1f, 1f, ColorPalette.text, 13f)
         getTextWidth("400", 13f) to getTextHeight("400", 13f)
     }.withDependency { blinkShit }
+    private val cancelC05s by BooleanSetting("Cancel C05s", default = false, description = "Allows the cancelling of rotation packets.")
     private val movementMode by DualSetting("Movement Mode","Playback", "Silent", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
 
 
@@ -154,6 +154,7 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
+        //devMessage("MoveEntityWithHeadingEvent") Kys wadey
         if (!inF7Boss || editMode || movementPackets.isNotEmpty()) return
 
         if (recordingPacketList.isNotEmpty()) {
@@ -537,16 +538,26 @@ object AutoP3: Module (
         }
         recentUndoActionStack.add(ringAction)
     }
+    private fun getModifyingRingFromArgs(args: Array<out String>): Ring? {
+        val ringList = rings[route]?.toMutableList()?.apply { activeBlinkWaypoint?.let { add(it) } }
+        if (ringList.isNullOrEmpty() ) {
+            modMessage("No Rings to Delete")
+            return null
+        }
+        return if (args.requirement(2)) {
+            val index = args[1].toIntOrNull() ?: run { modMessage("Invalid Index"); return null }
+            ringList.getSafe(index) ?: run { modMessage("Index Out of Bounds"); return null }
+        } else {
+            ringList.minByOrNull { it.coords.distanceToPlayer } ?: run { modMessage("No Rings to Delete"); return null }
+        }
+    }
+
+    fun handleEdit(args: Array<out String>) {
+        EditUI.openUI(getModifyingRingFromArgs(args) ?: return)
+    }
 
     fun handleDelete(args: Array<out String>) {
-        val ringList = rings[route]?.toMutableList()?.apply { activeBlinkWaypoint?.let { add(it) } }
-        if (ringList.isNullOrEmpty() ) return modMessage("No Rings to Delete")
-        val ring = if (args.requirement(2)) {
-            val index = args[1].toIntOrNull() ?: return modMessage("Invalid Index")
-            ringList.getSafe(index) ?: return modMessage("Index Out of Bounds")
-        } else {
-            ringList.minByOrNull { it.coords.distanceToPlayer } ?: return modMessage("No Rings to Delete")
-        }
+        val ring = getModifyingRingFromArgs(args) ?: return
         if (ring is BlinkWaypoint) {
             setActiveBlinkWaypoint(null)
             modMessage("Deleted Blink Waypoint")
@@ -561,11 +572,16 @@ object AutoP3: Module (
             val file = DataManager.loadDataFromFileObject("rings")
             for (route in file) {
                 val ringsInJson = mutableListOf<Ring>()
+                val ringList = rings.getOrPut(route.key) {mutableListOf()}
                 route.value.forEach {
                     val ring = it.asJsonObject
                     val ringType = ring.get("type")?.asString ?: "Unknown"
                     val ringClass = RingType.getTypeFromName(ringType)
-                    val instance: Ring = ringClass?.ringClass?.java?.getDeclaredConstructor()?.newInstance() ?: return@forEach
+                    if (ringClass == null) {
+                        loadOldRing(ring, ringList)
+                        return@forEach
+                    }
+                    val instance: Ring = ringClass.ringClass.java.getDeclaredConstructor().newInstance() ?: return@forEach
                     instance.base.coords = ring.get("coords").asVec3
                     instance.base.yaw = MathHelper.wrapAngleTo180_float(ring.get("yaw")?.asFloat ?: 0f)
                     instance.base.term = ring.get("term")?.asBoolean == true
@@ -600,6 +616,32 @@ object AutoP3: Module (
         } catch (e: Exception) {
             modMessage("error saving")
             logger.error("error saving rings", e)
+        }
+    }
+
+    fun loadOldRing(obj: JsonObject, ringList: MutableList<Ring>){
+        val ringType = obj.get("type")?.asString ?: return
+        val coords = obj.get("coords").asVec3
+        val yaw = MathHelper.wrapAngleTo180_float(obj.get("yaw")?.asFloat ?: 0f)
+        val term = obj.get("term")?.asBoolean == true
+        val leap = obj.get("leap")?.asBoolean == true
+        val center = obj.get("center")?.asBoolean == true
+        val rotate = obj.get("rotate")?.asBoolean == true
+        val left = obj.get("left")?.asBoolean == true
+        val diameter = obj.get("diameter")?.asFloat ?: 1f
+        val height = obj.get("height")?.asFloat ?: 1f
+        val walk = obj.get("left")?.asBoolean == true
+        val ringBase = RingBase(coords, yaw, term, leap, left, center, rotate, diameter, height)
+        when (ringType) {
+            "Insta" -> {
+                ringList.add(
+                    HClipRing(ringBase, walk, true)
+                )
+            }
+            "LavaClip" -> {
+                val length = obj.get("length")?.asDouble ?: return
+                ringList.add(LavaClipRing(ringBase, length))
+            }
         }
     }
 }

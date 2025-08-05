@@ -15,10 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static noobroutes.utils.UtilsKt.postAndCatch;
 
 
-@Mixin(EntityLivingBase.class)
+@Mixin(value = EntityLivingBase.class, priority = 9000)
 public abstract class MixinEntityLivingBase {
 
     @Shadow protected abstract boolean isPlayer();
+
 
     @ModifyConstant(
             method = "jump",
@@ -43,21 +44,23 @@ public abstract class MixinEntityLivingBase {
 
     @Inject(
             method = {"moveEntityWithHeading"},
-            at = @At("HEAD")
+            at = @At("HEAD"),
+            require = 0
     )
-    private void onMoveEntityWithHeadingPre(float strafe, float forward, CallbackInfo ci) {
+    private void onMoveEntityWithHeadingPre$noobroutes(float strafe, float forward, CallbackInfo ci) {
         if ((Object) this instanceof EntityPlayerSP) {
             postAndCatch(new MoveEntityWithHeadingEvent.Pre());
         }
     }
-
     @Inject(
             method = {"moveEntityWithHeading"},
-            at = @At("TAIL")
+            at = @At("TAIL"),
+            require = 0
     )
-    private void onMoveEntityWithHeadingPost(float strafe, float forward, CallbackInfo ci) {
+    private void onMoveEntityWithHeadingPost$noobroutes(float strafe, float forward, CallbackInfo ci) {
         if ((Object) this instanceof EntityPlayerSP) {
             postAndCatch(new MoveEntityWithHeadingEvent.Post());
         }
     }
+
 }

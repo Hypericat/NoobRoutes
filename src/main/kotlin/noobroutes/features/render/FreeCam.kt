@@ -201,7 +201,6 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
 
     fun shouldOverrideSpectator(player: AbstractClientPlayer): Boolean {
         return player == mc.renderViewEntity && shouldOverride && !renderingEntities
-
     }
 
     fun setAngles(yaw: Float, pitch: Float) {

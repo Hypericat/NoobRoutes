@@ -23,8 +23,6 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 
 @Mixin(value = {Minecraft.class}, priority = 800)
 public class MixinMinecraft {
-
-
     @Inject(method = {"runTick"}, at = {@At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;dispatchKeypresses()V")})
     public void keyPresses(CallbackInfo ci) {
         if (Keyboard.getEventKeyState()) postAndCatch(new InputEvent.Keyboard((Keyboard.getEventKey() == 0) ? (Keyboard.getEventCharacter() + 256) : Keyboard.getEventKey()));
@@ -34,8 +32,6 @@ public class MixinMinecraft {
     public void mouseKeyPresses(CallbackInfo ci) {
         if (Mouse.getEventButtonState()) postAndCatch(new InputEvent.Mouse(Mouse.getEventButton()));
     }
-
-
 
     @Inject(method = "rightClickMouse", at = @At("HEAD"), cancellable = true)
     private void rightClickMouse(CallbackInfo ci) {

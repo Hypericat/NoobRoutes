@@ -35,12 +35,11 @@ object Scheduler {
     private val scheduledPostMoveEntityWithHeadingTasks = Tasks()
     private val scheduledFrameTasks = Tasks()
     private val scheduledServerTasks = Tasks()
-
     private val scheduledPreMotionUpdateTasks = Tasks()
     private val scheduledLowPreMotionUpdateTasks = Tasks()
     private val scheduledPostMotionUpdateTasks = Tasks()
 
-    private fun reset() { //i cba to make this better rn. pwetty pls wadey
+    private fun reset() {
         scheduledPreTickTasks.clear()
         scheduledPostTickTasks.clear()
         scheduledHighPreTickTasks.clear()
@@ -57,10 +56,10 @@ object Scheduler {
         scheduledPostMoveEntityWithHeadingTasks.clear()
         scheduledFrameTasks.clear()
         scheduledServerTasks.clear()
-
         scheduledPreMotionUpdateTasks.clear()
         scheduledLowPreMotionUpdateTasks.clear()
         scheduledPostMotionUpdateTasks.clear()
+
     }
 
     @SubscribeEvent
@@ -348,6 +347,11 @@ object Scheduler {
         fun clear() {
             queue.clear()
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Unload){
+        reset()
     }
 
 

@@ -25,7 +25,7 @@ enum class RingType(
 
     companion object {
         fun getTypeFromName(name: String): RingType? {
-            return entries.firstOrNull {it.name.lowercase() == name.lowercase() || it.aliases.any { alias -> alias.lowercase() == name.lowercase() }}
+            return entries.firstOrNull {it.ringName.lowercase() == name.lowercase() || it.aliases.any { alias -> alias.lowercase() == name.lowercase() }}
         }
     }
 }

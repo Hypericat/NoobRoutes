@@ -1,6 +1,7 @@
 package noobroutes.pathfinding;
 
 import com.mojang.realmsclient.util.Pair;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import noobroutes.features.misc.EWPathfinderModule;
@@ -171,7 +172,6 @@ public class PathFinder {
 
         if (goal.test(checkNode.getPos())) {
             ChatUtilsKt.devMessage("Found valid route length " + checkNode.getIndex(), "§8§l-<§r§aNoob Routes§r§8§l>-§r ", null);
-
             if (!isComplete() || checkNode.getMoveCost() < getBestNodeMoveCost()) setBestNode(checkNode);
         }
 
