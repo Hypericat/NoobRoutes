@@ -34,25 +34,12 @@ fun getSkull(pos: BlockPos): TileEntitySkull? {
     return (mc.theWorld?.getTileEntity(pos) as? TileEntitySkull)
 }
 
-/**
- * Checks if the chunk at the specified `BlockPos` is loaded.
- * @param blockPos The position in the world to query.
- * @return `true` if chunk is loaded, `false` otherwise
- */
 fun isBlockLoaded(blockPos: BlockPos): Boolean{
     return mc.theWorld.getChunkFromBlockCoords(blockPos).isLoaded
 }
 
-/**
- * Checks if the block at the specified `BlockPos` is considered "air" in the Minecraft world.
- *
- * @param blockPos The position in the world to query.
- * @return `true` if the block at the given position is air, `false` otherwise.
- */
 fun isAir(blockPos: BlockPos): Boolean =
     getBlockAt(blockPos) == Blocks.air
-
-
 
 fun isBlock(blockPos: BlockPos, vararg blocks: Block): Boolean {
     val block = getBlockAt(blockPos)
@@ -73,33 +60,10 @@ fun getBlockPosWithinAABB(aabb: AxisAlignedBB) : List<BlockPos> {
 }
 
 
-/**
- * Checks if the block at the specified `BlockPos` is a gold block in the Minecraft world.
- *
- * @param blockPos The position in the world to query.
- * @return `true` if the block at the given position is a gold block, `false` otherwise.
- */
-fun isGold(blockPos: BlockPos): Boolean =
-    getBlockAt(blockPos) == Blocks.gold_block
-
-/**
- * Retrieves the block at the specified `BlockPos` in the Minecraft world.
- *
- * @param pos The position in the world to query for the block.
- * @return The block at the given position, or `Blocks.air` if the block is not present.
- */
 fun getBlockAt(pos: BlockPos): Block =
     mc.theWorld?.chunkProvider?.provideChunk(pos.x shr 4, pos.z shr 4)?.getBlock(pos) ?: Blocks.air
 
 
-
-
-/**
- * Retrieves the block state at the specified `BlockPos` in the Minecraft world.
- *
- * @param pos The position in the world to query for the block state.
- * @return The block state at the given position, or the default state of `Blocks.air` if the block is not present.
- */
 fun getBlockStateAt(pos: BlockPos): IBlockState =
     mc.theWorld?.chunkProvider?.provideChunk(pos.x shr 4, pos.z shr 4)?.getBlockState(pos) ?: Blocks.air.defaultState
 

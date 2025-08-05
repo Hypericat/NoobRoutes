@@ -19,15 +19,15 @@ class LavaClipRing(
     companion object : CommandGenerated {
         override fun generateRing(args: Array<out String>): Ring? {
             if (args.size < 3) {
-                modMessage("need a length arg")
+                modMessage("need a length arg 1-50")
                 return null
             }
-            val endY = args[2].toDoubleOrNull()?.absoluteValue
-            if (endY == null) {
-                modMessage("need a length arg")
+            val endY = args[2].toDoubleOrNull()?.absoluteValue ?: run {
+                modMessage("need a length arg 1-50")
                 return null
             }
-            return LavaClipRing(generateRingBaseFromArgs(args), endY)
+
+            return LavaClipRing(generateRingBaseFromArgs(args), endY.coerceAtMost(50.0))
         }
     }
 

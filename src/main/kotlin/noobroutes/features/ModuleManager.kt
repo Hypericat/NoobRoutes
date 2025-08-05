@@ -5,14 +5,14 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import noobroutes.Core
 import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.InputEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
-import noobroutes.features.dungeon.AutoBr
+import noobroutes.features.dungeon.AutoBloodRush
+import noobroutes.features.dungeon.AutoClose
 import noobroutes.features.dungeon.SecretAura
 import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.features.dungeon.puzzle.IceFill
@@ -90,7 +90,7 @@ object ModuleManager {
         FreeCam,
         QOL,
         BarPhase,
-        AutoBr,
+        AutoBloodRush,
         AutoPath,
         EWPathfinderModule,
         DynamicRoute,
@@ -98,8 +98,8 @@ object ModuleManager {
         WaterBoard,
         ZealotAura,
         IceFill,
-        SecretAura
-
+        SecretAura,
+        AutoClose
     )
 
     init {

@@ -42,7 +42,7 @@ object LavaClip: Module(
             cancelS12 = true
             val clipDistance = if (ringClip != null) ringClip else lavaDistance.toDouble()
             if (clipDistance == null) return
-            Scheduler.schedulePreTickTask {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - clipDistance, mc.thePlayer.posZ)}
+            Scheduler.schedulePreTickTask {mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - clipDistance.coerceAtMost(50.0), mc.thePlayer.posZ)}
         }
     }
 

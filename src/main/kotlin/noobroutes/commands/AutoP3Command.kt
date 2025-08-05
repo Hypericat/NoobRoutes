@@ -15,7 +15,7 @@ import kotlin.reflect.full.companionObjectInstance
 
 class AutoP3Command: CommandBase() {
     override fun getCommandName(): String {
-        return "ap3"
+        return "noob"
     }
 
     override fun getCommandUsage(sender: ICommandSender?): String {
@@ -23,7 +23,7 @@ class AutoP3Command: CommandBase() {
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Delete, clearWaypoints, Start, Load, Undo, Redo")
+        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Edit, Delete, clearWaypoints, Start, Load, Undo, Redo")
         when (args[0].lowercase()) {
             "add" -> {
                 if (!args.requirement(2)) return modMessage("Rings: ${getCommandGeneratedRings()}")
@@ -31,6 +31,9 @@ class AutoP3Command: CommandBase() {
                     ?: return modMessage("Rings: ${getCommandGeneratedRings()}")
                 val ring = (ringType.ringClass.companionObjectInstance as? CommandGenerated)?.generateRing(args) ?: return
                 AutoP3.addRing(ring)
+            }
+            "edit" -> {
+                AutoP3.handleEdit(args)
             }
             "delete" -> {
                 AutoP3.handleDelete(args)
@@ -57,7 +60,7 @@ class AutoP3Command: CommandBase() {
                 AutoP3.loadRings()
                 modMessage("loaded rings")
             }
-            else -> modMessage("Usages: Add, Delete, clearWaypoints, Start, Load, Undo, Redo")
+            else -> modMessage("Usages: Add, Edit, Delete, clearWaypoints, Start, Load, Undo, Redo")
         }
     }
 
@@ -70,7 +73,7 @@ class AutoP3Command: CommandBase() {
     }
 
     override fun getCommandAliases(): List<String?>? {
-        return listOf("p3", "sigma69420autop3gamertime", "autop3", "autophase3", "autophasethree")
+        return listOf("ap3", "sigma69420autop3gamertime", "autop3", "autophase3", "autophasethree")
     }
 
     override fun addTabCompletionOptions(
@@ -80,7 +83,7 @@ class AutoP3Command: CommandBase() {
     ): List<String?>? {
         return when (args.size) {
             0 -> getListOfStringsMatchingLastWord(args, listOf("ap3", "p3", "sigma69420autop3gamertime"))
-            1 -> getListOfStringsMatchingLastWord(args, listOf("add", "delete", "clearwaypoints", "start", "restore", "load"))
+            1 -> getListOfStringsMatchingLastWord(args, listOf("add", "delete", "clearwaypoints", "start", "restore", "load", "edit"))
             2 -> when (args[0]) { //I hate the amount of nesting here
                 "add" -> getListOfStringsMatchingLastWord(args, RingType.entries.filter { it.commandGenerated }.map { it.ringName })
                 else -> null
