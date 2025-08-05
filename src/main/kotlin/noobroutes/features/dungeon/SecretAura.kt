@@ -27,6 +27,7 @@ import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.utils.*
 import noobroutes.utils.Utils.isNotStart
+import noobroutes.utils.skyblock.devMessage
 
 object SecretAura : Module("Secret Aura", category = Category.DUNGEON, description = "Typical Secret Aura, is Disabled Inside of Boss. (Use Lever Aura)") {
     val enableOutsideOfDungeons by BooleanSetting("Enable Everywhere", description = "Enables the Aura outside of dungeons.")
@@ -118,8 +119,9 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
     }
 
     private fun handleSwap() {
-        if (previousSlot == -1) previousSlot = mc.thePlayer.inventory.currentItem
+        if (previousSlot == -1 && swapBack) previousSlot = mc.thePlayer.inventory.currentItem
         SwapManager.swapToSlot((swapTo - 1).coerceIn(0, 8))
+        devMessage("Secret Aura Swap: ${System.currentTimeMillis()}")
     }
 
     private fun isValidBlock(block: Block, position: BlockPos): Boolean {
