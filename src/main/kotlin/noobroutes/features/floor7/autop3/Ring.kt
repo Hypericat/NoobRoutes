@@ -186,33 +186,9 @@ abstract class Ring(
         return checkInBoundsWithSpecifiedHeight(height)
     }
 
-    /**
-     * Checks whether the ring structure, defined by its center coordinates and dimensions,
-     * lies entirely within a bounding volume relative to the player's current position in the world.
-     *
-     * This method constructs an axis-aligned bounding box (AABB) around the ring using the provided
-     * `heightToUse` value for the vertical dimension and the ring's diameter for the horizontal dimensions.
-     * It then checks whether the player's position vector is within this box.
-     *
-     * The bounding box is centered horizontally at the specified `coords` (x, z), extending equally
-     * in both the negative and positive directions by half the `diameter`. Vertically, the box starts
-     * from the base y-coordinate of `coords.yCoord` and extends upward by `heightToUse`, allowing for
-     * flexible height configuration—useful for rings of varying vertical size or placement.
-     *
-     * This check is often used to determine whether the ring is still "active" or relevant based on the
-     * player's location—for example, when validating if the player is inside or near a structure, a goal
-     * region, or a visual effect boundary.
-     *
-     * @param heightToUse The height to apply when calculating the upper Y-bound of the bounding box.
-     *        This allows dynamic vertical bounds, independent of the ring’s default dimensions.
-     *
-     * @return true if the player’s position is within the calculated bounding box of the ring, false otherwise.
-     * gay
-     */ //////////////////////////////////////////////////////////////////////////////////////////////////
     protected fun checkInBoundsWithSpecifiedHeight(heightToUse: Float): Boolean{
         return mc.thePlayer.positionVector.isVecInBounds(coords.xCoord - diameter * 0.5, coords.yCoord, coords.zCoord - diameter * 0.5, coords.xCoord + diameter * 0.5, coords.yCoord + heightToUse, coords.zCoord + diameter * 0.5)
     }
-    //////////////////////////////////////////////////////////////////////////////////////////////////////this was so bald
 
     protected fun center() {
         PlayerUtils.stopVelocity()

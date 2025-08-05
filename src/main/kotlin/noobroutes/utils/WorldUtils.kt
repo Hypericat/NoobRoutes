@@ -7,6 +7,8 @@ import net.minecraft.block.BlockLever.EnumOrientation
 import net.minecraft.block.BlockSkull
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntitySkull
 import net.minecraft.util.*
 import noobroutes.Core.mc
@@ -29,6 +31,15 @@ fun setBlock(blockPos: BlockPos, blockState: IBlockState){
 
 inline val TileEntitySkull.skullTexture get() =
     this.playerProfile?.properties?.get("textures")?.firstOrNull()?.value
+
+inline val TileEntitySkull.profileID get() =
+    this.playerProfile?.id.toString()
+
+inline val ItemStack.profileID get(): String? {
+    if (this.item !== Items.skull || !this.hasTagCompound()) return null
+    return this.tagCompound.getCompoundTag("SkullOwner").getString("Id")
+}
+
 
 fun getSkull(pos: BlockPos): TileEntitySkull? {
     return (mc.theWorld?.getTileEntity(pos) as? TileEntitySkull)

@@ -43,7 +43,7 @@ object LeverAura: Module(
         Lever(BlockPos(60, 134, 142), System.currentTimeMillis()),
         Lever(BlockPos(58, 136, 142), System.currentTimeMillis()),
         Lever(BlockPos(58, 133, 142), System.currentTimeMillis())
-        //Lever(BlockPos(210, 62, 226), System.currentTimeMillis())
+
     )
 
     @SubscribeEvent
@@ -62,7 +62,7 @@ object LeverAura: Module(
         levers.forEach { lever ->
             if (eyePos.distanceTo(lever.coords.toVec3()) > range) return@forEach
             if (System.currentTimeMillis() - lever.lastClick < cooldown * 1000) return@forEach
-            AuraManager.clickBlock(AuraManager.BlockAura(lever.coords, false) {}) //i need offtick
+            AuraManager.clickBlock(AuraManager.BlockAura(lever.coords, false) {})
             lever.lastClick = System.currentTimeMillis()
             return
         }
