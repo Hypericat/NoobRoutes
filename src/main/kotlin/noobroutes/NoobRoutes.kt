@@ -16,7 +16,7 @@ import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.move.AutoPath
 import noobroutes.font.FontType
-import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.ui.clickgui.ClickGui
 import noobroutes.utils.*
 import noobroutes.utils.clock.Executor
 import noobroutes.utils.render.RenderUtils
@@ -61,7 +61,7 @@ class NoobRoutes {
             Renderer,
             RenderUtils2D,
             RenderUtils,
-            ClickGUI,
+            ClickGui,
             Scheduler,
             PacketUtils,
             NettyS2DPacketInterceptor,

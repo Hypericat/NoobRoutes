@@ -30,7 +30,7 @@ import noobroutes.features.render.ColorPaletteModule
 import noobroutes.features.render.Trail
 import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.impl.KeybindSetting
-import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.ui.clickgui.ClickGui
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.hud.HudElement
 import noobroutes.utils.capitalizeFirst
@@ -194,7 +194,7 @@ object ModuleManager {
 
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Post) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL || mc.currentScreen == EditHUDGui || mc.currentScreen == ClickGUI) return
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL || mc.currentScreen == EditHUDGui || mc.currentScreen == ClickGui) return
 
         profile("Noobroutes Hud") {
             for (i in 0 until huds.size) {

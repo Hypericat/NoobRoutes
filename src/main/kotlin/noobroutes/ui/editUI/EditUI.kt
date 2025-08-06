@@ -12,9 +12,8 @@ import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.rings.*
 import noobroutes.features.render.ClickGUIModule
+import noobroutes.ui.ColorPalette
 import noobroutes.ui.Screen
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.editUI.elements.ElementCheckBox
 import noobroutes.ui.editUI.elements.ElementSlider
 import noobroutes.ui.util.MouseUtils
@@ -22,6 +21,7 @@ import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.MouseUtils.mouseY
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.darkerIf
 import kotlin.math.floor
 
 
@@ -445,11 +445,11 @@ object EditUI : Screen() {
             originX = floor(x2 + mouseX)
             originY = floor(y2 + mouseY)
         }
-        roundedRectangle(mc.displayWidth * 0.5 - 75, mc.displayHeight * 0.9f - 40, 150f, 80f, ColorUtil.buttonColor, 15f)
+        roundedRectangle(mc.displayWidth * 0.5 - 75, mc.displayHeight * 0.9f - 40, 150f, 80f, ColorPalette.buttonColor, 15f)
         text("Reset", mc.displayWidth * 0.5, mc.displayHeight * 0.9f, Color.WHITE.darkerIf(isResetHovered), 26f, align = TextAlign.Middle)
         //roundedRectangle(ORIGIN_X + 200f, ORIGIN_Y + 10f, 200f, 5f, Color.WHITE, 2f)
-        roundedRectangle(originX, originY, 600, 70, ColorUtil.titlePanelColor,  ColorUtil.titlePanelColor, Color.TRANSPARENT, 0, 20f, 20f, 0f, 0f, 0f)
-        roundedRectangle(originX, originY, 600, currentY, ColorUtil.buttonColor, radius = 20)
+        roundedRectangle(originX, originY, 600, 70, ColorPalette.titlePanelColor,  ColorPalette.titlePanelColor, Color.TRANSPARENT, 0, 20f, 20f, 0f, 0f, 0f)
+        roundedRectangle(originX, originY, 600, currentY, ColorPalette.buttonColor, radius = 20)
         text(ring.ringName, originX + X_ALIGNMENT_LEFT - 10, originY + 37.5, Color.WHITE, size = 30)
         elements.forEach { it.draw(originX + it.x, originY + it.y) }
         ring.coords = Vec3(ringX, ringY, ringZ)

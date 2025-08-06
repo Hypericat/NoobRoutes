@@ -44,10 +44,10 @@ object AutoPath: Module(
 
     private val resetPos by BooleanSetting("Align to node", true, false, "Moves the player to the center of the node after pathing.")
     private val selectionMode by SelectorSetting("Selection Mode", "Rotation", arrayListOf("Rotation", "Alt Key"), false,"Either use Alt Key or Angle to Select Door")
-    private val altKey by KeybindSetting("Alt Key", Keyboard.KEY_NONE, "Alt Key keybind", false).withDependency { this.selectionMode == 1}
-    private val pathKey by KeybindSetting("Path Key", Keyboard.KEY_NONE, "Path to selected door", false).withDependency { this.selectionMode == 0}
+    private val altKey by KeybindSetting("Alt Key", Keyboard.KEY_NONE, "Alt Key keybind", false).withDependency { this.selectionMode == "Alt Key"}
+    private val pathKey by KeybindSetting("Path Key", Keyboard.KEY_NONE, "Path to selected door", false).withDependency { this.selectionMode == "Rotation"}
     private val doorNumberColor by ColorSetting("Door Number Color", description = "I wonder what this could possibly mean", default = Color.ORANGE)
-    private val selectedDoorColor by ColorSetting("Selected Door Color", description = "I wonder what this could possibly mean", default = Color.GREEN).withDependency { this.selectionMode == 0 }
+    private val selectedDoorColor by ColorSetting("Selected Door Color", description = "I wonder what this could possibly mean", default = Color.GREEN).withDependency { this.selectionMode == "Rotation" }
 
     private const val DOOR_POS_BITMASK : Int = 0b111.inv();
     private const val MIN_DOT_THRESHOLD : Double = 0.95;
@@ -85,7 +85,7 @@ object AutoPath: Module(
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
         validDoors.forEachIndexed { index, pos ->
-            Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), if (index == validDoorLookIndex && selectionMode == 0) selectedDoorColor else getDoorColor(pos, doorNumberColor), scale = 0.1f)
+            Renderer.drawStringInWorld(index.toString(), pos.toVec3().add(0.5, 2.0, 0.5), if (index == validDoorLookIndex && selectionMode == "Rotation") selectedDoorColor else getDoorColor(pos, doorNumberColor), scale = 0.1f)
         }
 
         validBlocks.forEachIndexed { index, it ->
@@ -170,14 +170,14 @@ object AutoPath: Module(
     @SubscribeEvent
     fun onKeyInput(event: InputEvent.KeyInputEvent) {
         if (!mc.thePlayer.onGround || FreeCam.enabled || !Keyboard.getEventKeyState()) return
-        if (selectionMode == 0) {
+        if (selectionMode == "Rotation") {
             if (Keyboard.getEventKey() == pathKey.key) {
                 pathToDoor(validDoorLookIndex)
             }
             return;
         }
 
-        if (selectionMode != 1 || !Keyboard.isKeyDown(altKey.key)) return
+        if (selectionMode != "Alt Key" || !Keyboard.isKeyDown(altKey.key)) return
 
         var key = Keyboard.getEventKey()
         if (!validKeys!!.contains(key)) return
@@ -219,6 +219,6 @@ object AutoPath: Module(
     }
 
     fun shouldCancelKey(keyCode: Int) : Boolean {
-        return this.enabled && selectionMode == 1 && altKey.key != Keyboard.KEY_NONE && Keyboard.isKeyDown(altKey.key) && validKeys!!.contains(keyCode)
+        return this.enabled && selectionMode == "Alt Key" && altKey.key != Keyboard.KEY_NONE && Keyboard.isKeyDown(altKey.key) && validKeys!!.contains(keyCode)
     }
 }

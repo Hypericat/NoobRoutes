@@ -40,7 +40,7 @@ object QOL: Module(
     private fun spamRight() {
         modMessage("woosh")
         repeat(spamRightAmount) {
-            PlayerUtils.airClick(false)
+            PlayerUtils.airClick()
             devMessage("sent")
         }
     }

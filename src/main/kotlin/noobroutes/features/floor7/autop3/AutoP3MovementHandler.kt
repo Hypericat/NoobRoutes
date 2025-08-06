@@ -59,9 +59,9 @@ object AutoP3MovementHandler {
 
         var movementFactor = 0.02 * SPRINT_MULTIPLIER;
 
-        if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0 && AutoP3.walkBoost != 0)) {
+        if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0 && AutoP3.walkBoost != "none")) {
             movementFactor = speed;
-            if (AutoP3.walkBoost == 2)
+            if (AutoP3.walkBoost == "big")
                 movementFactor *= SPRINT_MULTIPLIER;
         }
 

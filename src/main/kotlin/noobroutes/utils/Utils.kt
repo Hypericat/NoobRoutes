@@ -36,8 +36,9 @@ import noobroutes.INetwork
 import noobroutes.IS23
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+
 import noobroutes.utils.render.Color
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords

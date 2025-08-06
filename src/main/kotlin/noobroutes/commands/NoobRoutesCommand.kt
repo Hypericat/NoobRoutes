@@ -6,7 +6,7 @@ import net.minecraft.util.BlockPos
 import noobroutes.Core.display
 import noobroutes.features.dungeon.AutoBloodRush
 import noobroutes.features.misc.SexAura
-import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.ui.clickgui.ClickGui
 import noobroutes.utils.Utils
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.modMessage
@@ -22,7 +22,7 @@ class NoobRoutesCommand : CommandBase() {
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
         if (args == null || args.isEmpty()) {
-            display = ClickGUI
+            display = ClickGui
             return
         }
 

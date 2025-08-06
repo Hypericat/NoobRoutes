@@ -29,7 +29,7 @@ class DynamicNode(
     override fun run() {
         val angles = RotationUtils.getYawAndPitch(target, true)
 
-        var state = SwapManager.swapFromSBId(DynamicRoute.extraDebug, "ASPECT_OF_THE_VOID")
+        var state = SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
         if (state == SwapManager.SwapState.UNKNOWN && Minecraft.getMinecraft().isSingleplayer) state = SwapManager.swapFromId(
             Item.getIdFromItem(Items.diamond_shovel))
         if (state == SwapManager.SwapState.UNKNOWN) return

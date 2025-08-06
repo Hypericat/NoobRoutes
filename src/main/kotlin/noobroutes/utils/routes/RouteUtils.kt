@@ -190,7 +190,7 @@ object RouteUtils {
         if (!sneakRegistered) return
         if (!mc.thePlayer.isSneaking) PlayerUtils.sneak()
         if (!serverSneak) return
-        PlayerUtils.airClick(false) // Hide the fucking message
+        PlayerUtils.airClick()
         sneakRegistered = false
         PlayerUtils.resyncSneak()
     }

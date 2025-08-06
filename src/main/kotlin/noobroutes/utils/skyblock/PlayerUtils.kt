@@ -4,13 +4,14 @@ import net.minecraft.block.Block
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
-import noobroutes.utils.AutoP3Utils
+import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
