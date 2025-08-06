@@ -25,7 +25,6 @@ import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
 import noobroutes.features.floor7.autop3.rings.HClipRing
 import noobroutes.features.floor7.autop3.rings.LavaClipRing
-import noobroutes.features.move.HClip
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.ColorPalette
@@ -112,6 +111,7 @@ object AutoP3: Module (
     private var activeBlinkWaypoint: BlinkWaypoint? = null
     var recordingPacketList = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
         private set
+    private var recording = false
 
     private var clear = 0
 
@@ -155,24 +155,7 @@ object AutoP3: Module (
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
         //devMessage("MoveEntityWithHeadingEvent") Kys wadey
-        if (!inF7Boss || editMode || movementPackets.isNotEmpty()) return
-
-        if (recordingPacketList.isNotEmpty()) {
-            val blinkWaypoint = activeBlinkWaypoint ?: return handleMissingWaypoint()
-
-            val c04ToAdd = C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, mc.thePlayer.onGround)
-            if (c04ToAdd == recordingPacketList.last()) return
-
-            recordingPacketList.add(c04ToAdd)
-            modMessage("recording, ${recordingPacketList.size}")
-
-            if (recordingPacketList.size >= blinkWaypoint.length) {
-                addRing(BlinkRing(blinkWaypoint.base, recordingPacketList, mc.thePlayer.motionY))
-                recordingPacketList = mutableListOf()
-            }
-        }
-
-        if (mc.thePlayer.isSneaking) return
+        if (!inF7Boss || editMode || movementPackets.isNotEmpty() || mc.thePlayer.isSneaking) return
 
         rings[route]?.forEach { ring ->
             if (ring.inRing()) {
@@ -184,10 +167,29 @@ object AutoP3: Module (
 
         activeBlinkWaypoint?.let {
             if (it.inRing()) {
-                if (!it.triggered) startRecording()
+                if (!it.triggered) recording = true
                 it.triggered = true
             }
             else it.triggered = false
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun recordBlink(event: PacketEvent.Send) {
+        if (!inF7Boss || editMode || movementPackets.isNotEmpty() || !recording || event.packet !is C03PacketPlayer) return
+
+        if (!event.packet.isMoving) return //this is a useless check, but I don't want to risk it
+
+        val blinkWaypoint = activeBlinkWaypoint ?: return handleMissingWaypoint()
+
+        val c04ToAdd = C03PacketPlayer.C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)
+        recordingPacketList.add(c04ToAdd)
+        modMessage("recording, ${recordingPacketList.size}")
+
+        if (recordingPacketList.size >= blinkWaypoint.length) {
+            addRing(BlinkRing(blinkWaypoint.base, recordingPacketList, mc.thePlayer.motionY))
+            recordingPacketList = mutableListOf()
+            recording = false
         }
     }
 
@@ -302,9 +304,6 @@ object AutoP3: Module (
         val firstPacket = movementPackets.first()
         val beforeFirst = lastMovementedC03
 
-
-
-
         movementRenderer.renderPlayerAt(
             firstPacket.positionX,
             firstPacket.positionY,
@@ -314,19 +313,6 @@ object AutoP3: Module (
             beforeFirst.positionZ,
             event.partialTicks
         )
-        //Renderer.renderPlayerAt(xPos, yPos, zPos)
-/*
-        Renderer.drawBox(
-            AxisAlignedBB(
-                xPos + 0.3,
-                yPos,
-                zPos + 0.3,
-                xPos - 0.3,
-                yPos + 1.8,
-                zPos - 0.3
-            ), Color.Companion.GREEN, fillAlpha = 0, outlineWidth = 1.5F)
-
- */
     }
 
     @SubscribeEvent
@@ -415,7 +401,7 @@ object AutoP3: Module (
             return
         }
 
-        if (event.packet.isOnGround && !event.packet.isMoving && movementPackets.isEmpty()) {
+        if (event.packet.isOnGround && !event.packet.isMoving && movementPackets.isEmpty() && (!event.packet.rotating || cancelC05s)) {
             event.isCanceled = true
             if (cancelled < 400) cancelled++
             clear = 0
@@ -427,10 +413,6 @@ object AutoP3: Module (
         }
         clear++
 
-    }
-
-    fun startRecording() {
-        recordingPacketList.add(C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, mc.thePlayer.onGround))
     }
 
     fun getMaxBlinks(): Int {
@@ -572,13 +554,12 @@ object AutoP3: Module (
             val file = DataManager.loadDataFromFileObject("rings")
             for (route in file) {
                 val ringsInJson = mutableListOf<Ring>()
-                val ringList = rings.getOrPut(route.key) {mutableListOf()}
                 route.value.forEach {
                     val ring = it.asJsonObject
                     val ringType = ring.get("type")?.asString ?: "Unknown"
                     val ringClass = RingType.getTypeFromName(ringType)
                     if (ringClass == null) {
-                        loadOldRing(ring, ringList)
+                        loadOldRing(ring, ringsInJson)
                         return@forEach
                     }
                     val instance: Ring = ringClass.ringClass.java.getDeclaredConstructor().newInstance() ?: return@forEach
@@ -619,7 +600,7 @@ object AutoP3: Module (
         }
     }
 
-    fun loadOldRing(obj: JsonObject, ringList: MutableList<Ring>){
+    fun loadOldRing(obj: JsonObject, ringsInJson: MutableList<Ring>){
         val ringType = obj.get("type")?.asString ?: return
         val coords = obj.get("coords").asVec3
         val yaw = MathHelper.wrapAngleTo180_float(obj.get("yaw")?.asFloat ?: 0f)
@@ -630,17 +611,17 @@ object AutoP3: Module (
         val left = obj.get("left")?.asBoolean == true
         val diameter = obj.get("diameter")?.asFloat ?: 1f
         val height = obj.get("height")?.asFloat ?: 1f
-        val walk = obj.get("left")?.asBoolean == true
+        val walk = obj.get("walk")?.asBoolean == true
         val ringBase = RingBase(coords, yaw, term, leap, left, center, rotate, diameter, height)
         when (ringType) {
             "Insta" -> {
-                ringList.add(
+                ringsInJson.add(
                     HClipRing(ringBase, walk, true)
                 )
             }
             "LavaClip" -> {
                 val length = obj.get("length")?.asDouble ?: return
-                ringList.add(LavaClipRing(ringBase, length))
+                ringsInJson.add(LavaClipRing(ringBase, length))
             }
         }
     }

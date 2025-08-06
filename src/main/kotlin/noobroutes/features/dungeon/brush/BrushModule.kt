@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import net.minecraft.block.Block
 import net.minecraft.block.properties.IProperty
 import net.minecraft.block.state.IBlockState
+import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.MovingObjectPosition
@@ -34,6 +35,7 @@ import noobroutes.utils.json.JsonUtils.add
 import noobroutes.utils.json.JsonUtils.asBlockPos
 import noobroutes.utils.skyblock.Island
 import noobroutes.utils.skyblock.LocationUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
@@ -143,7 +145,8 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
     private fun handlePlaceBlock(pos: BlockPos, hitVec: Vec3, facing: EnumFacing, room: UniqueRoom?){
         lastPlace = System.currentTimeMillis()
         val blockState = getEditingBlockState() ?: return
-        if (!isAir(pos)) return
+        val block = mc.theWorld.getBlockState(pos).block
+        if (block != Blocks.air && block != Blocks.lava && block != Blocks.flowing_lava) return
         val state = if (forceRotation) blockState else blockState.block.onBlockPlaced(
             mc.theWorld,
             pos,
@@ -235,13 +238,8 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
 
             val blockList = getBlockList(room)
             val pos = room?.getRelativeCoords(target) ?: target
-
-            val removed = blockList.removeAll{ (_, blockPos) ->
-                pos == blockPos
-            }
             removeBlockFromChunk(pos)
             setBlock(pos, IBlockStateUtils.airIBlockState)
-            if (removed) return modMessage("thing")
             addBlockToChunk(pos, IBlockStateUtils.airIBlockState)
             blockList.add(IBlockStateUtils.airIBlockState to pos)
             return
