@@ -14,7 +14,7 @@ import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.routes.AutoRoute
-import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.ui.util.shader.GapOutlineShader
 import noobroutes.ui.util.shader.RoundedRect
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -25,7 +25,8 @@ object Core {
     @JvmStatic
     val mc: Minecraft = Minecraft.getMinecraft()
 
-
+    //do not simplify the expression, it is changed inside the gradle build
+    val DEV_MODE = ("@DEV_MODE@" == "true") || (System.getenv("ENVIRONMENT")?.equals("dev", ignoreCase = true) == true)
     const val VERSION = "@VER@"
     val scope = CoroutineScope(SupervisorJob() + EmptyCoroutineContext)
     val logger: Logger = LogManager.getLogger("NoobRoutes")
@@ -53,8 +54,8 @@ object Core {
         }
         AutoP3.loadRings()
         AutoRoute.loadFile()
-        ClickGUI.init()
         RoundedRect.initShaders()
+        GapOutlineShader.initShader()
         BrushModule.loadConfig()
     }
     private var lastChatVisibility: EntityPlayer.EnumChatVisibility? = null

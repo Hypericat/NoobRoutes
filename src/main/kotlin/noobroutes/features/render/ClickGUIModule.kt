@@ -1,13 +1,18 @@
 package noobroutes.features.render
 
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.config.Config
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.AlwaysActive
 import noobroutes.features.settings.impl.*
-import noobroutes.ui.clickgui.ClickGUI
+import noobroutes.font.FontType
+import noobroutes.ui.ColorPalette
 import noobroutes.ui.hud.EditHUDGui
+import noobroutes.ui.clickgui.ClickGui
+import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.LocationUtils
 import org.lwjgl.input.Keyboard
@@ -30,6 +35,7 @@ object  ClickGUIModule: Module(
         true,
         description = "Shows you a notification in chat when you toggle an option with a keybind."
     )
+
     val color by ColorSetting(
         "Gui Color",
         Color(57, 191, 60),
@@ -52,6 +58,14 @@ object  ClickGUIModule: Module(
     ) {
         Core.display = EditHUDGui
     }
+    val font by SelectorSetting("Font", "NUNITO", FontType.entries.map { it.name }.toCollection(ArrayList()), description = "")
+
+    @SubscribeEvent
+    fun onTick(tickEvent: TickEvent.ClientTickEvent) {
+        if (tickEvent.isEnd) return
+
+        ColorPalette.defaultPalette.font = FontType.entries.firstOrNull { it.name == font } ?: return
+    }
 
     private var joined by BooleanSetting("First join", false, hidden = true, "")
     var lastSeenVersion: String by StringSetting("Last seen version", "1.0.0", hidden = true, description = "")
@@ -60,6 +74,11 @@ object  ClickGUIModule: Module(
     val panelX = mutableMapOf<Category, NumberSetting<Float>>()
     val panelY = mutableMapOf<Category, NumberSetting<Float>>()
     val panelExtended = mutableMapOf<Category, BooleanSetting>()
+    var searchBarX = NumberSetting<Float>("", 0f, hidden = true, description = "")
+        private set
+    var searchBarY = NumberSetting<Float>("", 0f, hidden = true, description = "")
+        private set
+
 
     init {
         execute(250) {
@@ -84,6 +103,19 @@ object  ClickGUIModule: Module(
             )
             }.enabled = true
         }
+        val searchIncrement = 10f + 260f * Category.entries.size
+        searchBarX = NumberSetting<Float>(
+            "searchBarX",
+            default = searchIncrement,
+            hidden = true,
+            description = ""
+        ).apply { value = searchIncrement }
+        searchBarY = NumberSetting<Float>(
+            "searchBarY",
+            default = 10f,
+            hidden = true,
+            description = ""
+        ).apply { value = 10f }
     }
 
     override fun onKeybind() {
@@ -91,7 +123,7 @@ object  ClickGUIModule: Module(
     }
 
     override fun onEnable() {
-        Core.display = ClickGUI
+        Core.display = ClickGui
         super.onEnable()
         toggle()
     }

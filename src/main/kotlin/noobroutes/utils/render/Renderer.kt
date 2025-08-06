@@ -14,8 +14,8 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
-import noobroutes.ui.clickgui.util.ColorUtil.multiplyAlpha
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
+import noobroutes.utils.render.ColorUtil.multiplyAlpha
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.addVec
 import noobroutes.utils.fastEyeHeight
 import noobroutes.utils.getBlockAt

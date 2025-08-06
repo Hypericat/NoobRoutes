@@ -5,10 +5,12 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.Core.mc
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
 import noobroutes.font.FontType
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.clickgui.util.ColorUtil
+import noobroutes.ui.ColorPalette.moduleButtonColor
+import noobroutes.ui.util.shader.GapOutlineShader
+import noobroutes.ui.util.shader.GaussianBlurShader
 import noobroutes.ui.util.shader.RoundedRect
 import noobroutes.utils.coerceAlpha
 import noobroutes.utils.minus
@@ -17,7 +19,8 @@ import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import noobroutes.utils.times
 import org.lwjgl.opengl.Display
 import org.lwjgl.opengl.GL11
-import java.util.*
+import org.lwjgl.opengl.GL45
+import java.util.Stack
 
 val matrix = UMatrixStack.Compat
 val scaleFactor get() = ScaledResolution(mc).scaleFactor.toFloat()
@@ -75,7 +78,7 @@ fun <T: Number> roundedRectangle(box: BoxWithClass<T>, color: Color, radius: Num
 
 
 fun rectangleOutline(x: Number, y: Number, w: Number, h: Number, color: Color, radius: Number = 0f, thickness: Number, edgeSoftness: Number = 1f) {
-    roundedRectangle(x, y, w, h, Color.TRANSPARENT, color, Color.TRANSPARENT, thickness, radius, radius, radius, radius, edgeSoftness)
+    gapOutline(x, y, w, h, radius, color, thickness, 0f, 0f, 0f, 0f)
 }
 
 fun gradientRect(x: Float, y: Float, w: Float, h: Float, color1: Color, color2: Color, radius: Float, direction: GradientDirection = GradientDirection.Right, borderColor: Color = Color.TRANSPARENT, borderThickness: Number = 0f) {
@@ -112,22 +115,46 @@ fun circle(x: Number, y: Number, radius: Number, color: Color, borderColor: Colo
         )
     }
 }
-
-fun drawTextWithSelection(text: String, selectionStart: Int, selectionEnd: Int, x: Number, y: Number, color: Color, size: Number, type: Int = Font.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font){
-
+fun gapOutline(
+    x: Number, y: Number,
+    width: Number, height: Number,
+    radius: Number, color: Color, thickness: Number,
+    gapCenterX: Number, gapCenterY: Number,
+    gapWidth: Number, gapHeight: Number,
+    gapRadius: Number = 0f
+) {
+    matrix.runLegacyMethod(matrix.get()) {
+        GapOutlineShader.drawGapOutline(
+            matrix.get(),
+            x.toFloat(),
+            y.toFloat(),
+            width.toFloat(),
+            height.toFloat(),
+            radius.toFloat(),
+            thickness.toFloat(),
+            color,
+            gapCenterX.toFloat() + x.toFloat(),
+            gapCenterY.toFloat() + y.toFloat(),
+            gapWidth.toFloat(),
+            gapHeight.toFloat(),
+            gapRadius.toFloat()
+        )
+    }
 }
 
-fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = Font.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font) {
-    fontType.font.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
+
+
+fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = FontRenderer.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font) {
+    FontRenderer.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
 }
 
 fun mcText(text: String, x: Number, y: Number, scale: Number, color: Color, shadow: Boolean = true, center: Boolean = true) {
     RenderUtils.drawText("$text§r", x.toFloat(), y.toFloat(), scale.toDouble(), color, shadow, center)
 }
 
-fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = Font.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font): Float {
+fun textAndWidth(text: String, x: Float, y: Float, color: Color, size: Float, type: Int = FontRenderer.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font): Float {
     text(text, x, y, color, size, type, align, verticalAlign, shadow, fontType)
-    return getTextWidth(text, size, fontType)
+    return getTextWidth(text, size)
 }
 
 fun mcTextAndWidth(text: String, x: Number, y: Number, scale: Number, color: Color, shadow: Boolean = true, center: Boolean = true): Float {
@@ -137,11 +164,11 @@ fun mcTextAndWidth(text: String, x: Number, y: Number, scale: Number, color: Col
 
 fun getMCTextWidth(text: String) = mc.fontRendererObj.getStringWidth(text)
 
-fun getTextWidth(text: String, size: Float, fontType: FontType = ColorPalette.font) = fontType.font.getTextWidth(text, size)
+fun getTextWidth(text: String, size: Float) = FontRenderer.getTextWidth(text, size)
 
 fun getMCTextHeight() = mc.fontRendererObj.FONT_HEIGHT
 
-fun getTextHeight(text: String = "", size: Float, fontType: FontType = ColorPalette.font) = fontType.font.getTextHeight(text, size)
+fun getTextHeight(text: String = "", size: Float) = FontRenderer.getTextHeight(text, size)
 
 fun translate(x: Number, y: Number, z: Number = 1f) = GlStateManager.translate(x.toDouble(), y.toDouble(), z.toDouble())
 
@@ -175,11 +202,11 @@ fun dropShadow(x: Number, y: Number, w: Number, h: Number, shadowColor: Color, s
     translate(0f, 0f, 100f)
 }
 
-fun dropShadow(x: Number, y: Number, w: Number, h: Number,  radius: Number, shadowSoftness: Number = 1f, shadowColor: Color = ColorUtil.moduleButtonColor) {
+fun dropShadow(x: Number, y: Number, w: Number, h: Number,  radius: Number, shadowSoftness: Number = 1f, shadowColor: Color = moduleButtonColor) {
     dropShadow(x, y, w, h, shadowColor, shadowSoftness, radius, radius, radius, radius)
 }
 
-fun dropShadow(box: Box, radius: Number, shadowSoftness: Number = 1f, shadowColor: Color = ColorUtil.moduleButtonColor) =
+fun dropShadow(box: Box, radius: Number, shadowSoftness: Number = 1f, shadowColor: Color = moduleButtonColor) =
     dropShadow(box.x, box.y, box.w, box.h, radius, shadowSoftness, shadowColor)
 
 data class Scissor(val x: Number, val y: Number, val w: Number, val h: Number, val context: Int)
@@ -202,48 +229,42 @@ fun initUIFramebufferStencil() {
 }
 
 fun stencilRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number, inverse: Boolean = false) {
-    stencil(inverse) {roundedRectangle(x, y,w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
+    stencil{roundedRectangle(x, y,w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
 }
 
 fun stencilRoundedRectangle(x: Float, y: Float, w: Float, h: Float, radius: Number = 0f, edgeSoftness: Number = 0.5f, inverse: Boolean = false) {
     stencilRoundedRectangle(x, y, w, h, radius, radius, radius, radius, edgeSoftness, inverse)
 }
 
+fun blurRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number){
+    stencil {roundedRectangle(x, y, w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
+    GaussianBlurShader.blurredBackground(x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat(), 8f)
+    popStencil()
+}
 
-//an int would probably be better, however, i am using a stack just in case it does more in the future
 private var stencilStack = Stack<Int>()
 
-fun stencil(inverse: Boolean = false, mask: () -> Unit) {
+fun stencil(mask: () -> Unit) {
     val newStencilValue = if (stencilStack.isEmpty()) 1 else stencilStack.peek() + 1
     stencilStack.push(newStencilValue)
     GL11.glEnable(GL11.GL_STENCIL_TEST)
-
 
     if (stencilStack.peek() == 1) {
         GL11.glClearStencil(0)
         GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT)
     }
 
-
     GL11.glColorMask(false, false, false, false)
     GL11.glDepthMask(false)
     GL11.glStencilMask(0xFF)
     if (stencilStack.peek() > 1) {
-
         val previousStencilValue = stencilStack.peek() - 1
-
         GL11.glStencilFunc(GL11.GL_EQUAL, previousStencilValue, 0xFF)
-
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_INCR)
-
     } else {
-
         GL11.glStencilFunc(GL11.GL_ALWAYS, newStencilValue, 0xFF)
-
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
-
     }
-
     mask.invoke()
 
     GL11.glStencilFunc(GL11.GL_EQUAL, if (stencilStack.peek() > 1) newStencilValue else 0, 0xFF)
@@ -256,10 +277,13 @@ fun stencil(inverse: Boolean = false, mask: () -> Unit) {
     GL11.glDepthMask(true)
     GL11.glStencilMask(0x00)
 
-    GL11.glStencilFunc(if (inverse) GL11.GL_NOTEQUAL else GL11.GL_EQUAL, newStencilValue, 0xFF)
+    GL11.glStencilFunc(GL11.GL_EQUAL, newStencilValue, 0xFF)
     GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
 }
-
+/**
+ * pop stencil is broken and it is annoying
+ * I have no idea how to fix it
+ */
 fun popStencil() {
     if (stencilStack.isEmpty()) {
         throw IllegalStateException("StencilStack is empty")
@@ -267,13 +291,11 @@ fun popStencil() {
 
     stencilStack.pop()
     if (stencilStack.isEmpty()) {
-        // If no more stencils, disable the test entirely
         GL11.glDisable(GL11.GL_STENCIL_TEST)
         GL11.glStencilFunc(GL11.GL_ALWAYS, 0, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
         GL11.glStencilMask(0xFF) // Reset mask
     } else {
-        // If there are still stencils on the stack, apply the previous one
         val previousStencilValue = stencilStack.peek()
         GL11.glStencilFunc(GL11.GL_EQUAL, previousStencilValue, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
@@ -282,11 +304,14 @@ fun popStencil() {
 }
 
 
+
+
 fun resetScissor(scissor: Scissor) {
     val nextScissor = scissorList[scissor.context - 1]
     GL11.glScissor(nextScissor.x.toInt(), nextScissor.y.toInt(), nextScissor.w.toInt(), nextScissor.h.toInt())
     GL11.glDisable(GL11.GL_SCISSOR_TEST)
     scissorList.removeLast()
+
 }
 
 fun drawArrow(xpos: Float, ypos: Float, rotation: Float = 90f, scale: Float = 1f, color: Color = Color.WHITE) {
@@ -324,12 +349,12 @@ fun drawDynamicTexture(dynamicTexture: DynamicTexture, x: Number, y: Number, w: 
     GlStateManager.popMatrix()
 }
 
-fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = Font.REGULAR, shadow: Boolean = false, fontType: FontType = ColorPalette.font) {
-    fontType.font.wrappedText(text, x, y, w, color, size, type, shadow = shadow)
+fun wrappedText(text: String, x: Float, y: Float, w: Float, color: Color, size: Float, type: Int = FontRenderer.REGULAR, shadow: Boolean = false, fontType: FontType = ColorPalette.font) {
+    FontRenderer.wrappedText(text, x, y, w, color, size, type, shadow = shadow)
 }
 
 fun wrappedTextBounds(text: String, width: Float, size: Float, fontType: FontType = ColorPalette.font): Pair<Float, Float> {
-    return fontType.font.wrappedTextBounds(text, width, size)
+    return FontRenderer.wrappedTextBounds(text, width, size)
 }
 
 enum class TextAlign {

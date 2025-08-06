@@ -1,11 +1,13 @@
 package noobroutes.ui.util.elements.colorelement
 
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.ui.clickgui.util.ColorUtil.hsbMax
+import noobroutes.Core.logger
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
+import noobroutes.utils.render.ColorUtil.hsbMax
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.withAlpha
 
 class ColorBoxElement(
     x: Float, y: Float,
@@ -15,32 +17,69 @@ class ColorBoxElement(
 
     override fun draw() {
         GlStateManager.pushMatrix()
-        translate(x, y)
+        translate(x - ColorElementsConstants.COLOR_BOX_SIZE_HALF, y - ColorElementsConstants.COLOR_BOX_SIZE_HALF)
+
+        GlStateManager.translate(0f, 0f, 1f)
+        circle(
+            elementValue.saturation * ColorElementsConstants.COLOR_BOX_SIZE,
+            (1 - elementValue.brightness) * ColorElementsConstants.COLOR_BOX_SIZE,
+            ColorElementsConstants.COLOR_BOX_CIRCLE_RADIUS,
+            elementValue.withAlpha(1f),
+            Color.Companion.WHITE,
+            ColorElementsConstants.COLOR_BOX_CIRCLE_THICKNESS
+        )
+        GlStateManager.translate(0f, 0f, -1f)
+
         stencilRoundedRectangle(
-            -ColorElementsConstants.COLOR_BOX_SIZE_HALF,
-            -ColorElementsConstants.COLOR_BOX_SIZE_HALF,
+            0f,
+            0f,
             ColorElementsConstants.COLOR_BOX_SIZE,
             ColorElementsConstants.COLOR_BOX_SIZE,
             ColorElementsConstants.COLOR_BOX_RADIUS
         )
         drawHSBBox(
-            -ColorElementsConstants.COLOR_BOX_SIZE_HALF,
-            -ColorElementsConstants.COLOR_BOX_SIZE_HALF,
+            0f,
+            0f,
             ColorElementsConstants.COLOR_BOX_SIZE,
             ColorElementsConstants.COLOR_BOX_SIZE,
             elementValue.hsbMax()
         )
-
-        circle(
-            elementValue.saturation * ColorElementsConstants.COLOR_SLIDER_WIDTH,
-            (1 - elementValue.brightness) * ColorElementsConstants.COLOR_SLIDER_WIDTH,
-            ColorElementsConstants.COLOR_BOX_CIRCLE_RADIUS,
-            Color.Companion.TRANSPARENT,
-            Color.Companion.WHITE,
-            ColorElementsConstants.COLOR_BOX_CIRCLE_THICKNESS
-        )
-
         popStencil()
+
+
         GlStateManager.popMatrix()
+        if (dragging) {
+            elementValue.saturation = getMouseXPercentageInBounds(
+                0f,
+                ColorElementsConstants.COLOR_BOX_SIZE
+            )
+            elementValue.brightness = getMouseYPercentageInBounds(
+                0f,
+                ColorElementsConstants.COLOR_BOX_SIZE, true
+            )
+            invokeValueChangeListeners()
+        }
+
+    }
+
+    var dragging = false
+    val isHovered get() = isAreaHovered(
+        0f,
+        0f,
+        ColorElementsConstants.COLOR_BOX_SIZE,
+        ColorElementsConstants.COLOR_BOX_SIZE
+    )
+    override fun mouseClicked(mouseButton: Int): Boolean {
+        if (mouseButton != 0) return false
+        if (isHovered) {
+            dragging = true
+            return true
+        }
+        return false
+    }
+
+    override fun mouseReleased(): Boolean {
+        dragging = false
+        return false
     }
 }

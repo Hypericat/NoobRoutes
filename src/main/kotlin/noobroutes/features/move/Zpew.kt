@@ -53,8 +53,8 @@ object Zpew : Module(
         "mob.guardian.land.hit",
         "Custom"
     )
-    private val soundSelector by SelectorSetting("Sound", soundOptions[0], soundOptions, description =  "Sound Selection").withDependency { dingdingding }
-    private val customSound by StringSetting("Custom Sound", soundOptions[0], description = "Name of a custom sound to play. This is used when Custom is selected in the Sound setting.").withDependency { dingdingding && soundSelector == 6 }
+    private val soundSelector = SelectorSetting("Sound", soundOptions[0], soundOptions, description =  "Sound Selection").withDependency { dingdingding }
+    private val customSound by StringSetting("Custom Sound", soundOptions[0], description = "Name of a custom sound to play. This is used when Custom is selected in the Sound setting.").withDependency { dingdingding && soundSelector.index == 6 }
     private val pitch by NumberSetting("Pitch", 1.0, 0.1, 2.0, 0.1, description = "").withDependency { dingdingding }
     private val volume by NumberSetting("Volume", 100, 1, 200, 1, description = "").withDependency { dingdingding }
     private val soundButton by ActionSetting("Play Sound", description = "", default = {
@@ -315,8 +315,8 @@ object Zpew : Module(
      * Returns the sound from the selector setting, or the custom sound when the last element is selected
      */
     private fun getSound(): String {
-        return if (soundSelector < soundOptions.size - 1)
-            soundOptions[soundSelector]
+        return if (soundSelector.index < soundOptions.size - 1)
+            soundOptions[soundSelector.index]
         else
             customSound
     }

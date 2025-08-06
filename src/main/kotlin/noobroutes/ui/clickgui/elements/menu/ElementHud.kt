@@ -1,27 +1,23 @@
 package noobroutes.ui.clickgui.elements.menu
 
 import net.minecraft.client.renderer.texture.DynamicTexture
+import noobroutes.Core
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.impl.HudSetting
-import noobroutes.font.Font
-import noobroutes.ui.clickgui.ClickGUI
-import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
+import noobroutes.font.FontRenderer
+import noobroutes.ui.ColorPalette.TEXT_OFFSET
+import noobroutes.ui.ColorPalette.buttonColor
+import noobroutes.ui.ColorPalette.clickGUIColor
+import noobroutes.ui.ColorPalette.elementBackground
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
-import noobroutes.ui.clickgui.elements.ModuleButton
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
-import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
-import noobroutes.ui.clickgui.util.ColorUtil.darker
-import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
-import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.hud.EditHUDGui
-import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.darker
+import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 
 
@@ -34,8 +30,8 @@ import noobroutes.utils.render.RenderUtils.loadBufferedImage
  * @author Stivais, Aton
  * @see [Element]
  */
-class ElementHud(parent: ModuleButton, setting: HudSetting) : Element<HudSetting>(
-    parent, setting, ElementType.DUAL
+class ElementHud(setting: HudSetting) : Element<HudSetting>(
+    setting, ElementType.DUAL
 ) {
     override val isHovered: Boolean
         get() = setting.displayToggle && isAreaHovered(x + w - 30f, y + 5f, 21f, 20f)
@@ -46,19 +42,17 @@ class ElementHud(parent: ModuleButton, setting: HudSetting) : Element<HudSetting
             else isAreaHovered(x + w - 30f, y + 5f, 21f, 20f)
         }
 
-    private val movementIcon = DynamicTexture(loadBufferedImage("/assets/ui/MovementIcon.png"))
+    private val movementIcon = DynamicTexture(loadBufferedImage("/assets/ui/MoveHudIcon.png"))
     private val colorAnim = ColorAnimation(250)
-    private val hover = HoverHandler(0, 150)
     private val linearAnimation = LinearAnimation<Float>(200)
 
     override fun draw() {
-        roundedRectangle(x, y, w, h, ColorUtil.elementBackground)
-        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, Font.REGULAR)
+        roundedRectangle(x, y, w, h, elementBackground)
+        text(name, x + TEXT_OFFSET, y + 18f, textColor, 12f, FontRenderer.REGULAR)
 
         var offset = 30f
         if (setting.displayToggle) {
-            hover.handle(x + w - 30f, y + 5f, 21f, 20f)
-            val color = colorAnim.get(clickGUIColor, buttonColor, setting.enabled).brighter(1 + hover.percent() / 500f)
+            val color = colorAnim.get(clickGUIColor, buttonColor, setting.enabled)//.brighter()
             if (!ClickGUIModule.switchType) {
                 roundedRectangle(x + w - offset, y + 5f, 21f, 20f, color, 5f)
                 rectangleOutline(x + w - offset, y + 5f, 21f, 20f, clickGUIColor, 5f, 3f)
@@ -87,7 +81,7 @@ class ElementHud(parent: ModuleButton, setting: HudSetting) : Element<HudSetting
                     setting.enabled = !setting.enabled
                     setting.value.enabledSetting.value = setting.enabled
                 }
-                isShortcutHovered -> ClickGUI.swapScreens(EditHUDGui)
+                isShortcutHovered -> Core.display = EditHUDGui
                 else -> return false
             }
             return true

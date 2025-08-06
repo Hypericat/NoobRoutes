@@ -1,10 +1,10 @@
 package noobroutes.ui.blockgui.blockselector
 
 import net.minecraft.block.Block
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.darker
-import noobroutes.ui.clickgui.util.ColorUtil.multiplyAlpha
+import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.utils.render.ColorUtil.darker
+import noobroutes.utils.render.ColorUtil.multiplyAlpha
 import noobroutes.utils.render.roundedRectangle
 
 abstract class BlockElement(var x: Int, var y: Int) {
@@ -25,7 +25,7 @@ abstract class BlockElement(var x: Int, var y: Int) {
                 x * 50f + BlockSelector.originX + 45f,
                 y * 50f + BlockSelector.scrollOffset + BlockSelector.originY - 5,
                 48f, 48f,
-                ColorUtil.buttonColor.darker(0.4f).multiplyAlpha(1.3f)
+                buttonColor.darker(0.4f).multiplyAlpha(1.3f)
             )
         }
     }

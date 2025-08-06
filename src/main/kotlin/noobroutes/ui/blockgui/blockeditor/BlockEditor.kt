@@ -4,9 +4,10 @@ import net.minecraft.block.properties.PropertyEnum
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
 import noobroutes.features.dungeon.brush.BrushModule
+import noobroutes.ui.ColorPalette.buttonColor
+import noobroutes.ui.ColorPalette.titlePanelColor
 import noobroutes.ui.blockgui.blockeditor.elements.ElementSelector
 import noobroutes.ui.blockgui.blockeditor.elements.ElementSlider
-import noobroutes.ui.clickgui.util.ColorUtil
 import noobroutes.ui.util.MouseUtils
 import noobroutes.utils.IBlockStateUtils
 import noobroutes.utils.render.Color
@@ -59,7 +60,7 @@ object BlockEditor {
         drawTop()
         var currentY = 70f + originY
         elements.forEach {
-            roundedRectangle(originX, currentY, WIDTH, it.getElementHeight(), ColorUtil.buttonColor)
+            roundedRectangle(originX, currentY, WIDTH, it.getElementHeight(), buttonColor)
             it.x = 30f
             it.y = currentY
             it.draw()
@@ -70,8 +71,8 @@ object BlockEditor {
             currentY,
             WIDTH,
             30f,
-            ColorUtil.buttonColor,
-            ColorUtil.buttonColor,
+            buttonColor,
+            buttonColor,
             Color.TRANSPARENT,
             0,
             0,
@@ -88,8 +89,8 @@ object BlockEditor {
             originY,
             600,
             70,
-            ColorUtil.titlePanelColor,
-            ColorUtil.titlePanelColor,
+            titlePanelColor,
+            titlePanelColor,
             Color.TRANSPARENT,
             0,
             20f,
@@ -103,8 +104,8 @@ object BlockEditor {
             originY,
             600,
             70,
-            ColorUtil.titlePanelColor,
-            ColorUtil.titlePanelColor,
+            titlePanelColor,
+            titlePanelColor,
             Color.TRANSPARENT,
             0,
             20f,

@@ -18,6 +18,7 @@ import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.utils.BlockUtils.collisionRayTrace
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
+import noobroutes.utils.skyblock.PlayerUtils.isZeroTickSwapping
 import noobroutes.utils.skyblock.devMessage
 
 object AuraManager {
@@ -95,6 +96,7 @@ object AuraManager {
 
 
     fun clickBlock(aura: BlockAura, removeFirst: Boolean = false) {
+        if (isZeroTickSwapping()) return
         var aabb = BlockUtils.getAABB(aura.pos)
         if (aura.force && aabb == null) {
             aabb = AxisAlignedBB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
@@ -131,6 +133,7 @@ object AuraManager {
      * https://github.com/WompWatr/CatgirlAddons
      */
     private fun clickEntity(entityAura: EntityAura, removeFirst: Boolean = false) {
+        if (isZeroTickSwapping()) return
         if (removeFirst) queuedEntityClicks.removeFirst()
         if (mc.thePlayer.getPositionEyes(0f)
                 .distanceTo(Vec3(entityAura.entity.posX, entityAura.entity.posY, entityAura.entity.posZ)) < 5

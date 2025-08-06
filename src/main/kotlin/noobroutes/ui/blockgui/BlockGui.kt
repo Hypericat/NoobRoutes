@@ -7,11 +7,11 @@ import net.minecraft.util.ResourceLocation
 import noobroutes.config.Config
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.render.ClickGUIModule
+import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.Screen
 import noobroutes.ui.blockgui.blockselector.BlockSelector
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.darkerIf
 import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.*
 
 
@@ -65,7 +65,7 @@ object BlockGui : Screen() {
         BlockSelector.draw()
         //BlockEditor.draw()
 
-        roundedRectangle(mc.displayWidth * 0.5 - 75, mc.displayHeight * 0.9f - 40, 150f, 80f, ColorUtil.buttonColor, 15f)
+        roundedRectangle(mc.displayWidth * 0.5 - 75, mc.displayHeight * 0.9f - 40, 150f, 80f, buttonColor, 15f)
         text("Reset", mc.displayWidth * 0.5, mc.displayHeight * 0.9f, Color.WHITE.darkerIf(isResetHovered), 26f, align = TextAlign.Middle)
 
         scale(scaleFactor, scaleFactor, 1f)

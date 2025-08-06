@@ -1,6 +1,6 @@
 import dev.architectury.pack200.java.Pack200Adapter
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 /*
     Requirements: Gradle java version is 20
     Project Java version 1.8
@@ -16,18 +16,21 @@ plugins {
     kotlin("jvm") version "2.0.0-Beta1"
 }
 
+blossom {
+    replaceToken("@VER@", version)
+    replaceToken("@MOD_ID@", modId)
+    replaceToken("@DEV_MODE@", true)
+}
+
 group = "noobroutes"
 
 version = project.findProperty("version") as String
 val modId = project.findProperty("modid") as String
+val isDevBuild = !project.hasProperty("prod")
+
 
 val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
-}
-
-blossom {
-    replaceToken("@VER@", version)
-    replaceToken("@MOD_ID@", modId)
 }
 
 
@@ -96,11 +99,9 @@ kotlin.jvmToolchain(8)
 tasks {
     processResources {
         inputs.property("version", version)
-
         filesMatching("mcmod.info") {
             expand(inputs.properties)
         }
-
         dependsOn(compileJava)
     }
 
@@ -119,16 +120,20 @@ tasks {
 
     remapJar {
         input.set(shadowJar.get().archiveFile)
+        if (isDevBuild) archiveClassifier.set("dev") else archiveClassifier.set("")
     }
 
     shadowJar {
         destinationDirectory.set(layout.buildDirectory.dir("archiveJars"))
         archiveBaseName.set("NoobRoutes")
-        archiveClassifier.set("dev")
+        archiveClassifier.set("gay")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(shadowImpl)
+        exclude("META-INF/versions/**")
         mergeServiceFiles()
     }
+
+
 }
 
 tasks.withType<KotlinCompile> {

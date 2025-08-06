@@ -3,7 +3,6 @@ package noobroutes.ui.util.elements.colorelement
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.util.ElementValue
-import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.TEXT_BOX_THICKNESS
 import noobroutes.utils.render.Color
@@ -22,7 +21,7 @@ class ColorElement(
 
     override val elementValueChangeListeners = mutableListOf<(Color) -> Unit>()
     var isOpen = false
-    inline val isHovered get() = MouseUtils.isAreaHovered(x, y, w, h)
+    private inline val isHovered get() = isAreaHovered(x, y, w, h)
 
     object ColorElementsConstants {
         const val COLOR_POPOUT_GAP = 15f
@@ -30,7 +29,7 @@ class ColorElement(
         const val COLOR_BOX_SIZE = 150f
         const val COLOR_BOX_SIZE_HALF = COLOR_BOX_SIZE * 0.5f
         const val COLOR_BOX_RADIUS = 10f
-        const val COLOR_BOX_CIRCLE_RADIUS = 9f
+        const val COLOR_BOX_CIRCLE_RADIUS = 8f
         const val COLOR_BOX_CIRCLE_THICKNESS = COLOR_BOX_CIRCLE_RADIUS * 0.225f
 
         val ALPHA_BACKGROUND = DynamicTexture(RenderUtils.loadBufferedImage("/assets/ui/alphaBackground.png"))
@@ -55,28 +54,27 @@ class ColorElement(
 
         const val COLOR_POPOUT_HEIGHT = COLOR_BOX_SIZE + COLOR_POPOUT_GAP * 4f + TEXT_BOX_HEIGHT * 2
 
-
+        //based off of image size
         const val ALPHA_BACKGROUND_WIDTH = 20f
         const val ALPHA_BACKGROUND_HEIGHT = 155f
-        const val ALPHA_BACKGROUND_WIDTH_HALF = ALPHA_BACKGROUND_WIDTH * 0.5f
-        const val ALPHA_BACKGROUND_HEIGHT_HALF = ALPHA_BACKGROUND_HEIGHT * 0.5f
-
     }
 
     init {
-        uiChildren.add(
+        addChild(
             ColorPopoutElement(0f, 0f, alphaEnabled, elementValue)
         )
+
     }
 
     override fun draw() {
+        GlStateManager.pushMatrix()
         roundedRectangle(
             x,
             y,
             w,
             h,
             elementValue,
-            ColorPalette.backgroundSecondary,
+            ColorPalette.elementBackground,
             Color.Companion.TRANSPARENT,
             TEXT_BOX_THICKNESS,
             radius,
@@ -85,16 +83,14 @@ class ColorElement(
             radius,
             0.5f
         )
-        if (isOpen) {
-            uiChildren[0].updatePosition(x + 300f, y)
-            uiChildren[0].draw()
-        }
+
+        uiChildren[0].updatePosition(x + 300f, y)
+        uiChildren[0].visible = isOpen
+
+        GlStateManager.popMatrix()
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {
-        if (isOpen && super.mouseClicked(mouseButton)) {
-            return true
-        }
         if (isHovered) {
             isOpen = !isOpen
             return true

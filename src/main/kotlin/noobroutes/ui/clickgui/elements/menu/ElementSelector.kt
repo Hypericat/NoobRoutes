@@ -1,22 +1,21 @@
 package noobroutes.ui.clickgui.elements.menu
 
+import noobroutes.Core.logger
 import noobroutes.features.settings.impl.SelectorSetting
-import noobroutes.font.Font
-import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
+import noobroutes.font.FontRenderer
+import noobroutes.ui.ColorPalette.TEXT_OFFSET
+import noobroutes.ui.ColorPalette.buttonColor
+import noobroutes.ui.ColorPalette.clickGUIColor
+import noobroutes.ui.ColorPalette.elementBackground
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
-import noobroutes.ui.clickgui.elements.ModuleButton
-import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
-import noobroutes.ui.clickgui.util.ColorUtil.clickGUIColor
-import noobroutes.ui.clickgui.util.ColorUtil.darker
-import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
-import noobroutes.ui.clickgui.util.HoverHandler
-import noobroutes.ui.util.MouseUtils.isAreaHovered
+import noobroutes.ui.util.animations.impl.CubicBezierAnimation
 import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.brighterIf
+import noobroutes.utils.render.ColorUtil.darker
 
 /**
  * Renders all the modules.
@@ -27,8 +26,8 @@ import noobroutes.utils.render.*
  * @author Stivais, Aton
  * @see [Element]
  */
-class ElementSelector(parent: ModuleButton, setting: SelectorSetting) :
-    Element<SelectorSetting>(parent, setting, ElementType.SELECTOR) {
+class ElementSelector(setting: SelectorSetting) :
+    Element<SelectorSetting>(setting, ElementType.SELECTOR) {
 
     override val isHovered: Boolean
         get() = isAreaHovered(x, y, w, DEFAULT_HEIGHT)
@@ -39,16 +38,14 @@ class ElementSelector(parent: ModuleButton, setting: SelectorSetting) :
     inline val size: Int
         get () = setting.options.size
 
-    private val settingAnim = EaseInOut(200)
+    private val settingAnim = CubicBezierAnimation(200, 0.4, 0, 0.2, 1)
 
     private val isSettingHovered: (Int) -> Boolean = {
         isAreaHovered(x, y + 38f + 32f * it, w, 32f)
     }
 
-    private val hover = HoverHandler(0, 150)
-
     private val color: Color
-        get() = buttonColor.brighter(1 + hover.percent() / 500f)
+        get() = buttonColor.brighterIf(isHovered)
 
     override fun draw() {
         h = settingAnim.get(32f, size * 36f + DEFAULT_HEIGHT, !extended)
@@ -56,23 +53,22 @@ class ElementSelector(parent: ModuleButton, setting: SelectorSetting) :
         roundedRectangle(x, y, w, h, elementBackground)
         val width = getTextWidth(display, 12f)
 
-        hover.handle(x + w - 20f - width, y + 4f, width + 12f, 22f)
         roundedRectangle(x + w - 20f - width, y + 4f, width + 12f, 22f, color, 5f)
 
-        text(name, x + TEXTOFFSET, y + 16f, textColor, 12f, Font.REGULAR)
-        text(display, x + w - 14f - width, y + 8f, textColor, 12f, Font.REGULAR, TextAlign.Left, TextPos.Top)
+        text(name, x + TEXT_OFFSET, y + 16f, textColor, 12f, FontRenderer.REGULAR)
+        text(display, x + w - 14f - width, y + 8f, textColor, 12f, FontRenderer.REGULAR, TextAlign.Left, TextPos.Top)
 
         if (!extended && !settingAnim.isAnimating()) return
 
         rectangleOutline(x + w - 20f - width, y + 4f, width + 12f, 22f, clickGUIColor, 5f, 1.5f)
 
-        val scissor = scissor(x, y, w, h)
+        val scissor = scissor(getEffectiveX() + x, y + getEffectiveY(), w, h)
 
-        roundedRectangle(x + TEXTOFFSET, y + 37f, w - 12f, size * 32f, buttonColor, 5f)
+        roundedRectangle(x + TEXT_OFFSET, y + 37f, w - 12f, size * 32f, buttonColor, 5f)
 
         for (i in 0 until size) {
             val y = y + 38 + 32 * i
-            text(setting.options[i].lowercase().capitalizeFirst(), x + w / 2f, y + 6f, textColor, 12f, Font.REGULAR, TextAlign.Middle, TextPos.Top)
+            text(setting.options[i].lowercase().capitalizeFirst(), x + w / 2f, y + 6f, textColor, 12f, FontRenderer.REGULAR, TextAlign.Middle, TextPos.Top)
             if (isSettingHovered(i)) rectangleOutline(x + 5, y - 1f, w - 11.5f, 32.5f, clickGUIColor.darker(), 4f, 3f)
         }
         resetScissor(scissor)

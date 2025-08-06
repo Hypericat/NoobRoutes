@@ -30,52 +30,35 @@ float roundedBoxSDF(vec2 CenterPosition, vec2 Size, vec4 Radius) {
 }
 
 void main() {
-    vec2 uv = (f_Position - u_rectCenter) / u_rectSize;
-    vec2 strength = vec2(uv.x * u_gradientDirectionVector.x, uv.y * u_gradientDirectionVector.y);
-    // Interpolate colors based on the distance
-    vec4 gradientColor = mix(u_colorRect, u_colorRect2, (strength.x == 0.0) ? strength.y + 0.5 : strength.x + 0.5);
+      vec2 uv = (f_Position - u_rectCenter) / u_rectSize;
+      vec2 strength = vec2(uv.x * u_gradientDirectionVector.x, uv.y * u_gradientDirectionVector.y);
 
-    float u_borderSoftness = 2.0; // How soft the (internal) border should be (in pixels)
-    vec2  u_shadowOffset = vec2(0.0, 0.0); // The pixel-space shadow offset from rectangle center
-    vec4  u_colorBg = vec4(0.0); // The color of background
-    vec2 halfSize = (u_rectSize / 2.0); // Rectangle extents (half of the size)
+      vec4 gradientColor = mix(u_colorRect, u_colorRect2, (strength.x == 0.0) ? strength.y + 0.5 : strength.x + 0.5);
 
+      float u_borderSoftness = 2.0; // How soft the (internal) border should be (in pixels)
+      vec2  u_shadowOffset = vec2(0.0, 0.0); // The pixel-space shadow offset from rectangle center
+      vec4  u_colorBg = vec4(0.0); // The color of background
+      vec2 halfSize = (u_rectSize / 2.0); // Rectangle extents (half of the size)
 
-    // Calculate distance to edge.
-    float distance = roundedBoxSDF(f_Position.xy - u_rectCenter, halfSize, u_Radii);
-    // Smooth the result (free antialiasing).
-    float smoothedAlpha = 1.0 - smoothstep(0.0, u_edgeSoftness, distance);
+      float distance = roundedBoxSDF(f_Position.xy - u_rectCenter, halfSize, u_Radii);
 
-    float borderAlpha   = 1.0 - smoothstep(u_borderThickness - u_borderSoftness, u_borderThickness, abs(distance));
-
-    // Apply a drop shadow effect.
-
-    float shadowDistance  = roundedBoxSDF(f_Position.xy - u_rectCenter + u_shadowOffset, halfSize, u_Radii);
-    float shadowAlpha 	  = 1.0 - smoothstep(-u_shadowSoftness, u_shadowSoftness, shadowDistance);
+      float smoothedAlpha = 1.0 - smoothstep(0.0, u_edgeSoftness, distance);
 
 
-    // Blend background with shadow
-    vec4 res_shadow_color =
-        mix(
-            u_colorBg,
-            vec4(u_colorShadow.rgb, shadowAlpha),
-            shadowAlpha
-        );
+      float borderAlpha = 1.0 - smoothstep(u_borderThickness - u_borderSoftness, u_borderThickness, abs(distance));
 
-    // Blend (background+shadow) with rect
-    //   Note:
-    //     - Used 'min(gradientColor.a, smoothedAlpha)' instead of 'smoothedAlpha'
-    //       to enable rectangle color transparency
-    vec4 res_shadow_with_rect_color =
-        mix(
-            res_shadow_color,
-            gradientColor,
-            min(gradientColor.a, smoothedAlpha)
-        );
+      float shadowDistance = roundedBoxSDF(f_Position.xy - u_rectCenter + u_shadowOffset, halfSize, u_Radii);
+      float shadowAlpha = 1.0 - smoothstep(-u_shadowSoftness, u_shadowSoftness, shadowDistance);
 
-    vec4 combinedColor = mix(gradientColor, u_colorBorder, borderAlpha);
-    vec4 finalColor = mix(res_shadow_color, combinedColor, smoothedAlpha);
-    finalColor.rgb *= finalColor.a;
-    gl_FragColor = finalColor;
+
+      vec4 rectColor = mix(gradientColor, u_colorBorder, borderAlpha);
+
+      vec4 bgWithShadow = mix(u_colorBg, u_colorShadow, shadowAlpha);
+
+
+      vec4 finalColor = mix(bgWithShadow, rectColor, smoothedAlpha);
+
+      //finalColor.rgb *= finalColor.a;
+      gl_FragColor = finalColor;
 
 }

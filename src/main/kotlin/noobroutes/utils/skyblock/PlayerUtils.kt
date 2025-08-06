@@ -10,7 +10,7 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
-import noobroutes.mixin.accessors.TimerFieldAccessor
+import noobroutes.utils.AutoP3Utils
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
@@ -42,9 +42,10 @@ object PlayerUtils {
         }
     }
 
-    fun airClick(bl: Boolean = true){
-        if (bl)
-            devMessage("Clicked: ${System.currentTimeMillis()}")
+    var slot = -1
+
+    fun airClick(){
+        if (isZeroTickSwapping()) return
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
     }
 
@@ -90,7 +91,16 @@ object PlayerUtils {
     fun onPacketSend(event: PacketEvent.Send) {
         when (event.packet) {
             is C0EPacketClickWindow -> lastGuiClickSent = System.currentTimeMillis()
+            is C09PacketHeldItemChange -> {
+                if (!event.isCanceled) slot = event.packet.slotId
+            }
         }
+    }
+
+    fun isZeroTickSwapping(): Boolean {
+        val zeroSwapped = mc.thePlayer.inventory.currentItem != slot
+        if (zeroSwapped) modMessage("Tip: zero tick swapping isn't good for the longevity of the account.")
+        return zeroSwapped
     }
 
     fun windowClick(slotId: Int, button: Int, mode: Int) {

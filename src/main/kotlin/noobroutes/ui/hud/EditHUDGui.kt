@@ -3,10 +3,9 @@ package noobroutes.ui.hud
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.config.Config
 import noobroutes.features.ModuleManager.huds
-import noobroutes.font.Font
+import noobroutes.font.FontRenderer
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.Screen
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
-import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.EaseInOut
@@ -33,8 +32,6 @@ object EditHUDGui : Screen() {
     private val openAnim = EaseInOut(600)
     private val resetAnim = EaseInOut(1000)
 
-    private val hoverHandler = HoverHandler(150) // for reset button
-
     /** Code is horrible ngl but it looks nice */
     override fun draw() {
         mc.mcProfiler.startSection("Noobroutes Example Hud")
@@ -50,7 +47,6 @@ object EditHUDGui : Screen() {
             val animVal = openAnim.get(0f, 1f, !open)
             scale(animVal, animVal)
         }
-        hoverHandler.handle(Display.getWidth() * 0.5f - 75f, Display.getHeight() * .86f - 30, 150f, 40f)
 
         //dropShadow(-100f, -25f, 200f, 50f, 10f, 1f)
         roundedRectangle(Display.getWidth() * 0.5f - 75, Display.getHeight() * .86f - 30, 150f, 40f, color, 9f)
@@ -61,7 +57,7 @@ object EditHUDGui : Screen() {
             Display.getHeight() * .86f,
             textColor,
             18f,
-            Font.REGULAR,
+            FontRenderer.REGULAR,
             TextAlign.Middle,
             TextPos.Bottom
         )
@@ -84,7 +80,7 @@ object EditHUDGui : Screen() {
 
     private val color = Color(0f, 0.75f, 0.75f, 0.75f)
         get() {
-            field.brightness = (0.75f + hoverHandler.percent() / 500f).coerceAtMost(1f)
+            field.brightness = (0.75f).coerceAtMost(1f)
             return field
         }
 
@@ -135,7 +131,7 @@ object EditHUDGui : Screen() {
         }.register()
 
         for (i in 0 until huds.size) {
-            huds[i].hoverHandler.reset()
+            huds[i]
         }
         Config.save()
     }

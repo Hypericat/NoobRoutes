@@ -6,6 +6,8 @@ import com.google.gson.JsonPrimitive
 
 /**
  * Setting that lets you pick between an array of strings.
+ *
+ * I changed it to return strings, even though it was less efficient, it just makes the code more readable/
  * @author Aton, Stivais
  */
 class SelectorSetting(
@@ -14,15 +16,15 @@ class SelectorSetting(
     var options: ArrayList<String>,
     hidden: Boolean = false,
     description: String,
-) : noobroutes.features.settings.Setting<Int>(name, hidden, description),
+) : noobroutes.features.settings.Setting<String>(name, hidden, description),
     noobroutes.features.settings.Saving {
 
-    override val default: Int = optionIndex(defaultSelected)
+    override val default: String = defaultSelected
 
-    override var value: Int
-        get() = index
+    override var value: String
+        get() = options[index]
         set(value) {
-            index = value
+            index = optionIndex(value)
         }
 
     var index: Int = optionIndex(defaultSelected)

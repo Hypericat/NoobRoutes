@@ -1,33 +1,37 @@
 package noobroutes.ui.clickgui.elements.menu
 
-import net.minecraft.client.renderer.texture.DynamicTexture
+import net.minecraft.client.renderer.GlStateManager
 import noobroutes.features.settings.impl.ColorSetting
-import noobroutes.font.Font
-import noobroutes.ui.clickgui.ClickGUI.TEXTOFFSET
+import noobroutes.font.FontRenderer
+import noobroutes.ui.ColorPalette
+import noobroutes.ui.ColorPalette.TEXT_OFFSET
+import noobroutes.ui.ColorPalette.elementBackground
+import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
-import noobroutes.ui.clickgui.util.ColorUtil
-import noobroutes.ui.clickgui.util.ColorUtil.brighter
-import noobroutes.ui.clickgui.util.ColorUtil.buttonColor
-import noobroutes.ui.clickgui.util.ColorUtil.darker
-import noobroutes.ui.clickgui.util.ColorUtil.elementBackground
-import noobroutes.ui.clickgui.util.ColorUtil.hsbMax
-import noobroutes.ui.clickgui.util.ColorUtil.textColor
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
-import noobroutes.ui.clickgui.util.HoverHandler
-import noobroutes.ui.util.MouseUtils.isAreaHovered
-import noobroutes.ui.util.MouseUtils.mouseX
-import noobroutes.ui.util.MouseUtils.mouseY
-import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.ui.util.animations.impl.EaseInOut
+import noobroutes.ui.clickgui.elements.Panel
+import noobroutes.ui.util.animations.impl.CubicBezierAnimation
+import noobroutes.ui.util.elements.colorelement.AlphaSliderElement
+import noobroutes.ui.util.elements.colorelement.ColorBoxElement
+import noobroutes.ui.util.elements.textElements.TextBoxElement
+import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
+import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.COLOR_BOX_SIZE
+import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.COLOR_POPOUT_GAP
+import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.COLOR_POPOUT_GAP_THIRD
+import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.TEXT_BOX_HEIGHT
+import noobroutes.ui.util.elements.colorelement.ColorPopoutElement
+import noobroutes.ui.util.elements.colorelement.ColorSliderElement
+import noobroutes.ui.util.elements.colorelement.EmptyColorSliderElement
+import noobroutes.ui.util.elements.textElements.AccessorBasedNumberBoxElement
 import noobroutes.utils.Utils.COLOR_NORMALIZER
-import noobroutes.utils.equalsOneOf
-import noobroutes.utils.render.*
-import noobroutes.utils.render.RenderUtils.bind
-import noobroutes.utils.render.RenderUtils.loadBufferedImage
-import org.lwjgl.input.Keyboard
-import kotlin.math.floor
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.Color.Companion.HEX_REGEX
+import noobroutes.utils.render.TextAlign
+import noobroutes.utils.render.popStencil
+import noobroutes.utils.render.roundedRectangle
+import noobroutes.utils.render.stencilRoundedRectangle
+import noobroutes.utils.render.text
 
 /**
  * Renders all the modules.
@@ -38,153 +42,186 @@ import kotlin.math.floor
  * @author Stivais, Aton
  * @see [Element]
  */
-class ElementColor(parent: ModuleButton, setting: ColorSetting) :
-    Element<ColorSetting>(parent, setting, ElementType.COLOR) {
-
-    private val anim = EaseInOut(200)
-    var dragging: Int? = null
-
+class ElementColor(setting: ColorSetting) :
+    Element<ColorSetting>(setting, ElementType.COLOR) {
     inline val color: Color
         get() = setting.value
 
-    private val hover = HoverHandler(0, 150)
-    private val hueGradiant = DynamicTexture(loadBufferedImage("/assets/ui/HueGradient.png"))
+    companion object {
+        private const val COLOR_ELEMENT_WIDTH = 34f
+        private const val COLOR_ELEMENT_HEIGHT = 20f
+        private const val COLOR_ELEMENT_HEIGHT_HALF = COLOR_ELEMENT_HEIGHT * 0.5f
+        private const val COLOR_ELEMENT_RADIUS = 6f
+        private const val COLOR_ELEMENT_X_POSITION = Panel.WIDTH - COLOR_ELEMENT_WIDTH - BORDER_OFFSET
+        private const val COLOR_ELEMENT_Y_POSITION = ModuleButton.BUTTON_HEIGHT * 0.5f - COLOR_ELEMENT_HEIGHT_HALF
+        private const val HEX_WIDTH = Panel.WIDTH - COLOR_POPOUT_GAP * 2f
+        private const val RGB_BOX_WIDTH = (HEX_WIDTH - COLOR_POPOUT_GAP * 4f) / 3
+        private const val RGB_BOX_GAP = (Panel.WIDTH - COLOR_POPOUT_GAP) / 3
+        private const val SHIFT = 1f //I am shifting it over by 1 because of the green line, makes it look even.
+        private const val GAP = (Panel.WIDTH - COLOR_POPOUT_GAP * 2f - COLOR_BOX_SIZE - ColorElementsConstants.COLOR_SLIDER_WIDTH * 2f) / 3f
+        private const val COLOR_SLIDER_X_POSITION = COLOR_POPOUT_GAP * 2f + COLOR_BOX_SIZE + ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF
+        private const val ALPHA_SLIDER_X_POSITION = COLOR_POPOUT_GAP * 3f + COLOR_BOX_SIZE + ColorElementsConstants.COLOR_SLIDER_WIDTH * 1.5f
 
-    private var hexString = "#FFFFFFFF"
-    private var stringBefore = hexString
-    private val colorAnim = ColorAnimation(100)
-    private var listeningForString = false
 
-    // TODO: MAKE A BETTER DESIGN (FUNCTION IS ALL HERE P MUCH)
-    override fun draw() {
-        h = floor(anim.get(36f, if (setting.allowAlpha) 285f else 255f, !extended))
-
-        hover.handle(x + w - 41, y, 31.5f, 19f)
-
-        roundedRectangle(x, y, w, h, elementBackground)
-        text(name, x + TEXTOFFSET, y + 18f, textColor, 12f, Font.REGULAR)
-        roundedRectangle(x + w - 40f, y + 9, 31f, 19f, color.brighter(1 + hover.percent() / 500f), 5f)
-        rectangleOutline(x + w - 40f, y + 9, 31f, 19f, color.darker().withAlpha(1f), 5f, 1.5f)
-
-        if (!extended && !anim.isAnimating()) return
-        stencilRoundedRectangle(x + 2, y, w - 4, h, 0f)
-        // SATURATION AND BRIGHTNESS
-
-        drawHSBBox(x + 10f, y + 38f, w - 20f, 170f, color.hsbMax())
-
-        val sbPointer = Pair((x + 10f + setting.saturation * 220), (y + 38f + (1 - setting.brightness) * 170))
-        circle(sbPointer.first, sbPointer.second, 9f, Color.TRANSPARENT, color.darker(.5f).withAlpha(1f), 3f)
-
-        // HUE
-
-        drawDynamicTexture(hueGradiant, x + 10f, y + 214f, w - 20f, 15f)
-        rectangleOutline(x + 10f, y + 214f, w - 20f, 15f, buttonColor, 1f, 2.5f)
-
-        val hue = x + 10f + setting.hue * 221f to y + 221f
-        circle(hue.first, hue.second, 9f, color.hsbMax(), color.hsbMax().darker(.5f), 2f)
-
-        // ALPHA
-        if (setting.allowAlpha) {
-            gradientRect(x + 10f, y + 235f, w - 20f, 15f, Color.TRANSPARENT, color.withAlpha(1f), 5f, GradientDirection.Right, Color.DARK_GRAY, 2.5f)
-
-            val alpha = Pair((x + 10f + setting.alpha * 220f), y + 243f)
-            circle(alpha.first, alpha.second, 9f, Color.WHITE.withAlpha(setting.alpha), Color.GRAY, 2f)
-        }
-
-        when (dragging) {
-            0 -> {
-                setting.saturation = (mouseX - (x + 10f)) / 220f
-                setting.brightness = -((mouseY - (y + 38f)) - 170f) / 170f
-            }
-            1 -> setting.hue = (mouseX - (x + 10f)) / (w - 20f)
-            2 -> setting.alpha = (mouseX - (x + 10f)) / (w - 20f)
-        }
-
-        if (dragging != null) {
-            hexString = "#${color.hex}"
-            stringBefore = hexString
-        }
-
-        val stringWidth = getTextWidth(hexString, 12f)
-        roundedRectangle(x + w * 0.5 - stringWidth * 0.5 - 12, y + 260, stringWidth + 24, 22f, buttonColor, 5f)
-        text(hexString, x + w * 0.5, y + 271, Color.WHITE, 12f, Font.REGULAR, TextAlign.Middle, TextPos.Middle)
-
-        if (listeningForString || colorAnim.isAnimating()) {
-            val color = colorAnim.get(ColorUtil.clickGUIColor, buttonColor, listeningForString)
-            rectangleOutline(x + w * 0.5 - stringWidth * 0.5 - 13 , y + 259, stringWidth + 25f, 23f, color, 5f,2f)
-        }
-        popStencil()
-        Color.WHITE.bind()
     }
 
-    private fun completeHexString() {
-        if (colorAnim.isAnimating()) return
-        if (colorAnim.start()) listeningForString = false
-        if (hexString.isEmpty()) return
-        val stringWithoutHash = hexString.substring(1)
-        if (stringWithoutHash.length.equalsOneOf(6, 8)) {
-            try {
-                val alpha = if (stringWithoutHash.length == 8) stringWithoutHash.substring(6).toInt(16) * COLOR_NORMALIZER else 1f
-                val red = stringWithoutHash.substring(0, 2).toInt(16)
-                val green = stringWithoutHash.substring(2, 4).toInt(16)
-                val blue = stringWithoutHash.substring(4, 6).toInt(16)
-                setting.value = Color(red, green, blue, alpha)
-                stringBefore = hexString
-            } catch (_: Exception) {
-                hexString = stringBefore
-                return
+
+    private inline val isHoveredColor
+        get() = isAreaHovered(
+            COLOR_ELEMENT_X_POSITION,
+            COLOR_ELEMENT_Y_POSITION,
+            COLOR_ELEMENT_WIDTH,
+            COLOR_ELEMENT_HEIGHT
+        )
+    private val extendAnimation = CubicBezierAnimation(250, 0.4, 0, 0.2, 1)
+
+    val hexElement = TextBoxElement(
+        "HEX",
+        0f,
+        0f,
+        HEX_WIDTH,
+        TEXT_BOX_HEIGHT,
+        12f, TextAlign.Middle, 5f, 6f,
+        textColor, if (setting.allowAlpha) 8 else 6,
+        TextBoxElement.TextBoxType.GAP,
+        2f,
+        getHex(),
+    ).apply {
+        addValueChangeListener {
+            if (!HEX_REGEX.matches(it)) {
+                elementValue = (parent as? ColorPopoutElement)?.elementValue?.hex ?: return@addValueChangeListener
+                return@addValueChangeListener
             }
-        } else hexString = stringBefore
+            color.r = it.substring(0, 2).toInt(16)
+            color.g = it.substring(2, 4).toInt(16)
+            color.b = it.substring(4, 6).toInt(16)
+            color.alpha = if (it.length == 8) it.substring(6, 8).toInt(16) * COLOR_NORMALIZER else 1f
+
+        }
+    }
+    val rgbElements = listOf("R", "G", "B").mapIndexed { index, label ->
+        AccessorBasedNumberBoxElement(
+            label, 0f, 0f,
+            RGB_BOX_WIDTH, ColorElementsConstants.TEXT_BOX_HEIGHT,
+            12f, TextAlign.Left, 5f, 6f,
+            ColorPalette.textColor,
+            3,
+            TextBoxElement.TextBoxType.GAP,
+            2f,
+            0,
+            0.0,
+            255.0,
+            when (index) {
+                0 -> {{ color.r.toDouble() }}
+                1 -> {{color.g.toDouble()}}
+                else -> {{color.b.toDouble()}}
+            },
+            when (index) {
+                0 -> {{
+                    color.r = it.toInt()
+                    updateHexElement()
+                }}
+                1 -> {{
+                    color.g = it.toInt()
+                    updateHexElement()
+                }}
+                else -> {{
+                    color.b = it.toInt()
+                    updateHexElement()
+                }}
+            }
+        )
+    }
+    private val colorBox = ColorBoxElement(0f, 0f, color).apply { addValueChangeListener { updateHexElement() } }
+    private val colorSlider = ColorSliderElement(0f, 0f, color).apply { addValueChangeListener { updateHexElement() } }
+    private val alphaSlider = if (setting.allowAlpha) AlphaSliderElement(0f, 0f, color).apply { addValueChangeListener { updateHexElement() } } else null
+
+    fun updateHexElement(){
+        hexElement.elementValue = getHex()
     }
 
-    override fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
-        if (listeningForString) {
-            when (keyCode) {
-                Keyboard.KEY_ESCAPE, Keyboard.KEY_NUMPADENTER, Keyboard.KEY_RETURN -> completeHexString()
-                Keyboard.KEY_BACK -> hexString = hexString.dropLast(1)
-                !in ElementTextField.keyBlackList -> hexString += typedChar.toString()
+    private fun getHex(): String{
+        return if (setting.allowAlpha) color.hex else color.hex.dropLast(2)
+    }
+
+    init {
+        addChildren(hexElement)
+        addChildren(rgbElements)
+        addChildren(colorBox, colorSlider)
+        alphaSlider?.let { addChild(it) }
+    }
+
+    override fun doHandleDraw() {
+        if (!visible) return
+        GlStateManager.pushMatrix()
+        translate(x, y)
+        roundedRectangle(0f, 0f, w, getHeight(), elementBackground)
+        text(name, TEXT_OFFSET,  18f, textColor, 12f, FontRenderer.REGULAR)
+        roundedRectangle(
+            COLOR_ELEMENT_X_POSITION,
+            COLOR_ELEMENT_Y_POSITION,
+            COLOR_ELEMENT_WIDTH,
+            COLOR_ELEMENT_HEIGHT,
+            color,
+            ColorPalette.buttonColor,
+            Color.TRANSPARENT,
+            3f,
+            COLOR_ELEMENT_RADIUS,
+            COLOR_ELEMENT_RADIUS,
+            COLOR_ELEMENT_RADIUS,
+            COLOR_ELEMENT_RADIUS,
+            0.5f
+        )
+        if (extended || extendAnimation.isAnimating()) {
+            roundedRectangle(0f, ModuleButton.BUTTON_HEIGHT, w, getHeight() - ModuleButton.BUTTON_HEIGHT, elementBackground, 15f)
+            stencilRoundedRectangle(2f, 0f, w, getHeight(), 0f, 0f, 0f, 0f, 0.5f, false)
+            for (i in rgbElements.indices) {
+                rgbElements[i].updatePosition(
+                    COLOR_POPOUT_GAP + RGB_BOX_GAP * i + SHIFT + COLOR_POPOUT_GAP_THIRD * (-1 * (-i + 1)),
+                    COLOR_POPOUT_GAP * 2f + COLOR_BOX_SIZE + ModuleButton.BUTTON_HEIGHT
+                )
             }
-            hexString = hexString.uppercase()
+            hexElement.updatePosition(COLOR_POPOUT_GAP + HEX_WIDTH * 0.5f + SHIFT, COLOR_POPOUT_GAP * 3f + TEXT_BOX_HEIGHT + COLOR_BOX_SIZE + ModuleButton.BUTTON_HEIGHT)
+            colorBox.updatePosition(
+                GAP + SHIFT + ColorElementsConstants.COLOR_BOX_SIZE_HALF,
+                ColorElementsConstants.COLOR_BOX_SIZE_HALF + ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP
+            )
+            colorSlider.updatePosition(
+                COLOR_SLIDER_X_POSITION,
+                ColorElementsConstants.COLOR_BOX_SIZE_HALF + ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP
+            )
+            alphaSlider?.updatePosition(
+                ALPHA_SLIDER_X_POSITION,
+                ColorElementsConstants.COLOR_BOX_SIZE_HALF + ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP
+            )
+            for (i in uiChildren.indices) {
+                uiChildren[i].apply {
+                    visible = true
+                    doHandleDraw()
+                }
+            }
+            popStencil()
+        } else {
+            for (i in uiChildren.indices) {
+                uiChildren[i].apply {
+                    visible = false
+                }
+            }
+        }
+
+        GlStateManager.popMatrix()
+    }
+
+    override fun getHeight(): Float {
+        return ModuleButton.BUTTON_HEIGHT + (COLOR_POPOUT_GAP * 4 + COLOR_BOX_SIZE + TEXT_BOX_HEIGHT * 2f) * extendAnimation.get(0f, 1f, !extended)
+    }
+
+    override fun mouseClicked(mouseButton: Int): Boolean {
+        if (mouseButton != 0) return false
+        if (isHoveredColor) {
+            if (extendAnimation.start()) extended = !extended
             return true
         }
         return false
     }
-
-    override fun mouseClicked(mouseButton: Int): Boolean {
-        if (mouseButton == 0) {
-            if (isHovered) {
-                if (anim.start()) extended = !extended
-                return true
-            }
-            if (!extended) return false
-
-            dragging = when {
-                isAreaHovered(x + 10f, y + 38f, w - 20f, 170f) -> 0 // sat & brightness
-                isAreaHovered(x + 10f, y + 214f, w - 20f, 15f) -> 1 // hue
-                isAreaHovered(x + 10f, y + 235f, w - 20f, 15f) && setting.allowAlpha -> 2 // alpha
-                else -> null
-            }
-
-            if (isAreaHovered(x + 10f, y + 255f, w, y + 278f)) {
-                if (!colorAnim.isAnimating()) {
-                    if (listeningForString) completeHexString()
-                    else listeningForString = true
-                }
-            } else if (listeningForString) listeningForString = false
-
-        } else if (mouseButton == 1) {
-            if (isHovered) {
-                if (anim.start()) extended = !extended
-                return true
-            }
-        }
-        return false
-    }
-
-    override fun mouseReleased(state: Int) {
-        dragging = null
-    }
-
-    override val isHovered: Boolean
-        get() = isAreaHovered(x + w - 41, y + 9, 31.5f, 19f)
 }

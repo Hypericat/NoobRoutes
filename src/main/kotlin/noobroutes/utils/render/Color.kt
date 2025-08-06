@@ -23,6 +23,8 @@ class Color(hue: Float, saturation: Float, brightness: Float, alpha: Float = 1f)
         hex.substring(6, 8).toInt(16) * COLOR_NORMALIZER
     )
 
+
+
     var hue = hue
         set(value) {
             field = value
@@ -72,9 +74,32 @@ class Color(hue: Float, saturation: Float, brightness: Float, alpha: Float = 1f)
             return field
         }
 
-    inline val r get() = rgba.red
-    inline val g get() = rgba.green
-    inline val b get() = rgba.blue
+    fun setHSB(r: Int, g: Int, b: Int) {
+        setHSB(RGBtoHSB(r, g, b, FloatArray(3)))
+    }
+
+    fun setHSB(array: FloatArray) {
+        hue = array[0]
+        saturation = array[1]
+        brightness = array[2]
+        needsUpdate = true
+    }
+
+    inline var r
+        get() = rgba.red
+        set(value) {
+            setHSB(value, g, b)
+        }
+    inline var g
+        get() = rgba.green
+        set(value) {
+            setHSB(r, value, b)
+        }
+    inline var b
+        get() = rgba.blue
+        set(value) {
+            setHSB(r, g, value)
+        }
     inline val a get() = rgba.alpha
 
     inline val redFloat get() = r * COLOR_NORMALIZER
@@ -117,6 +142,8 @@ class Color(hue: Float, saturation: Float, brightness: Float, alpha: Float = 1f)
     fun copy(): Color = Color(this.rgba)
 
     companion object {
+        val HEX_REGEX = Regex("^#?([A-Fa-f0-9]{3}|[A-Fa-f0-9]{4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$")
+
 
         @JvmField
         val TRANSPARENT = Color(0, 0, 0, 0f)

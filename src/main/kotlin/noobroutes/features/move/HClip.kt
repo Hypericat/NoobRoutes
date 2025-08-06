@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.render.FreeCam
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.NotPersistent
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
@@ -25,6 +26,7 @@ object HClip: Module(
     category = Category.MOVE,
     description = "hclips when activating"
 ) {
+
     private val omni by BooleanSetting("omni", false, description = "should go in a direction based of key inputs")
     private val shouldSpam by BooleanSetting("should repeat", false, description = "should repeatedly hclip if holding the button")
     private val hclipInterval by NumberSetting(name = "delay", description = "how long to wait between hclips", min = 2, max = 10, default = 6).withDependency { shouldSpam }

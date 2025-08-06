@@ -7,11 +7,10 @@ import noobroutes.features.Module
 import noobroutes.features.ModuleManager.huds
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.ui.clickgui.util.ColorUtil.withAlpha
-import noobroutes.ui.clickgui.util.HoverHandler
 import noobroutes.ui.hud.EditHUDGui.dragging
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.EaseInOut
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.endProfile
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.rectangleOutline
@@ -47,8 +46,6 @@ open class HudElement(
     internal val ySetting: NumberSetting<Float>
     internal val scaleSetting: NumberSetting<Float>
     val enabledSetting: BooleanSetting = BooleanSetting("$settingName enabled", default = enabled, hidden = true, "")
-
-    val hoverHandler = HoverHandler(200)
 
     fun init(module: Module) {
         parentModule = module
@@ -103,18 +100,15 @@ open class HudElement(
         val (width, height) = render(example)
 
         if (example) {
-            hoverHandler.handle(x, y, width * scale, height * scale)
-            var thickness = anim.get(.25f, 1f, !hasStarted)
-            if (anim2.isAnimating() || dragging != null) {
-                thickness += anim2.get(0f, 1f, dragging == null)
-            }
+
+            val thickness = 3f
 
             rectangleOutline(
                 -1.5f,
                 -1.5f,
                 3f + width,
                 3f + height,
-                Color.WHITE.withAlpha(percent / 100f),
+                Color.WHITE,
                 5f,
                 max(thickness * (scale / 2.5f), 2f)
             )
@@ -145,18 +139,6 @@ open class HudElement(
      * Animation for clicking on it
      */
     val anim2 = EaseInOut(200)
-
-    /** Wrapper */
-    private inline val anim
-        get() = hoverHandler.anim
-
-    /** Wrapper */
-    private inline val percent: Int
-        get() = hoverHandler.percent()
-
-    /** Wrapper */
-    private inline val hasStarted: Boolean
-        get() = hoverHandler.hasStarted
 
     /** Used for smooth resetting animations */
     internal var resetX: Float = 0f

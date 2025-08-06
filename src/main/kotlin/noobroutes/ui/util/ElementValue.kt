@@ -1,5 +1,7 @@
 package noobroutes.ui.util
 
+import noobroutes.Core.logger
+
 interface ElementValue<T> {
     val elementValueChangeListeners: MutableList<(T) -> Unit>
     var elementValue: T
@@ -9,6 +11,12 @@ interface ElementValue<T> {
             listener.invoke(elementValue)
         }
     }
+    fun invokeValueChangeListeners() {
+        for (listener in elementValueChangeListeners) {
+            listener.invoke(elementValue)
+        }
+    }
+
     fun getValue(): T {
         return elementValue
     }

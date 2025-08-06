@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+import kotlin.reflect.full.hasAnnotation
 
 /**
  * Superclass of Settings.
@@ -15,6 +16,11 @@ abstract class Setting<T> (
     var hidden: Boolean = false,
     var description: String = "",
 ) : ReadWriteProperty<noobroutes.features.Module, T>, PropertyDelegateProvider<noobroutes.features.Module, ReadWriteProperty<noobroutes.features.Module, T>> {
+
+
+    var devOnly: Boolean = false
+        private set
+
 
     /**
      * Default value of the setting
@@ -44,6 +50,7 @@ abstract class Setting<T> (
         }
 
     override operator fun provideDelegate(thisRef: noobroutes.features.Module, property: KProperty<*>): ReadWriteProperty<noobroutes.features.Module, T> {
+        devOnly = property.hasAnnotation<DevOnly>()
         return thisRef.register(this)
     }
 
