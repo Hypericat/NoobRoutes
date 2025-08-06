@@ -55,12 +55,7 @@ object AutoBloodRush: Module(
     private val goOn1Delay by NumberSetting("go on delay", 13, 0, 20, description = "how long to wait before u actually go down (ticks)").withDependency { autoStartBrToggle }
     private val preLoadDelay by NumberSetting("Preload Delay", 0, 0, 20, description = "delay for preloading the map")
     private val silent by BooleanSetting("silent", description = "do silent rotations")
-    private val noWait by BooleanSetting("Low Ping Pearls", default = false, description = "for ling ping players. makes pearls work")
-
-    private val keyBind1 by KeybindSetting("test 1", Keyboard.KEY_NONE, "tests smth").onPress { goToHopper() }
-
-    private val keyBind2 by KeybindSetting("test 2", Keyboard.KEY_NONE, "tests smth").onPress { clipOut() }
-
+    private val noWait by BooleanSetting("Low Ping Pearls", default = false, description = "for low ping players. makes pearls work")
 
     private val snipeTick by NumberSetting("Snipe Tick", 1, 0, 40, description = "how to align with the server ticks")
 
@@ -206,7 +201,7 @@ object AutoBloodRush: Module(
 
             val coords = when {
                 otherCoords != null -> otherCoords
-                !hasRunStarted -> MIDDLE_MAP_COORDS
+                !hasRunStarted -> getFurthestDoor()
                 bloodRoom != null -> bloodRoom.getRealCoords(BLOOD_MIDDLE_COORDS).toVec2i()
                 else -> return@schedulePreTickTask modMessage("smth went wrong , probably couldnt find blood")
             }
@@ -219,7 +214,7 @@ object AutoBloodRush: Module(
 
             Scheduler.schedulePostTickTask { Scheduler.scheduleFrameTask { repeat(aotvNumber) { PlayerUtils.airClick() } } }
 
-            if (coords == MIDDLE_MAP_COORDS) return@schedulePreTickTask
+            if (coords == getFurthestDoor()) return@schedulePreTickTask
 
             Scheduler.scheduleLowS08Task(aotvNumber - 1) {
                 tpUp(otherCoords != null)
