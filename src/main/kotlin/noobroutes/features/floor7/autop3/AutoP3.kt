@@ -78,7 +78,7 @@ object AutoP3: Module (
     private var editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions").withDependency { editShit }
     private val editModeKey by KeybindSetting("Toggle Edit Mode", Keyboard.KEY_NONE, "Toggles editmode on press").onPress {
         editMode = !editMode
-        modMessage("edit Mode: " + !editMode)
+        modMessage("edit Mode: " + editMode)
     }.withDependency { editShit }
     val walkBoost by SelectorSetting("Walk Boost", "none", arrayListOf("none", "normal", "big"), description = "how much of a boost to apply walking of edges. Non none values might lagback more").withDependency { editShit }
 

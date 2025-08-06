@@ -38,11 +38,11 @@ object LavaClip: Module(
         if (mc.thePlayer == null) return
         if (!event.isEnd) return
 
-        if (customInLavaCheck()) {
+        if (mc.thePlayer.isInLava) {
             cancelS12 = true
-            val clipDistance = if (ringClip != null) ringClip else lavaDistance.toDouble()
-            if (clipDistance == null) return
-            mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - clipDistance.coerceAtMost(50.0), mc.thePlayer.posZ)
+            val clipDistance = if (ringClip != null) ringClip!! else lavaDistance.toDouble()
+
+            Scheduler.schedulePreTickTask { mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - clipDistance.coerceAtMost(50.0), mc.thePlayer.posZ) }
         }
     }
 
