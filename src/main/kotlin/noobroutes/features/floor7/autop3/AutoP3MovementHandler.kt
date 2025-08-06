@@ -28,10 +28,17 @@ object AutoP3MovementHandler {
     private const val JUMP_SPEED = 6.0075
     private const val SPRINT_MULTIPLIER = 1.3
 
-    private const val DRAG = 0.9063338661881611
-    private const val PUSH = 0.036901383361851
-    private const val TICK1 = 6.16
-    private const val TICK2 = 3.98
+    //private const val DRAG = 0.9063338661881611
+    //private const val PUSH = 0.036901383361851
+
+    var motionDrag = 0.91
+    var motionPush = 0.02
+
+    var motionTick1 = 6.16
+    var motionTick2 = 3.98
+
+    //private const val TICK1 = 6.16
+    //private const val TICK2 = 3.98
 
     @SubscribeEvent //stolen from sy? (its just so good)
     fun handleWalking(event: MoveEntityWithHeadingEvent.Post) {
@@ -84,7 +91,7 @@ object AutoP3MovementHandler {
 
     private fun doMotionTick() {
         if (motionTicks == 0 && mc.thePlayer.onGround) {
-            setVelocity(TICK1 * scale)
+            setVelocity(motionTick1 * scale)
             return;
         }
 
@@ -96,13 +103,13 @@ object AutoP3MovementHandler {
         }
 
         if (motionTicks == 1) {
-            setVelocity(TICK2 * scale);
-            lastSpeed = TICK2;
+            setVelocity(motionTick2 * scale);
+            lastSpeed = motionTick2;
             return;
         }
 
-        lastSpeed *= DRAG
-        lastSpeed += PUSH
+        lastSpeed *= motionDrag
+        lastSpeed += motionPush
         setVelocity(lastSpeed * scale)
     }
 

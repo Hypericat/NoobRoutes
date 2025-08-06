@@ -36,6 +36,7 @@ import noobroutes.INetwork
 import noobroutes.IS23
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
+import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.withAlpha
@@ -127,6 +128,22 @@ object Utils {
                 val pos = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector) ?: return
                 GuiScreen.setClipboardString("Vec3(${pos.xCoord}, ${pos.yCoord}, ${pos.zCoord})")
                 modMessage(pos)
+            }
+
+            "motion" -> {
+                if (args.size < 4) return
+                AutoP3MovementHandler.motionDrag = args[2].toDoubleOrNull() ?: return
+                AutoP3MovementHandler.motionPush = args[3].toDoubleOrNull() ?: return
+
+                devMessage("drag: ${AutoP3MovementHandler.motionDrag}, push: ${AutoP3MovementHandler.motionPush}")
+            }
+
+            "motionStart" -> {
+                if (args.size < 4) return
+                AutoP3MovementHandler.motionTick1 = args[2].toDoubleOrNull() ?: return
+                AutoP3MovementHandler.motionTick2 = args[3].toDoubleOrNull() ?: return
+
+                devMessage("tick1: ${AutoP3MovementHandler.motionTick1}, tick2: ${AutoP3MovementHandler.motionTick2}")
             }
 
             else -> {
