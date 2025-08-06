@@ -194,6 +194,7 @@ abstract class Ring(
         PlayerUtils.stopVelocity()
         mc.thePlayer.isSprinting = false
         PlayerUtils.unPressKeys()
+        AutoP3MovementHandler.resetShit()
 
         Scheduler.schedulePostMoveEntityWithHeadingTask {
             PlayerUtils.setPosition(coords.xCoord, coords.zCoord)
