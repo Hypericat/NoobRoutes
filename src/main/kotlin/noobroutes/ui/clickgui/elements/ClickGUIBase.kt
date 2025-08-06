@@ -18,6 +18,10 @@ class ClickGUIBase : UiElement(0f, 0f) {
         }
     }
 
+    fun removePanel(panel: Panel) {
+        uiChildren.remove(panel)
+    }
+
     override fun doDrawChildren() {
         for (i in uiChildren.indices) {
             uiChildren[i].doHandleDraw()

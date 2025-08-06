@@ -138,7 +138,7 @@ object Utils {
                 devMessage("drag: ${AutoP3MovementHandler.motionDrag}, push: ${AutoP3MovementHandler.motionPush}")
             }
 
-            "motionStart" -> {
+            "motionstart" -> {
                 if (args.size < 4) return
                 AutoP3MovementHandler.motionTick1 = args[2].toDoubleOrNull() ?: return
                 AutoP3MovementHandler.motionTick2 = args[3].toDoubleOrNull() ?: return

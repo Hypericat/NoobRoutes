@@ -15,6 +15,7 @@ import noobroutes.features.Module
 import noobroutes.features.misc.EWPathfinderModule
 import noobroutes.features.render.FreeCam
 import noobroutes.features.routes.DynamicRoute
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.utils.*
@@ -34,7 +35,7 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 
-
+@DevOnly
 object AutoPath: Module(
     name = "Auto Path",
     Keyboard.KEY_NONE,

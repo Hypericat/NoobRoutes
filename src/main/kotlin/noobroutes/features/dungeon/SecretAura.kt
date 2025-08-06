@@ -137,6 +137,7 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
             Blocks.chest -> true
             Blocks.lever -> true
             Blocks.redstone_block -> isHoldingRedstoneKey
+            Blocks.trapped_chest -> true
             Blocks.skull -> {
                 val skull = getSkull(position) ?: return false
                 skull.profileID == REDSTONE_KEY_ID || skull.profileID == WITHER_ESSENCE_ID

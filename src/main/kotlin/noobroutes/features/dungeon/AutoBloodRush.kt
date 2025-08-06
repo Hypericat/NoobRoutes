@@ -78,7 +78,7 @@ object AutoBloodRush: Module(
 
     var hasRunStarted = false
 
-    private const val VERTICAL_TP_AMOUNT = 5
+    private const val VERTICAL_TP_AMOUNT = 6
 
     private var serverTickCount = 0
 

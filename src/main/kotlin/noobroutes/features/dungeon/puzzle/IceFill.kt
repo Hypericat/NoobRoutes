@@ -21,6 +21,7 @@ import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.render.ClickGUIModule
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.Keybinding
@@ -45,6 +46,7 @@ import scala.reflect.internal.StdAttachments.PlainAttachment
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
+@DevOnly
 object IceFill: Module(
     "Auto Icefill",
     category = Category.DUNGEON,

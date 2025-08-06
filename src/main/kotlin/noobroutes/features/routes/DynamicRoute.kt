@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.routes.nodes.DynamicNode
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
@@ -31,6 +32,7 @@ import scala.collection.parallel.ParIterableLike.Min
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 
+@DevOnly
 object DynamicRoute : Module("Dynamic Route", description = "Dynamic Etherwarp Routes.", category = Category.ROUTES) {
     val silent by BooleanSetting("Silent", default = true, description = "Server side rotations")
     val renderRoutes by BooleanSetting("Render Routes", default = false, description = "Renders nodes")

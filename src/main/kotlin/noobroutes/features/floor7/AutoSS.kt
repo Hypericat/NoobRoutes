@@ -17,6 +17,7 @@ import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.render.ClickGUIModule.devMode
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
@@ -51,9 +52,13 @@ object AutoSS : Module(
     private val forceDevice by BooleanSetting("Force Device", false, description = "").withDependency {devMode}
     private val resetSSKeybind by KeybindSetting("Reset SS", Keyboard.KEY_NONE, "Resets AutoSS on press").onPress { resetKey() }
 
+    @DevOnly
     private val i1Keybind by KeybindSetting("i1 test", Keyboard.KEY_NONE, "tries to i1 on press").onPress { tryI1() }
+    @DevOnly
     private val i1ClickAmount by NumberSetting("i1 clicks", 24, 9, 36, 3, description = "how often i1 should click (triple of 3 man i1)")
+    @DevOnly
     private val i1Delay by NumberSetting("i1 delay", 42, 5, 60, description = "how long to wait beetween click bursts")
+    @DevOnly
     private val i1People by NumberSetting("i1 fake people", 2, 0, 5, description = "how many extra people it should click for")
 
     private val autoStart by BooleanSetting("Autostart", true, description = "Automatically starts autoSS")

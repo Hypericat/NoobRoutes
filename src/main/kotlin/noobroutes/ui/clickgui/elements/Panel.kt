@@ -81,6 +81,7 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
             }
             addChild(ModuleButton(0f, module))
         }
+        if (uiChildren.isEmpty()) (parent as? ClickGUIBase)?.removePanel(this)
     }
 
 
@@ -106,7 +107,15 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
         translate(x, y)
         blurRoundedRectangle(-BORDER_THICKNESS, -BORDER_THICKNESS, WIDTH + DOUBLE_BORDER_THICKNESS, offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT + DOUBLE_BORDER_THICKNESS, PANEL_RADIUS, PANEL_RADIUS, PANEL_RADIUS, PANEL_RADIUS, 0.5f)
 
-        rectangleOutline(-BORDER_THICKNESS, -BORDER_THICKNESS, WIDTH + DOUBLE_BORDER_THICKNESS, offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT + DOUBLE_BORDER_THICKNESS, titlePanelColor, 10f, 3f)
+        rectangleOutline(
+            -BORDER_THICKNESS,
+            -BORDER_THICKNESS,
+            WIDTH + DOUBLE_BORDER_THICKNESS,
+            offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT + DOUBLE_BORDER_THICKNESS,
+            titlePanelColor,
+            10f,
+            3f
+        )
 
 
 

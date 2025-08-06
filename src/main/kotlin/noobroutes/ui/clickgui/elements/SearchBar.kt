@@ -32,6 +32,7 @@ import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.drawDynamicTexture
 import noobroutes.utils.render.getTextWidth
 import noobroutes.utils.render.popStencil
+import noobroutes.utils.render.rectangleOutline
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.stencilRoundedRectangle
 import noobroutes.utils.round
@@ -151,9 +152,17 @@ object SearchBar : UiElement(ClickGUIModule.searchBarX.value, ClickGUIModule.sea
                 titlePanelColor, Color.TRANSPARENT, Color.TRANSPARENT,
                 0f, PANEL_RADIUS, PANEL_RADIUS, 0f, 0f, 0.5f
             )
-            stencilRoundedRectangle(0f, 0f, WIDTH, offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT, 10f, 0.5f, true)
-            roundedRectangle(-BORDER_THICKNESS, -BORDER_THICKNESS, WIDTH + DOUBLE_BORDER_THICKNESS, offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT + DOUBLE_BORDER_THICKNESS, titlePanelColor, 10f, 0.5f)
-            popStencil()
+            rectangleOutline(
+                -BORDER_THICKNESS,
+                -BORDER_THICKNESS,
+                WIDTH + DOUBLE_BORDER_THICKNESS,
+                offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT + DOUBLE_BORDER_THICKNESS,
+                titlePanelColor,
+                10f,
+                3f
+            )
+
+
             roundedRectangle(
                 0f, offset + HEIGHT, WIDTH, BOTTOM_SEGMENT_HEIGHT, bottomSegmentColor, bottomSegmentColor, bottomSegmentColor,
                 0f, 0f, 0f, PANEL_RADIUS, PANEL_RADIUS, 0.5f

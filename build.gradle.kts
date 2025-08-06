@@ -19,7 +19,7 @@ plugins {
 blossom {
     replaceToken("@VER@", version)
     replaceToken("@MOD_ID@", modId)
-    replaceToken("@DEV_MODE@", true)
+    replaceToken("@DEV_MODE@", isDevBuild)
 }
 
 group = "noobroutes"
