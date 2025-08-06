@@ -26,7 +26,7 @@ object Core {
     val mc: Minecraft = Minecraft.getMinecraft()
 
     //do not simplify the expression, it is changed inside the gradle build
-    val DEV_MODE = ("@DEV_MODE@" == "true")|| ("@DEV_MODE@".contains("DEV_MODE"))// || (System.getenv("ENVIRONMENT")?.equals("dev", ignoreCase = true) == true)// //
+    val DEV_MODE = "@DEV_MODE@".toBoolean()
     const val VERSION = "@VER@"
     val scope = CoroutineScope(SupervisorJob() + EmptyCoroutineContext)
     val logger: Logger = LogManager.getLogger("NoobRoutes")

@@ -25,14 +25,14 @@ public abstract class MixinChunk {
     @Shadow @Final private World worldObj;
 
     @Inject(method = "setBlockState", at = @At("HEAD"), cancellable = true)
-    private void onBlockChange(BlockPos pos, IBlockState state, CallbackInfoReturnable<IBlockState> cir) {
+    private void noobRoutes$onBlockChange(BlockPos pos, IBlockState state, CallbackInfoReturnable<IBlockState> cir) {
         IBlockState oldState = getBlockState(pos);
         if (oldState != state)
             if (postAndCatch(new BlockChangeEvent(pos, oldState, state, this.worldObj))) cir.setReturnValue(oldState);
     }
 
     @Inject(method = "fillChunk", at = @At("TAIL"))
-    private void onFillChunk(byte[] p_177439_1_, int p_177439_2_, boolean p_177439_3_, CallbackInfo ci) {
+    private void noobRoutes$onFillChunk(byte[] p_177439_1_, int p_177439_2_, boolean p_177439_3_, CallbackInfo ci) {
         BrushModule.INSTANCE.onChunkLoad((Chunk) (Object) this);
     }
 }

@@ -15,7 +15,7 @@ public abstract class MixinAbstractClientPlayer{
             method = {"isSpectator()Z"},
             cancellable = true
     )
-    private void isSpectator(CallbackInfoReturnable<Boolean> cir) {
+    private void noobRoutes$isSpectator(CallbackInfoReturnable<Boolean> cir) {
         if (FreeCam.INSTANCE.shouldOverrideSpectator((AbstractClientPlayer) (Object) this)) {
             cir.setReturnValue(true);
         }

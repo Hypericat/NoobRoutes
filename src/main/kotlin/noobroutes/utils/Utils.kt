@@ -15,18 +15,13 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.network.INetHandler
 import net.minecraft.network.Packet
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C0FPacketConfirmTransaction
-import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S23PacketBlockChange
-import net.minecraft.network.play.server.S32PacketConfirmTransaction
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.Vec3
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
@@ -35,7 +30,6 @@ import noobroutes.Core.mc
 import noobroutes.INetwork
 import noobroutes.IS23
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
-import noobroutes.events.impl.PacketEvent
 import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 
 import noobroutes.utils.render.Color
@@ -111,6 +105,9 @@ object Utils {
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣦⣤⣤⣤⣶⣦⣿⣿⣶⣾⣿⣥⣤⣤⣬⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
     )
 
+    private const val DEV_STRING = "@DEV_MODE@"
+    private const val PROD_STRING = "@PROD@"
+
     fun testFunctions(args: Array<out String>) {
         if (args.size < 2) {
             modMessage("Test: rel, relp")
@@ -145,11 +142,22 @@ object Utils {
 
                 devMessage("tick1: ${AutoP3MovementHandler.motionTick1}, tick2: ${AutoP3MovementHandler.motionTick2}")
             }
+            "dev" -> {
+                modMessage(DEV_STRING)
+                modMessage(PROD_STRING)
+
+            }
 
             else -> {
                 modMessage("All tests passed")
             }
         }
+    }
+
+    fun isRunningInIntelliJ(): Boolean {
+        return System.getProperty("idea.test.cyclic.buffer.size") != null ||
+                System.getProperty("idea.launcher.port") != null ||
+                System.getProperty("idea.paths.selector") != null
     }
 
     var lastPlayerPos = Vec3(0.0, 0.0, 0.0)
@@ -476,7 +484,7 @@ fun romanToInt(s: String): Int {
 
 
 fun simulateClientReceivePacket(packet: Packet<*>) {
-    (Minecraft.getMinecraft().netHandler.networkManager as INetwork).receive(packet as Packet<INetHandler>);
+    (Minecraft.getMinecraft().netHandler.networkManager as INetwork).`noobRoutes$receive`(packet as Packet<INetHandler>);
 }
 
 fun setClientSideBlockPacket(blockPos: BlockPos, blockState: IBlockState) {

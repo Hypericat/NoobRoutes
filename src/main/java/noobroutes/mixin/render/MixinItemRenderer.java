@@ -15,7 +15,7 @@ public class MixinItemRenderer {
             at = {@At("HEAD")},
             cancellable = true
     )
-    private void renderItemInFirstPerson(float partialTicks, CallbackInfo ci) {
+    private void noobRoutes$renderItemInFirstPerson(float partialTicks, CallbackInfo ci) {
         if (FreeCam.INSTANCE.getEnabled()) {
             ci.cancel();
         }

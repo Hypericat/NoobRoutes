@@ -25,7 +25,7 @@ public abstract class MixinWorldClient extends World {
     @Shadow public abstract void invalidateBlockReceiveRegion(int x1, int y1, int z1, int x2, int y2, int z2);
 
     @Inject(method = "invalidateRegionAndSetBlock", at = @At("HEAD"), cancellable = true)
-    private void invalidateRegionAndSetBlock(BlockPos pos, IBlockState state, CallbackInfoReturnable<Boolean> cir) {
+    private void noobRoutes$invalidateRegionAndSetBlock(BlockPos pos, IBlockState state, CallbackInfoReturnable<Boolean> cir) {
         int i = pos.getX();
         int j = pos.getY();
         int k = pos.getZ();

@@ -16,7 +16,7 @@ public class MixinRenderGlobal {
             at = {@At("HEAD")},
             method = {"renderEntities(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/renderer/culling/ICamera;F)V"}
     )
-    private void beforeRenderEntities(Entity renderViewEntity, ICamera camera, float partialTicks, CallbackInfo ci) {
+    private void noobRoutes$beforeRenderEntities(Entity renderViewEntity, ICamera camera, float partialTicks, CallbackInfo ci) {
         FreeCam.INSTANCE.onBeforeRenderEntities();
     }
 
@@ -24,7 +24,7 @@ public class MixinRenderGlobal {
             at = {@At("TAIL")},
             method = {"renderEntities(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/renderer/culling/ICamera;F)V"}
     )
-    private void afterRenderEntities(Entity renderViewEntity, ICamera camera, float partialTicks, CallbackInfo ci) {
+    private void noobRoutes$afterRenderEntities(Entity renderViewEntity, ICamera camera, float partialTicks, CallbackInfo ci) {
         FreeCam.INSTANCE.onAfterRenderEntities();
     }
 }

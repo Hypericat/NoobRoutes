@@ -36,7 +36,7 @@ public class MixinKeybinding {
     @Shadow private int pressTime;
 
     @Inject(method = "isPressed", at = @At("HEAD"), cancellable = true)
-    private void isPressed(CallbackInfoReturnable<Boolean> cir) {
+    private void noobRoutes$isPressed(CallbackInfoReturnable<Boolean> cir) {
         if (AutoPath.INSTANCE.shouldCancelKey(keyCode) || IceFill.INSTANCE.shouldCancelKey(keyCode))  {
             cir.setReturnValue(false);
             this.pressed = false;
@@ -45,7 +45,7 @@ public class MixinKeybinding {
     }
 
     @Inject(method = "isKeyDown", at = @At("HEAD"), cancellable = true)
-    private void isKeyDown(CallbackInfoReturnable<Boolean> cir) {
+    private void noobRoutes$isKeyDown(CallbackInfoReturnable<Boolean> cir) {
         if (IceFill.INSTANCE.shouldCancelKey(keyCode))  {
             cir.setReturnValue(false);
             this.pressed = false;

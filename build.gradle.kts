@@ -16,17 +16,20 @@ plugins {
     kotlin("jvm") version "2.0.0-Beta1"
 }
 
-blossom {
-    replaceToken("@VER@", version)
-    replaceToken("@MOD_ID@", modId)
-    replaceToken("@DEV_MODE@", isDevBuild)
-}
-
-group = "noobroutes"
 
 version = project.findProperty("version") as String
 val modId = project.findProperty("modid") as String
-val isDevBuild = !project.hasProperty("prod")
+val prodValue = project.findProperty("prod") as? String ?: "false"
+val isDevBuild = (prodValue == false.toString())
+
+blossom {
+    replaceToken("@VER@", version)
+    replaceToken("@MOD_ID@", modId)
+    replaceToken("@DEV_MODE@", isDevBuild.toString())
+    replaceToken("@PROD@", prodValue)
+}
+
+group = "noobroutes"
 
 
 val shadowImpl: Configuration by configurations.creating {

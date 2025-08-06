@@ -18,7 +18,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static noobroutes.utils.UtilsKt.postAndCatch;
 
-
+/**
+ * Motion Update Event Taken From CGA
+ */
 @Mixin(value = {EntityPlayerSP.class})
 public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
     @Shadow private int positionUpdateTicks;

@@ -25,19 +25,19 @@ public abstract class MixinEntityLivingBase {
             method = "jump",
             constant = @Constant(floatValue = 0.2F)
     )
-    private float modifySprintJumpBoost(float constant) {
+    private float noobRoutes$modifySprintJumpBoost(float constant) {
         if (!QOL.INSTANCE.getEnabled() || (!LocationUtils.INSTANCE.isInSkyblock() && !Minecraft.getMinecraft().isSingleplayer())) return constant;
         return QOL.INSTANCE.getSpeed() * Minecraft.getMinecraft().thePlayer.capabilities.getWalkSpeed();
     }
 
     @ModifyConstant(method = "onLivingUpdate", constant = @Constant(intValue = 10))
-    private int modifyJumpResetTime(int constant) {
+    private int noobRoutes$modifyJumpResetTime(int constant) {
         if (!QOL.INSTANCE.getEnabled()) return 10;
         else return QOL.INSTANCE.getJumpDelay();
     }
 
     @Redirect(method = {"moveEntityWithHeading"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityLivingBase;isInLava()Z"))
-    private boolean isInLava(EntityLivingBase entity) {
+    private boolean noobRoutes$isInLava(EntityLivingBase entity) {
         if (QOL.INSTANCE.getEnabled() && QOL.INSTANCE.getLavaFix()) return entity.worldObj.isMaterialInBB(entity.getEntityBoundingBox().expand(-1.0E-4D, -1.0E-4D, -1.0E-4D), Material.lava);
         else return entity.isInLava();
     }
@@ -47,7 +47,7 @@ public abstract class MixinEntityLivingBase {
             at = @At("HEAD"),
             require = 0
     )
-    private void onMoveEntityWithHeadingPre$noobroutes(float strafe, float forward, CallbackInfo ci) {
+    private void noobRoutes$onMoveEntityWithHeadingPre$noobroutes(float strafe, float forward, CallbackInfo ci) {
         if ((Object) this instanceof EntityPlayerSP) {
             postAndCatch(new MoveEntityWithHeadingEvent.Pre());
         }
@@ -57,7 +57,7 @@ public abstract class MixinEntityLivingBase {
             at = @At("TAIL"),
             require = 0
     )
-    private void onMoveEntityWithHeadingPost$noobroutes(float strafe, float forward, CallbackInfo ci) {
+    private void noobRoutes$onMoveEntityWithHeadingPost$noobroutes(float strafe, float forward, CallbackInfo ci) {
         if ((Object) this instanceof EntityPlayerSP) {
             postAndCatch(new MoveEntityWithHeadingEvent.Post());
         }

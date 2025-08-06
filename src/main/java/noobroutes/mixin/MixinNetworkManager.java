@@ -40,30 +40,30 @@ public class MixinNetworkManager implements INetwork {
     @Shadow private INetHandler packetListener;
 
     @Inject(method = "channelRead0*", at = @At("HEAD"), cancellable = true)
-    private void onReceivePacket(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
+    private void noobRoutes$onReceivePacket(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
         if (postAndCatch(new PacketEvent.Receive(packet)) && !ci.isCancelled()) ci.cancel();
     }
 
 
     @Inject(method = {"sendPacket(Lnet/minecraft/network/Packet;)V"}, at = {@At("HEAD")}, cancellable = true)
-    private void onSendPacket(Packet<?> packet, CallbackInfo ci) {
+    private void noobRoutes$onSendPacket(Packet<?> packet, CallbackInfo ci) {
         if (!ServerUtils.handleSendPacket(packet))
             if (postAndCatch(new PacketEvent.Send(packet)) && !ci.isCancelled()) ci.cancel();
     }
 
     @Inject(method = {"sendPacket(Lnet/minecraft/network/Packet;)V"}, at = {@At("RETURN")})
-    private void onSendPacketReturn(Packet<?> packet, CallbackInfo ci) {
+    private void noobRoutes$onSendPacketReturn(Packet<?> packet, CallbackInfo ci) {
         postAndCatch(new PacketReturnEvent.Send(packet));
     }
 
     @Inject(method = "channelRead0*", at = {@At("RETURN")})
-    private void onReceivePacketReturn(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
+    private void noobRoutes$onReceivePacketReturn(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
         postAndCatch(new PacketReturnEvent.Receive(packet));
     }
 
 
     @Override
-    public void receive(Packet<INetHandler> packet) {
+    public void noobRoutes$receive(Packet<INetHandler> packet) {
         packet.processPacket(this.packetListener);
     }
 }

@@ -15,22 +15,22 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 @Mixin(value = EntityRenderer.class)
 abstract public class MixinEntityRenderer implements IResourceManagerReloadListener {
     @Inject(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiIngame;renderGameOverlay(F)V", shift = At.Shift.AFTER))
-    private void drawHud(float partialTicks, long nanoTime, CallbackInfo ci) {
+    private void noobRoutes$drawHud(float partialTicks, long nanoTime, CallbackInfo ci) {
         postAndCatch(new RenderOverlayNoCaching(partialTicks));
     }
 
     @Inject(method = "hurtCameraEffect", at = @At("HEAD"), cancellable = true)
-    private void onHurtCam(float partialTicks, CallbackInfo ci) {
+    private void noobRoutes$onHurtCam(float partialTicks, CallbackInfo ci) {
         if (NoDebuff.INSTANCE.getNoHurtCam()) ci.cancel();
     }
 
     @Inject(method = "renderWorld", at = @At("HEAD"))
-    private void beforeRenderWorld(float partialTicks, long finishTimeNano, CallbackInfo ci){
+    private void noobRoutes$beforeRenderWorld(float partialTicks, long finishTimeNano, CallbackInfo ci){
         FreeCam.INSTANCE.onBeforeRenderWorld();
     }
 
     @Inject(method = "renderWorld", at = @At("TAIL"))
-    private void afterRenderWorld(float partialTicks, long finishTimeNano, CallbackInfo ci){
+    private void noobRoutes$afterRenderWorld(float partialTicks, long finishTimeNano, CallbackInfo ci){
         FreeCam.INSTANCE.onAfterRenderWorld();
     }
 

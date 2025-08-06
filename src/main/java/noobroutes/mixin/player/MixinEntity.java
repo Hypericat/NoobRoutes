@@ -16,7 +16,7 @@ public abstract class MixinEntity {
     @Unique
     Minecraft noobRoutes$mc = Minecraft.getMinecraft();
     @Inject(method = "setAngles", at = @At("HEAD"), cancellable = true)
-    public void setAngles(float yaw, float pitch, CallbackInfo ci) {
+    public void noobRoutes$setAngles(float yaw, float pitch, CallbackInfo ci) {
         if (FreeCam.INSTANCE.getEnabled() && this.entityId == noobRoutes$mc.thePlayer.getEntityId()) {
             FreeCam.INSTANCE.setAngles(yaw, pitch);
             ci.cancel();

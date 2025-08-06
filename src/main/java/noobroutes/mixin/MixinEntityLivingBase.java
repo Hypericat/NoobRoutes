@@ -25,7 +25,7 @@ public abstract class MixinEntityLivingBase extends Entity {
      * I don't know why it fixes it, it just does.
      */
     @Inject(method = "getLook", at = @At("HEAD"), cancellable = true)
-    private void blockOverlayFix(float partialTicks, CallbackInfoReturnable<Vec3> cir) {
+    private void noobRoutes$blockOverlayFix(float partialTicks, CallbackInfoReturnable<Vec3> cir) {
         if ((EntityLivingBase)(Object)this instanceof EntityPlayerSP)
             cir.setReturnValue(noobRoutes$getLook(partialTicks));
     }

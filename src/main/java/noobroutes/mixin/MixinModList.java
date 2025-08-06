@@ -20,7 +20,7 @@ public abstract class MixinModList {
     private Map<String, String> modTags;
 
     @Inject(method = "<init>(Ljava/util/List;)V", at = @At("RETURN"))
-    private void removeModID(List<ModContainer> modList, CallbackInfo ci) {
+    private void noobRoutes$removeModID(List<ModContainer> modList, CallbackInfo ci) {
         if (!Minecraft.getMinecraft().isIntegratedServerRunning()) {
             modTags.remove(NoobRoutesKt.MODID);
         }

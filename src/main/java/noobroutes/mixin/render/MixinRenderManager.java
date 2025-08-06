@@ -15,7 +15,7 @@ public class MixinRenderManager {
             at = {@At("HEAD")},
             method = {"renderEntitySimple(Lnet/minecraft/entity/Entity;F)Z"}
     )
-    private void beforeRenderEntitySimple(Entity entityIn, float partialTicks, CallbackInfoReturnable<Boolean> cir) {
+    private void noobRoutes$beforeRenderEntitySimple(Entity entityIn, float partialTicks, CallbackInfoReturnable<Boolean> cir) {
         FreeCam.INSTANCE.onBeforeRenderEntity(entityIn);
     }
 
@@ -23,7 +23,7 @@ public class MixinRenderManager {
             at = {@At("TAIL")},
             method = {"renderEntitySimple(Lnet/minecraft/entity/Entity;F)Z"}
     )
-    private void afterRenderEntitySimple(Entity entityIn, float partialTicks, CallbackInfoReturnable<Boolean> cir) {
+    private void noobRoutes$afterRenderEntitySimple(Entity entityIn, float partialTicks, CallbackInfoReturnable<Boolean> cir) {
         FreeCam.INSTANCE.onAfterRenderEntity(entityIn);
     }
 
