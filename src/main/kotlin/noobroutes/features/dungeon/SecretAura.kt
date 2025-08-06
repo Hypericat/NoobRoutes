@@ -20,6 +20,7 @@ import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.DropdownSetting
@@ -29,6 +30,7 @@ import noobroutes.utils.*
 import noobroutes.utils.Utils.isNotStart
 import noobroutes.utils.skyblock.devMessage
 
+@DevOnly
 object SecretAura : Module("Secret Aura", category = Category.DUNGEON, description = "Typical Secret Aura, is Disabled Inside of Boss. (Use Lever Aura)") {
     val enableOutsideOfDungeons by BooleanSetting("Enable Everywhere", description = "Enables the Aura outside of dungeons.")
     private val rangeDropDown by DropdownSetting("Range Settings")
@@ -106,10 +108,14 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
         when (swapOn) {
             "None" -> {}
             "Skulls" -> {
-                if (blockCandidate.block === Blocks.skull) handleSwap()
+                if (blockCandidate.block === Blocks.skull) {
+                    val swap = handleSwap()
+                    if (swap == SwapManager.SwapState.SWAPPED) return
+                }
             }
             "All" -> {
-                handleSwap()
+                val swap = handleSwap()
+                if (swap == SwapManager.SwapState.SWAPPED) return
             }
         }
 
@@ -118,10 +124,11 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
         AuraManager.auraBlock(blockCandidate.pos)
     }
 
-    private fun handleSwap() {
+    private fun handleSwap(): SwapManager.SwapState {
         if (previousSlot == -1 && swapBack) previousSlot = mc.thePlayer.inventory.currentItem
-        SwapManager.swapToSlot((swapTo - 1).coerceIn(0, 8))
-        devMessage("Secret Aura Swap: ${System.currentTimeMillis()}")
+        //devMessage("Secret Aura Swap: ${System.currentTimeMillis()}")
+        return SwapManager.swapToSlot((swapTo - 1).coerceIn(0, 8))
+
     }
 
     private fun isValidBlock(block: Block, position: BlockPos): Boolean {

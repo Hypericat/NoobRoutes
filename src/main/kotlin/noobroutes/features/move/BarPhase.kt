@@ -9,6 +9,7 @@ import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.settings.DevOnly
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.Utils
 import noobroutes.utils.Utils.lastPlayerPos
@@ -16,6 +17,7 @@ import noobroutes.utils.Utils.lastPlayerSpeed
 import noobroutes.utils.toBlockPos
 import org.lwjgl.input.Keyboard
 
+@DevOnly
 object BarPhase: Module(
     name = "Bar Phase",
     Keyboard.KEY_NONE,

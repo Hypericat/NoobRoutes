@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.settings.DevOnly
 import noobroutes.utils.PacketUtils.sendPacket
 import noobroutes.utils.Utils.isNotEnd
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
@@ -19,6 +20,7 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils
  *
  * one could say I took inspiration
  */
+@DevOnly
 object AutoClose : Module("Auto Close", description = "Taken from Secret Guide", category = Category.DUNGEON) {
     private var closeId: Int? = null
 

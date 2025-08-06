@@ -321,7 +321,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
     }
 
     fun loadConfig() {
-        val floorConfigFile = DataManager.loadDataFromFileObjectOfObjects("floorConfig")
+        val floorConfigFile = DataManager.loadDataFromFileObjectOfObjects("floorsConfig")
         val roomConfigFile = DataManager.loadDataFromFileObjectOfObjects("roomConfig")
         floorConfig.clear()
         roomConfig.clear()

@@ -8,6 +8,7 @@ import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.AuraManager
+import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
 import noobroutes.utils.isAir
 import noobroutes.utils.skyblock.modMessage
@@ -35,7 +36,7 @@ class BoomRing(
 
     override fun doRing() {
         SwapManager.swapFromName("TNT")
-        AuraManager.auraBlock(block, force = true)
-        //Scheduler.schedulePreTickTask(1) { AuraManager.auraBlock(block, force = true) }
+        //AuraManager.auraBlock(block, force = true)
+        Scheduler.schedulePreTickTask(0) { AuraManager.auraBlock(block, force = true) }
     }
 }

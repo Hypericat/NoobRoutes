@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.RotationUtils
@@ -18,6 +19,7 @@ import noobroutes.utils.routes.RouteUtils
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 
+@DevOnly
 object ZealotAura: Module(
     name = "Zealot Aura",
     Keyboard.KEY_NONE,

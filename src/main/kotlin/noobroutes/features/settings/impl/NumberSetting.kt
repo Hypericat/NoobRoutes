@@ -31,7 +31,7 @@ import kotlin.math.round
         value = (roundToIncrement(number).coerceIn(min, max) as E)
     }
 
-    val roundTo = if ((1 as E) is Int || increment == (1 as E)) 0 else 2
+    val roundTo = if ((1 as E) is Int || increment.toDouble() == 1.0) 0 else 2
 
     /**
      * The amount a setting should increment.

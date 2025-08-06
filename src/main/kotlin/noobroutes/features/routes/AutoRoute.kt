@@ -18,6 +18,7 @@ import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.features.routes.nodes.autoroutes.Aotv
 import noobroutes.features.routes.nodes.autoroutes.Bat
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
@@ -51,6 +52,7 @@ import kotlin.math.ceil
 /**
  * Modified from AK47 and MeowClient
  */
+@DevOnly
 object AutoRoute : Module("Autoroute", description = "Ak47 modified", category = Category.ROUTES) {
     val silent by BooleanSetting("Silent", default = true, description = "Server side rotations")
     val decrease by BooleanSetting("Reduce Pearlclip", default = false, description = "When creating PearlClips it decreases the distance input by 1")

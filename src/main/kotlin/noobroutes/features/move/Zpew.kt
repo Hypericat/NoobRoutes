@@ -19,6 +19,7 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.render.ClickGUIModule
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.utils.*
@@ -29,6 +30,7 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import scala.collection.parallel.ParIterableLike.Min
 import kotlin.math.floor
 
+@DevOnly
 object Zpew : Module(
     name = "Zpew",
     category = Category.MOVE,

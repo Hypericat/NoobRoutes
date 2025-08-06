@@ -26,8 +26,8 @@ import noobroutes.features.move.*
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.render.FreeCam
 import noobroutes.features.render.RotationVisualizer
-import noobroutes.features.render.ColorPaletteModule
 import noobroutes.features.render.Trail
+import noobroutes.features.routes.AutoRoute
 import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.ui.clickgui.ClickGui
@@ -91,17 +91,16 @@ object ModuleManager {
         FreeCam,
         QOL,
         BarPhase,
-        ColorPaletteModule,
         AutoBloodRush,
         AutoPath,
         EWPathfinderModule,
         DynamicRoute,
         ZealotAura,
         WaterBoard,
-        ZealotAura,
         IceFill,
         SecretAura,
-        AutoClose
+        AutoClose,
+        AutoRoute
     )
 
     init {
