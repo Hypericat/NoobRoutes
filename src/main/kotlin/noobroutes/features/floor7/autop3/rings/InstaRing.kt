@@ -36,10 +36,10 @@ class InstaRing(
             return
         }
         if (mc.thePlayer.motionX != 0.0 || mc.thePlayer.motionZ != 0.0) {
-            if (AutoP3.renderStyle != 3) modMessage("must be still before insta")
+            if (AutoP3.renderStyle != "cgy") modMessage("must be still before insta")
             return
         }
-        if (AutoP3.renderStyle == 3) modMessage("Hclipping", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == "cgy") modMessage("Hclipping", "§0[§6Yharim§0]§7 ")
         AutoP3Utils.unPressKeys()
         super.doRing()
         direction = yaw

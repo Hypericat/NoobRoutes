@@ -31,8 +31,8 @@ class ElementTextField(setting: StringSetting) :
     }
 
     val textElement = TextBoxElement(
-        "", w - BORDER_OFFSET, h * 0.5f - TEXT_BOX_ELEMENT_HEIGHT_HALF, 16f, TEXT_BOX_ELEMENT_HEIGHT, 12f, TextAlign.Right, 6f, 3f,
-        textColor.darker(), 12, TextBoxElement.TextBoxType.NORMAL, 3f, setting.text
+        "", w - BORDER_OFFSET, h * 0.5f - TEXT_BOX_ELEMENT_HEIGHT_HALF, 36f, TEXT_BOX_ELEMENT_HEIGHT, 12f, TextAlign.Right, 6f, 9f,
+        textColor.darker(), 12, TextBoxElement.TextBoxType.NORMAL, 2f, setting.text
     ).apply {
         addValueChangeListener {
             setting.text = it

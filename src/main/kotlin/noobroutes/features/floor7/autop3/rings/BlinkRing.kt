@@ -97,7 +97,7 @@ class BlinkRing(
         }
         
         if (exceedsBlinkLimit || blinkDisabled) {
-            if (AutoP3.renderStyle == 3) modMessage("Moving", "§0[§6Yharim§0]§7 ")
+            if (AutoP3.renderStyle == "cgy") modMessage("Moving", "§0[§6Yharim§0]§7 ")
             movementPackets = packets.toMutableList()
             mc.thePlayer.motionX = 0.0
             mc.thePlayer.motionZ = 0.0
@@ -116,7 +116,7 @@ class BlinkRing(
         AutoP3.isAligned = true
         mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
         resetTriggered()
-        if (AutoP3.renderStyle == 3) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == "cgy") modMessage("Blinking", "§0[§6Yharim§0]§7 ")
         else modMessage("§c§l$cancelled§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }
 

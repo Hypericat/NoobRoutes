@@ -128,16 +128,16 @@ object AutoSS : Module(
             }
 
             when (i1Mode) {
-                0 -> { //tickshift
+                "tickshift" -> { //tickshift
                     Thread.sleep(49)
                     dontCancel = true
                     timesToClickI1 = i1ClickAmount
                 }
-                1, 2 -> { //the others
+                "c03", "c08" -> { //the others
                     dontCancel = true
                     repeat(i1ClickAmount) {
                         if (it % 3 == 0) Thread.sleep(50)
-                        if (i1Mode == 1) PacketUtils.sendPacket(C03PacketPlayer(mc.thePlayer.onGround))
+                        if (i1Mode == "c03") PacketUtils.sendPacket(C03PacketPlayer(mc.thePlayer.onGround))
                         clickStartButton()
                     }
                     dontCancel = false

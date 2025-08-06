@@ -1,13 +1,18 @@
 package noobroutes.features.render
 
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.config.Config
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.AlwaysActive
 import noobroutes.features.settings.impl.*
+import noobroutes.font.FontType
+import noobroutes.ui.ColorPalette
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.clickgui.ClickGui
+import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.LocationUtils
 import org.lwjgl.input.Keyboard
@@ -52,6 +57,14 @@ object  ClickGUIModule: Module(
         description = "Opens an example hud to allow configuration of huds."
     ) {
         Core.display = EditHUDGui
+    }
+    val font by SelectorSetting("Font", "NUNITO", FontType.entries.map { it.name }.toCollection(ArrayList()), description = "")
+
+    @SubscribeEvent
+    fun onTick(tickEvent: TickEvent.ClientTickEvent) {
+        if (tickEvent.isEnd) return
+
+        ColorPalette.defaultPalette.font = FontType.entries.firstOrNull { it.name == font } ?: return
     }
 
     private var joined by BooleanSetting("First join", false, hidden = true, "")

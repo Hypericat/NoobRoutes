@@ -185,8 +185,8 @@ object AutoP3Utils {
             return
         }
 
-        val movementFactor = if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0 && AutoP3.walkFix != 0)) {
-            speed * if (walkFix == 2) SPRINT_MULTIPLIER else 1.0
+        val movementFactor = if (mc.thePlayer.onGround || (airTicks == 1 && mc.thePlayer.motionY < 0 && AutoP3.walkFix != "none")) {
+            speed * if (walkFix == "big") SPRINT_MULTIPLIER else 1.0
         } else {
             0.02 * SPRINT_MULTIPLIER
         }

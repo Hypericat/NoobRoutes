@@ -65,7 +65,7 @@ object AutoP3: Module (
     }
     val silentLook by BooleanSetting("Silent Look", false, description = "when activating a look ring only rotate serverside (may lead to desync)")
     val renderStyle by SelectorSetting("ring design", "normal", arrayListOf("normal", "simple", "box", "cgy"), false, description = "how rings should look")
-    val ringSlices by NumberSetting(name = "slices", description = "hexagons would look cool -wadey", min = 3, max = 50, default = 24).withDependency { renderStyle < 2 }
+    val ringSlices by NumberSetting(name = "slices", description = "hexagons would look cool -wadey", min = 3, max = 50, default = 24).withDependency { renderStyle == "normal" || renderStyle == "simple" }
     val walkFix by SelectorSetting("walk boost", "none", arrayListOf("none", "normal", "big"), false, description = "boost of an edge")
     private val alignedOnly by BooleanSetting("aligned only", false, description = "only lets u use ring that align or while aligned")
     private val blinkShit by DropdownSetting(name = "Blink Settings")
@@ -102,10 +102,10 @@ object AutoP3: Module (
         rings[route]?.forEachIndexed { i, ring ->
             if (alignedOnly && !isAligned && !ring.center && ring !is BlinkRing) return@forEachIndexed
 
-            if (renderIndex && renderStyle != 3) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
+            if (renderIndex && renderStyle != "box") Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), Color.GREEN, depth = depth)
 
             ring.renderRing()
-            if (renderStyle == 3 || ring !is BlinkRing) return@forEachIndexed
+            if (renderStyle == "box" || ring !is BlinkRing) return@forEachIndexed
 
             val vec3List: List<Vec3> = ring.packets.map { packet -> Vec3(packet.positionX, packet.positionY + 0.01, packet.positionZ) }
             if (showEnd && ring.packets.size > 1) Renderer.drawCylinder(vec3List[vec3List.size-1].add(Vec3(0.0, 0.03, 0.0)),  0.5, 0.5, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)

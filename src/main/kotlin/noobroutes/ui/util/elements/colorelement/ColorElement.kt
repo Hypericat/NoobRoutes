@@ -30,7 +30,7 @@ class ColorElement(
         const val COLOR_BOX_SIZE = 150f
         const val COLOR_BOX_SIZE_HALF = COLOR_BOX_SIZE * 0.5f
         const val COLOR_BOX_RADIUS = 10f
-        const val COLOR_BOX_CIRCLE_RADIUS = 9f
+        const val COLOR_BOX_CIRCLE_RADIUS = 8f
         const val COLOR_BOX_CIRCLE_THICKNESS = COLOR_BOX_CIRCLE_RADIUS * 0.225f
 
         val ALPHA_BACKGROUND = DynamicTexture(RenderUtils.loadBufferedImage("/assets/ui/alphaBackground.png"))

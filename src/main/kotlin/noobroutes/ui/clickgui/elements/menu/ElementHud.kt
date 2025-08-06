@@ -42,7 +42,7 @@ class ElementHud(setting: HudSetting) : Element<HudSetting>(
             else isAreaHovered(x + w - 30f, y + 5f, 21f, 20f)
         }
 
-    private val movementIcon = DynamicTexture(loadBufferedImage("/assets/ui/MovementIcon.png"))
+    private val movementIcon = DynamicTexture(loadBufferedImage("/assets/ui/MoveHudIcon.png"))
     private val colorAnim = ColorAnimation(250)
     private val linearAnimation = LinearAnimation<Float>(200)
 

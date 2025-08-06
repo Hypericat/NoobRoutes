@@ -62,7 +62,7 @@ class SpedRing(
         AutoP3Utils.speeding = false
         //AutoP3Utils.setGameSpeed(100f)
         //spedFor = length
-        if (AutoP3.renderStyle == 3) modMessage("Blinking", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == "cgy") modMessage("Blinking", "§0[§6Yharim§0]§7 ")
         else modMessage("§c§l${cancelled}§r§f c04s available, used §c${length}§f,  §7(${AutoP3.maxBlinks - blinksInstance} left on this instance)")
     }
 }

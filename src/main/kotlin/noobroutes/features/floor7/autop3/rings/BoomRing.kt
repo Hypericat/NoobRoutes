@@ -30,7 +30,7 @@ class BoomRing(
 
     override fun doRing() {
         super.doRing()
-        if (AutoP3.renderStyle == 3) modMessage("Exploding", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == "cgy") modMessage("Exploding", "§0[§6Yharim§0]§7 ")
         SwapManager.swapFromName("TNT")
         Scheduler.schedulePreTickTask(1) { AuraManager.auraBlock(block, force = true) }
     }

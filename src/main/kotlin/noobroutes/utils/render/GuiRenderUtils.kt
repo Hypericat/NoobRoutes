@@ -9,6 +9,7 @@ import noobroutes.font.FontRenderer
 import noobroutes.font.FontType
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.ColorPalette.moduleButtonColor
+import noobroutes.ui.util.shader.GapOutlineShader
 import noobroutes.ui.util.shader.GaussianBlurShader
 import noobroutes.ui.util.shader.RoundedRect
 import noobroutes.utils.coerceAlpha
@@ -77,7 +78,7 @@ fun <T: Number> roundedRectangle(box: BoxWithClass<T>, color: Color, radius: Num
 
 
 fun rectangleOutline(x: Number, y: Number, w: Number, h: Number, color: Color, radius: Number = 0f, thickness: Number, edgeSoftness: Number = 1f) {
-    roundedRectangle(x, y, w, h, Color.TRANSPARENT, color, Color.TRANSPARENT, thickness, radius, radius, radius, radius, edgeSoftness)
+    gapOutline(x, y, w, h, radius, color, thickness, 0f, 0f, 0f, 0f)
 }
 
 fun gradientRect(x: Float, y: Float, w: Float, h: Float, color1: Color, color2: Color, radius: Float, direction: GradientDirection = GradientDirection.Right, borderColor: Color = Color.TRANSPARENT, borderThickness: Number = 0f) {
@@ -114,6 +115,34 @@ fun circle(x: Number, y: Number, radius: Number, color: Color, borderColor: Colo
         )
     }
 }
+fun gapOutline(
+    x: Number, y: Number,
+    width: Number, height: Number,
+    radius: Number, color: Color, thickness: Number,
+    gapCenterX: Number, gapCenterY: Number,
+    gapWidth: Number, gapHeight: Number,
+    gapRadius: Number = 0f
+) {
+    matrix.runLegacyMethod(matrix.get()) {
+        GapOutlineShader.drawGapOutline(
+            matrix.get(),
+            x.toFloat(),
+            y.toFloat(),
+            width.toFloat(),
+            height.toFloat(),
+            radius.toFloat(),
+            thickness.toFloat(),
+            color,
+            gapCenterX.toFloat() + x.toFloat(),
+            gapCenterY.toFloat() + y.toFloat(),
+            gapWidth.toFloat(),
+            gapHeight.toFloat(),
+            gapRadius.toFloat()
+        )
+    }
+}
+
+
 
 fun text(text: String, x: Number, y: Number, color: Color, size: Number, type: Int = FontRenderer.REGULAR, align: TextAlign = TextAlign.Left, verticalAlign: TextPos = TextPos.Middle, shadow: Boolean = false, fontType: FontType = ColorPalette.font) {
     FontRenderer.text(text, x.toFloat(), y.toFloat(), color, size.toFloat(), align, verticalAlign, shadow, type)
@@ -200,7 +229,7 @@ fun initUIFramebufferStencil() {
 }
 
 fun stencilRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number, inverse: Boolean = false) {
-    stencil(inverse) {roundedRectangle(x, y,w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
+    stencil{roundedRectangle(x, y,w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
 }
 
 fun stencilRoundedRectangle(x: Float, y: Float, w: Float, h: Float, radius: Number = 0f, edgeSoftness: Number = 0.5f, inverse: Boolean = false) {
@@ -213,15 +242,14 @@ fun blurRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Numbe
     popStencil()
 }
 
-private data class StencilState(val value: Int, val inverse: Boolean)
-private var stencilStack = Stack<StencilState>()
+private var stencilStack = Stack<Int>()
 
-fun stencil(inverse: Boolean = false, mask: () -> Unit) {
-    val newStencilValue = if (stencilStack.isEmpty()) 1 else stencilStack.peek().value + 1
-    stencilStack.push(StencilState(newStencilValue, inverse))
-
+fun stencil(mask: () -> Unit) {
+    val newStencilValue = if (stencilStack.isEmpty()) 1 else stencilStack.peek() + 1
+    stencilStack.push(newStencilValue)
     GL11.glEnable(GL11.GL_STENCIL_TEST)
-    if (newStencilValue == 1) {
+
+    if (stencilStack.peek() == 1) {
         GL11.glClearStencil(0)
         GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT)
     }
@@ -229,19 +257,18 @@ fun stencil(inverse: Boolean = false, mask: () -> Unit) {
     GL11.glColorMask(false, false, false, false)
     GL11.glDepthMask(false)
     GL11.glStencilMask(0xFF)
-
-    if (newStencilValue > 1) {
-        val previousState = stencilStack.elementAt(stencilStack.size - 2)
-        GL11.glStencilFunc(GL11.GL_EQUAL, previousState.value, 0xFF)
+    if (stencilStack.peek() > 1) {
+        val previousStencilValue = stencilStack.peek() - 1
+        GL11.glStencilFunc(GL11.GL_EQUAL, previousStencilValue, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_INCR)
     } else {
         GL11.glStencilFunc(GL11.GL_ALWAYS, newStencilValue, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
     }
-
     mask.invoke()
 
-    GL11.glStencilFunc(GL11.GL_EQUAL, if (newStencilValue > 1) newStencilValue else 0, 0xFF)
+    GL11.glStencilFunc(GL11.GL_EQUAL, if (stencilStack.peek() > 1) newStencilValue else 0, 0xFF)
+
     GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
     GL11.glStencilMask(0xFF)
     mask.invoke()
@@ -249,28 +276,30 @@ fun stencil(inverse: Boolean = false, mask: () -> Unit) {
     GL11.glColorMask(true, true, true, true)
     GL11.glDepthMask(true)
     GL11.glStencilMask(0x00)
-    GL11.glStencilFunc(if (inverse) GL11.GL_NOTEQUAL else GL11.GL_EQUAL, newStencilValue, 0xFF)
+
+    GL11.glStencilFunc(GL11.GL_EQUAL, newStencilValue, 0xFF)
     GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
 }
-
+/**
+ * pop stencil is broken and it is annoying
+ * I have no idea how to fix it
+ */
 fun popStencil() {
     if (stencilStack.isEmpty()) {
         throw IllegalStateException("StencilStack is empty")
     }
 
     stencilStack.pop()
-
     if (stencilStack.isEmpty()) {
         GL11.glDisable(GL11.GL_STENCIL_TEST)
         GL11.glStencilFunc(GL11.GL_ALWAYS, 0, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
-        GL11.glStencilMask(0xFF)
+        GL11.glStencilMask(0xFF) // Reset mask
     } else {
-        val previousState = stencilStack.peek()
-        val stencilFunc = if (previousState.inverse) GL11.GL_NOTEQUAL else GL11.GL_EQUAL
-        GL11.glStencilFunc(stencilFunc, previousState.value, 0xFF)
+        val previousStencilValue = stencilStack.peek()
+        GL11.glStencilFunc(GL11.GL_EQUAL, previousStencilValue, 0xFF)
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
-        GL11.glStencilMask(0x00)
+        GL11.glStencilMask(0x00) // Continue to disable writing unless re-entering a stencil
     }
 }
 

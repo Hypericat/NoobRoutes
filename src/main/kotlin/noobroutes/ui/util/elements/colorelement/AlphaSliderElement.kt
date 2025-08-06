@@ -16,6 +16,17 @@ class AlphaSliderElement(
     override fun draw() {
         GlStateManager.pushMatrix()
         translate(x - ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF, y - ColorElementsConstants.COLOR_SLIDER_HEIGHT_HALF)
+        GlStateManager.translate(0f, 0f, 1f)
+        circle(
+            ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF,
+            ColorElementsConstants.COLOR_SLIDER_HEIGHT * (1f - elementValue.alpha),
+            ColorElementsConstants.COLOR_SLIDER_CIRCLE_RADIUS,
+            elementValue,
+            Color.Companion.WHITE,
+            ColorElementsConstants.COLOR_SLIDER_CIRCLE_BORDER_THICKNESS
+        )
+        GlStateManager.translate(0f, 0f, -1f)
+
         stencilRoundedRectangle(
             0f,
             0f,
@@ -23,6 +34,8 @@ class AlphaSliderElement(
             ColorElementsConstants.COLOR_SLIDER_HEIGHT,
             ColorElementsConstants.COLOR_SLIDER_CIRCLE_RADIUS
         )
+
+
         //the alpha background const values are based off of the png size,
         //it will get cut by the stencil tool to match the actual wanted size
         drawDynamicTexture(
@@ -42,15 +55,10 @@ class AlphaSliderElement(
             0f,
             GradientDirection.Up
         )
-        circle(
-            ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF,
-            ColorElementsConstants.COLOR_SLIDER_HEIGHT * (1f - elementValue.alpha),
-            ColorElementsConstants.COLOR_SLIDER_CIRCLE_RADIUS,
-            Color.Companion.TRANSPARENT,
-            Color.Companion.WHITE,
-            ColorElementsConstants.COLOR_SLIDER_CIRCLE_BORDER_THICKNESS
-        )
         popStencil()
+        GlStateManager.translate(0f, 0f, 1f)
+
+
         if (dragging) {
             elementValue.alpha = getMouseYPercentageInBounds(
                 0f,

@@ -28,7 +28,7 @@ import kotlin.math.min
 
 //implement copy and paste
 //make it so you can add custom string filters
-class TextBoxElement(
+class AccessorBasedTextBoxElement(
     val name: String,
     x: Float,
     y: Float,
@@ -40,13 +40,15 @@ class TextBoxElement(
     val textPadding: Float,
     val boxColor: Color,
     var maxCharacters: Int,
-    val boxType: TextBoxType,
+    val boxType: TextBoxElement.TextBoxType,
     val boxThickness: Float = 3f,
-    override var elementValue: String,
     val keyWhiteList: List<Int>,
     val placeHolder: String = "",
-    val verticalAlign: TextPos = TextPos.Middle
-) : UiElement(x, y), ElementValue<String> {
+    val verticalAlign: TextPos = TextPos.Middle,
+    val getter: () -> String,
+    val setter: (String) -> Unit
+) : UiElement(x, y){
+
     constructor(
         name: String,
         x: Float,
@@ -59,20 +61,17 @@ class TextBoxElement(
         textPadding: Float,
         boxColor: Color,
         maxCharacters: Int,
-        boxType: TextBoxType,
+        boxType: TextBoxElement.TextBoxType,
         boxThickness: Float = 3f,
-        elementValue: String,
         placeHolder: String = "",
-        verticalAlign: TextPos = TextPos.Middle
-    ) : this(name, x, y, minWidth, h, textScale, textAlign, radius, textPadding, boxColor, maxCharacters, boxType, boxThickness, elementValue, defaultWhiteList, placeHolder, verticalAlign)
+        verticalAlign: TextPos = TextPos.Middle,
+        getter: () -> String,
+        setter: (String) -> Unit
+    ) : this(name, x, y, minWidth, h, textScale, textAlign, radius, textPadding, boxColor, maxCharacters, boxType, boxThickness, defaultWhiteList, placeHolder, verticalAlign, getter, setter)
 
-    enum class TextBoxType{
-        GAP,
-        NORMAL,
-        NO_BOX
-    }
-
-    override val elementValueChangeListeners = mutableListOf<(String) -> Unit>()
+    inline var elementValue
+        get() = getter.invoke()
+        set(value) {setter(value)}
 
     companion object {
         const val TEXT_BOX_GAP_TEXT_MULTIPLIER = 0.1f
@@ -81,7 +80,7 @@ class TextBoxElement(
             return getTextWidth(text, scale).coerceAtLeast(min) + textPadding * 2
         }
 
-        private var activeTextBoxElement: TextBoxElement? = null
+        private var activeTextBoxElement: AccessorBasedTextBoxElement? = null
 
         val defaultWhiteList = listOf(
             Keyboard.KEY_A,
@@ -140,7 +139,7 @@ class TextBoxElement(
         when (keyCode) {
             Keyboard.KEY_ESCAPE, Keyboard.KEY_NUMPADENTER, Keyboard.KEY_RETURN -> {
                 resetSelection()
-                invokeValueChangeListeners()
+
                 listening = false
             }
             Keyboard.KEY_BACK -> {
@@ -323,9 +322,9 @@ class TextBoxElement(
 
     override fun draw() {
         when (boxType) {
-            TextBoxType.NORMAL -> drawTextBox()
-            TextBoxType.GAP -> drawTextBoxWithGapTitle()
-            TextBoxType.NO_BOX -> drawTextBoxNoBox()
+            TextBoxElement.TextBoxType.NORMAL -> drawTextBox()
+            TextBoxElement.TextBoxType.GAP -> drawTextBoxWithGapTitle()
+            TextBoxElement.TextBoxType.NO_BOX -> drawTextBoxNoBox()
         }
         if (!listening) return
 
@@ -364,6 +363,7 @@ class TextBoxElement(
         }
     }
 
+
     val resetClickStageClock = Clock(250)
     var clickSelectStage = 0
     override fun mouseClicked(mouseButton: Int): Boolean {
@@ -371,7 +371,6 @@ class TextBoxElement(
         if (!isHovered) {
             listening = false
             resetSelection()
-            invokeValueChangeListeners()
             return false
         }
         if (resetClickStageClock.hasTimePassed(false)) clickSelectStage = 0

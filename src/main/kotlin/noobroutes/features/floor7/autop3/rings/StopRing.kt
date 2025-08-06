@@ -24,7 +24,7 @@ class StopRing(
     override fun doRing() {
         AutoP3Utils.unPressKeys()
         super.doRing()
-        if (AutoP3.renderStyle == 3) modMessage("Stopping", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == "cgy") modMessage("Stopping", "§0[§6Yharim§0]§7 ")
         mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
     }
 }

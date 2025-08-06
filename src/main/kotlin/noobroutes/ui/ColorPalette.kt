@@ -14,6 +14,8 @@ object ColorPalette {
         var moduleButtonColor: Color,
         var font: FontType
     )
+
+
     val defaultPalette = Palette(
         Color(239, 239, 239),
         ClickGUIModule.color,

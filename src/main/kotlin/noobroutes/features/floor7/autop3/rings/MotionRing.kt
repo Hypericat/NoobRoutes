@@ -31,7 +31,7 @@ class MotionRing(
     override fun doRing() {
         AutoP3Utils.unPressKeys()
         super.doRing()
-        if (AutoP3.renderStyle == 3) modMessage("Jumping", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == "cgy") modMessage("Jumping", "§0[§6Yharim§0]§7 ")
         AutoP3Utils.direction = yaw
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0

@@ -100,16 +100,16 @@ abstract class Ring(
         val topOffset = (0.48 * sin(System.currentTimeMillis().toDouble() * 0.0033333334)) + 0.5
         val bottomOffset = 1 - topOffset
         when (renderStyle) {
-            0 -> {
+            "normal" -> {
                 drawCylinderWithRingArgs(offsetCoords.add(0.0, topOffset * height, 0.0), Color.GREEN) //moving ring 1
                 drawCylinderWithRingArgs(offsetCoords.add(0.0, bottomOffset * height, 0.0), Color.GREEN) //moving ring 2
                 drawCylinderWithRingArgs(offsetCoords, Color.DARK_GRAY) //bottom static
                 drawCylinderWithRingArgs(offsetCoords.add(0.0, 0.5 * height, 0.0), Color.GREEN) // middle static
                 drawCylinderWithRingArgs(offsetCoords.add(0.0, height.toDouble(), 0.0), Color.DARK_GRAY) //bottom static
             }
-            1 -> drawCylinderWithRingArgs(offsetCoords, Color.GREEN)
-            2 -> RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), Color.GREEN, thickness = 3, depth = depth)
-            3 -> Renderer.drawCylinder(this.coords, diameter * 0.5, diameter * 0.5, -0.01, 24, 1, 90, 0, 0, ringColors.getOrDefault(this.type, Color(255, 0, 255)), depth = depth)
+            "simple" -> drawCylinderWithRingArgs(offsetCoords, Color.GREEN)
+            "box" -> RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), Color.GREEN, thickness = 3, depth = depth)
+            "cgy" -> Renderer.drawCylinder(this.coords, diameter * 0.5, diameter * 0.5, -0.01, 24, 1, 90, 0, 0, ringColors.getOrDefault(this.type, Color(255, 0, 255)), depth = depth)
         }
         if (this.renderYawVector) Renderer.draw3DLine(listOf(
             this.coords.add(0.0, PlayerUtils.STAND_EYE_HEIGHT, 0.0),
@@ -151,7 +151,7 @@ abstract class Ring(
             Blink.rotate = yaw
         }
 
-        if (renderStyle == 3) {
+        if (renderStyle == "cgy") {
             Scheduler.schedulePostTickTask { mc.thePlayer.rotationYaw = yaw }
             val javaRandom = java.util.Random()
             val gaussian = javaRandom.nextGaussian().toFloat()

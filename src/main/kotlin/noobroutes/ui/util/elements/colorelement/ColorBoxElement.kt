@@ -7,6 +7,7 @@ import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
 import noobroutes.utils.render.ColorUtil.hsbMax
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.withAlpha
 
 class ColorBoxElement(
     x: Float, y: Float,
@@ -17,6 +18,18 @@ class ColorBoxElement(
     override fun draw() {
         GlStateManager.pushMatrix()
         translate(x - ColorElementsConstants.COLOR_BOX_SIZE_HALF, y - ColorElementsConstants.COLOR_BOX_SIZE_HALF)
+
+        GlStateManager.translate(0f, 0f, 1f)
+        circle(
+            elementValue.saturation * ColorElementsConstants.COLOR_BOX_SIZE,
+            (1 - elementValue.brightness) * ColorElementsConstants.COLOR_BOX_SIZE,
+            ColorElementsConstants.COLOR_BOX_CIRCLE_RADIUS,
+            elementValue.withAlpha(1f),
+            Color.Companion.WHITE,
+            ColorElementsConstants.COLOR_BOX_CIRCLE_THICKNESS
+        )
+        GlStateManager.translate(0f, 0f, -1f)
+
         stencilRoundedRectangle(
             0f,
             0f,
@@ -31,17 +44,9 @@ class ColorBoxElement(
             ColorElementsConstants.COLOR_BOX_SIZE,
             elementValue.hsbMax()
         )
-
-        circle(
-            elementValue.saturation * ColorElementsConstants.COLOR_BOX_SIZE,
-            (1 - elementValue.brightness) * ColorElementsConstants.COLOR_BOX_SIZE,
-            ColorElementsConstants.COLOR_BOX_CIRCLE_RADIUS,
-            Color.Companion.TRANSPARENT,
-            Color.Companion.WHITE,
-            ColorElementsConstants.COLOR_BOX_CIRCLE_THICKNESS
-        )
-
         popStencil()
+
+
         GlStateManager.popMatrix()
         if (dragging) {
             elementValue.saturation = getMouseXPercentageInBounds(

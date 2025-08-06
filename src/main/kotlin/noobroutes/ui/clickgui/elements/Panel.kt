@@ -23,6 +23,7 @@ import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.getTextWidth
 import noobroutes.utils.render.popStencil
+import noobroutes.utils.render.rectangleOutline
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.stencilRoundedRectangle
 import noobroutes.utils.render.text
@@ -105,22 +106,21 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
         translate(x, y)
         blurRoundedRectangle(-BORDER_THICKNESS, -BORDER_THICKNESS, WIDTH + DOUBLE_BORDER_THICKNESS, offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT + DOUBLE_BORDER_THICKNESS, PANEL_RADIUS, PANEL_RADIUS, PANEL_RADIUS, PANEL_RADIUS, 0.5f)
 
-        stencilRoundedRectangle(0f, 0f, WIDTH, offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT, 10f, 0.5f, true)
-        roundedRectangle(-BORDER_THICKNESS, -BORDER_THICKNESS, WIDTH + DOUBLE_BORDER_THICKNESS, offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT + DOUBLE_BORDER_THICKNESS, titlePanelColor, 10f, 0.5f)
-        popStencil()
+        rectangleOutline(-BORDER_THICKNESS, -BORDER_THICKNESS, WIDTH + DOUBLE_BORDER_THICKNESS, offset + HEIGHT + BOTTOM_SEGMENT_HEIGHT + DOUBLE_BORDER_THICKNESS, titlePanelColor, 10f, 3f)
+
 
 
         roundedRectangle(
             0f, 0f, WIDTH, HEIGHT,
             titlePanelColor, Color.TRANSPARENT, Color.TRANSPARENT,
-            0f, PANEL_RADIUS, PANEL_RADIUS, 0f, 0f, 0.5f
+            0f, PANEL_RADIUS, PANEL_RADIUS, 0f, 0f, 2.6f
         )
         text(name, TEXT_OFFSET, HALF_HEIGHT, ColorPalette.textColor, 16f, FontRenderer.BOLD,TextAlign.Left)
 
 
 
         if (extended || extendAnim.isAnimating()) {
-            stencilRoundedRectangle(0f, HEIGHT, WIDTH, offset)
+            stencilRoundedRectangle(-3f, HEIGHT, WIDTH + 3f, offset)
             var startY = scrollOffset + HEIGHT
             if (uiChildren.isNotEmpty()) {
                 for (button in uiChildren) {
@@ -141,7 +141,7 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
 
         roundedRectangle(
             0f, offset + HEIGHT, WIDTH, BOTTOM_SEGMENT_HEIGHT, bottomSegmentColor, bottomSegmentColor, bottomSegmentColor,
-            0f, 0f, 0f, PANEL_RADIUS, PANEL_RADIUS, 0.5f
+            0f, 0f, 0f, PANEL_RADIUS, PANEL_RADIUS, 3f
         )
 
 

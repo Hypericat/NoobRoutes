@@ -128,6 +128,21 @@ class ColorPopoutElement(
         val width = ColorElementsConstants.COLOR_POPOUT_WIDTH + if (alphaEnabled) ColorElementsConstants.COLOR_POPOUT_ALPHA_WIDTH else 0f
         val topRX = width * -0.5f
         val topRY = ColorElementsConstants.COLOR_POPOUT_HEIGHT * -0.5f
+        roundedRectangle(
+            topRX,
+            topRY,
+            width,
+            ColorElementsConstants.COLOR_POPOUT_HEIGHT,
+            ColorPalette.elementBackground,
+            ColorPalette.elementBackground.darker(0.7f),
+            elementValue,
+            5f,
+            10f,
+            10f,
+            10f,
+            10f,
+            0.5f
+        )
         for (i in 0..2) {
             uiChildren[i].updatePosition(
                 topRX + ColorElementsConstants.COLOR_POPOUT_GAP * (i + 1) + ColorElementsConstants.TEXT_BOX_WIDTH_WITH_GAP * i,

@@ -31,7 +31,7 @@ class ClampRing(
     override fun doRing() {
         AutoP3Utils.unPressKeys()
         super.doRing()
-        if (AutoP3.renderStyle == 3) modMessage("Looking", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == "cgy") modMessage("Looking", "§0[§6Yharim§0]§7 ")
         if (walk) AutoP3Utils.startWalk(yaw)
         val motionX = mc.thePlayer.motionX
         val motionZ = mc.thePlayer.motionZ

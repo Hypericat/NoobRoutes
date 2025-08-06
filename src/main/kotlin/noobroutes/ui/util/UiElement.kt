@@ -170,7 +170,7 @@ abstract class UiElement(var x: Float, var y: Float) {
         stencil {
             roundedRectangle(effX + x.toFloat(),effY + y.toFloat(), w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)
         }
-        GaussianBlurShader.blurredBackground(effX + x.toFloat(), effY + y.toFloat(), w.toFloat(), h.toFloat(), 8f)
+        GaussianBlurShader.blurredBackground(effX + x.toFloat(), effY + y.toFloat(), w.toFloat(), h.toFloat(), 4f)
         popStencil()
         GlStateManager.translate(effX, effY, 1f)
 

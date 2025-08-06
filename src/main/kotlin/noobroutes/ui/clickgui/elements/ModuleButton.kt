@@ -35,6 +35,8 @@ import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.darkerIf
+import noobroutes.utils.render.ColorUtil.hsbMax
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.popStencil
 import noobroutes.utils.render.resetScissor
@@ -46,7 +48,6 @@ import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 
 class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
-
     companion object {
         const val BUTTON_HEIGHT = 32f
     }
@@ -56,6 +57,8 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
     }
 
     private val extendAnim = CubicBezierAnimation(250, 0.4, 0, 0.2, 1)
+    private val extendColorAnim = ColorAnimation(250)
+
 
     private inline val UiElement.element get() = (this as Element<*>)
 
@@ -71,7 +74,6 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
     fun getHeight(): Float {
         return BUTTON_HEIGHT + floor(extendAnim.get(0f, getOptionsHeight(), !extended))
     }
-
 
     private fun getOptionsHeight(): Float {
         var drawY = 0f
@@ -105,14 +107,13 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
             }
         }
 
-        val scissor = scissor(x + getEffectiveX(), BUTTON_HEIGHT + getEffectiveY(), width * getEffectiveXScale(), (drawY - BUTTON_HEIGHT) * extendAnim.get(0f, 1f, !extended) * getEffectiveYScale())
-        roundedRectangle(x, BUTTON_HEIGHT, 2, drawY - BUTTON_HEIGHT, clickGUIColor.brighter(1.65f), edgeSoftness = 0f)
+        val scissor = scissor(x + getEffectiveX() - 3f, BUTTON_HEIGHT + getEffectiveY(), width * getEffectiveXScale() + 3, (drawY - BUTTON_HEIGHT) * extendAnim.get(0f, 1f, !extended) * getEffectiveYScale())
         doDrawChildren()
-        resetScissor(scissor)
+        roundedRectangle(x, BUTTON_HEIGHT, 2, drawY - BUTTON_HEIGHT, clickGUIColor.brighter(1.65f), edgeSoftness = 0f)
 
+        resetScissor(scissor)
         GlStateManager.popMatrix()
     }
-
 
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (!isButtonHovered) return false
@@ -127,9 +128,6 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
         }
         return true
     }
-
-
-
 
     fun updateElements() {
         uiChildren.clear()
@@ -158,7 +156,6 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
                     else -> return@addElement
                 }
                 addChild(newElement)
-            } else {
             }
         }
     }

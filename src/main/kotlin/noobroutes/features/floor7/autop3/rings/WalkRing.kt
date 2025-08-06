@@ -25,7 +25,7 @@ class WalkRing(
     override fun doRing() {
         AutoP3Utils.unPressKeys()
         super.doRing()
-        if (AutoP3.renderStyle == 3) modMessage("Looking", "§0[§6Yharim§0]§7 ")
+        if (AutoP3.renderStyle == "cgy") modMessage("Looking", "§0[§6Yharim§0]§7 ")
         if (!center) AutoP3Utils.startWalk(yaw)
         else {
             mc.thePlayer.motionX = 0.0

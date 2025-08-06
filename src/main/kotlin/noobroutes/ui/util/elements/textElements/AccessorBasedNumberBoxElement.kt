@@ -58,6 +58,12 @@ class AccessorBasedNumberBoxElement(
         }
     }
 
+
+
+    override fun draw() {
+        updateTextBoxValue()
+    }
+
     init {
         addChild(
             textBox
@@ -82,12 +88,14 @@ class AccessorBasedNumberBoxElement(
 
         updateTextBoxValue()
     }
+
+    var lastValue = Double.MAX_VALUE
     fun updateTextBoxValue() {
+        val get = elementValue
+        if (lastValue == get) return
+        lastValue = get
         textBox.elementValue = if (roundTo == 0) this.elementValue.toInt().toString() else this.elementValue.toString()
     }
 
-    override fun updateChildren() {
-        updateTextBoxValue()
-    }
 
 }

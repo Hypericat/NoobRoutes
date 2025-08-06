@@ -19,18 +19,12 @@ object ColorPaletteModule : Module(
 
     @DevOnly
     val text by ColorSetting("Text", Color(205, 214, 244), description = "")
-    val subText by ColorSetting("subText", Color(166, 173, 200), description = "")
-    val elementPrimary by ColorSetting("elementPrimary", Color(75, 75, 204), description = "")
-    val elementSecondary by ColorSetting("elementSecondary", Color(95, 95, 222), description = "")
-    val backgroundPrimary by ColorSetting("backgroundPrimary", Color(51, 51, 95), description = "")
-    val backgroundSecondary by ColorSetting("backgroundSecondary", Color(58, 58, 107), description = "")
-    val font by SelectorSetting("Font", "NUNITO", FontType.entries.map { it.name }.toCollection(ArrayList()), description = "")
+    val subText by ColorSetting("subText", Color(166, 173, 200), description = "", allowAlpha = true)
+    val elementPrimary by ColorSetting("elementPrimary", Color(75, 75, 204), description = "", allowAlpha = true)
+    val elementSecondary by ColorSetting("elementSecondary", Color(95, 95, 222), description = "", allowAlpha = true)
+    val backgroundPrimary by ColorSetting("backgroundPrimary", Color(51, 51, 95), description = "", allowAlpha = true)
+    val backgroundSecondary by ColorSetting("backgroundSecondary", Color(58, 58, 107), description = "", allowAlpha = true)
 
-    @SubscribeEvent
-    fun onTick(tickEvent: TickEvent.ClientTickEvent) {
-        if (tickEvent.isEnd) return
-        ColorPalette.defaultPalette.font = FontType.entries[font]
-    }
 
 
 }

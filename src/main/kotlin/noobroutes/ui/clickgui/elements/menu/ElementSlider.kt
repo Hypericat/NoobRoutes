@@ -33,16 +33,13 @@ class ElementSlider(setting: NumberSetting<*>) :
     companion object {
         private const val TEXT_BOX_HEIGHT = 21.5f
         private const val HALF_TEXT_BOX_HEIGHT = TEXT_BOX_HEIGHT * 0.5f
-        private const val SLIDER_TEXT_BOX_PADDING = 9f
         private const val SLIDER_HEIGHT = 7f
         private const val Y_PADDING = 12f
-        private const val NUMBER_BOX_MIN_WIDTH = 14f
+        private const val NUMBER_BOX_MIN_WIDTH = 28f
         private const val NUMBER_BOX_RADIUS = 6f
-        private const val NUMBER_BOX_PADDING = 3f
+        private const val NUMBER_BOX_PADDING = 9f
         private const val TEXT_BOX_THICKNESS = 2f
     }
-
-    private val roundTo = if (setting.value is Int) 0 else 2
 
     val sliderElement = SliderElement(
         BORDER_OFFSET,
@@ -74,7 +71,7 @@ class ElementSlider(setting: NumberSetting<*>) :
         8,
         TextBoxElement.TextBoxType.NORMAL,
         TEXT_BOX_THICKNESS,
-        roundTo,
+        setting.roundTo,
         setting.min,
         setting.max,
         setting.valueDouble

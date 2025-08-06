@@ -10,6 +10,7 @@ import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.elements.Element
 import noobroutes.ui.clickgui.elements.ElementType
+import noobroutes.ui.util.animations.impl.CubicBezierAnimation
 import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.*
@@ -37,7 +38,7 @@ class ElementSelector(setting: SelectorSetting) :
     inline val size: Int
         get () = setting.options.size
 
-    private val settingAnim = EaseInOut(200)
+    private val settingAnim = CubicBezierAnimation(200, 0.4, 0, 0.2, 1)
 
     private val isSettingHovered: (Int) -> Boolean = {
         isAreaHovered(x, y + 38f + 32f * it, w, 32f)
@@ -61,7 +62,7 @@ class ElementSelector(setting: SelectorSetting) :
 
         rectangleOutline(x + w - 20f - width, y + 4f, width + 12f, 22f, clickGUIColor, 5f, 1.5f)
 
-        val scissor = scissor(x, y, w, h)
+        val scissor = scissor(getEffectiveX() + x, y + getEffectiveY(), w, h)
 
         roundedRectangle(x + TEXT_OFFSET, y + 37f, w - 12f, size * 32f, buttonColor, 5f)
 
