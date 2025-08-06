@@ -88,7 +88,7 @@ class BlinkRing(
         mc.thePlayer.isSprinting = false
         PlayerUtils.unPressKeys()
 
-        FreeCam.onDisable()
+        if (FreeCam.enabled) FreeCam.onDisable()
 
         if (!AutoP3.blinkToggle || AutoP3.blinksThisInstance + packets.size > AutoP3.getMaxBlinks()) {
             doMovement()
