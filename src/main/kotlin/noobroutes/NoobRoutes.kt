@@ -83,7 +83,7 @@ class NoobRoutes {
         }
         //this is probably done already by other mods, but it wasn't in the dev env, so I am doing it here
         FontRenderer.initShaders()
-        noobroutes.font.FontRenderer.init()
+        //noobroutes.font.FontRenderer.init()
     }
 
     @Mod.EventHandler

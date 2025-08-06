@@ -20,7 +20,7 @@ object FontRenderer {
     const val BOLD = 2
 
 
-    fun init() {
+    init {
         fonts[FontType.MANROPE] = FontRenderer(
             EssentialFont.fromResource("/assets/fonts/manrope/Regular"),
             EssentialFont.fromResource("/assets/fonts/manrope/SemiBold")
