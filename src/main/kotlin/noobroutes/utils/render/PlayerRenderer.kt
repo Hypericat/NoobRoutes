@@ -120,15 +120,12 @@ class MovementRenderer {
         val renderZ = zPos - renderManager.viewerPosZ
 
         GlStateManager.translate(renderX, renderY, renderZ)
-        GlStateManager.enableLighting()
-        GlStateManager.enableLight(0)
-        GlStateManager.enableLight(1)
-        GlStateManager.enableColorMaterial()
+        GlStateManager.enableTexture2D()
         GlStateManager.enableAlpha()
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1f)
         GlStateManager.enableBlend()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1f)
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+        GlStateManager.disableLighting()
 
 
         try {
@@ -139,6 +136,9 @@ class MovementRenderer {
             for (i in 0..4) {
                 tempPlayer.setCurrentItemOrArmor(i, player.getEquipmentInSlot(i))
             }
+            tempPlayer.inventory.mainInventory[0] = mc.thePlayer.heldItem
+            tempPlayer.inventory.currentItem = 0
+
             val targetBodyYaw = yaw
             val bodyYawDiff = MathHelper.wrapAngleTo180_float(targetBodyYaw - lastBodyYaw)
             val smoothedBodyYaw = lastBodyYaw + bodyYawDiff * 0.3f
@@ -169,10 +169,16 @@ class MovementRenderer {
 
         } catch (e: Exception) {
             e.printStackTrace()
-        }
+        } finally {
+            GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+            GlStateManager.enableTexture2D()
+            GlStateManager.disableBlend()
+            GlStateManager.disableAlpha()
+            GlStateManager.disableLighting()
 
-        GlStateManager.popMatrix()
-        GlStateManager.popAttrib()
+            GlStateManager.popAttrib()
+            GlStateManager.popMatrix()
+        }
     }
 }
 
