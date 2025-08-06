@@ -10,6 +10,7 @@ import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
+import noobroutes.features.render.FreeCam
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.runOnMCThread
 import noobroutes.utils.skyblock.PlayerUtils
@@ -86,6 +87,8 @@ class BlinkRing(
         PlayerUtils.stopVelocity()
         mc.thePlayer.isSprinting = false
         PlayerUtils.unPressKeys()
+
+        FreeCam.onDisable()
 
         if (!AutoP3.blinkToggle || AutoP3.blinksThisInstance + packets.size > AutoP3.getMaxBlinks()) {
             doMovement()

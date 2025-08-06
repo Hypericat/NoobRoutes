@@ -17,10 +17,10 @@ import org.lwjgl.input.Keyboard
 
 object AutoP3MovementHandler {
     private var airTicks = 0
-    private var motionTicks = -1 //write setter
-    private var jumping = false //write setter
-    private var direction: Float? = null //write setter
-    private var scale = 1f //write setter
+    private var motionTicks = -1
+    private var jumping = false
+    private var direction: Float? = null
+    private var scale = 1f
 
     private var lastSpeed = 0.0
 
@@ -85,19 +85,17 @@ object AutoP3MovementHandler {
     private fun doMotionTick() {
         if (motionTicks == 0 && mc.thePlayer.onGround) {
             setVelocity(TICK1 * scale)
-            devMessage("yeet")
-            devMessage("${System.currentTimeMillis()}, tick 0")
             return;
         }
 
         if (motionTicks == 0) {
-            motionTicks = -1;
+            motionTicks = -2 //fuck u hyper
+            direction = null
             modMessage("herp im midair") //yes herp
             return;
         }
 
         if (motionTicks == 1) {
-            devMessage("${System.currentTimeMillis()}, tick 1")
             setVelocity(TICK2 * scale);
             lastSpeed = TICK2;
             return;

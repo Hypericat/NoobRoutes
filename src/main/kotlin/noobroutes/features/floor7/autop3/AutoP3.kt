@@ -357,20 +357,14 @@ object AutoP3: Module (
         dontCancelNextC03 = true
     }
 
-    var shouldFreeze = false
-        private set
-
-
-
-    @SubscribeEvent
-    fun noTicks(event: RenderWorldLastEvent) {
-        shouldFreeze =
-            !(!inF7Boss || !mc.thePlayer.onGround || mc.thePlayer.motionX != 0.0 || mc.thePlayer.motionZ != 0.0 || PlayerUtils.keyBindings.any { it.isKeyDown })
-    }
-
     @SubscribeEvent(priority = EventPriority.LOW)
     fun cancelC03s(event: PacketEvent.Send) {
-        if (!inF7Boss || event.packet !is C03PacketPlayer || movementPackets.isNotEmpty()) return
+        if (!inF7Boss || event.packet !is C03PacketPlayer) return
+
+        if (movementPackets.isNotEmpty()) {
+            cancelled = 0
+            return
+        }
 
         if (dontCancelNextC03) {
             dontCancelNextC03 = false
