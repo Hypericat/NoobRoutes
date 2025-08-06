@@ -57,7 +57,6 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
     }
 
     private val extendAnim = CubicBezierAnimation(250, 0.4, 0, 0.2, 1)
-    private val extendColorAnim = ColorAnimation(250)
 
 
     private inline val UiElement.element get() = (this as Element<*>)
@@ -90,7 +89,9 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
         roundedRectangle(0f, 0f, width, BUTTON_HEIGHT, ColorPalette.moduleButtonColor)
         text(module.name, width * 0.5, BUTTON_HEIGHT * 0.5, color, 14f, FontRenderer.REGULAR, TextAlign.Middle)
 
+
         if (!extendAnim.isAnimating() && !extended) {
+
             for (i in uiChildren.indices) {
                 uiChildren[i].visible = false
             }

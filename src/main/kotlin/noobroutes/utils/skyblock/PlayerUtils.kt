@@ -4,6 +4,7 @@ import net.minecraft.block.Block
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
@@ -42,9 +43,10 @@ object PlayerUtils {
         }
     }
 
+    var slot = -1
+
     fun airClick(){
-        if (!canSendC08) return
-        devMessage("Clicked: ${System.currentTimeMillis()}")
+        if (isZeroTickSwapping()) return
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
     }
 
@@ -81,16 +83,22 @@ object PlayerUtils {
     fun getPositionString() = "x: ${posX.toInt()}, y: ${posY.toInt()}, z: ${posZ.toInt()}"
 
     private var lastGuiClickSent = 0L
-    var lastC08Sent = 0L
-    inline val canSendC08 get() = System.currentTimeMillis() - lastC08Sent > 49
 
 
     @SubscribeEvent
     fun onPacketSend(event: PacketEvent.Send) {
         when (event.packet) {
             is C0EPacketClickWindow -> lastGuiClickSent = System.currentTimeMillis()
-            is C08PacketPlayerBlockPlacement -> lastC08Sent = System.currentTimeMillis()
+            is C09PacketHeldItemChange -> {
+                if (!event.isCanceled) slot = event.packet.slotId
+            }
         }
+    }
+
+    fun isZeroTickSwapping(): Boolean {
+        val zeroSwapped = mc.thePlayer.inventory.currentItem != slot
+        if (zeroSwapped) modMessage("Tip: zero tick swapping isn't good for the longevity of the account.")
+        return zeroSwapped
     }
 
     fun windowClick(slotId: Int, button: Int, mode: Int) {
