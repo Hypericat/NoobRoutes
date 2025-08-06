@@ -8,6 +8,7 @@ import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
@@ -23,12 +24,23 @@ object QOL: Module(
     val lavaFix by BooleanSetting("lava fix", false, description = "the shit from sby")
 
     private val leftClickSpam by KeybindSetting("Spam Left", Keyboard.KEY_NONE, "clicks left click a few times").onPress { spamLeft() }
-    private val spamLeftAmount by NumberSetting("Spam Left Amount", 20, 5, 40, description = "how often it should leftclick")
+    private val spamLeftAmount by NumberSetting("Spam Left Amount", 20, 5, 40, description = "how often it should left click")
+
+    private val rightClickSpam by KeybindSetting("Spam Right", Keyboard.KEY_NONE, "clicks left click a few times").onPress { spamRight() }
+    private val spamRightAmount by NumberSetting("Spam Right Amount", 20, 5, 40, description = "how often it should right click")
 
     private fun spamLeft() {
         modMessage("boom")
         repeat(spamLeftAmount) {
             PacketUtils.sendPacket(C0APacketAnimation())
+            devMessage("sent")
+        }
+    }
+
+    private fun spamRight() {
+        modMessage("woosh")
+        repeat(spamRightAmount) {
+            PlayerUtils.airClick(false)
             devMessage("sent")
         }
     }
