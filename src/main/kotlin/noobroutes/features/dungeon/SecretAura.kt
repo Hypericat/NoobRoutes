@@ -88,7 +88,7 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
             else -> false
         }
     }
-    private inline val inValidArea get() = DungeonUtils.inDungeons || enableOutsideOfDungeons
+    private inline val inValidArea get() = (!DungeonUtils.inDungeons && !enableOutsideOfDungeons)
 
 
     @SubscribeEvent
