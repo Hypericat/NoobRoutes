@@ -71,7 +71,7 @@ object AutoP3: Module (
     private var editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions").withDependency { editShit }
     private val editModeKey by KeybindSetting("Toggle Edit Mode", Keyboard.KEY_NONE, "Toggles editmode on press").onPress {
         editMode = !editMode
-        modMessage("edit Mode: " + editMode)
+        modMessage("edit Mode: $editMode")
     }.withDependency { editShit }
     val walkBoost by SelectorSetting("Walk Boost", "none", arrayListOf("none", "normal", "big"), description = "how much of a boost to apply walking of edges. Non none values might lagback more").withDependency { editShit }
 
@@ -84,7 +84,7 @@ object AutoP3: Module (
     }.withDependency { blinkShit }
     private val cancelC05s by BooleanSetting("Cancel C05s", default = false, description = "Allows the cancelling of rotation packets.")
     private val movementMode by DualSetting("Movement Mode","Playback", "Silent", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
-    val x_y0uMode by BooleanSetting("x_y0u Mode", description = "x_y0u strongly believes this is better, while its faster it also probably flags timer and will lobby you sometimes. (We Jew the Timer -x_y0u)").withDependency { blinkShit }
+    val x_y0uMode by BooleanSetting("x_y0u Mode", description = "x_y0u strongly believes this is better, while its faster it also probably flags timer and will lobby you sometimes. (We Jew the Packets -x_y0u)").withDependency { blinkShit }
     val blinkCooldown by NumberSetting("Blink Cooldown", 5, 0, 10, description = "how many ticks to wait after entering a blink ring before allowing blink").withDependency { x_y0uMode && blinkShit }
     private val resetInterval by NumberSetting(name = "clear intervall", description = "delete packets periodically", min = 1, max = 300, default = 200, unit = "t").withDependency { x_y0uMode && blinkShit }
     private val resetAmount by NumberSetting(name = "clear amount", description = "delete packets periodically", min = 1, max = 400, default = 50).withDependency { x_y0uMode && blinkShit }
