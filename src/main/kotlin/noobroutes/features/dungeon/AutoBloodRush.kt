@@ -2,32 +2,40 @@ package noobroutes.features.dungeon
 
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S03PacketTimeUpdate
-import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.events.impl.ChatPacketEvent
+import noobroutes.events.impl.DeathTickEvent
 import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.S08Event
 import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.utils.*
+import noobroutes.utils.RotationUtils
+import noobroutes.utils.Scheduler
+import noobroutes.utils.SwapManager
+import noobroutes.utils.Utils.isNotStart
+import noobroutes.utils.Vec2i
+import noobroutes.utils.isAir
+import noobroutes.utils.postAndCatch
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.routes.RouteUtils.setRotation
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.Dungeon
-import noobroutes.utils.skyblock.dungeon.DungeonScan
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Door
 import noobroutes.utils.skyblock.dungeon.tiles.DoorType
 import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.toBlockPos
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 import kotlin.math.round
@@ -39,13 +47,26 @@ object AutoBloodRush: Module(
     category = Category.DUNGEON,
     description = "Bloodrushes very fast (a little inconsistent rn)"
 ) {
-    private val autoStartBrToggle by BooleanSetting("Main Toggle", default = true, description = "u also need the module enabled for the snipe command")
-    private val goOn1Delay by NumberSetting("go on delay", 13, 0, 20, description = "how long to wait before u actually go down (ticks). Test to find appropriate value, it is ping dependent.").withDependency { autoStartBrToggle }
-    private val preLoadDelay by NumberSetting("Preload Delay", 0, 0, 20, description = "delay for preloading the map")
+    private val autoStartBrToggle by BooleanSetting(
+        "Main Toggle",
+        default = true,
+        description = "u also need the module enabled for the snipe command"
+    )
+    private val goOn1Delay by NumberSetting(
+        "go on delay",
+        13,
+        0,
+        20,
+        description = "how long to wait before u actually go down (ticks). Test to find appropriate value, it is ping dependent."
+    ).withDependency { autoStartBrToggle }
     private val silent by BooleanSetting("silent", description = "do silent rotations")
-    private val noWait by BooleanSetting("Low Ping Pearls", default = false, description = "for low ping players. makes pearls work")
+    private val noWait by BooleanSetting(
+        "Low Ping Pearls",
+        default = false,
+        description = "for low ping players. makes pearls work"
+    )
 
-    private val snipeTick by NumberSetting("Snipe Tick", 1, 0, 40, description = "how to align with the server ticks")
+    private val deathTickOffset by NumberSetting("Death Tick Offset", 1, 0, 40, description = "how to death ticks")
 
     private val BLOOD_MIDDLE_COORDS = BlockPos(0, 70, 0)
 
@@ -54,7 +75,7 @@ object AutoBloodRush: Module(
     private val BAR_COORDS = BlockPos(-14, 73, 11)
     private val BAR_COORDS_SIDE = Vec3(-13.5, 73.5, 11.0)
 
-    private val OTHER_BAR_COORDS =  BlockPos(-14, 73, 10)
+    private val OTHER_BAR_COORDS = BlockPos(-14, 73, 10)
     private val OTHER_OTHER_BAR_COORDS = BlockPos(-14, 74, 10)
 
     private val CLIP_SPOT_IN = Vec3(-14.2624, 74.0, 11.0)
@@ -72,26 +93,71 @@ object AutoBloodRush: Module(
 
     private var snipeCoords: Vec2i? = null
 
+    private var teleportedToBar = false
+    private var timeSet = false
+    private var s08Detected = false
+
     @SubscribeEvent
-    fun onS03(event: PacketEvent.Receive) {
-        if (event.packet !is S03PacketTimeUpdate) return
-        val time = event.packet.totalWorldTime.toInt()
-        serverTickCount = time % 40
+    fun onS08(event: S08Event) {
+        if (!timeSet && !s08Detected) s08Detected = true
     }
 
-    private fun goToHopper() {
+    @SubscribeEvent
+    fun onS03(event: PacketEvent.Receive) {
+        if (event.packet !is S03PacketTimeUpdate || timeSet || !s08Detected) return
+        val time = event.packet.totalWorldTime.toInt()
+        serverTickCount = time % 40
+        timeSet = true
+        devMessage("setting time")
+    }
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (mc.thePlayer == null ||
+            event.isNotStart ||
+            !autoStartBrToggle ||
+            Dungeon.currentRoom?.name != "Entrance" ||
+            teleportedToBar ||
+            !mc.thePlayer.onGround ||
+            mc.theWorld.getBlockState(mc.thePlayer.positionVector.toBlockPos().down()).block == Blocks.iron_bars
+        ) return
+
+        goToBars()
+        teleportedToBar = true
+    }
+
+    private fun goToBars() {
         val room = Dungeon.currentRoom ?: return
         if (room.name != "Entrance") return
 
         Scheduler.schedulePreTickTask {
             val offset = when {
-                mc.theWorld.getBlockState(room.getRealCoords(BAR_COORDS)).block == Blocks.iron_bars -> Vec3(0.0, 0.0, 0.0)
-                mc.theWorld.getBlockState(room.getRealCoords(OTHER_OTHER_BAR_COORDS)).block == Blocks.iron_bars -> Vec3(0.0, 1.0, -1.0)
-                mc.theWorld.getBlockState(room.getRealCoords(OTHER_BAR_COORDS)).block == Blocks.iron_bars -> Vec3(0.0, 0.0, -1.0)
+                mc.theWorld.getBlockState(room.getRealCoords(BAR_COORDS)).block == Blocks.iron_bars -> Vec3(
+                    0.0,
+                    0.0,
+                    0.0
+                )
+
+                mc.theWorld.getBlockState(room.getRealCoords(OTHER_OTHER_BAR_COORDS)).block == Blocks.iron_bars -> Vec3(
+                    0.0,
+                    1.0,
+                    -1.0
+                )
+
+                mc.theWorld.getBlockState(room.getRealCoords(OTHER_BAR_COORDS)).block == Blocks.iron_bars -> Vec3(
+                    0.0,
+                    0.0,
+                    -1.0
+                )
+
                 else -> return@schedulePreTickTask modMessage("Couldn't get Entrance type")
             }
 
             RouteUtils.etherwarpToRelativeVec3(BAR_COORDS_SIDE.add(offset), Dungeon.currentRoom!!, silent)
+            Scheduler.scheduleLowS08Task {
+                if (!Dungeon.Info.uniqueRooms.any { it.name == "Blood" }) Scheduler.scheduleDeathTickTask { clipOut() }
+                devMessage("deathtick task scheduled")
+            }
         }
     }
 
@@ -100,13 +166,25 @@ object AutoBloodRush: Module(
 
         val offset = when {
             mc.theWorld.getBlockState(room.getRealCoords(BAR_COORDS)).block == Blocks.iron_bars -> Vec3(0.0, 0.0, 0.0)
-            mc.theWorld.getBlockState(room.getRealCoords(OTHER_OTHER_BAR_COORDS)).block == Blocks.iron_bars -> Vec3(0.0, 1.0, -1.0)
-            mc.theWorld.getBlockState(room.getRealCoords(OTHER_BAR_COORDS)).block == Blocks.iron_bars -> Vec3(0.0, 0.0, -1.0)
+            mc.theWorld.getBlockState(room.getRealCoords(OTHER_OTHER_BAR_COORDS)).block == Blocks.iron_bars -> Vec3(
+                0.0,
+                1.0,
+                -1.0
+            )
+
+            mc.theWorld.getBlockState(room.getRealCoords(OTHER_BAR_COORDS)).block == Blocks.iron_bars -> Vec3(
+                0.0,
+                0.0,
+                -1.0
+            )
+
             else -> return modMessage("Couldn't get Entrance type")
         }
 
         Scheduler.schedulePreTickTask {
-            if (room.name != "Entrance" || room.getRelativeCoords(mc.thePlayer.positionVector).toBlockPos().down() != BAR_COORDS.add(offset)) return@schedulePreTickTask
+            if (room.name != "Entrance" || room.getRelativeCoords(mc.thePlayer.positionVector).toBlockPos()
+                    .down() != BAR_COORDS.add(offset)
+            ) return@schedulePreTickTask
 
             val spot1 = room.getRealCoords(CLIP_SPOT_IN.add(offset))
             PlayerUtils.setPosition(spot1.xCoord, spot1.zCoord)
@@ -118,7 +196,9 @@ object AutoBloodRush: Module(
                 val spot2 = room.getRealCoords(CLIP_SPOT_OUT.add(offset))
                 PlayerUtils.setPosition(spot2.xCoord, spot2.zCoord)
 
-                Scheduler.schedulePostTickTask { Scheduler.scheduleFrameTask { repeat(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() } } }
+                Scheduler.schedulePostTickTask { repeat(VERTICAL_TP_AMOUNT) { PlayerUtils.airClick() } }
+
+                Scheduler.schedulePreTickTask(5) { teleportedToBar = false }
 
                 Scheduler.scheduleLowS08Task(VERTICAL_TP_AMOUNT - 1) {
                     tpOver(snipeCoords)
@@ -133,31 +213,23 @@ object AutoBloodRush: Module(
         if (bloodDoor != null) return Vec2i(bloodDoor.x, bloodDoor.z)
 
         val doors = Dungeon.Info.dungeonList.filter { it is Door && it.type == DoorType.WITHER }
-        val furthest = doors.maxBy { getXZDistance(it.x.toDouble(), it.z.toDouble(), mc.thePlayer.posX, mc.thePlayer.posZ) }
+        val furthest =
+            doors.maxBy { getXZDistance(it.x.toDouble(), it.z.toDouble(), mc.thePlayer.posX, mc.thePlayer.posZ) }
         return Vec2i(furthest.x, furthest.z)
     }
 
     @SubscribeEvent
     fun onChat(event: ChatPacketEvent) {
-        if (event.message == "Starting in 4 seconds." && autoStartBrToggle && !Dungeon.Info.uniqueRooms.any { it.name == "Blood" }) {
-            goToHopper()
-            Scheduler.scheduleLowS08Task { clipOut() }
-            //Scheduler.scheduleServerTickTask(preLoadDelay) { testAutoPearl(true) }
-        }
-        else if (event.message == "Starting in 1 second.") {
-            serverTickCount = 20
+        if (event.message != "Starting in 1 second.") return
 
-            goToHopper()
-            Scheduler.scheduleServerTickTask(goOn1Delay) {
-                hasRunStarted = true
-                if (!Dungeon.Info.uniqueRooms.any { it.name == "Blood" }) return@scheduleServerTickTask
-                //if (autoStartBrToggle) testAutoPearl(true)
-                if (autoStartBrToggle) clipOut()
-            }
+        Scheduler.scheduleServerTickTask(goOn1Delay) {
+            hasRunStarted = true
+            if (!Dungeon.Info.uniqueRooms.any { it.name == "Blood" }) return@scheduleServerTickTask
+            if (autoStartBrToggle) clipOut()
         }
     }
 
-    private fun testAutoPearl(autoCommand: Boolean = false) {
+    /*private fun testAutoPearl(autoCommand: Boolean = false) {
 
         if (autoCommand && Dungeon.currentRoom?.name != "Entrance") return;
 
@@ -170,9 +242,9 @@ object AutoBloodRush: Module(
         }
 
         Dungeon.Info.uniqueRooms.forEach { it.tiles }
-    }
+    }*/
 
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true) //detect after pearlclip
+    /*@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true) //detect after pearlclip
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook || !waitingForClip) return
         waitingForClip = false
@@ -188,15 +260,15 @@ object AutoBloodRush: Module(
                 snipeCoords = null
             }
         }
-    }
+    }*/
 
     private fun tpOver(otherCoords: Vec2i?) {
-        Scheduler.schedulePreTickTask {
+        Scheduler.schedulePreTickTask(1) {
             val bloodRoom = Dungeon.Info.uniqueRooms.find { it.name == "Blood" }
 
             val coords = when {
                 otherCoords != null -> otherCoords
-                !hasRunStarted -> getFurthestDoor()
+                !hasRunStarted -> MIDDLE_MAP_COORDS
                 bloodRoom != null -> bloodRoom.getRealCoords(BLOOD_MIDDLE_COORDS).toVec2i()
                 else -> return@schedulePreTickTask modMessage("smth went wrong , probably couldnt find blood")
             }
@@ -207,9 +279,9 @@ object AutoBloodRush: Module(
 
             setRotation(yaw, GO_STRAIGHT_ON_AOTV_PITCH, silent)
 
-            Scheduler.schedulePostTickTask { Scheduler.scheduleFrameTask { repeat(aotvNumber) { PlayerUtils.airClick() } } }
+            Scheduler.schedulePostTickTask { repeat(aotvNumber) { PlayerUtils.airClick() } }
 
-            if (coords == getFurthestDoor()) return@schedulePreTickTask
+            if (coords == MIDDLE_MAP_COORDS) return@schedulePreTickTask
 
             Scheduler.scheduleLowS08Task(aotvNumber - 1) {
                 tpUp(otherCoords != null)
@@ -218,23 +290,22 @@ object AutoBloodRush: Module(
     }
 
     private fun tpUp(isSnipe: Boolean) {
-        Scheduler.schedulePreTickTask {
+        Scheduler.schedulePreTickTask(1) {
 
             setRotation(0f, -90f, silent)
 
             Scheduler.schedulePreTickTask {
 
-                Scheduler.schedulePostTickTask { Scheduler.scheduleFrameTask { repeat(VERTICAL_TP_AMOUNT + if (isSnipe) 2 else 1) { PlayerUtils.airClick() } } }
+                repeat(VERTICAL_TP_AMOUNT + if (isSnipe) 2 else 1) { PlayerUtils.airClick() }
 
-                Scheduler.schedulePreTickTask {
-                    SwapManager.swapFromName("pearl")
+                SwapManager.swapFromName("pearl")
 
-                    setRotation(0f, -90f, silent)
+                setRotation(0f, -90f, silent)
 
-                    Scheduler.schedulePostTickTask { Scheduler.scheduleFrameTask { PlayerUtils.airClick() } }
+                Scheduler.schedulePostTickTask { PlayerUtils.airClick() }
 
-                    throwOtherPearls(isSnipe)
-                }
+                throwOtherPearls(isSnipe)
+
             }
         }
     }
@@ -255,7 +326,8 @@ object AutoBloodRush: Module(
     }
 
     fun snipeCommand(args: Array<out String>) {
-        if (!canPearlClipToY62()) return modMessage("room goes to low")
+        return modMessage("not ready rn")
+        /*if (!canPearlClipToY62()) return modMessage("room goes to low")
         if (args.size < 2) {
             modMessage("gib room name")
             return
@@ -272,13 +344,17 @@ object AutoBloodRush: Module(
         val worldX = DungeonScan.startX + center.x * (DungeonScan.roomSize shr 1)
         val worldZ = DungeonScan.startZ + center.z * (DungeonScan.roomSize shr 1)
         snipeCoords = Vec2i(worldX, worldZ)
-        modMessage("sniping $name")
+        modMessage("sniping $name")*/
     }
 
     private fun reset() {
         waitingForClip = false
         hasRunStarted = false
         serverTickCount = 0
+        teleportedToBar = false
+        snipeCoords = null
+        timeSet = false
+        s08Detected = false
     }
 
     @SubscribeEvent
@@ -302,7 +378,10 @@ object AutoBloodRush: Module(
     @SubscribeEvent
     fun onServerTick(event: ServerTickEvent) {
         serverTickCount++
-        if (serverTickCount == snipeTick && snipeCoords != null) testAutoPearl()
+        if (serverTickCount == deathTickOffset) {
+            DeathTickEvent().postAndCatch()
+            devMessage("deathtick")
+        }
         if (serverTickCount >= 40) serverTickCount = 0
     }
 

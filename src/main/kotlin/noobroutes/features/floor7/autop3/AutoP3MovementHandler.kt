@@ -31,7 +31,7 @@ object AutoP3MovementHandler {
     private const val TICK1 = 6.16
     private const val TICK2 = 3.98
 
-    @SubscribeEvent //stolen from sy? (its just so good)
+    @SubscribeEvent //taken from cga who took from sy?
     fun handleWalking(event: MoveEntityWithHeadingEvent.Post) {
         if (mc.thePlayer == null) return
         if (mc.thePlayer.onGround) {
