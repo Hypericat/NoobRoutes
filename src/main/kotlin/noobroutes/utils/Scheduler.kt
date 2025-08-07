@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.mc
+import noobroutes.events.impl.DeathTickEvent
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
@@ -41,6 +42,7 @@ object Scheduler {
     private val scheduledPreMotionUpdateTasks = Tasks()
     private val scheduledLowPreMotionUpdateTasks = Tasks()
     private val scheduledPostMotionUpdateTasks = Tasks()
+    private val scheduledDeathTickTasks = Tasks()
 
     private fun reset() {
         scheduledPreTickTasks.clear()
@@ -62,7 +64,7 @@ object Scheduler {
         scheduledPreMotionUpdateTasks.clear()
         scheduledLowPreMotionUpdateTasks.clear()
         scheduledPostMotionUpdateTasks.clear()
-
+        scheduledDeathTickTasks.clear()
     }
 
     @SubscribeEvent
@@ -115,6 +117,12 @@ object Scheduler {
     fun scheduleServerTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledServerTasks.add(Task({ p -> callback(p) }, ticks, priority))
+    }
+
+    @Throws(IndexOutOfBoundsException::class)
+    fun scheduleDeathTickTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
+        if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
+        scheduledDeathTickTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
 
@@ -253,6 +261,11 @@ object Scheduler {
     fun onLivingUpdateEvent(event: LivingEvent.LivingUpdateEvent){
         if (event.entityLiving != mc.thePlayer || event.entityLiving == null) return
         scheduledPlayerLivingUpdateTasks.doTasks(event)
+    }
+
+    @SubscribeEvent
+    fun onDeathTickEvent(event: DeathTickEvent){
+        scheduledDeathTickTasks.doTasks(event)
     }
 
     @SubscribeEvent

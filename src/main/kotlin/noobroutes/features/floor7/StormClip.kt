@@ -25,7 +25,7 @@ object StormClip: Module(
     fun onS08(event: PacketEvent.Receive) {
         if (event.packet !is S08PacketPlayerPosLook || has) return
         if (event.packet.x == 73.5 && event.packet.y == 221.5 && event.packet.z == 14.5) {
-            Scheduler.schedulePreTickTask(0) { mc.thePlayer.setPosition(73.5, 221.5 - clipDistance, 14.5) }
+            Scheduler.schedulePostTickTask { mc.thePlayer.setPosition(73.5, 221.5 - clipDistance, 14.5) }
             has = true
         }
     }
