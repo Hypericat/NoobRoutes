@@ -75,7 +75,10 @@ object Utils {
     inline val TickEvent.isNotEnd get() = this.phase == TickEvent.Phase.START
 
 
-
+    /**
+     * Taken from odin
+     * Goats
+     */
     val rat = listOf(
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿",
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏⠉⠻⣿⣿⢿⣿⠿⠛⢻⣟⣛⣩⣵⡾⠋⠁⢹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿",
@@ -137,12 +140,6 @@ object Utils {
                 modMessage("All tests passed")
             }
         }
-    }
-
-    fun isRunningInIntelliJ(): Boolean {
-        return System.getProperty("idea.test.cyclic.buffer.size") != null ||
-                System.getProperty("idea.launcher.port") != null ||
-                System.getProperty("idea.paths.selector") != null
     }
 
     var lastPlayerPos = Vec3(0.0, 0.0, 0.0)
@@ -425,33 +422,6 @@ fun <T> Collection<T>.lastSafe(): T? {
     }
 }
 
-/**
- * Formats a time duration in milliseconds into a human-readable string.
- *
- * The string will show hours, minutes, and seconds, with an optional number of decimal places for the seconds.
- *
- * @param time The time duration in milliseconds to be formatted.
- * @param decimalPlaces The number of decimal places to show for the seconds. Default is 2.
- * @return A formatted string representing the time duration. For example, "1h 2m 3.45s".
- */
-fun formatTime(time: Long, decimalPlaces: Int = 2): String {
-    if (time == 0L) return "0s"
-    var remaining = time
-    val hours = (remaining / 3600000).toInt().let {
-        remaining -= it * 3600000
-        if (it > 0) "${it}h " else ""
-    }
-    val minutes = (remaining / 60000).toInt().let {
-        remaining -= it * 60000
-        if (it > 0) "${it}m " else ""
-    }
-    val seconds = (remaining / 1000f).let {
-        String.format(Locale.US, "%.${decimalPlaces}f", it)
-    }
-    return "$hours$minutes${seconds}s"
-}
-
-
 private val romanMap = mapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
 private val numberRegex = Regex("^[0-9]+$")
 fun romanToInt(s: String): Int {
@@ -487,11 +457,16 @@ inline fun <T> MutableCollection<T>.removeFirstOrNull(predicate: (T) -> Boolean)
 
 fun Int.rangeAdd(add: Int): IntRange = this..this+add
 
-
+/**
+ * Taken from Odin
+ */
 fun runOnMCThread(run: () -> Unit) {
     if (!mc.isCallingFromMinecraftThread) mc.addScheduledTask(run) else run()
 }
 
+/**
+ * Taken from Odin
+ */
 fun EntityLivingBase?.getSBMaxHealth(): Float {
     return this?.getEntityAttribute(SharedMonsterAttributes.maxHealth)?.baseValue?.toFloat() ?: 0f
 }

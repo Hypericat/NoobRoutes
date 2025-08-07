@@ -6,7 +6,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.inventory.ContainerChest
 
-
+/**
+ * Taken from odin
+ */
 suspend fun waitUntilLastItem(container: ContainerChest) = coroutineScope {
     val deferredResult = CompletableDeferred<Unit>()
     val startTime = System.currentTimeMillis()

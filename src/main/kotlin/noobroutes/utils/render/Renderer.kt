@@ -27,6 +27,10 @@ import org.lwjgl.opengl.GL11
 import kotlin.math.max
 import kotlin.math.min
 
+
+/**
+ * Taken from odin
+ */
 object Renderer {
 
     const val DEFAULT_STYLE = "Outline"
@@ -212,10 +216,6 @@ object Renderer {
         color: Color, depth: Boolean = false
     ) {
         RenderUtils.drawCylinder(pos, baseRadius, topRadius, height, slices, stacks, rot1, rot2, rot3, color, depth)
-    }
-
-    fun draw2DEntity(entity: Entity, color: Color, lineWidth: Float) {
-       RenderUtils2D.draw2DESP(entity.entityBoundingBox, color, lineWidth)
     }
 
     private var displayTitle = ""

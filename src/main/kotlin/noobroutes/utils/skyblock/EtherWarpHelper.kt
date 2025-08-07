@@ -8,6 +8,9 @@ import noobroutes.utils.render.RenderUtils.renderVec
 import noobroutes.utils.skyblock.PlayerUtils.SNEAK_EYE_HEIGHT
 import kotlin.math.*
 
+/**
+ * Taken from odin
+ */
 object EtherWarpHelper {
     data class EtherPos(val succeeded: Boolean, val pos: BlockPos?) {
         val vec: Vec3? get() = pos?.let { Vec3(it) }

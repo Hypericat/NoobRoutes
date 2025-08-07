@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import noobroutes.events.impl.*
 
-object NettyS2DPacketInterceptor {
+object NettyPacketInterceptor {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onNetworkEvent(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
         val channel = event.manager.channel()
@@ -29,6 +29,7 @@ object NettyS2DPacketInterceptor {
                 }
                 super.channelRead(ctx, msg)
                 }
-            })
+            }
+        )
     }
 }

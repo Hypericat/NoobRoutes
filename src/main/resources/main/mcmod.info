@@ -3,7 +3,7 @@
     "modid": "@MOD_ID@",
     "name": "Noob Porn 4k",
     "description": "https://notability.com/g/AMZ261xtCIQlc5DMaa6Ov",
-    "version": "${version}",
+    "version": "@VER@",
     "mcversion": "${mcversion}",
     "url": "",
     "updateUrl": "",

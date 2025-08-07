@@ -25,7 +25,6 @@ object Core {
     @JvmStatic
     val mc: Minecraft = Minecraft.getMinecraft()
 
-    //do not simplify the expression, it is changed inside the gradle build
     val DEV_MODE = "@DEV_MODE@".toBoolean()
     const val VERSION = "@VER@"
     val scope = CoroutineScope(SupervisorJob() + EmptyCoroutineContext)

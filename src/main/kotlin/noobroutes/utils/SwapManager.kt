@@ -61,11 +61,6 @@ object SwapManager {
         }
     }
 
-    @Deprecated("Use swapFromSBId with silent parameter instead")
-    fun swapFromSBId(bitch: Boolean, vararg skyblockID: String): SwapState {
-        return swapFromSBId(*skyblockID, silent = !bitch)
-    }
-
     fun swapFromId(id: Int): SwapState {
         return findAndSwapItem { stack ->
             stack.ID == id

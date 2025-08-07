@@ -3,6 +3,10 @@ package noobroutes.utils
 import net.minecraft.scoreboard.ScorePlayerTeam
 import noobroutes.Core.mc
 
+/**
+ * Taken from Odin
+ */
+
 fun cleanSB(scoreboard: String?): String {
     return scoreboard.noControlCodes.filter { it.code in 21..126 }
 }
@@ -16,6 +20,8 @@ fun cleanSB(scoreboard: String?): String {
  *
  * @return A list of strings representing lines on the scoreboard sidebar. Returns an empty list if the scoreboard or
  * objective is not available, or if the list is empty after filtering.
+ *
+ * Taken from Odin
  */
 val sidebarLines: List<String>
     get() {
@@ -32,6 +38,9 @@ fun cleanLine(scoreboard: String): String = scoreboard.noControlCodes.filter { i
 
 // Tablist utils
 
+/**
+ * Taken from Odin
+ */
 val getTabList: List<String>
     get() {
         val playerInfoMap = mc.thePlayer?.sendQueue?.playerInfoMap ?: return emptyList()

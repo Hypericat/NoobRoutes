@@ -1,5 +1,9 @@
 package noobroutes.utils.skyblock
 
+
+/**
+ * Taken from odin
+ */
 enum class Island(val displayName: String) {
     SinglePlayer("Singleplayer"),
     PrivateIsland("Private Island"),

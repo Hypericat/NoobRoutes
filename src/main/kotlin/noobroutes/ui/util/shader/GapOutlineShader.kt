@@ -89,29 +89,14 @@ object GapOutlineShader {
         GL20.glShaderSource(vertexShader, vertexShaderSource)
         GL20.glCompileShader(vertexShader)
 
-        if (GL20.glGetShaderi(vertexShader, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
-            println("Gap outline vertex shader compilation failed: ${GL20.glGetShaderInfoLog(vertexShader, 1024)}")
-            return
-        }
-
         fragmentShader = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER)
         GL20.glShaderSource(fragmentShader, fragmentShaderSource)
         GL20.glCompileShader(fragmentShader)
-
-        if (GL20.glGetShaderi(fragmentShader, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
-            println("Gap outline fragment shader compilation failed: ${GL20.glGetShaderInfoLog(fragmentShader, 1024)}")
-            return
-        }
 
         program = GL20.glCreateProgram()
         GL20.glAttachShader(program, vertexShader)
         GL20.glAttachShader(program, fragmentShader)
         GL20.glLinkProgram(program)
-
-        if (GL20.glGetProgrami(program, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
-            println("Gap outline shader program linking failed: ${GL20.glGetProgramInfoLog(program, 1024)}")
-            return
-        }
 
         shaderCenterUniform = ShaderUniform2f(program, "u_center")
         shaderSizeUniform = ShaderUniform2f(program, "u_size")
@@ -123,7 +108,6 @@ object GapOutlineShader {
         shaderGapRadiusUniform = ShaderUniform1f(program, "u_gapRadius")
 
         isInitialized = true
-        println("Gap outline shader initialized successfully")
     }
 
     fun drawGapOutline(
@@ -143,7 +127,6 @@ object GapOutlineShader {
 
         bind()
 
-        // Set rectangle center (like the working shader)
         shaderCenterUniform.setValue(x + width * 0.5f, y + height * 0.5f)
         shaderSizeUniform.setValue(width, height)
         shaderRadiusUniform.setValue(radius)
@@ -154,12 +137,11 @@ object GapOutlineShader {
             color.b * COLOR_NORMALIZER,
             color.alpha
         )
-        // Gap center is absolute position (like f_Position)
+
         shaderGapCenterUniform.setValue(gapCenterX, gapCenterY)
         shaderGapSizeUniform.setValue(gapWidth, gapHeight)
         shaderGapRadiusUniform.setValue(gapRadius)
 
-        // Use the same drawing method as the working shader
         UIBlock.drawBlockWithActiveShader(
             matrixStack,
             color.javaColor,

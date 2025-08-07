@@ -22,6 +22,10 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL45
 import java.util.Stack
 
+/**
+ * Most stuff taken from odin
+ */
+
 val matrix = UMatrixStack.Compat
 val scaleFactor get() = ScaledResolution(mc).scaleFactor.toFloat()
 private val arrowIcon = DynamicTexture(

@@ -15,12 +15,10 @@ import noobroutes.features.ModuleManager
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.move.AutoPath
-import noobroutes.font.FontType
 import noobroutes.ui.clickgui.ClickGui
 import noobroutes.utils.*
 import noobroutes.utils.clock.Executor
 import noobroutes.utils.render.RenderUtils
-import noobroutes.utils.render.RenderUtils2D
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.render.initUIFramebufferStencil
 import noobroutes.utils.routes.RouteUtils
@@ -60,12 +58,11 @@ class NoobRoutes {
             ModuleManager,
             Executor,
             Renderer,
-            RenderUtils2D,
             RenderUtils,
             ClickGui,
             Scheduler,
             PacketUtils,
-            NettyS2DPacketInterceptor,
+            NettyPacketInterceptor,
             AuraManager,
             Utils,
             LocationUtils,

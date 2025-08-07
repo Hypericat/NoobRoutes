@@ -4,6 +4,9 @@ import noobroutes.Core.mc
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
 
+/**
+ * Taken from Odin
+ */
 object MouseUtils {
 
     val mouseX: Float

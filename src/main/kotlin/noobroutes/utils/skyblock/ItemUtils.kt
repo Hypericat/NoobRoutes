@@ -14,6 +14,10 @@ import noobroutes.utils.noControlCodes
 import noobroutes.utils.render.Color
 
 /**
+ * Most functions taken from odin
+ */
+
+/**
  * Returns the ExtraAttribute Compound
  */
 val ItemStack?.extraAttributes: NBTTagCompound?

@@ -95,12 +95,11 @@ object ModuleManager {
         AutoPath,
         EWPathfinderModule,
         DynamicRoute,
-        ZealotAura,
         WaterBoard,
         IceFill,
         SecretAura,
         AutoClose,
-        AutoRoute
+        //AutoRoute
     )
 
     init {

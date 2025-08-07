@@ -24,8 +24,6 @@ object RotationUtils {
         return Vec3(f1*f2, f3, f*f2).bloomNormalize()
     }
 
-    //
-
     /**
      * Taken from cga
      * @param x X position to aim at.
@@ -92,47 +90,8 @@ object RotationUtils {
         pitch?.let { mc.thePlayer.rotationPitch = pitch.coerceIn(-90f, 90f) }
     }
 
-
     fun setAngleToVec3(vec3: Vec3, sneaking: Boolean = false) {
         val angles = getYawAndPitch(vec3.xCoord, vec3.yCoord, vec3.zCoord, sneaking)
         setAngles(angles.first, angles.second)
-    }
-
-    /**
-     * Smoothly rotates the players head to the given yaw and pitch.
-     *
-     * @param yaw The yaw to rotate to
-     * @param pitch The pitch to rotate to
-     * @param rotTime how long the rotation should take. In milliseconds.
-     */
-    @OptIn(ObsoleteCoroutinesApi::class)
-    fun smoothRotateTo(yaw: Float, pitch: Float, rotTime: Number, functionToRunWhenDone: () -> Unit = {}) {
-        scope.launch {
-            val initialYaw = MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw)
-            val initialPitch = MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationPitch)
-            val targetYaw = wrapAngle(yaw)
-            val targetPitch = wrapAngle(pitch)
-            val startTime = System.currentTimeMillis()
-            val duration = rotTime.toInt().coerceIn(10, 10000)
-
-            val tickerChannel = ticker(delayMillis = 1, initialDelayMillis = 0)
-            for (event in tickerChannel) {
-                val currentTime = System.currentTimeMillis()
-                val progress = ((currentTime - startTime).toFloat() / duration).coerceIn(0f, 1f)
-                val amount = bezier(progress, 0f, 1f, 1f, 1f)
-
-                mc.thePlayer?.rotationYaw = initialYaw + (targetYaw - initialYaw) * amount
-                mc.thePlayer?.rotationPitch = initialPitch + (targetPitch - initialPitch) * amount
-
-                if (progress >= 1f) {
-                    tickerChannel.cancel()
-                    break
-                }
-            }
-
-            mc.thePlayer?.rotationYaw = yaw
-            mc.thePlayer?.rotationPitch = pitch
-            functionToRunWhenDone.invoke()
-        }
     }
 }

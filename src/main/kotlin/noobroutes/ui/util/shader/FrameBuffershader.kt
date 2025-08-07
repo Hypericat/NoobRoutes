@@ -8,6 +8,9 @@ import noobroutes.utils.render.Color
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL20.glUseProgram
 
+/**
+ * Taken from Odin
+ */
 abstract class FramebufferShader(fragmentShader: String) : Shader(fragmentShader) {
     protected var color = Color.WHITE
     protected var radius: Float = 2f

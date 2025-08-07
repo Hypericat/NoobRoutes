@@ -16,6 +16,9 @@ import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.ServerTickEvent
 
+/**
+ * Taken from meow
+ */
 object Scheduler {
     var runTime = 0L
 

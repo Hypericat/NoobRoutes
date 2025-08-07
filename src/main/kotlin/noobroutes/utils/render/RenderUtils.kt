@@ -31,6 +31,10 @@ import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
+
+/**
+ * Taken from odin
+ */
 object RenderUtils {
 
     val tessellator: Tessellator = Tessellator.getInstance()

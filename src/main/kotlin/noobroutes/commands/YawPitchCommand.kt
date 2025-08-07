@@ -7,13 +7,16 @@ import noobroutes.features.render.ClickGUIModule.devMode
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 
+/**
+ * this should probably just be in the noobroutes command
+ */
 class YawPitchCommand: CommandBase() {
     override fun getCommandName(): String {
         return "setlook"
     }
 
     override fun getCommandUsage(sender: ICommandSender?): String {
-        return "used to add rings"
+        return "for testing"
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {

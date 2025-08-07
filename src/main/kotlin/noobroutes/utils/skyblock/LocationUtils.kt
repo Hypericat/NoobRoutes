@@ -18,6 +18,10 @@ import noobroutes.utils.skyblock.dungeon.DungeonInstance
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.Floor
 
+
+/**
+ * Taken from odin
+ */
 object LocationUtils {
 
     var isOnHypixel: Boolean = false

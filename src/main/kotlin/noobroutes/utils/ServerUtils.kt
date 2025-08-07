@@ -11,6 +11,9 @@ import noobroutes.Core.mc
 import noobroutes.utils.clock.Executor
 import noobroutes.utils.clock.Executor.Companion.register
 
+/**
+ * Taken from Odin
+ */
 object ServerUtils {
     private val packets = ArrayList<Packet<*>>()
 

@@ -4,6 +4,9 @@ import noobroutes.Core.logger
 import org.apache.commons.io.IOUtils
 import org.lwjgl.opengl.*
 
+/**
+ * Taken from Odin
+ */
 abstract class Shader(fragmentShader: String) {
     private var programId: Int = 0
 

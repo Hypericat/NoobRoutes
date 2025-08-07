@@ -65,21 +65,6 @@ object PlayerUtils {
     inline val movementKeysPressed: Boolean get() = (mc.thePlayer.moveForward != 0.0f || mc.thePlayer.moveStrafing != 0.0f || mc.thePlayer.movementInput.jump) && mc.currentScreen == null
 
 
-
-
-    /**
-     * Displays an alert on screen and plays a sound
-     *
-     * @param title String to be displayed.
-     * @param playSound Toggle for sound.
-     *
-     * @author Odtheking, Bonsai
-     */
-    fun alert(title: String, time: Int = 20, color: Color = Color.WHITE, playSound: Boolean = true, displayText: Boolean = true) {
-        if (playSound) playLoudSound("note.pling", 100f, 1f)
-        if (displayText) Renderer.displayTitle(title , time, color = color)
-    }
-
     inline val posX get() = mc.thePlayer?.posX ?: 0.0
     inline val posY get() = mc.thePlayer?.posY ?: 0.0
     inline val posZ get() = mc.thePlayer?.posZ ?: 0.0
@@ -104,26 +89,10 @@ object PlayerUtils {
         return zeroSwapped
     }
 
-    fun windowClick(slotId: Int, button: Int, mode: Int) {
-        if (lastGuiClickSent + 45 > System.currentTimeMillis())
-        mc.thePlayer?.openContainer?.let {
-            if (it !is ContainerChest || slotId !in 0 until it.inventorySlots.size) return
-            mc.netHandler?.networkManager?.sendPacket(C0EPacketClickWindow(it.windowId, slotId, button, mode, it.inventory[slotId], it.getNextTransactionID(mc.thePlayer?.inventory)))
-        }
-    }
-
-    fun windowClick(slotId: Int, clickType: ClickType) {
-        when (clickType) {
-            is ClickType.Left -> windowClick(slotId, 0, 0)
-            is ClickType.Right -> windowClick(slotId, 1, 0)
-            is ClickType.Middle -> windowClick(slotId, 2, 3)
-            is ClickType.Shift -> windowClick(slotId, 0, 1)
-        }
-    }
-
     fun distanceToPlayer(x: Int, y: Int, z: Int): Double {
         return mc.thePlayer.positionVector.distanceTo(Vec3(x.toDouble(), y.toDouble(), z.toDouble()))
     }
+
 
     inline val Vec3.distanceToPlayer2D get() = sqrt((mc.thePlayer.positionVector.xCoord - this.xCoord).pow(2) + (mc.thePlayer.positionVector.zCoord - this.zCoord).pow(2))
     inline val Vec3.distanceToPlayer2DSq get() = (mc.thePlayer.positionVector.xCoord - this.xCoord).pow(2) + (mc.thePlayer.positionVector.zCoord - this.zCoord).pow(2)

@@ -15,6 +15,10 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+/*
+    Most functions taken from Odin
+ */
+
 data class Vec2(val x: Double, val z: Double)
 
 data class Vec2i(val x: Int, val z: Int)

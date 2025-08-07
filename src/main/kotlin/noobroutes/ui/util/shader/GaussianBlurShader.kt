@@ -12,7 +12,6 @@ object GaussianBlurShader {
     private var blurShader: Int = 0
     private var backgroundTexture: Int = 0
 
-    // Simple blur shader that samples the background
     private val vertexShaderSource = """
         #version 120
         
@@ -72,13 +71,12 @@ object GaussianBlurShader {
     }
 
     /**
-     * Captures the current screen content as a texture for blurring
-     * Call this BEFORE drawing any UI elements
+     * Needs to be called before drawing any ui elements
      */
     fun captureBackground() {
         initShaders()
 
-        // Delete old texture if it exists
+
         if (backgroundTexture != 0) {
             GL11.glDeleteTextures(backgroundTexture)
         }
@@ -95,26 +93,17 @@ object GaussianBlurShader {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP)
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP)
 
-        // Unbind texture
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0)
     }
 
-    /**
-     * Draws a blurred version of the captured background
-     * This respects the current stencil state
-     * Call this BETWEEN stencil() and popStencil()
-     */
     fun drawBlur(x: Float, y: Float, width: Float, height: Float, radius: Float) {
         if (backgroundTexture == 0 || radius <= 0) return
 
-        // Save current state
         val prevProgram = GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM)
         val prevTexture = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D)
 
-        // Use blur shader
         GL20.glUseProgram(blurShader)
 
-        // Set uniforms
         val textureUniform = GL20.glGetUniformLocation(blurShader, "u_texture")
         val texelSizeUniform = GL20.glGetUniformLocation(blurShader, "u_texelSize")
         val radiusUniform = GL20.glGetUniformLocation(blurShader, "u_radius")
@@ -125,14 +114,11 @@ object GaussianBlurShader {
         GL20.glUniform1f(radiusUniform, radius)
         GL20.glUniform2f(resolutionUniform, mc.displayWidth.toFloat(), mc.displayHeight.toFloat())
 
-        // Bind background texture
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, backgroundTexture)
 
-        // Draw textured quad - this will be clipped by the active stencil
         GlStateManager.color(1f, 1f, 1f, 1f)
         drawTexturedRect(x, y, width, height)
 
-        // Restore state
         GL20.glUseProgram(prevProgram)
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, prevTexture)
     }
@@ -141,12 +127,10 @@ object GaussianBlurShader {
         val tessellator = Tessellator.getInstance()
         val worldRenderer = tessellator.worldRenderer
 
-        // Calculate texture coordinates for the specific screen region
-        // Convert screen coordinates to normalized texture coordinates [0,1]
         val u1 = x / mc.displayWidth
-        val v1 = 1.0f - (y + height) / mc.displayHeight  // Flip Y and use correct bounds
+        val v1 = 1.0f - (y + height) / mc.displayHeight
         val u2 = (x + width) / mc.displayWidth
-        val v2 = 1.0f - y / mc.displayHeight  // Flip Y and use correct bounds
+        val v2 = 1.0f - y / mc.displayHeight
 
         worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
         worldRenderer.pos(x.toDouble(), (y + height).toDouble(), 0.0).tex(u1.toDouble(), v1.toDouble()).endVertex()
@@ -167,7 +151,6 @@ object GaussianBlurShader {
         }
     }
 
-    // Extension function for easier use with your stencil system
     fun blurredBackground(x: Float, y: Float, width: Float, height: Float, radius: Float) {
         drawBlur(x, y, width, height, radius)
     }

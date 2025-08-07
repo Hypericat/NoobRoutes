@@ -10,6 +10,8 @@ import java.awt.Color as JavaColor
 /**
  * HSB based color class.
  * Based on [PolyUI](https://github.com/Polyfrost/polyui-jvm/blob/master/src/main/kotlin/cc/polyfrost/polyui/color/Color.kt)
+ *
+ * Taken from Odin
  */
 class Color(hue: Float, saturation: Float, brightness: Float, alpha: Float = 1f) {
     constructor(hsb: FloatArray, alpha: Float = 1f) : this(hsb[0], hsb[1], hsb[2], alpha)

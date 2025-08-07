@@ -8,6 +8,9 @@ import noobroutes.utils.Utils.COLOR_NORMALIZER
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils.createLegacyShader
 
+/**
+ * Taken from Odin
+ */
 object RoundedRect {
     fun initShaders() {
         logger.info("initing rounded rect shader")
