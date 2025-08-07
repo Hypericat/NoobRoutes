@@ -44,7 +44,7 @@ class NumberBoxElement(
         maxCharacters,
         boxType,
         boxThickness,
-        if (roundTo == 0) this.elementValue.toInt().toString() else this.elementValue.toString(),
+        if (roundTo == 0) this.elementValue.toInt().toString() else this.elementValue.round(roundTo).toString(),
         numberKeyWhiteList,
         ""
     ).apply {
@@ -103,7 +103,7 @@ class NumberBoxElement(
         updateTextBoxValue()
     }
     fun updateTextBoxValue() {
-        textBox.elementValue = if (roundTo == 0) this.elementValue.toInt().toString() else this.elementValue.toString()
+        textBox.elementValue = if (roundTo == 0) this.elementValue.toInt().toString() else this.elementValue.round(roundTo).toString()
     }
 
     override fun updateChildren() {

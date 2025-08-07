@@ -1,24 +1,12 @@
 package noobroutes.ui.util.elements
 
-import net.minecraft.client.renderer.GlStateManager
-import noobroutes.Core.logger
-import noobroutes.ui.ColorPalette
-import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.clickGUIColor
-import noobroutes.ui.clickgui.elements.Element.Companion.BORDER_OFFSET
 import noobroutes.ui.util.ElementValue
-import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.UiElement
-import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.utils.render.ColorUtil.brighter
-import noobroutes.utils.floor
 import noobroutes.utils.render.*
 import noobroutes.utils.render.ColorUtil.brighterIf
-import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.round
-import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
-import kotlin.math.roundToInt
 
 class SliderElement(
     x: Float,

@@ -24,6 +24,7 @@ import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.render.FreeCam
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
@@ -45,7 +46,9 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import java.util.concurrent.ConcurrentHashMap
 
+
 @Suppress("unused")
+@DevOnly
 object BrushModule : Module("Brush", description = "It is just fme but way less laggy. Works with FME floor config, but not the room config.", category = Category.DUNGEON) {
 
     private val hotbarPalette by BooleanSetting(

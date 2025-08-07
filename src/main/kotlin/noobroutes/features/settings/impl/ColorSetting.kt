@@ -18,7 +18,7 @@ class ColorSetting(
 ) : noobroutes.features.settings.Setting<Color>(name, hidden, description),
     noobroutes.features.settings.Saving {
 
-    override var value: Color = default
+    override var value: Color = default.copy()
 
     var hue: Float
         get() = value.hue

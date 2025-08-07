@@ -12,38 +12,37 @@ import org.lwjgl.opengl.GL11
 import kotlin.math.sign
 
 object ClickGui : Screen() {
-    val base = ClickGUIBase()
     override fun draw() {
         scaleUI()
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
 
         if (ClickGUIModule.blur) GaussianBlurShader.captureBackground()
-        base.doHandleDraw()
+        ClickGUIBase.doHandleDraw()
         if (ClickGUIModule.blur) GaussianBlurShader.cleanup()
         resetScale()
     }
 
     override fun onScroll(amount: Int) {
         if (Mouse.getEventDWheel() == 0) return
-        base.handleScroll(amount.sign * 16)
+        ClickGUIBase.handleScroll(amount.sign * 16)
     }
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
-        base.handleMouseClicked(mouseButton)
+        ClickGUIBase.handleMouseClicked(mouseButton)
     }
 
     override fun keyTyped(typedChar: Char, keyCode: Int) {
-        if (base.doHandleKeyTyped(typedChar, keyCode)) return
+        if (ClickGUIBase.doHandleKeyTyped(typedChar, keyCode)) return
         super.keyTyped(typedChar, keyCode)
     }
 
     override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
         if (state != 0) return
-        base.handleMouseReleased()
+        ClickGUIBase.handleMouseReleased()
     }
     override fun initGui() {
-        base.onGuiInit()
+        ClickGUIBase.onGuiInit()
     }
 
     override fun onGuiClosed() {

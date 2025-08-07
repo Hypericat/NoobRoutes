@@ -1,6 +1,5 @@
 package noobroutes.ui.clickgui.elements.menu
 
-import noobroutes.Core.logger
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.TEXT_OFFSET
@@ -8,10 +7,9 @@ import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.elements.Element
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.util.animations.impl.CubicBezierAnimation
-import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.*
 import noobroutes.utils.render.ColorUtil.brighterIf
@@ -24,10 +22,10 @@ import noobroutes.utils.render.ColorUtil.darker
  * Design mostly made by Stivais
  *
  * @author Stivais, Aton
- * @see [Element]
+ * @see [SettingElement]
  */
-class ElementSelector(setting: SelectorSetting) :
-    Element<SelectorSetting>(setting, ElementType.SELECTOR) {
+class SettingElementSelector(setting: SelectorSetting) :
+    SettingElement<SelectorSetting>(setting, ElementType.SELECTOR) {
 
     override val isHovered: Boolean
         get() = isAreaHovered(x, y, w, DEFAULT_HEIGHT)

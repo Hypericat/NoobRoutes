@@ -24,7 +24,7 @@ object CoreClip: Module(
     name = "CoreClip",
     Keyboard.KEY_NONE,
     category = Category.FLOOR7,
-    description = "The cleanest CoreClip™ in the west, east, north, and south."
+    description = "The cleanest CoreClip™ in the west, east, north, and south. (Much nicer with no push in No Debuff)"
 ) {
     private const val CORE_Y = 115.0
 

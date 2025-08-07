@@ -3,7 +3,7 @@ package noobroutes.ui.clickgui.elements.menu
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.features.settings.impl.DualSetting
 import noobroutes.ui.ColorPalette.elementBackground
-import noobroutes.ui.clickgui.elements.Element
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.util.elements.DualElement
 import noobroutes.utils.render.roundedRectangle
@@ -15,9 +15,9 @@ import noobroutes.utils.render.roundedRectangle
  * Design mostly made by Stivais
  *
  * @author Stivais, Aton
- * @see [Element]
+ * @see [SettingElement]
  */
-class ElementDual(setting: DualSetting) : Element<DualSetting>(
+class SettingElementDual(setting: DualSetting) : SettingElement<DualSetting>(
     setting, ElementType.DUAL
 ) {
     val dualElement = DualElement(setting.left, setting.right, w * 0.5f, h * 0.5f - y, 0.9f, 0.9f, setting.enabled).apply {

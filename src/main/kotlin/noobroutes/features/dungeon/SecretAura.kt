@@ -32,7 +32,7 @@ import noobroutes.utils.Utils.isNotStart
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 
-@DevOnly
+
 object SecretAura : Module("Secret Aura", category = Category.DUNGEON, description = "Typical Secret Aura, is Disabled Inside of Boss. (Use Lever Aura)") {
     val enableOutsideOfDungeons by BooleanSetting("Enable Everywhere", description = "Enables the Aura outside of dungeons.")
     private val rangeDropDown by DropdownSetting("Range Settings")
@@ -176,7 +176,7 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
 
     /**
      * Logic taken from secret guide
-     * The original code is so bad T-T
+     * The original secret guide code is so bad T-T
      */
     @SubscribeEvent
     fun onPacketReceive(event: PacketEvent.Receive){

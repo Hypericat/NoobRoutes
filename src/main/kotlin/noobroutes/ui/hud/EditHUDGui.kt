@@ -49,12 +49,12 @@ object EditHUDGui : Screen() {
         }
 
         //dropShadow(-100f, -25f, 200f, 50f, 10f, 1f)
-        roundedRectangle(Display.getWidth() * 0.5f - 75, Display.getHeight() * .86f - 30, 150f, 40f, color, 9f)
+        roundedRectangle(Display.getWidth() * 0.5f - 75, Display.getHeight() * 0.86f - 30, 150f, 40f, color, 9f)
 
         text(
             "Reset",
             Display.getWidth() * 0.5f,
-            Display.getHeight() * .86f,
+            Display.getHeight() * 0.86f,
             textColor,
             18f,
             FontRenderer.REGULAR,
@@ -93,7 +93,7 @@ object EditHUDGui : Screen() {
     }
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
-        if (isAreaHovered(Display.getWidth() / 2 - 100f, Display.getHeight() * .875f - 25f, 200f, 50f)) {
+        if (isAreaHovered(Display.getWidth() * 0.5f - 75, Display.getHeight() * 0.86f - 90f, 150f, 40f)) {
             resetHUDs()
             return
         }

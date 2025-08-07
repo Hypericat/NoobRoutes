@@ -20,7 +20,7 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils
  *
  * one could say I took inspiration
  */
-@DevOnly
+
 object AutoClose : Module("Auto Close", description = "Taken from Secret Guide", category = Category.DUNGEON) {
     private var closeId: Int? = null
 

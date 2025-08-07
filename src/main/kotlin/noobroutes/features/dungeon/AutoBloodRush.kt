@@ -49,10 +49,10 @@ object AutoBloodRush: Module(
     name = "Auto Br",
     Keyboard.KEY_NONE,
     category = Category.DUNGEON,
-    description = "Bloodrushes very fast (does it outside of map)"
+    description = "Bloodrushes very fast (a little inconsistent rn)"
 ) {
     private val autoStartBrToggle by BooleanSetting("Main Toggle", default = true, description = "u also need the module enabled for the snipe command")
-    private val goOn1Delay by NumberSetting("go on delay", 13, 0, 20, description = "how long to wait before u actually go down (ticks)").withDependency { autoStartBrToggle }
+    private val goOn1Delay by NumberSetting("go on delay", 13, 0, 20, description = "how long to wait before u actually go down (ticks). Test to find appropriate value, it is ping dependent.").withDependency { autoStartBrToggle }
     private val preLoadDelay by NumberSetting("Preload Delay", 0, 0, 20, description = "delay for preloading the map")
     private val silent by BooleanSetting("silent", description = "do silent rotations")
     private val noWait by BooleanSetting("Low Ping Pearls", default = false, description = "for low ping players. makes pearls work")

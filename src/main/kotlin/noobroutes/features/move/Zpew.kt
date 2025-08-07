@@ -183,7 +183,7 @@ object Zpew : Module(
 
         if (dingdingding) PlayerUtils.playLoudSound(getSound(), volume.toFloat(), Zpew.pitch.toFloat())
         if (sendTPCommand && LocationUtils.isSinglePlayer) { sendChatMessage("/tp $x $y $z")}
-        if (sendPacket) Scheduler.schedulePreTickTask(1) {
+        if (sendPacket) Scheduler.schedulePreTickTask(0) {
             PacketUtils.sendPacket(
                 C03PacketPlayer.C06PacketPlayerPosLook(
                     x,

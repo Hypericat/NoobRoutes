@@ -10,7 +10,7 @@ import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.elements.Element
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.util.animations.impl.ColorAnimation
@@ -28,9 +28,9 @@ import noobroutes.utils.render.RenderUtils.loadBufferedImage
  * Design mostly made by Stivais
  *
  * @author Stivais, Aton
- * @see [Element]
+ * @see [SettingElement]
  */
-class ElementHud(setting: HudSetting) : Element<HudSetting>(
+class SettingElementHud(setting: HudSetting) : SettingElement<HudSetting>(
     setting, ElementType.DUAL
 ) {
     override val isHovered: Boolean

@@ -1,7 +1,9 @@
 package noobroutes.ui.clickgui.elements
 
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.Core
+import noobroutes.Core.logger
 import noobroutes.features.Category
 import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
@@ -20,7 +22,9 @@ import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.withAlpha
+import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import noobroutes.utils.render.TextAlign
+import noobroutes.utils.render.drawDynamicTexture
 import noobroutes.utils.render.getTextWidth
 import noobroutes.utils.render.popStencil
 import noobroutes.utils.render.rectangleOutline
@@ -31,7 +35,7 @@ import noobroutes.utils.round
 import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 
-class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule.panelX[category]!!.value, ClickGUIModule.panelY[category]!!.value) {
+class Panel(val name: String, val category: Category, val icon: DynamicTexture) : UiElement(ClickGUIModule.panelX[category]!!.value, ClickGUIModule.panelY[category]!!.value) {
     companion object {
         const val WIDTH = 240f
         const val HEIGHT = 40f
@@ -44,14 +48,22 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
         const val BOTTOM_SEGMENT_HEIGHT = 10f
         const val PANEL_RADIUS = 10f
         const val HIGHLIGHT_THICKNESS = 2f
+
+        private const val IMAGE_SIZE = 32f
+        private const val IMAGE_X = WIDTH * 0.9f - IMAGE_SIZE * 0.5f
+        private const val IMAGE_Y = HEIGHT * 0.5f - IMAGE_SIZE * 0.5f
     }
 
     fun updatingModuleButtons(){
         uiChildren.forEach {
             (it as ModuleButton).updateElements()
         }
-
     }
+
+    private fun drawIcon(){
+        drawDynamicTexture(icon, IMAGE_X, IMAGE_Y, IMAGE_SIZE, IMAGE_SIZE)
+    }
+
 
     private var dragging = false
 
@@ -81,8 +93,9 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
             }
             addChild(ModuleButton(0f, module))
         }
-        if (uiChildren.isEmpty()) (parent as? ClickGUIBase)?.removePanel(this)
+        //if (uiChildren.isEmpty()) ClickGUIBase.removePanel(this)
     }
+    val isNotEmpty = uiChildren.isNotEmpty()
 
 
     private inline val isHovered get() = isAreaHovered(-BORDER_THICKNESS, -BORDER_THICKNESS, HITBOX_WIDTH, HITBOX_HEIGHT)
@@ -125,7 +138,7 @@ class Panel(val name: String, val category: Category) : UiElement(ClickGUIModule
             0f, PANEL_RADIUS, PANEL_RADIUS, 0f, 0f, 2.6f
         )
         text(name, TEXT_OFFSET, HALF_HEIGHT, ColorPalette.textColor, 16f, FontRenderer.BOLD,TextAlign.Left)
-
+        drawIcon()
 
 
         if (extended || extendAnim.isAnimating()) {

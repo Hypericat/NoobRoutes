@@ -23,7 +23,9 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 
-
+/**
+ * Not Functional will fix later
+ */
 object Blaze : Module(
     "Blaze",
     description = "Automatically completes the higher or lower puzzle",
@@ -63,10 +65,6 @@ object Blaze : Module(
         "Aura Secret",
         description = "Secret Aura for the secret in blaze."
     )
-    private val toggleSG by BooleanSetting(
-        "Toggle Secret Guide",
-        description = "Toggles secret aura in blaze."
-    )
     private val lowerBlazeEWLocations = listOf(
         Vec3(22.0, 56.0, 16.0),
         Vec3(15.0, 42.0, 22.0),
@@ -105,7 +103,6 @@ object Blaze : Module(
 
     @SubscribeEvent
     fun onEnterRoom(event: RoomEnterEvent) {
-        if (awaitingRoomChange) {SecretGuideIntegration.setSecretGuideAura(true); awaitingRoomChange = false}
         hasAuraedBlock = false
         if (event.room == null || !event.room.name.equalsOneOf("Lower Blaze", "Higher Blaze")) return
         getBlaze()
@@ -118,13 +115,6 @@ object Blaze : Module(
             }
         }
 
-        if (toggleSG) {
-            val state = SecretGuideIntegration.getSecretGuideAura() ?: return
-            if (state) {
-                SecretGuideIntegration.setSecretGuideAura(false)
-                awaitingRoomChange = true
-            }
-        }
     }
 
 

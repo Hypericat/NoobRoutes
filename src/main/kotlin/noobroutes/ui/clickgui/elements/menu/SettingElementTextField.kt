@@ -5,7 +5,7 @@ import noobroutes.features.settings.impl.StringSetting
 import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.elements.Element
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.util.elements.textElements.TextBoxElement
 import noobroutes.utils.render.ColorUtil.darker
@@ -20,10 +20,10 @@ import noobroutes.utils.render.text
  * Design mostly made by Stivais
  *
  * @author Stivais, Aton
- * @see [Element]
+ * @see [SettingElement]
  */
-class ElementTextField(setting: StringSetting) :
-    Element<StringSetting>(setting, ElementType.TEXT_FIELD) {
+class SettingElementTextField(setting: StringSetting) :
+    SettingElement<StringSetting>(setting, ElementType.TEXT_FIELD) {
 
     companion object {
         private const val TEXT_BOX_ELEMENT_HEIGHT = 24f

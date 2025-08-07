@@ -26,8 +26,9 @@ import noobroutes.utils.render.ColorUtil.darkerIf
 import kotlin.math.floor
 
 
-/*
-    I will fix this later, yes ik the code is shit.
+/**
+ * TODO Remake this
+ * the code is shit.
  */
 
 
@@ -221,15 +222,16 @@ object EditUI : Screen() {
                     )
                 )
 
-                currentY += 75
-
-                ElementCheckBox(
-                    X_ALIGNMENT_RIGHT,
-                    currentY,
-                    250f, 50f,
-                    { ring.insta = it },
-                    { ring.insta },
-                    "Insta"
+                currentY += 50
+                elements.add(
+                    ElementCheckBox(
+                        X_ALIGNMENT_LEFT,
+                        currentY,
+                        250f, 50f,
+                        { ring.insta = it },
+                        { ring.insta },
+                        "Insta"
+                    )
                 )
             }
 

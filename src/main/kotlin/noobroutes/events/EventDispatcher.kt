@@ -101,13 +101,4 @@ object EventDispatcher {
         if (System.currentTimeMillis() - lastEntityClick < 400 && termNames.any{regex -> regex.matches(title)}) TermOpenEvent().postAndCatch()
     }
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.isStart) AutoP3MovementEvent().postAndCatch()
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onTickHighest(event: TickEvent.ClientTickEvent) {
-        if (event.isStart) AutoP3RingEvent().postAndCatch()
-    }
 }

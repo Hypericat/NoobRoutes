@@ -2,18 +2,16 @@ package noobroutes.ui.clickgui.elements.menu
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.ui.ColorPalette
 import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.elements.Element
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.util.elements.textElements.NumberBoxElement
 import noobroutes.ui.util.elements.SliderElement
 import noobroutes.ui.util.elements.textElements.TextBoxElement
 import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.TextAlign
-import noobroutes.utils.render.getTextHeight
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
 import noobroutes.utils.round
@@ -25,10 +23,10 @@ import noobroutes.utils.round
  * Design mostly made by Stivais
  *
  * @author Stivais, Aton
- * @see [Element]
+ * @see [SettingElement]
  */
-class ElementSlider(setting: NumberSetting<*>) :
-    Element<NumberSetting<*>>(setting, ElementType.SLIDER) {
+class SettingElementSlider(setting: NumberSetting<*>) :
+    SettingElement<NumberSetting<*>>(setting, ElementType.SLIDER) {
 
     companion object {
         private const val TEXT_BOX_HEIGHT = 21.5f

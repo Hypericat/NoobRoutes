@@ -82,7 +82,6 @@ object ModuleManager {
         AutoSS,
         InstantSlow,
         Doorless,
-        SecretGuideManager,
         Penis,
         RotationVisualizer,
         BrushModule,
@@ -97,7 +96,7 @@ object ModuleManager {
         IceFill,
         SecretAura,
         AutoClose,
-        //AutoRoute
+        AutoRoute
     )
 
     init {

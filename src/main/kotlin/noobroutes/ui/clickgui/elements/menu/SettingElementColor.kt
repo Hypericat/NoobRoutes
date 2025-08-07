@@ -7,7 +7,7 @@ import noobroutes.ui.ColorPalette
 import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.elements.Element
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
 import noobroutes.ui.clickgui.elements.Panel
@@ -22,7 +22,6 @@ import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConsta
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.TEXT_BOX_HEIGHT
 import noobroutes.ui.util.elements.colorelement.ColorPopoutElement
 import noobroutes.ui.util.elements.colorelement.ColorSliderElement
-import noobroutes.ui.util.elements.colorelement.EmptyColorSliderElement
 import noobroutes.ui.util.elements.textElements.AccessorBasedNumberBoxElement
 import noobroutes.utils.Utils.COLOR_NORMALIZER
 import noobroutes.utils.render.Color
@@ -40,10 +39,10 @@ import noobroutes.utils.render.text
  * Design mostly made by Stivais
  *
  * @author Stivais, Aton
- * @see [Element]
+ * @see [SettingElement]
  */
-class ElementColor(setting: ColorSetting) :
-    Element<ColorSetting>(setting, ElementType.COLOR) {
+class SettingElementColor(setting: ColorSetting) :
+    SettingElement<ColorSetting>(setting, ElementType.COLOR) {
     inline val color: Color
         get() = setting.value
 

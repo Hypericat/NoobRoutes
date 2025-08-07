@@ -2,12 +2,10 @@ package noobroutes.ui.clickgui.elements.menu
 
 import noobroutes.features.settings.impl.ActionSetting
 import noobroutes.font.FontRenderer
-import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.elements.Element
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
-import noobroutes.ui.clickgui.elements.Panel
 import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.TextPos
@@ -21,9 +19,9 @@ import noobroutes.utils.render.text
  * Design mostly made by Stivais
  *
  * @author Stivais, Aton
- * @see [Element]
+ * @see [SettingElement]
  */
-class ElementAction(setting: ActionSetting) : Element<ActionSetting>(setting, ElementType.ACTION) {
+class SettingElementAction(setting: ActionSetting) : SettingElement<ActionSetting>(setting, ElementType.ACTION) {
     override val isHovered: Boolean
         get() = isAreaHovered(x + 20f, y, w - 40f, h - 10f)
 

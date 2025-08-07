@@ -92,7 +92,7 @@ object SwapManager {
             return when {
                 mc.thePlayer.inventory.currentItem == i -> SwapState.ALREADY_HELD
                 recentlySwapped -> {
-                    modMessage("tried to swap too fast ${stack.displayName ?: stack.skyblockID}")
+                    modMessage("Tried to 0 tick swap ${stack.displayName ?: stack.skyblockID}")
                     SwapState.TOO_FAST
                 }
                 else -> {
