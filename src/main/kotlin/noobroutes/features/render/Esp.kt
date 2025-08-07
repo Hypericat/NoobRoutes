@@ -1,10 +1,15 @@
 package noobroutes.features.render
 
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLiving
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.server.S13PacketDestroyEntities
 import net.minecraft.util.AxisAlignedBB
+import net.minecraftforge.client.event.EntityViewRenderEvent
+import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -50,7 +55,11 @@ object Esp : Module(
         if (!DungeonUtils.inDungeons) return
 
         if (!drawBoxes) return
-        for (entityID in starredMobs) {
+
+        val size = starredMobs.size;
+        val list: List<Int> = starredMobs.toList();
+        for (i in 0 until size) {
+            val entityID = list[i];
             val entity = Minecraft.getMinecraft().theWorld.getEntityByID(entityID)
             if (entity == null) {
                 starredMobs.remove(entityID)
@@ -64,7 +73,7 @@ object Esp : Module(
 
     private fun isValidEntity(entity: EntityArmorStand?): Boolean {
         if (entity == null) return false;
-        if (scannedMobs.contains(entity.entityId)) return false;
+        //if (scannedMobs.contains(entity.entityId)) return false;
         if (!entity.hasCustomName() || !entity.customNameTag.contains("§6✯ ") || !entity.customNameTag.endsWith("§c❤") || !entity.alwaysRenderNameTag) {
             scannedMobs.add(entity.entityId)
             return false;
@@ -91,7 +100,7 @@ object Esp : Module(
 
             val e = getMobEntity(armorStand) ?: continue; // Entity may not be loaded
             starredMobs.add(e.entityId)
-            scannedMobs.add(armorStand.entityId)
+            //scannedMobs.add(armorStand.entityId)
         }
 
         // Check for shadow assassins
@@ -99,4 +108,17 @@ object Esp : Module(
             starredMobs.add(player.entityId)
         }
     }
+
+    fun isStarred(id: Int): Boolean {
+        return this.starredMobs.contains(id);
+    }
+
+    fun shouldCancelDepthCheck(id: Int) : Boolean {
+        return depthCheck && this.enabled && isStarred(id);
+    }
+
+    // Todo
+    // Fix missing mobs with the performance
+    // Add fels
+    // Disable depth check for entity armor and weapons too
 }
