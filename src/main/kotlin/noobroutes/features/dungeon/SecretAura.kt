@@ -73,7 +73,7 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
         clear()
     }
 
-    fun isInDisabledRoom(): Boolean {
+    private fun isInDisabledRoom(): Boolean {
         return when (DungeonUtils.currentRoomName) {
             "Water Board" -> waterBoard
             "Tic Tac Toe" -> ticTacToe
@@ -88,10 +88,12 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
             else -> false
         }
     }
+    private inline val inValidArea get() = DungeonUtils.inDungeons || enableOutsideOfDungeons
+
 
     @SubscribeEvent
     fun onPostTick(event: ClientTickEvent) {
-        if (event.isNotStart || mc.thePlayer == null || mc.theWorld == null || mc.currentScreen != null || BossEventDispatcher.inF7Boss || isInDisabledRoom()) return
+        if (event.isNotStart || mc.thePlayer == null || mc.theWorld == null || mc.currentScreen != null || BossEventDispatcher.inF7Boss || isInDisabledRoom() || inValidArea) return
 
         var blockCandidate = BlockDistance(Blocks.air, BlockPos(Int.MAX_VALUE, 69, Int.MIN_VALUE), Double.POSITIVE_INFINITY)
 
