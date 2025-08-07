@@ -23,10 +23,7 @@ import noobroutes.features.floor7.*
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.misc.*
 import noobroutes.features.move.*
-import noobroutes.features.render.ClickGUIModule
-import noobroutes.features.render.FreeCam
-import noobroutes.features.render.RotationVisualizer
-import noobroutes.features.render.Trail
+import noobroutes.features.render.*
 import noobroutes.features.routes.AutoRoute
 import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.impl.KeybindSetting
@@ -60,6 +57,7 @@ object ModuleManager {
 
     val modules: ArrayList<Module> = arrayListOf(
         ClickGUIModule,
+        Esp,
         BlinkKeybind,
         AutoP3,
         NoDebuff,

@@ -30,6 +30,4 @@ class BlockPosCache {
     private fun hash(blockPos: BlockPos) : Int {
         return blockPos.y and 0xFF or (((blockPos.x + 2048) and 0xFFF) shl 8) or (((blockPos.z + 2048) and 0xFFF) shl 20);
     }
-
-
 }

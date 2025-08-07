@@ -3,6 +3,7 @@ package noobroutes.utils.render
 import gg.essential.universal.shader.BlendState
 import gg.essential.universal.shader.UShader
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
@@ -101,9 +102,79 @@ object RenderUtils {
         block.invoke(this)
     }
 
+    fun getPartialEntityBoundingBox(entity: Entity, partialTicks: Float): AxisAlignedBB {
+        val lerpX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks
+        val lerpY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks
+        val lerpZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
+
+        return entity.entityBoundingBox.offset(lerpX - entity.posX, lerpY - entity.posY, lerpZ - entity.posZ)
+    }
+
     private fun WorldRenderer.addVertex(x: Double, y: Double, z: Double, nx: Float, ny: Float, nz: Float) {
         pos(x, y, z).normal(nx, ny, nz).endVertex()
     }
+
+    fun renderBBOutline(bb: AxisAlignedBB, partialTicks: Float, color: Color) {
+        var bb = bb
+        val player = Minecraft.getMinecraft().renderViewEntity
+
+        val playerX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks
+        val playerY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks
+        val playerZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks
+
+        bb = bb.offset(-playerX, -playerY, -playerZ)
+
+        drawOutlinedBoundingBox(bb, color, 1f)
+    }
+
+    fun drawOutlinedBoundingBox(bb: AxisAlignedBB, c: Color, alphaMultiplier: Float, thickness: Float = 1f) {
+        val r = c.r
+        val g = c.g
+        val b = c.b
+        val a = (255 * alphaMultiplier).toInt()
+
+        GL11.glLineWidth(thickness)
+        GlStateManager.disableDepth()
+        GlStateManager.disableCull()
+        GlStateManager.enableBlend()
+        GlStateManager.disableLighting()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.disableTexture2D()
+
+        val tessellator = Tessellator.getInstance()
+        val worldrenderer = tessellator.worldRenderer
+        worldrenderer.begin(3, DefaultVertexFormats.POSITION_COLOR)
+        worldrenderer.pos(bb.minX, bb.minY, bb.minZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.maxX, bb.minY, bb.minZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.maxX, bb.minY, bb.maxZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.minX, bb.minY, bb.maxZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.minX, bb.minY, bb.minZ).color(r, g, b, a).endVertex()
+        tessellator.draw()
+        worldrenderer.begin(3, DefaultVertexFormats.POSITION_COLOR)
+        worldrenderer.pos(bb.minX, bb.maxY, bb.minZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.maxX, bb.maxY, bb.minZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.maxX, bb.maxY, bb.maxZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.minX, bb.maxY, bb.maxZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.minX, bb.maxY, bb.minZ).color(r, g, b, a).endVertex()
+        tessellator.draw()
+        worldrenderer.begin(1, DefaultVertexFormats.POSITION_COLOR)
+        worldrenderer.pos(bb.minX, bb.minY, bb.minZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.minX, bb.maxY, bb.minZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.maxX, bb.minY, bb.minZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.maxX, bb.maxY, bb.minZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.maxX, bb.minY, bb.maxZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.maxX, bb.maxY, bb.maxZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.minX, bb.minY, bb.maxZ).color(r, g, b, a).endVertex()
+        worldrenderer.pos(bb.minX, bb.maxY, bb.maxZ).color(r, g, b, a).endVertex()
+        tessellator.draw()
+
+        GlStateManager.enableTexture2D()
+        GlStateManager.disableBlend()
+        GlStateManager.enableDepth()
+        GlStateManager.enableCull()
+        GL11.glLineWidth(1f)
+    }
+
 
     private fun preDraw(disableTexture2D: Boolean = true) {
         GlStateManager.enableAlpha()

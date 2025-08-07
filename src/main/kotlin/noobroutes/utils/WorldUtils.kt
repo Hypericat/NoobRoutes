@@ -6,6 +6,10 @@ import net.minecraft.block.BlockLever
 import net.minecraft.block.BlockLever.EnumOrientation
 import net.minecraft.block.BlockSkull
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.Minecraft
+import net.minecraft.entity.Entity
+import net.minecraft.entity.boss.EntityWither
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -68,6 +72,20 @@ fun getBlockPosWithinAABB(aabb: AxisAlignedBB) : List<BlockPos> {
         }
     }
     return blocks;
+}
+
+// Skidded from odin
+fun getMobEntity(armorStand: EntityArmorStand): Entity? {
+    if (Minecraft.getMinecraft().theWorld == null) return null
+    return Minecraft.getMinecraft().theWorld.getEntitiesWithinAABBExcludingEntity(
+        armorStand,
+        armorStand.entityBoundingBox.offset(0.0, -1.0, 0.0)
+    )
+        .stream()
+        .filter { e: Entity -> e.javaClass != EntityArmorStand::class.java && e !== Minecraft.getMinecraft().thePlayer && !(e.javaClass == EntityWither::class.java && e.isInvisible) }  // Maybe check name to filter for other players, always show name?
+        .min(Comparator.comparingDouble { e: Entity ->
+            e.getDistanceSqToEntity(armorStand)
+        }).orElse(null)
 }
 
 
