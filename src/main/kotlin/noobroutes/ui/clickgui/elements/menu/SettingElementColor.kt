@@ -7,14 +7,13 @@ import noobroutes.ui.ColorPalette
 import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
 import noobroutes.ui.clickgui.elements.ModuleButton
 import noobroutes.ui.clickgui.elements.Panel
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.util.animations.impl.CubicBezierAnimation
 import noobroutes.ui.util.elements.colorelement.AlphaSliderElement
 import noobroutes.ui.util.elements.colorelement.ColorBoxElement
-import noobroutes.ui.util.elements.textElements.TextBoxElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.COLOR_BOX_SIZE
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.COLOR_POPOUT_GAP
@@ -23,14 +22,10 @@ import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConsta
 import noobroutes.ui.util.elements.colorelement.ColorPopoutElement
 import noobroutes.ui.util.elements.colorelement.ColorSliderElement
 import noobroutes.ui.util.elements.textElements.AccessorBasedNumberBoxElement
+import noobroutes.ui.util.elements.textElements.TextBoxElement
 import noobroutes.utils.Utils.COLOR_NORMALIZER
-import noobroutes.utils.render.Color
+import noobroutes.utils.render.*
 import noobroutes.utils.render.Color.Companion.HEX_REGEX
-import noobroutes.utils.render.TextAlign
-import noobroutes.utils.render.popStencil
-import noobroutes.utils.render.roundedRectangle
-import noobroutes.utils.render.stencilRoundedRectangle
-import noobroutes.utils.render.text
 
 /**
  * Renders all the modules.

@@ -3,14 +3,7 @@ package noobroutes.ui.util
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core.logger
 import noobroutes.ui.util.shader.GaussianBlurShader
-import noobroutes.utils.render.Color
-import noobroutes.utils.render.Scissor
-import noobroutes.utils.render.popStencil
-import noobroutes.utils.render.resetScissor
-import noobroutes.utils.render.roundedRectangle
-import noobroutes.utils.render.scissor
-import noobroutes.utils.render.stencil
-import noobroutes.utils.render.stencilRoundedRectangle
+import noobroutes.utils.render.*
 
 
 abstract class UiElement(var x: Float, var y: Float) {

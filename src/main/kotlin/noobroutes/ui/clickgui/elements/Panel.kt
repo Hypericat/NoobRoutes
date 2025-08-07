@@ -3,7 +3,6 @@ package noobroutes.ui.clickgui.elements
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.Core
-import noobroutes.Core.logger
 import noobroutes.features.Category
 import noobroutes.features.ModuleManager.modules
 import noobroutes.features.render.ClickGUIModule
@@ -19,18 +18,9 @@ import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.EaseInOut
 import noobroutes.ui.util.animations.impl.LinearAnimation
-import noobroutes.utils.render.Color
+import noobroutes.utils.render.*
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.withAlpha
-import noobroutes.utils.render.RenderUtils.loadBufferedImage
-import noobroutes.utils.render.TextAlign
-import noobroutes.utils.render.drawDynamicTexture
-import noobroutes.utils.render.getTextWidth
-import noobroutes.utils.render.popStencil
-import noobroutes.utils.render.rectangleOutline
-import noobroutes.utils.render.roundedRectangle
-import noobroutes.utils.render.stencilRoundedRectangle
-import noobroutes.utils.render.text
 import noobroutes.utils.round
 import org.lwjgl.input.Keyboard
 import kotlin.math.floor

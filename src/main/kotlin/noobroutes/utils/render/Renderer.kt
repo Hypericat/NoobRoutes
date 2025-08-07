@@ -1,11 +1,6 @@
 package noobroutes.utils.render
 
-import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.entity.RenderPlayer
-import net.minecraft.entity.Entity
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
@@ -14,16 +9,14 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
-import noobroutes.utils.render.ColorUtil.multiplyAlpha
-import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.addVec
 import noobroutes.utils.fastEyeHeight
 import noobroutes.utils.getBlockAt
-import noobroutes.utils.render.RenderUtils.bind
+import noobroutes.utils.render.ColorUtil.multiplyAlpha
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.RenderUtils.outlineBounds
 import noobroutes.utils.render.RenderUtils.renderVec
 import noobroutes.utils.toAABB
-import org.lwjgl.opengl.GL11
 import kotlin.math.max
 import kotlin.math.min
 

@@ -4,14 +4,11 @@ import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.events.BossEventDispatcher.inF7Boss
-import noobroutes.events.impl.AutoP3MovementEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.AuraManager
 import noobroutes.utils.Utils.isNotStart
-import noobroutes.utils.Utils.isStart
 import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 

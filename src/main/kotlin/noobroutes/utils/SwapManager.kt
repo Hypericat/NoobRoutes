@@ -7,7 +7,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
-import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.utils.Utils.ID
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.devMessage

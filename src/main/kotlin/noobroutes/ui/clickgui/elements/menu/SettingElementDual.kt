@@ -3,8 +3,8 @@ package noobroutes.ui.clickgui.elements.menu
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.features.settings.impl.DualSetting
 import noobroutes.ui.ColorPalette.elementBackground
-import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.util.elements.DualElement
 import noobroutes.utils.render.roundedRectangle
 

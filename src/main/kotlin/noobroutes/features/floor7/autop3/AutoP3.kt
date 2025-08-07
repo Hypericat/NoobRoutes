@@ -34,22 +34,15 @@ import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.getSafe
 import noobroutes.utils.json.JsonUtils.asVec3
-import noobroutes.utils.lastSafe
-import noobroutes.utils.render.Color
-import noobroutes.utils.render.MovementRenderer
-import noobroutes.utils.render.RenderUtils
-import noobroutes.utils.render.Renderer
-import noobroutes.utils.render.getTextHeight
-import noobroutes.utils.render.getTextWidth
-import noobroutes.utils.render.text
+import noobroutes.utils.render.*
 import noobroutes.utils.requirement
-import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
-import java.util.Stack
+import java.util.*
+
 @Suppress("Unused")
 object AutoP3: Module (
     name = "AutoP3",
@@ -91,6 +84,11 @@ object AutoP3: Module (
     }.withDependency { blinkShit }
     private val cancelC05s by BooleanSetting("Cancel C05s", default = false, description = "Allows the cancelling of rotation packets.")
     private val movementMode by DualSetting("Movement Mode","Playback", "Silent", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
+    val x_y0uMode by BooleanSetting("x_y0u Mode", description = "x_y0u strongly believes this is better, while its faster it also probably flags timer and will lobby you sometimes. (We Jew the Timer -x_y0u)").withDependency { blinkShit }
+    val blinkCooldown by NumberSetting("Blink Cooldown", 5, 0, 10, description = "how many ticks to wait after entering a blink ring before allowing blink").withDependency { x_y0uMode && blinkShit }
+    private val resetInterval by NumberSetting(name = "clear intervall", description = "delete packets periodically", min = 1, max = 300, default = 200, unit = "t").withDependency { x_y0uMode && blinkShit }
+    private val resetAmount by NumberSetting(name = "clear amount", description = "delete packets periodically", min = 1, max = 400, default = 50).withDependency { x_y0uMode && blinkShit }
+
 
 
     var waitingRing: Ring? = null
@@ -107,6 +105,8 @@ object AutoP3: Module (
     private var blinkMovementPacketSkip = false
     private var endY = 0.0
     private var activeBlink: BlinkRing? = null
+    var lastBlink = -1L
+    var waitedTicks = 0
 
     private var activeBlinkWaypoint: BlinkWaypoint? = null
     var recordingPacketList = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
@@ -152,7 +152,6 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
-        //devMessage("MoveEntityWithHeadingEvent") Kys wadey
         if (!inF7Boss || editMode || movementPackets.isNotEmpty() || mc.thePlayer.isSneaking) return
 
         rings[route]?.forEach { ring ->
@@ -233,6 +232,7 @@ object AutoP3: Module (
         mc.thePlayer.posZ = event.packet.z
 
         val blinkRing = rings[route]?.find { it is BlinkRing && it.inRing() } ?: return
+        waitedTicks = 10
         activeBlink = blinkRing as BlinkRing
     }
 
@@ -355,12 +355,22 @@ object AutoP3: Module (
         dontCancelNextC03 = true
     }
 
+    @SubscribeEvent
+    fun resetter(event: TickEvent.ClientTickEvent) {
+        if (!event.isStart || !inF7Boss || !x_y0uMode) return
+        if (toReset <= 0) {
+            cancelled -= resetAmount.coerceAtMost(cancelled)
+            toReset = resetInterval
+        }
+        toReset--
+    }
+
     @SubscribeEvent(priority = EventPriority.LOW)
     fun cancelC03s(event: PacketEvent.Send) {
         if (!inF7Boss || event.packet !is C03PacketPlayer) return
 
         if (movementPackets.isNotEmpty()) {
-            cancelled = 0
+            if (!x_y0uMode) cancelled = 0
             return
         }
 
@@ -400,7 +410,7 @@ object AutoP3: Module (
             return
         }
         if (clear > 1) {
-            cancelled = 0
+            cancelled.coerceAtMost(200)
             return
         }
         clear++

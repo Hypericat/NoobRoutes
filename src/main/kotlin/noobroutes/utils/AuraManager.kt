@@ -3,7 +3,6 @@ package noobroutes.utils
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C02PacketUseEntity.Action
-import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -13,13 +12,10 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.utils.BlockUtils.collisionRayTrace
-import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.isZeroTickSwapping
-import noobroutes.utils.skyblock.devMessage
 
 object AuraManager {
     class EntityAura(val entity: Entity, val action: Action)

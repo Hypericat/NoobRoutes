@@ -11,11 +11,11 @@ import noobroutes.ui.editUI.Element
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.LinearAnimation
+import noobroutes.utils.render.*
 import noobroutes.utils.render.ColorUtil.brighter
 import noobroutes.utils.render.ColorUtil.brighterIf
 import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.ColorUtil.darkerIf
-import noobroutes.utils.render.*
 
 class ElementCheckBox(
     x: Float,

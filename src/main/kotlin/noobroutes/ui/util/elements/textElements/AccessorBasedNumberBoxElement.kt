@@ -1,14 +1,12 @@
 package noobroutes.ui.util.elements.textElements
 
 import noobroutes.Core
-import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.textElements.NumberBoxElement.Companion.numberKeyWhiteList
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.round
 import noobroutes.utils.skyblock.modMessage
-import org.lwjgl.input.Keyboard
 
 class AccessorBasedNumberBoxElement(
     val name: String,

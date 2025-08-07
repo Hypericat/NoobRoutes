@@ -4,15 +4,11 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.S08Event
 import noobroutes.utils.Utils
-import noobroutes.utils.Utils.isEnd
-import noobroutes.utils.Utils.isNotStart
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 
@@ -126,7 +122,9 @@ object AutoP3MovementHandler {
         val keyCode = Keyboard.getEventKey()
         if (!PlayerUtils.keyBindings.map { it.keyCode }.contains(keyCode) && keyCode != mc.gameSettings.keyBindSneak.keyCode) return
 
-        if (keyCode != mc.gameSettings.keyBindSneak.keyCode) AutoP3.cancelled = 0
+        AutoP3.waitedTicks = 0
+
+        if (!AutoP3.x_y0uMode) AutoP3.cancelled = 0
 
         if (direction == null) return
 

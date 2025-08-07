@@ -17,9 +17,13 @@ import noobroutes.features.render.FreeCam
 import noobroutes.features.routes.DynamicRoute
 import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.Setting.Companion.withDependency
-import noobroutes.features.settings.impl.*
-import noobroutes.utils.*
+import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.features.settings.impl.ColorSetting
+import noobroutes.features.settings.impl.KeybindSetting
+import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.utils.Utils.isEnd
+import noobroutes.utils.add
+import noobroutes.utils.offset
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
@@ -33,6 +37,7 @@ import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.modMessage
+import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 
 @DevOnly

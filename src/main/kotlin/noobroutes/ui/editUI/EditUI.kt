@@ -1,10 +1,6 @@
 package noobroutes.ui.editUI
 
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.OpenGlHelper
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.MathHelper
-import net.minecraft.util.ResourceLocation
 import net.minecraft.util.Vec3
 import noobroutes.Core
 import noobroutes.config.Config

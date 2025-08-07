@@ -16,8 +16,6 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.PacketUtils
-import noobroutes.utils.render.Color
-import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard

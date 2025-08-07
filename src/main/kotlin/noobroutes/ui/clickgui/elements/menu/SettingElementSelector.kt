@@ -7,8 +7,8 @@ import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.util.animations.impl.CubicBezierAnimation
 import noobroutes.utils.capitalizeFirst
 import noobroutes.utils.render.*

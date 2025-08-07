@@ -1,15 +1,10 @@
 package noobroutes.mixin;
 
 import net.minecraft.client.Minecraft;
-import noobroutes.Core;
 import noobroutes.events.impl.ClickEvent;
 import noobroutes.events.impl.InputEvent;
 import noobroutes.features.dungeon.brush.BrushModule;
-import noobroutes.features.floor7.autop3.AutoP3;
 import noobroutes.features.render.FreeCam;
-import noobroutes.utils.Utils;
-import noobroutes.utils.UtilsKt;
-import noobroutes.utils.skyblock.ChatUtilsKt;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;

@@ -6,16 +6,11 @@ import com.google.gson.JsonPrimitive
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
-import noobroutes.features.floor7.autop3.AutoP3
-import noobroutes.features.floor7.autop3.CommandGenerated
-import noobroutes.features.floor7.autop3.Ring
-import noobroutes.features.floor7.autop3.RingBase
-import noobroutes.features.floor7.autop3.RingType
+import noobroutes.features.floor7.autop3.*
 import noobroutes.features.render.FreeCam
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
-import noobroutes.utils.runOnMCThread
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
@@ -84,12 +79,18 @@ class BlinkRing(
         packets = packetsLoaded
     }
 
+
     override fun doRing() {
         super.doRing()
 
         PlayerUtils.stopVelocity()
         mc.thePlayer.isSprinting = false
         PlayerUtils.unPressKeys()
+
+        if (AutoP3.waitedTicks < AutoP3.blinkCooldown && AutoP3.x_y0uMode) {
+            AutoP3.waitedTicks++
+            return
+        }
 
         if (FreeCam.enabled) FreeCam.onDisable()
 
@@ -123,6 +124,7 @@ class BlinkRing(
     }
 
     private fun doBlink() {
+        AutoP3.waitedTicks = 0
         val firstPacket = packets.first()
         val toFar = mc.thePlayer.getDistanceSq(firstPacket.positionX, firstPacket.positionY, firstPacket.positionZ) > ( PlayerUtils.getPlayerWalkSpeed() * 2.806).pow(2)
 
@@ -132,7 +134,8 @@ class BlinkRing(
         }
 
         AutoP3.blinksThisInstance += packets.size
-        AutoP3.cancelled -= packets.size
+        if (AutoP3.x_y0uMode) AutoP3.cancelled -= packets.size
+        else AutoP3.cancelled = 0
 
         packets.forEach { PacketUtils.sendPacket(it) }
 

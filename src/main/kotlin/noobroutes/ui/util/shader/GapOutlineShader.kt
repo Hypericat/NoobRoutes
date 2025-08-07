@@ -3,8 +3,8 @@ package noobroutes.ui.util.shader
 import gg.essential.elementa.components.UIBlock
 import gg.essential.universal.UMatrixStack
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.utils.render.Color
 import noobroutes.utils.Utils.COLOR_NORMALIZER
+import noobroutes.utils.render.Color
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL20
 

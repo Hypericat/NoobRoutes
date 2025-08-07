@@ -4,8 +4,8 @@ import noobroutes.features.settings.impl.ActionSetting
 import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.TextPos

@@ -1,11 +1,10 @@
 package noobroutes.ui.util.elements.colorelement
 
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
-import noobroutes.utils.render.ColorUtil.withAlpha
-import noobroutes.utils.render.*
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.rectangleOutline
 
 class EmptyColorSliderElement(
     x: Float, y: Float, val color: Color, val thickness: Float

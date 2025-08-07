@@ -1,15 +1,10 @@
 package noobroutes.features.render
 
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLiving
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.server.S13PacketDestroyEntities
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.client.event.EntityViewRenderEvent
-import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -20,8 +15,8 @@ import noobroutes.features.Module
 import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
-import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
+import noobroutes.utils.getMobEntity
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils

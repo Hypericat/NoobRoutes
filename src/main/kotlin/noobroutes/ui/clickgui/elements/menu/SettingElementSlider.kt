@@ -5,10 +5,10 @@ import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
-import noobroutes.ui.util.elements.textElements.NumberBoxElement
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.util.elements.SliderElement
+import noobroutes.ui.util.elements.textElements.NumberBoxElement
 import noobroutes.ui.util.elements.textElements.TextBoxElement
 import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.TextAlign

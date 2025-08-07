@@ -10,18 +10,20 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraft.util.Vec3i
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import noobroutes.Core
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.utils.*
+import noobroutes.utils.PacketUtils
+import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isClose
+import noobroutes.utils.isAir
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.sendChatMessage
+import noobroutes.utils.toBlockPos
 import org.lwjgl.input.Keyboard
 
 object Doorless: Module(

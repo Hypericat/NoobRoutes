@@ -6,7 +6,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.Scheduler
 import org.lwjgl.input.Keyboard

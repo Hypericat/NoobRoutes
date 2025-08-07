@@ -7,7 +7,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.render.FreeCam
-import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.NotPersistent
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting

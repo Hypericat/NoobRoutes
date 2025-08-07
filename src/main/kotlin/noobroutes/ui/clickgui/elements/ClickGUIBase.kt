@@ -5,13 +5,11 @@ import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.features.Category
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.font.FontRenderer.wrappedTextBounds
-import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.ColorPalette.titlePanelColor
 import noobroutes.ui.util.UiElement
 import noobroutes.utils.capitalizeFirst
-import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import noobroutes.utils.render.rectangleOutline
 import noobroutes.utils.render.roundedRectangle

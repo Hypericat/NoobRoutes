@@ -1,6 +1,5 @@
 package noobroutes.features.floor7.autop3.rings
 
-import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring

@@ -1,6 +1,5 @@
 package noobroutes.features.move
 
-import codes.som.anthony.koffee.modifiers.module
 import net.minecraft.network.play.client.C0APacketAnimation
 import noobroutes.features.Category
 import noobroutes.features.Module

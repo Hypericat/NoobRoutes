@@ -1,8 +1,6 @@
 package noobroutes.utils
 
 import net.minecraft.util.BlockPos
-import org.lwjgl.Sys
-import kotlin.random.Random
 
 class BlockPosMap<V> {
     private val cache: MutableMap<Int, V> = mutableMapOf()

@@ -20,7 +20,9 @@ import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.move.Zpew
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.autoroutes.*
-import noobroutes.utils.*
+import noobroutes.utils.RotationUtils
+import noobroutes.utils.Scheduler
+import noobroutes.utils.SwapManager
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords

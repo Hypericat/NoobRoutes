@@ -1,20 +1,15 @@
 package noobroutes.ui.util.elements
 
 
-import com.sun.org.apache.bcel.internal.generic.SWITCH
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.Core.logger
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.util.ElementValue
-import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.ui.util.animations.impl.LinearAnimation
-import noobroutes.utils.render.ColorUtil.brighterIf
-import noobroutes.utils.render.ColorUtil.darkerIf
-import noobroutes.utils.render.ColorUtil.saturationIf
 import noobroutes.utils.render.Color
+import noobroutes.utils.render.ColorUtil.brighterIf
 import noobroutes.utils.render.circle
 import noobroutes.utils.render.roundedRectangle
 

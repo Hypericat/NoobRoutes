@@ -1,6 +1,5 @@
 package noobroutes.ui.util.animations
 
-import noobroutes.Core.logger
 import noobroutes.utils.clock.Clock
 
 /**

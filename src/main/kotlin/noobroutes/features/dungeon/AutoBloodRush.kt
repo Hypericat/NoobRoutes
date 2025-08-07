@@ -1,13 +1,10 @@
 package noobroutes.features.dungeon
 
-import net.minecraft.block.BlockColored
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
-import net.minecraft.item.EnumDyeColor
+import net.minecraft.network.play.server.S03PacketTimeUpdate
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
-import net.minecraft.util.Vec3i
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -18,17 +15,10 @@ import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.features.settings.impl.NumberSetting
-import noobroutes.utils.IBlockStateUtils.setProperty
-import noobroutes.utils.RotationUtils
-import noobroutes.utils.Scheduler
-import noobroutes.utils.SwapManager
-import noobroutes.utils.Vec2i
-import noobroutes.utils.isAir
+import noobroutes.utils.*
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.routes.RouteUtils.setRotation
-import noobroutes.utils.setBlock
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.Dungeon
@@ -38,8 +28,6 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Door
 import noobroutes.utils.skyblock.dungeon.tiles.DoorType
 import noobroutes.utils.skyblock.modMessage
-import noobroutes.utils.toBlockPos
-import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 import kotlin.math.round
@@ -83,6 +71,13 @@ object AutoBloodRush: Module(
     private var serverTickCount = 0
 
     private var snipeCoords: Vec2i? = null
+
+    @SubscribeEvent
+    fun onS03(event: PacketEvent.Receive) {
+        if (event.packet !is S03PacketTimeUpdate) return
+        val time = event.packet.totalWorldTime.toInt()
+        serverTickCount = time % 40
+    }
 
     private fun goToHopper() {
         val room = Dungeon.currentRoom ?: return

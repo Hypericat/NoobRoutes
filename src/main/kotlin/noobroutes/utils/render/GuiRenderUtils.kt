@@ -19,8 +19,7 @@ import noobroutes.utils.render.RenderUtils.loadBufferedImage
 import noobroutes.utils.times
 import org.lwjgl.opengl.Display
 import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL45
-import java.util.Stack
+import java.util.*
 
 /**
  * Most stuff taken from odin

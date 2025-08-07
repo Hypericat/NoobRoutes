@@ -30,8 +30,6 @@ import noobroutes.Core.mc
 import noobroutes.INetwork
 import noobroutes.IS23
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
-import noobroutes.features.floor7.autop3.AutoP3MovementHandler
-
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.skyblock.devMessage

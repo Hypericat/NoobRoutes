@@ -3,8 +3,9 @@ package noobroutes.ui.util.elements
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
-import noobroutes.utils.render.*
+import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.brighterIf
+import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.round
 import org.lwjgl.input.Keyboard
 

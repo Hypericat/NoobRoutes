@@ -3,11 +3,9 @@ package noobroutes.commands
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
-import noobroutes.Core.mc
 import noobroutes.events.BossEventDispatcher
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.CommandGenerated
-import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.requirement
 import noobroutes.utils.skyblock.modMessage

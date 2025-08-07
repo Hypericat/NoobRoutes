@@ -27,7 +27,6 @@ import noobroutes.utils.Utils.ID
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import scala.collection.parallel.ParIterableLike.Min
 import kotlin.math.floor
 
 @DevOnly

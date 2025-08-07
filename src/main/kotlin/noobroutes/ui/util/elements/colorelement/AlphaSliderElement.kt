@@ -4,8 +4,8 @@ import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
-import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.withAlpha
 
 class AlphaSliderElement(
     x: Float, y: Float,

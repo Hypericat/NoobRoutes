@@ -9,12 +9,7 @@ import noobroutes.Core.mc
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import org.lwjgl.opengl.GL11
-import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sin
-import kotlin.math.sqrt
+import kotlin.math.*
 
 class AnimationGenerator {
     private var lastLimbSwing = 0f

@@ -1,20 +1,15 @@
 package noobroutes.features.floor7
 
 import net.minecraft.init.Blocks
-import net.minecraft.network.play.client.C03PacketPlayer
-import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
-import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
-import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.utils.BlockUtils.removeHitbox
 import noobroutes.utils.BlockUtils.restoreHitbox
-import noobroutes.utils.PacketUtils
 import noobroutes.utils.isAir
 import org.lwjgl.input.Keyboard
 import kotlin.math.abs

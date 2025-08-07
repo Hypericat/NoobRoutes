@@ -1,7 +1,6 @@
 package noobroutes.pathfinding;
 
 import com.mojang.realmsclient.util.Pair;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import noobroutes.features.misc.EWPathfinderModule;

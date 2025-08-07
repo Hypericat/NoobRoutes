@@ -6,8 +6,8 @@ import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.clickgui.elements.ElementType
+import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.util.elements.KeybindElement
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle

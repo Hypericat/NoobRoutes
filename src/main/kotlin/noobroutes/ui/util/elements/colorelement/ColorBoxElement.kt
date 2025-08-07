@@ -1,12 +1,11 @@
 package noobroutes.ui.util.elements.colorelement
 
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.Core.logger
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
-import noobroutes.utils.render.ColorUtil.hsbMax
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.hsbMax
 import noobroutes.utils.render.ColorUtil.withAlpha
 
 class ColorBoxElement(

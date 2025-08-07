@@ -10,10 +10,9 @@ import noobroutes.ui.editUI.Element
 import noobroutes.ui.util.MouseUtils.isAreaHovered
 import noobroutes.ui.util.MouseUtils.mouseX
 import noobroutes.ui.util.animations.impl.ColorAnimation
-import noobroutes.utils.render.ColorUtil.brighter
-import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.*
 import noobroutes.utils.render.ColorUtil.brighterIf
+import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.round
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard

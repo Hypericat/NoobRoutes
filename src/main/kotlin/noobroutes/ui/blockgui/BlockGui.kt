@@ -5,14 +5,13 @@ import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ResourceLocation
 import noobroutes.config.Config
-import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.Screen
 import noobroutes.ui.blockgui.blockselector.BlockSelector
 import noobroutes.ui.util.MouseUtils.isAreaHovered
-import noobroutes.utils.render.ColorUtil.darkerIf
 import noobroutes.utils.render.*
+import noobroutes.utils.render.ColorUtil.darkerIf
 
 
 object BlockGui : Screen() {

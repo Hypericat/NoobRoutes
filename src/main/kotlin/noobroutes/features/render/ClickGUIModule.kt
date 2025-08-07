@@ -10,8 +10,8 @@ import noobroutes.features.settings.AlwaysActive
 import noobroutes.features.settings.impl.*
 import noobroutes.font.FontType
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.hud.EditHUDGui
 import noobroutes.ui.clickgui.ClickGui
+import noobroutes.ui.hud.EditHUDGui
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.LocationUtils

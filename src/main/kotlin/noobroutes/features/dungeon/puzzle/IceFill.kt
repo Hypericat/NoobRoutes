@@ -2,7 +2,6 @@ package noobroutes.features.dungeon.puzzle
 
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister.Pack
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.GameSettings
@@ -20,29 +19,20 @@ import noobroutes.events.impl.BlockChangeEvent
 import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.render.ClickGUIModule
 import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
-import noobroutes.features.settings.impl.Keybinding
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
-import noobroutes.utils.Utils.isStart
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.IceFillFloors
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Rotations
-import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
-import org.lwjgl.Sys
-import org.lwjgl.input.Keyboard
-import scala.reflect.internal.StdAttachments.PlainAttachment
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 

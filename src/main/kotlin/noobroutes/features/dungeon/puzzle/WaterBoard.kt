@@ -12,11 +12,9 @@ import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.events.impl.ServerTickEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.utils.*
 import noobroutes.utils.routes.RouteUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.modMessage

@@ -1,18 +1,17 @@
 package noobroutes.ui.util.elements.colorelement
 
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.Core.logger
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.util.ElementValue
 import noobroutes.ui.util.UiElement
-import noobroutes.ui.util.elements.textElements.NumberBoxElement
-import noobroutes.ui.util.elements.textElements.TextBoxElement
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants
 import noobroutes.ui.util.elements.colorelement.ColorElement.ColorElementsConstants.TEXT_BOX_WIDTH
-import noobroutes.utils.render.ColorUtil.darker
+import noobroutes.ui.util.elements.textElements.NumberBoxElement
+import noobroutes.ui.util.elements.textElements.TextBoxElement
 import noobroutes.utils.Utils.COLOR_NORMALIZER
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Color.Companion.HEX_REGEX
+import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.TextAlign
 import noobroutes.utils.render.roundedRectangle
 
