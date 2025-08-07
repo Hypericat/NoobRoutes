@@ -12,7 +12,7 @@ class BooleanSetting (
     name: String,
     override val default: Boolean = false,
     hidden: Boolean = false,
-    description: String,
+    description: String = "",
 ): noobroutes.features.settings.Setting<Boolean>(name, hidden, description),
     noobroutes.features.settings.Saving {
 

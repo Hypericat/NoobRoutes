@@ -1,5 +1,6 @@
 package noobroutes.features.dungeon
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.item.EntityArmorStand
@@ -29,6 +30,7 @@ import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.utils.*
 import noobroutes.utils.Utils.isNotStart
 import noobroutes.utils.skyblock.devMessage
+import noobroutes.utils.skyblock.dungeon.DungeonUtils
 
 @DevOnly
 object SecretAura : Module("Secret Aura", category = Category.DUNGEON, description = "Typical Secret Aura, is Disabled Inside of Boss. (Use Lever Aura)") {
@@ -39,6 +41,16 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
     private val swapOn by SelectorSetting("Swap On", "Skulls", options = arrayListOf("None", "Skulls", "All"), description = "Swaps")
     private val swapTo by NumberSetting("Swap Slot", 1, 1, 9, 1, description = "The hotbar slot that the Secret Aura swaps to on click.").withDependency { swapOn != "None" }
     private val swapBack by BooleanSetting("Swap Back", description = "Determines whether the Secret Aura swaps back to the original slot after clicking").withDependency { swapOn != "None" }
+    private val roomDropDown by DropdownSetting("Room Blacklist")
+    private val blaze by BooleanSetting("Blaze").withDependency { roomDropDown }
+    private val creeperBeams by BooleanSetting("Creeper Beams").withDependency { roomDropDown }
+    private val icePath by BooleanSetting("Ice Path").withDependency { roomDropDown }
+    private val threeWeirdos by BooleanSetting("Three Weirdos").withDependency { roomDropDown }
+    private val waterBoard by BooleanSetting("Water Board").withDependency { roomDropDown }
+    private val boulder by BooleanSetting("Boulder").withDependency { roomDropDown }
+    private val iceFill by BooleanSetting("Ice Fill").withDependency { roomDropDown }
+    private val tpMaze by BooleanSetting("Tp Maze").withDependency { roomDropDown }
+    private val ticTacToe by BooleanSetting("Tic Tac Toe").withDependency { roomDropDown }
 
     private const val REDSTONE_KEY_ID = "fed95410-aba1-39df-9b95-1d4f361eb66e"
     private const val WITHER_ESSENCE_ID = "e0f3e929-869e-3dca-9504-54c666ee6f23"
@@ -66,9 +78,25 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
         clear()
     }
 
+    fun isInDisabledRoom(): Boolean {
+        return when (DungeonUtils.currentRoomName) {
+            "Water Board" -> waterBoard
+            "Tic Tac Toe" -> ticTacToe
+            "Higher Blaze" -> blaze
+            "Lower Blaze" -> blaze
+            "Ice Fill" -> iceFill
+            "Ice Path" -> icePath
+            "Creeper Beams" -> creeperBeams
+            "Three Weirdos" -> threeWeirdos
+            "Boulder" -> boulder
+            "Teleport Maze" -> tpMaze
+            else -> false
+        }
+    }
+
     @SubscribeEvent
     fun onPostTick(event: ClientTickEvent) {
-        if (event.isNotStart || mc.thePlayer == null || mc.theWorld == null || mc.currentScreen != null || BossEventDispatcher.inBoss) return
+        if (event.isNotStart || mc.thePlayer == null || mc.theWorld == null || mc.currentScreen != null || BossEventDispatcher.inF7Boss || isInDisabledRoom()) return
 
         var blockCandidate = BlockDistance(Blocks.air, BlockPos(Int.MAX_VALUE, 69, Int.MIN_VALUE), Double.POSITIVE_INFINITY)
 

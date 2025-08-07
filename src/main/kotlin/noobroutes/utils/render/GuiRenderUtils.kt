@@ -238,7 +238,7 @@ fun stencilRoundedRectangle(x: Float, y: Float, w: Float, h: Float, radius: Numb
 
 fun blurRoundedRectangle(x: Number, y: Number, w: Number, h: Number, topL: Number, topR: Number, botL: Number, botR: Number, edgeSoftness: Number){
     stencil {roundedRectangle(x, y, w, h, Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, 0f, topL, topR, botL, botR, edgeSoftness)}
-    GaussianBlurShader.blurredBackground(x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat(), 8f)
+    GaussianBlurShader.blurredBackground(x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat(), 4f)
     popStencil()
 }
 
