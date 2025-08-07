@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
+import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.CommandGenerated
@@ -12,6 +13,8 @@ import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.features.render.FreeCam
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.Renderer
 import noobroutes.utils.runOnMCThread
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
@@ -138,5 +141,11 @@ class BlinkRing(
         mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
 
         modMessage("§c§l${AutoP3.cancelled}§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.getMaxBlinks() - AutoP3.blinksThisInstance} left on this instance)")
+    }
+
+    fun drawEnd() {
+        val lastPacket = packets.last()
+        val endCoords = Vec3(lastPacket.positionX, lastPacket.positionY + 0.01, lastPacket.positionZ)
+        Renderer.drawCylinder(endCoords, 0.5, 0.5, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
     }
 }

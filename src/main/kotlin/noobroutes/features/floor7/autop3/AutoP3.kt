@@ -142,9 +142,7 @@ object AutoP3: Module (
 
             if (ring !is BlinkRing) return@forEachIndexed
 
-            val lastPacket = ring.packets.lastSafe() ?: return@forEachIndexed
-
-            ring.drawCylinderWithRingArgs(Vec3(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ), Color.RED)
+            ring.drawEnd()
 
             RenderUtils.drawGradient3DLine(ring.packets.map { Vec3(it.positionX, it.positionY + 0.03, it.positionZ) }, ringColor, Color.RED, 1F, true)
         }

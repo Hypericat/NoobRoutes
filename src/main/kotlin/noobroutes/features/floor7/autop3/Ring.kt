@@ -167,10 +167,6 @@ abstract class Ring(
         )
     }
 
-    fun drawCylinderWithRingArgs(drawCoords: Vec3, color: Color) {
-        Renderer.drawCylinder(drawCoords, diameter * 0.5, diameter * 0.5, 0.01, 24, 1, 90, 0, 0, color, depth = true)
-    }
-
     open fun addRingData(obj: JsonObject) {}
 
     open fun doRing() {
