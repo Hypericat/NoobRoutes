@@ -127,21 +127,6 @@ object Utils {
                 modMessage(pos)
             }
 
-            "motion" -> {
-                if (args.size < 4) return
-                AutoP3MovementHandler.motionDrag = args[2].toDoubleOrNull() ?: return
-                AutoP3MovementHandler.motionPush = args[3].toDoubleOrNull() ?: return
-
-                devMessage("drag: ${AutoP3MovementHandler.motionDrag}, push: ${AutoP3MovementHandler.motionPush}")
-            }
-
-            "motionstart" -> {
-                if (args.size < 4) return
-                AutoP3MovementHandler.motionTick1 = args[2].toDoubleOrNull() ?: return
-                AutoP3MovementHandler.motionTick2 = args[3].toDoubleOrNull() ?: return
-
-                devMessage("tick1: ${AutoP3MovementHandler.motionTick1}, tick2: ${AutoP3MovementHandler.motionTick2}")
-            }
             "dev" -> {
                 modMessage(DEV_STRING)
                 modMessage(PROD_STRING)
