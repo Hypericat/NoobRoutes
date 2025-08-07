@@ -82,7 +82,7 @@ object AutoP3: Module (
         if (inF7Boss) text(cancelled.toString(), 1f, 1f, ColorPalette.textColor, 13f)
         getTextWidth("400", 13f) to getTextHeight("400", 13f)
     }.withDependency { blinkShit }
-    private val cancelC05s by BooleanSetting("Cancel C05s", default = false, description = "Allows the cancelling of rotation packets.")
+    private val cancelC05s by BooleanSetting("Cancel C05s", default = false, description = "Allows the cancelling of rotation packets.").withDependency { blinkShit }
     private val movementMode by DualSetting("Movement Mode","Playback", "Silent", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
     val x_y0uMode by BooleanSetting("x_y0u Mode", description = "x_y0u strongly believes this is better, while its faster it also probably flags timer and will lobby you sometimes. (We Jew the Timer -x_y0u)").withDependency { blinkShit }
     val blinkCooldown by NumberSetting("Blink Cooldown", 5, 0, 10, description = "how many ticks to wait after entering a blink ring before allowing blink").withDependency { x_y0uMode && blinkShit }

@@ -28,7 +28,6 @@ import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.routes.RouteUtils.setRotation
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
@@ -108,7 +107,6 @@ object AutoBloodRush: Module(
         val time = event.packet.totalWorldTime.toInt()
         serverTickCount = time % 40
         timeSet = true
-        devMessage("setting time")
     }
 
     @SubscribeEvent
@@ -156,7 +154,6 @@ object AutoBloodRush: Module(
             RouteUtils.etherwarpToRelativeVec3(BAR_COORDS_SIDE.add(offset), Dungeon.currentRoom!!, silent)
             Scheduler.scheduleLowS08Task {
                 if (!Dungeon.Info.uniqueRooms.any { it.name == "Blood" }) Scheduler.scheduleDeathTickTask { clipOut() }
-                devMessage("deathtick task scheduled")
             }
         }
     }
@@ -378,10 +375,7 @@ object AutoBloodRush: Module(
     @SubscribeEvent
     fun onServerTick(event: ServerTickEvent) {
         serverTickCount++
-        if (serverTickCount == deathTickOffset) {
-            DeathTickEvent().postAndCatch()
-            devMessage("deathtick")
-        }
+        if (serverTickCount == deathTickOffset) { DeathTickEvent().postAndCatch() }
         if (serverTickCount >= 40) serverTickCount = 0
     }
 
