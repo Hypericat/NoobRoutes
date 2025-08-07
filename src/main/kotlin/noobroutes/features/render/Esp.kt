@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.utils.*
@@ -26,6 +27,7 @@ import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import java.util.*
 
+@DevOnly
 object Esp : Module(
     name = "Starred Mob ESP",
     category = Category.RENDER,
@@ -109,7 +111,7 @@ object Esp : Module(
         }
     }
 
-    fun isStarred(id: Int): Boolean {
+    private fun isStarred(id: Int): Boolean {
         return this.starredMobs.contains(id);
     }
 
