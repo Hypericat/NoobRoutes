@@ -30,6 +30,7 @@ import noobroutes.features.settings.impl.*
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.editUI.EditUI
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.RotationUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.getSafe
@@ -90,7 +91,7 @@ object AutoP3: Module (
     val blinkCooldown by NumberSetting("Blink Cooldown", 5, 0, 10, description = "how many ticks to wait after entering a blink ring before allowing blink").withDependency { x_y0uMode && blinkShit }
     private val resetInterval by NumberSetting(name = "clear intervall", description = "delete packets periodically", min = 1, max = 300, default = 200, unit = "t").withDependency { x_y0uMode && blinkShit }
     private val resetAmount by NumberSetting(name = "clear amount", description = "delete packets periodically", min = 1, max = 400, default = 50).withDependency { x_y0uMode && blinkShit }
-
+    private val nonSilentRotates by BooleanSetting("Non-Silent look", description = "Makes it so rings with the rotate argument rotate client side.")
 
 
     var waitingRing: Ring? = null
@@ -363,6 +364,7 @@ object AutoP3: Module (
     }
 
     fun setBlinkRotation(yaw: Float, pitch: Float) {
+        if (nonSilentRotates) RotationUtils.setAngles(yaw, pitch)
         blinkSetRotation = Pair(yaw, pitch)
     }
 
