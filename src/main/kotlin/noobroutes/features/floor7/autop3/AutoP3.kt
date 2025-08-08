@@ -35,6 +35,7 @@ import noobroutes.utils.Utils.isStart
 import noobroutes.utils.getSafe
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.*
+import noobroutes.utils.render.RenderUtils.renderVec
 import noobroutes.utils.requirement
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
@@ -64,6 +65,7 @@ object AutoP3: Module (
 
     val route by StringSetting("Route", "", description = "Route to use")
     private val ringColor by ColorSetting("Ring Color", Color.GREEN, false, description = "color of the rings")
+    private val onFrame by BooleanSetting("Check on frame", description = "Checks on frame if you are in a ring. Use if you are lazy.")
 
 
     private val editShit by DropdownSetting("Edit Settings", false)
@@ -152,22 +154,35 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
-        if (!inF7Boss || editMode || movementPackets.isNotEmpty() || mc.thePlayer.isSneaking) return
+        if (!inF7Boss || editMode || movementPackets.isNotEmpty() || mc.thePlayer.isSneaking || onFrame) return
 
-        rings[route]?.forEach { ring ->
-            if (ring.inRing()) {
-                if (ring.triggered) return@forEach
-                ring.run()
-            }
-            else ring.runTriggeredLogic()
-        }
+        handleRings(mc.thePlayer.positionVector)
 
-        activeBlinkWaypoint?.let {
+        activeBlinkWaypoint?.let { //this needs to be on tick otherwise shit breaks
             if (it.inRing()) {
                 if (!it.triggered) recording = true
                 it.triggered = true
             }
             else it.triggered = false
+        }
+    }
+
+    @SubscribeEvent
+    fun onFrameRing(event: RenderWorldLastEvent) {
+        if (!inF7Boss || editMode || movementPackets.isNotEmpty() || mc.thePlayer.isSneaking || !onFrame) return
+        handleRings(mc.thePlayer.renderVec)
+    }
+
+
+    private fun handleRings(pos: Vec3) {
+        val ringList = rings[route] ?: return
+        for (ring in ringList) {
+            if (ring.inRing(pos)) {
+                if (ring.triggered) continue
+                ring.run()
+            } else {
+                ring.runTriggeredLogic()
+            }
         }
     }
 

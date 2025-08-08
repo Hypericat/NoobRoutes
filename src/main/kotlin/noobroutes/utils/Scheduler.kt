@@ -43,6 +43,7 @@ object Scheduler {
     private val scheduledLowPreMotionUpdateTasks = Tasks()
     private val scheduledPostMotionUpdateTasks = Tasks()
     private val scheduledDeathTickTasks = Tasks()
+    private val scheduledPreMoveEntityWithHeadingTasks = Tasks()
 
     private fun reset() {
         scheduledPreTickTasks.clear()
@@ -65,6 +66,7 @@ object Scheduler {
         scheduledLowPreMotionUpdateTasks.clear()
         scheduledPostMotionUpdateTasks.clear()
         scheduledDeathTickTasks.clear()
+        scheduledPreMoveEntityWithHeadingTasks.clear()
     }
 
     @SubscribeEvent
@@ -174,6 +176,12 @@ object Scheduler {
     fun schedulePostMoveEntityWithHeadingTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
         if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
         scheduledPostMoveEntityWithHeadingTasks.add(Task({ p -> callback(p) }, ticks, priority))
+    }
+
+    @Throws(IndexOutOfBoundsException::class)
+    fun schedulePreMoveEntityWithHeadingTask(ticks: Int = 0, priority: Int = 0, callback: (Any?) -> Unit = {}) {
+        if (ticks < 0) throw IndexOutOfBoundsException("Scheduled Negative Number")
+        scheduledPreMoveEntityWithHeadingTasks.add(Task({ p -> callback(p) }, ticks, priority))
     }
 
     @Throws(IndexOutOfBoundsException::class)
@@ -303,6 +311,11 @@ object Scheduler {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun moveEntityWithHeadingPost(event: MoveEntityWithHeadingEvent.Post){
         if (scheduledPostMoveEntityWithHeadingTasks.doTasks(event)) event.isCanceled = true
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun moveEntityWithHeadingPre(event: MoveEntityWithHeadingEvent.Pre){
+        if (scheduledPreMoveEntityWithHeadingTasks.doTasks(event)) event.isCanceled = true
     }
 
     @SubscribeEvent
