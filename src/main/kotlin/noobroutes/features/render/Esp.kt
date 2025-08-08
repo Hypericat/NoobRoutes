@@ -1,8 +1,12 @@
 package noobroutes.features.render
 
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntityEnderman
+import net.minecraft.entity.monster.EntityGiantZombie
 import net.minecraft.network.play.server.S13PacketDestroyEntities
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -12,7 +16,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
-import noobroutes.features.settings.DevOnly
+import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.utils.Utils.isEnd
@@ -22,60 +26,91 @@ import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import java.util.*
 
-@DevOnly
 object Esp : Module(
     name = "Starred Mob ESP",
     category = Category.RENDER,
     description = "Cheaters get banned!"
 ) {
-    val depthCheck by BooleanSetting("Depth Check", false, description = "Disables depth check on starred mobs")
+    private val depthCheck by BooleanSetting("Disable Model Depth", false, description = "Disables depth check on starred mobs")
     private val drawBoxes by BooleanSetting("Draw Boxes", false, description = "Draws boxes around starred mobs")
-    private val color by ColorSetting("Esp Color", Color.GREEN, true, description = "Disables depth check on starred mobs")
+    private val drawFilledBox by BooleanSetting("Fill Box", false, description = "Fills the box").withDependency { drawBoxes }
+    private val color by ColorSetting("Esp Color", Color.GREEN, true, description = "Do you really need a description?").withDependency { drawBoxes }
+    private val bloodColor by ColorSetting("Blood Mob Color", Color.RED, true, description = "8====D").withDependency { drawBoxes }
 
     private val starredMobs: MutableSet<Int> = mutableSetOf();
-    private val scannedMobs: MutableSet<Int> = mutableSetOf();
+    private val bloodMobs: MutableSet<Int> = mutableSetOf();
+    private val bloodNames: MutableSet<Int> = mutableSetOf();
+
+    init {
+        addName("Revoker")
+        addName("Psycho")
+        addName("Reaper")
+        addName("Cannibal")
+        addName("Mute")
+        addName("Ooze")
+        addName("Putrid")
+        addName("Freak")
+        addName("Leech")
+        addName("Tear")
+        addName("Parasite")
+        addName("Flamer")
+        addName("Skull")
+        addName("Mr. Dead")
+        addName("Vader")
+        addName("Frost")
+        addName("Walker")
+        addName("Wandering Soul")
+        addName("Bonzo")
+        addName("Scarf")
+        addName("Livid")
+        addName("Spirit Bear")
+    }
+
+    private fun addName(name: String) {
+        bloodNames.add(name.hashCode());
+    }
+
 
     @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {
         starredMobs.clear();
-        scannedMobs.clear();
+        bloodMobs.clear();
     }
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
         starredMobs.clear();
-        scannedMobs.clear();
+        bloodMobs.clear();
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!DungeonUtils.inDungeons) return
+        if (!drawBoxes || !DungeonUtils.inDungeons) return
 
-        if (!drawBoxes) return
+        handleRender(starredMobs.toList(), color, starredMobs, event.partialTicks)
+        handleRender(bloodMobs.toList(), bloodColor, bloodMobs, event.partialTicks)
+    }
 
-        val size = starredMobs.size;
-        val list: List<Int> = starredMobs.toList();
-        for (i in 0 until size) {
-            val entityID = list[i];
+    private fun handleRender(ids: List<Int>, color: Color, parent: MutableSet<Int>, partialTicks: Float) {
+        for (i in 0 until ids.size) {
+            val entityID = ids[i];
             val entity = Minecraft.getMinecraft().theWorld.getEntityByID(entityID)
             if (entity == null) {
-                starredMobs.remove(entityID)
+                parent.remove(entityID)
                 continue
             }
 
-            val boundingBox: AxisAlignedBB = RenderUtils.getPartialEntityBoundingBox(entity, event.partialTicks)
-            RenderUtils.renderBBOutline(boundingBox, event.partialTicks, color)
+            val boundingBox: AxisAlignedBB = RenderUtils.getPartialEntityBoundingBox(entity, partialTicks)
+            if (drawFilledBox) {
+                RenderUtils.drawFilledAABB(boundingBox, color);
+            }
+            RenderUtils.drawOutlinedAABB(boundingBox, color, 1f)
         }
     }
 
-    private fun isValidEntity(entity: EntityArmorStand?): Boolean {
-        if (entity == null) return false;
-        //if (scannedMobs.contains(entity.entityId)) return false;
-        if (!entity.hasCustomName() || !entity.customNameTag.contains("§6✯ ") || !entity.customNameTag.endsWith("§c❤") || !entity.alwaysRenderNameTag) {
-            scannedMobs.add(entity.entityId)
-            return false;
-        }
-        return true
+    private fun isValidEntity(entity: EntityArmorStand): Boolean {
+        return !(!entity.hasCustomName() || !entity.customNameTag.contains("§6✯ ") || !entity.customNameTag.endsWith("§c❤"))
+        //return entity.hasCustomName() && entity.name.contains("✯")
     }
 
     @SubscribeEvent
@@ -91,18 +126,43 @@ object Esp : Module(
 
     @SubscribeEvent
     fun onClientTick(event: ClientTickEvent) {
-        if (event.isEnd || !DungeonUtils.inDungeons) return
-        for (armorStand in Minecraft.getMinecraft().theWorld.getEntities(EntityArmorStand::class.java) { obj: EntityArmorStand? -> isValidEntity(obj) }) {
-            if (armorStand == null) return
+        if (event.isEnd || !DungeonUtils.inDungeons || Minecraft.getMinecraft().theWorld == null) return
+        for (e: Entity in Minecraft.getMinecraft().theWorld.getLoadedEntityList()) {
+            if (e is EntityArmorStand) {
+                if (!isValidEntity(e)) continue
 
-            val e = getMobEntity(armorStand) ?: continue; // Entity may not be loaded
-            starredMobs.add(e.entityId)
-            //scannedMobs.add(armorStand.entityId)
-        }
+                val mob = getMobEntity(e) ?: continue; // Entity may not be loaded
+                starredMobs.add(mob.entityId)
+                e.alwaysRenderNameTag = true;
+                mob.isInvisible = false;
+                continue
+            }
 
-        // Check for shadow assassins
-        for (player in Minecraft.getMinecraft().theWorld.getPlayers(Entity::class.java) { entity: Entity? -> entity!!.name.hashCode() == -0x277A5F7B}) { // Dont even ask
-            starredMobs.add(player.entityId)
+            if (e is EntityOtherPlayerMP) {
+                if (e.name.hashCode() == -0x277A5F7B) { // Dont even ask
+                    starredMobs.add(e.entityId)
+                    e.isInvisible = false;
+                    continue
+                }
+                if (bloodNames.contains(e.name.trim().hashCode())) {
+                    bloodMobs.add(e.entityId)
+                    e.isInvisible = false;
+                    continue
+                }
+                continue
+            }
+
+            if (e is EntityEnderman) {
+                if (e.name.hashCode() == -0x3BEF85AA)
+                    e.isInvisible = false;
+                continue
+            }
+
+            if (e is EntityGiantZombie) {
+                bloodMobs.add(e.entityId)
+                e.isInvisible = false;
+                continue
+            }
         }
     }
 
@@ -110,12 +170,11 @@ object Esp : Module(
         return this.starredMobs.contains(id);
     }
 
-    fun shouldCancelDepthCheck(id: Int) : Boolean {
-        return depthCheck && this.enabled && isStarred(id);
+    private fun isBlood(id: Int): Boolean {
+        return this.bloodMobs.contains(id);
     }
 
-    // Todo
-    // Fix missing mobs with the performance
-    // Add fels
-    // Disable depth check for entity armor and weapons too
+    fun shouldCancelDepthCheck(id: Int) : Boolean {
+        return depthCheck && this.enabled && (isStarred(id) || isBlood(id));
+    }
 }
