@@ -32,7 +32,7 @@ object AutoP3MovementHandler {
     private const val TICK2 = 3.98
 
     @SubscribeEvent //taken from cga who took from sy?
-    fun handleWalking(event: MoveEntityWithHeadingEvent.Post) {
+    fun handleWalking(event: MoveEntityWithHeadingEvent.Pre) {
         if (mc.thePlayer == null) return
         if (mc.thePlayer.onGround) {
             airTicks = 0
@@ -68,7 +68,7 @@ object AutoP3MovementHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun doMotioning(event: MoveEntityWithHeadingEvent.Post) {
+    fun doMotioning(event: MoveEntityWithHeadingEvent.Pre) {
         if (direction == null || motionTicks == -1) return;
 
         doMotionTick();

@@ -6,6 +6,7 @@ import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
+import noobroutes.features.floor7.autop3.rings.StopRing
 import noobroutes.utils.*
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
@@ -175,13 +176,13 @@ abstract class Ring(
         triggered = false
     }
 
-    fun inRing(): Boolean {
-        if (center || this is BlinkRing || this is BlinkWaypoint) return checkInBoundsWithSpecifiedHeight(0f) && mc.thePlayer.onGround
-        return checkInBoundsWithSpecifiedHeight(height)
+    fun inRing(pos: Vec3 = mc.thePlayer.positionVector): Boolean {
+        if ((center || this is BlinkRing || this is BlinkWaypoint)) return checkInBoundsWithSpecifiedHeight(pos,0f) && mc.thePlayer.onGround
+        return checkInBoundsWithSpecifiedHeight(pos, height)
     }
 
-    protected fun checkInBoundsWithSpecifiedHeight(heightToUse: Float): Boolean{
-        return mc.thePlayer.positionVector.isVecInBounds(coords.xCoord - diameter * 0.5, coords.yCoord, coords.zCoord - diameter * 0.5, coords.xCoord + diameter * 0.5, coords.yCoord + heightToUse, coords.zCoord + diameter * 0.5)
+    protected fun checkInBoundsWithSpecifiedHeight(pos: Vec3, heightToUse: Float): Boolean{
+        return pos.isVecInBounds(coords.xCoord - diameter * 0.5, coords.yCoord, coords.zCoord - diameter * 0.5, coords.xCoord + diameter * 0.5, coords.yCoord + heightToUse, coords.zCoord + diameter * 0.5)
     }
 
     protected fun center() {
@@ -202,7 +203,7 @@ abstract class Ring(
         AutoP3.waitingRing = this
     }
 
-    fun run() {
+    open fun run() {
 
         triggered = true
 
