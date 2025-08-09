@@ -6,7 +6,6 @@ import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
 import noobroutes.ui.clickgui.elements.ElementType
-import noobroutes.ui.clickgui.elements.ModuleButton
 import noobroutes.ui.clickgui.elements.SettingElement
 import noobroutes.ui.util.animations.impl.LinearAnimation
 import noobroutes.utils.render.drawArrow

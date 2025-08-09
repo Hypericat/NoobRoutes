@@ -29,16 +29,12 @@ import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.editUI.EditUI
-import noobroutes.utils.PacketUtils
+import noobroutes.utils.*
 import noobroutes.utils.PacketUtils.isResponseToLastS08
-import noobroutes.utils.RotationUtils
-import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isStart
-import noobroutes.utils.getSafe
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.renderVec
-import noobroutes.utils.requirement
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
@@ -90,7 +86,7 @@ object AutoP3: Module (
     }.withDependency { blinkShit }
     private val cancelC05s by BooleanSetting("Cancel C05s", default = false, description = "Allows the cancelling of rotation packets.").withDependency { blinkShit }
     private val movementMode by DualSetting("Movement Mode","Playback", "Silent", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
-    val x_y0uMode by BooleanSetting("x_y0u Mode", description = "x_y0u strongly believes this is better, while its faster it also probably flags timer and will lobby you sometimes. (We Jew the Packets -x_y0u)").withDependency { blinkShit }
+    val x_y0uMode by BooleanSetting("x_y0u Mode", description = "While its faster it also probably flags timer and will lobby you sometimes. (We Jew the Packets -x_y0u)").withDependency { blinkShit }
     val blinkCooldown by NumberSetting("Blink Cooldown", 5, 0, 10, description = "how many ticks to wait after entering a blink ring before allowing blink").withDependency { x_y0uMode && blinkShit }
     private val resetInterval by NumberSetting(name = "clear intervall", description = "delete packets periodically", min = 1, max = 300, default = 200, unit = "t").withDependency { x_y0uMode && blinkShit }
     private val resetAmount by NumberSetting(name = "clear amount", description = "delete packets periodically", min = 1, max = 400, default = 50).withDependency { x_y0uMode && blinkShit }

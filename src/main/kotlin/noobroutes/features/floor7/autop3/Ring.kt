@@ -5,8 +5,6 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.rings.BlinkRing
-import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
-import noobroutes.features.floor7.autop3.rings.StopRing
 import noobroutes.utils.*
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
