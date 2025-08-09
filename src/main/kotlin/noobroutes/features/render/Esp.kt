@@ -58,7 +58,6 @@ object Esp : Module(
     private val starredMobs: MutableSet<Int> = mutableSetOf();
     private val bloodMobs: MutableSet<Int> = mutableSetOf();
     private val bloodNames: MutableSet<Int> = mutableSetOf();
-    private val scannedMobs: MutableSet<Int> = mutableSetOf();
 
     private var tick: Int = 0;
 
@@ -138,10 +137,7 @@ object Esp : Module(
     }
 
     private fun isValidEntity(entity: EntityArmorStand): Boolean {
-        if (scannedMobs.contains(entity.entityId)) return false;
-
         if (!entity.hasCustomName() || !entity.customNameTag.contains("§6✯ ") || !entity.customNameTag.endsWith("§c❤")) {
-            scannedMobs.add(entity.entityId)
             return false;
         }
         return true;
