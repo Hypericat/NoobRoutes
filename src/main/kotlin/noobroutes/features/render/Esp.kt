@@ -3,7 +3,6 @@ package noobroutes.features.render
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityGiantZombie
@@ -21,13 +20,18 @@ import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.utils.Utils
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.getMobEntity
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.modMessage
+import scala.reflect.runtime.ReflectionUtils
+import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.util.*
+
 
 object Esp : Module(
     name = "Starred Mob ESP",
@@ -44,14 +48,17 @@ object Esp : Module(
     private val bloodOutline by ColorSetting("Blood Mob Outline", Color.RED, true, description = "Blood mob outline").withDependency { drawBloodMobs }
     private val bloodFill by ColorSetting("Blood Mob Fill", Color.ORANGE, true, description = "Blood mob fill").withDependency { drawBloodMobs }
 
-    // With dependency doesn't update until you open / reopen
-
-    private val depthCheck by BooleanSetting("Disable Model Depth", false, description = "Disables depth check on starred mobs")
+    // With dependency doesn't update until you open / reopen pls fix wadey
+    private val depthCheck by BooleanSetting("Disable Model Depth", false, description = "Disables depth check on starred mobs, you will need to disable patcher cull entities for this to work!")
     private val updateInterval by NumberSetting("Update Interval", 10, 1, 100, 1, description = "Update interval (in ticks) for starred mobs")
+
+    private val fuckSkytils by BooleanSetting("Skytils Fix", true, description = "Disables skytils hide non-starred mobs feature which is bugged and hides all mobs. This is a temporary fix until skytils updates")
+
 
     private val starredMobs: MutableSet<Int> = mutableSetOf();
     private val bloodMobs: MutableSet<Int> = mutableSetOf();
     private val bloodNames: MutableSet<Int> = mutableSetOf();
+    private val scannedMobs: MutableSet<Int> = mutableSetOf();
 
     private var tick: Int = 0;
 
@@ -85,12 +92,18 @@ object Esp : Module(
     }
 
 
+    override fun onEnable() {
+        if (fuckSkytils) fuckSkytils(); // Skytils fix because of mod update it hides all nametags which makes some mobs not be esp
+        super.onEnable()
+    }
+
     @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {
         starredMobs.clear();
         bloodMobs.clear();
         tick = 0;
     }
+
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
@@ -125,7 +138,13 @@ object Esp : Module(
     }
 
     private fun isValidEntity(entity: EntityArmorStand): Boolean {
-        return !(!entity.hasCustomName() || !entity.customNameTag.contains("§6✯ ") || !entity.customNameTag.endsWith("§c❤"))
+        if (scannedMobs.contains(entity.entityId)) return false;
+
+        if (!entity.hasCustomName() || !entity.customNameTag.contains("§6✯ ") || !entity.customNameTag.endsWith("§c❤")) {
+            scannedMobs.add(entity.entityId)
+            return false;
+        }
+        return true;
         //return entity.hasCustomName() && entity.name.contains("✯")
     }
 
@@ -155,6 +174,7 @@ object Esp : Module(
 
                 val mob = getMobEntity(e) ?: continue; // Entity may not be loaded
                 starredMobs.add(mob.entityId)
+                //scannedMobs.add(e.entityId)
                 e.alwaysRenderNameTag = true;
                 mob.isInvisible = false;
                 continue
@@ -194,6 +214,25 @@ object Esp : Module(
 
     private fun isBlood(id: Int): Boolean {
         return this.bloodMobs.contains(id);
+    }
+
+    // Stolen and modified from farm helper
+    private fun fuckSkytils() {
+        if (Utils.hasPackageInstalled("gg.skytils.skytilsmod")) {
+            try {
+                // Get the ConfigManager instance
+                val skytilsClass = Class.forName("gg.skytils.skytilsmod.core.Config")
+
+                val hideNonStarredNametags: Field = skytilsClass.getDeclaredField("hideNonStarredNametags")
+                hideNonStarredNametags.isAccessible = true;
+                if (hideNonStarredNametags.getBoolean(null)) {
+                    modMessage(("Disabling Skytils Hide Non-Starred Nametags as it is required for esp to work!"));
+                    hideNonStarredNametags.setBoolean(null, false)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun shouldCancelDepthCheck(id: Int) : Boolean {
