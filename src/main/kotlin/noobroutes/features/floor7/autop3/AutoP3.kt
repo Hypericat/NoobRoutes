@@ -30,6 +30,7 @@ import noobroutes.features.settings.impl.*
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.editUI.EditUI
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.PacketUtils.isResponseToLastS08
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isStart
@@ -38,6 +39,7 @@ import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.*
 import noobroutes.utils.render.RenderUtils.renderVec
 import noobroutes.utils.requirement
+import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.modMessage
@@ -81,6 +83,7 @@ object AutoP3: Module (
     private val blinkShit by DropdownSetting("Blink Settings", false)
     val blinkToggle by BooleanSetting("Blink Toggle", description = "main toggle for blink").withDependency { blinkShit }
     private val maxBlink by NumberSetting("Max Blink", 150, 100, 400, description = "How many packets can be blinked on one instance").withDependency { blinkShit }
+    val suppressMaxBlink by BooleanSetting("Disable in Singleplayer", description = "Disables the max packets per instance check while in single player").withDependency { blinkShit }
     private val balanceHud by HudSetting("Balance Hud", 400f, 400f, 1f, false) {
         if (inF7Boss) text(cancelled.toString(), 1f, 1f, ColorPalette.textColor, 13f)
         getTextWidth("400", 13f) to getTextHeight("400", 13f)
@@ -110,13 +113,13 @@ object AutoP3: Module (
     private var activeBlink: BlinkRing? = null
     var lastBlink = -1L
     var waitedTicks = 0
+    inline val isBlinkLimitEnabled get() = !(LocationUtils.isSinglePlayer && suppressMaxBlink)
+
 
     private var activeBlinkWaypoint: BlinkWaypoint? = null
     var recordingPacketList = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
         private set
     private var recording = false
-
-    private var clear = 0
 
     private fun resetShit(worldChange: Boolean) {
         blinkSetRotation = null
@@ -155,12 +158,12 @@ object AutoP3: Module (
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
-        if (!inF7Boss || editMode || movementPackets.isNotEmpty() || mc.thePlayer.isSneaking || onFrame) return
+        if (!inF7Boss || editMode || movementPackets.isNotEmpty() || mc.thePlayer.isSneaking) return
 
-        handleRings(mc.thePlayer.positionVector)
+        if (!onFrame) handleRings(mc.thePlayer.positionVector)
 
         activeBlinkWaypoint?.let { //this needs to be on tick otherwise shit breaks
-            if (it.inRing()) {
+            if (it.inRing(mc.thePlayer.positionVector)) {
                 if (!it.triggered) recording = true
                 it.triggered = true
             }
@@ -393,6 +396,7 @@ object AutoP3: Module (
 
         if (dontCancelNextC03) {
             dontCancelNextC03 = false
+            if (!x_y0uMode) cancelled = 0
             return
         }
 
@@ -423,15 +427,21 @@ object AutoP3: Module (
         if (event.packet.isOnGround && !event.packet.isMoving && movementPackets.isEmpty() && (!event.packet.rotating || cancelC05s)) {
             event.isCanceled = true
             if (cancelled < 400) cancelled++
-            clear = 0
             return
-        }
-        if (clear > 1) {
-            cancelled.coerceAtMost(200)
-            return
-        }
-        clear++
+        } else {
 
+            if (event.packet is C03PacketPlayer.C06PacketPlayerPosLook && event.packet.isResponseToLastS08()) {
+                Scheduler.schedulePreMoveEntityWithHeadingTask { cancelledLogic() }
+                //Scheduler.scheduleFrameTask {  }
+                return
+            }
+            cancelledLogic()
+        }
+    }
+
+    private fun cancelledLogic(){
+        if (x_y0uMode) cancelled.coerceAtMost(200)
+        else cancelled = 0
     }
 
     fun getMaxBlinks(): Int {

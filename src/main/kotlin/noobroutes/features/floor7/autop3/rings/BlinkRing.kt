@@ -80,6 +80,7 @@ class BlinkRing(
     }
 
 
+
     override fun doRing() {
         super.doRing()
 
@@ -94,7 +95,7 @@ class BlinkRing(
 
         if (FreeCam.enabled) FreeCam.onDisable()
 
-        if (!AutoP3.blinkToggle || AutoP3.blinksThisInstance + packets.size > AutoP3.getMaxBlinks()) {
+        if (!AutoP3.blinkToggle || (AutoP3.blinksThisInstance + packets.size > AutoP3.getMaxBlinks() && AutoP3.isBlinkLimitEnabled) ) {
             doMovement()
             return
         }
@@ -143,7 +144,7 @@ class BlinkRing(
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
         mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
 
-        modMessage("§c§l${AutoP3.cancelled}§r§f c04s available, used §c${packets.size}§f,  §7(${AutoP3.getMaxBlinks() - AutoP3.blinksThisInstance} left on this instance)")
+        modMessage("used §c${packets.size}§f packets,  §7(${AutoP3.getMaxBlinks() - AutoP3.blinksThisInstance} left on this instance)")
     }
 
     fun drawEnd() {

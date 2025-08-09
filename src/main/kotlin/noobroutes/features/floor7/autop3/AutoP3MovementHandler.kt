@@ -124,8 +124,6 @@ object AutoP3MovementHandler {
 
         AutoP3.waitedTicks = 0
 
-        if (!AutoP3.x_y0uMode) AutoP3.cancelled = 0
-
         if (direction == null) return
 
         PlayerUtils.stopVelocity()

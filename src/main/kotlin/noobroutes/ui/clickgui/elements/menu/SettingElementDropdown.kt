@@ -42,7 +42,6 @@ class SettingElementDropdown(setting: DropdownSetting) : SettingElement<Dropdown
         if (isHovered) {
             if (linearAnimation.start()) {
                 setting.enabled = !setting.enabled
-                (parent as ModuleButton).updateElements()
                 return true
             }
         }

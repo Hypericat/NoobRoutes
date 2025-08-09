@@ -137,11 +137,7 @@ object Esp : Module(
     }
 
     private fun isValidEntity(entity: EntityArmorStand): Boolean {
-        if (!entity.hasCustomName() || !entity.customNameTag.contains("§6✯ ") || !entity.customNameTag.endsWith("§c❤")) {
-            return false;
-        }
-        return true;
-        //return entity.hasCustomName() && entity.name.contains("✯")
+        return !(!entity.hasCustomName() || !entity.customNameTag.contains("§6✯ ") || !entity.customNameTag.endsWith("§c❤"));
     }
 
     @SubscribeEvent

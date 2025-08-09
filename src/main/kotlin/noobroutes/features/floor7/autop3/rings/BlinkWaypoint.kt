@@ -16,6 +16,6 @@ class BlinkWaypoint(
     }
 
     override fun inRing(pos: Vec3): Boolean {
-        return checkInBoundsWithSpecifiedHeight(pos,0f) && mc.thePlayer.onGround
+        return checkInBoundsWithSpecifiedHeight(pos,1f) && mc.thePlayer.onGround
     }
 }
