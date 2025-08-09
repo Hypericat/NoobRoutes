@@ -13,16 +13,19 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
+import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.getMobEntity
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import java.util.*
 
@@ -31,15 +34,26 @@ object Esp : Module(
     category = Category.RENDER,
     description = "Cheaters get banned!"
 ) {
+    private val drawBoxes by BooleanSetting("Draw Outline", true, description = "Draws outlines around starred mobs")
+    private val outlineColor by ColorSetting("Outline Color", Color.GREEN, true, description = "Color of the outline").withDependency { drawBoxes }
+
+    private val drawFilledBox by BooleanSetting("Fill Box", false, description = "Draws filled boxes around starred mobs")
+    private val filledBoxColor by ColorSetting("Filled Color", Color.CYAN, true, description = "Color of the fill").withDependency { drawFilledBox }
+
+    private val drawBloodMobs by BooleanSetting("Show blood mobs", true, description = "ESPs blood mobs")
+    private val bloodOutline by ColorSetting("Blood Mob Outline", Color.RED, true, description = "Blood mob outline").withDependency { drawBloodMobs }
+    private val bloodFill by ColorSetting("Blood Mob Fill", Color.ORANGE, true, description = "Blood mob fill").withDependency { drawBloodMobs }
+
+    // With dependency doesn't update until you open / reopen
+
     private val depthCheck by BooleanSetting("Disable Model Depth", false, description = "Disables depth check on starred mobs")
-    private val drawBoxes by BooleanSetting("Draw Boxes", false, description = "Draws boxes around starred mobs")
-    private val drawFilledBox by BooleanSetting("Fill Box", false, description = "Fills the box").withDependency { drawBoxes }
-    private val color by ColorSetting("Esp Color", Color.GREEN, true, description = "Do you really need a description?").withDependency { drawBoxes }
-    private val bloodColor by ColorSetting("Blood Mob Color", Color.RED, true, description = "8====D").withDependency { drawBoxes }
+    private val updateInterval by NumberSetting("Update Interval", 10, 1, 100, 1, description = "Update interval (in ticks) for starred mobs")
 
     private val starredMobs: MutableSet<Int> = mutableSetOf();
     private val bloodMobs: MutableSet<Int> = mutableSetOf();
     private val bloodNames: MutableSet<Int> = mutableSetOf();
+
+    private var tick: Int = 0;
 
     init {
         addName("Revoker")
@@ -75,23 +89,25 @@ object Esp : Module(
     fun onWorldUnload(event: WorldEvent.Unload) {
         starredMobs.clear();
         bloodMobs.clear();
+        tick = 0;
     }
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
         starredMobs.clear();
         bloodMobs.clear();
+        tick = 0;
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!drawBoxes || !DungeonUtils.inDungeons) return
+        if (!drawBoxes || !DungeonUtils.inDungeons || BossEventDispatcher.inBoss) return
 
-        handleRender(starredMobs.toList(), color, starredMobs, event.partialTicks)
-        handleRender(bloodMobs.toList(), bloodColor, bloodMobs, event.partialTicks)
+        handleRender(starredMobs.toList(), outlineColor, filledBoxColor, starredMobs, event.partialTicks)
+        handleRender(bloodMobs.toList(), bloodOutline, bloodFill, bloodMobs, event.partialTicks)
     }
 
-    private fun handleRender(ids: List<Int>, color: Color, parent: MutableSet<Int>, partialTicks: Float) {
+    private fun handleRender(ids: List<Int>, outline: Color, fill: Color, parent: MutableSet<Int>, partialTicks: Float) {
         for (i in 0 until ids.size) {
             val entityID = ids[i];
             val entity = Minecraft.getMinecraft().theWorld.getEntityByID(entityID)
@@ -101,10 +117,10 @@ object Esp : Module(
             }
 
             val boundingBox: AxisAlignedBB = RenderUtils.getPartialEntityBoundingBox(entity, partialTicks)
-            if (drawFilledBox) {
-                RenderUtils.drawFilledAABB(boundingBox, color);
-            }
-            RenderUtils.drawOutlinedAABB(boundingBox, color, 1f)
+            if (drawFilledBox)
+                RenderUtils.drawFilledAABB(boundingBox, fill);
+            if (drawBoxes)
+                RenderUtils.drawOutlinedAABB(boundingBox, outline, 1f)
         }
     }
 
@@ -115,7 +131,7 @@ object Esp : Module(
 
     @SubscribeEvent
     fun onReceivePacket(event: PacketEvent.Receive) {
-        if (!DungeonUtils.inDungeons) return
+        if (!DungeonUtils.inDungeons || BossEventDispatcher.inBoss) return
 
         if (event.packet.javaClass == S13PacketDestroyEntities::class.java) {
             Arrays.stream((event.packet as S13PacketDestroyEntities).entityIDs).forEach { id: Int ->
@@ -126,7 +142,13 @@ object Esp : Module(
 
     @SubscribeEvent
     fun onClientTick(event: ClientTickEvent) {
-        if (event.isEnd || !DungeonUtils.inDungeons || Minecraft.getMinecraft().theWorld == null) return
+        if (event.isEnd || !DungeonUtils.inDungeons || Minecraft.getMinecraft().theWorld == null || BossEventDispatcher.inBoss) return;
+        if (++tick % updateInterval != 0) {
+            return
+        }
+        starredMobs.clear();
+        bloodMobs.clear();
+
         for (e: Entity in Minecraft.getMinecraft().theWorld.getLoadedEntityList()) {
             if (e is EntityArmorStand) {
                 if (!isValidEntity(e)) continue
