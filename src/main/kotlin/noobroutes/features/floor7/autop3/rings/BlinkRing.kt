@@ -151,4 +151,8 @@ class BlinkRing(
         val endCoords = Vec3(lastPacket.positionX, lastPacket.positionY + 0.01, lastPacket.positionZ)
         Renderer.drawCylinder(endCoords, 0.5, 0.5, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
     }
+
+    override fun inRing(pos: Vec3): Boolean {
+        return checkInBoundsWithSpecifiedHeight(pos,0f) && mc.thePlayer.onGround
+    }
 }
