@@ -7,7 +7,7 @@ interface CommandGenerated {
     fun generateRing(args: Array<out String>): Ring?
 
     fun getWalkFromArgs(args: Array<out String>): Boolean {
-        return args.any {it == "walk"}
+        return args.any {it.lowercase() == "walk"}
     }
     fun generateRingBaseFromArgs(args: Array<out String>): RingBase {
         val diameterString = args.firstOrNull { RingBase.diameterRegex.matches(it) }
@@ -17,11 +17,11 @@ interface CommandGenerated {
         return RingBase(
             mc.thePlayer.positionVector,
             MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
-            args.any {it == "term"},
-            args.any { it == "leap" },
-            args.any {it == "left"},
-            args.any {it == "center"},
-            args.any {it == "rotate" || it == "look"},
+            args.any {it.lowercase() == "term"},
+            args.any { it.lowercase() == "leap" },
+            args.any {it.lowercase() == "left"},
+            args.any {it.lowercase() == "center"},
+            args.any {it.lowercase() == "rotate" || it == "look"},
             diameter,
             height
         )
