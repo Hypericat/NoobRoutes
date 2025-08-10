@@ -5,6 +5,7 @@ import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -22,14 +23,17 @@ import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
 import noobroutes.utils.Utils.getEntitiesOfType
 import noobroutes.utils.Utils.isNotStart
+import noobroutes.utils.distanceSquaredTo
+import noobroutes.utils.render.Color
+import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.skyblockID
 import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 
-@DevOnly //
-object Relics: Module(
+@DevOnly //untested
+object Relics : Module(
     name = "Relics",
     Keyboard.KEY_NONE,
     category = Category.FLOOR7,
@@ -102,6 +106,8 @@ object Relics: Module(
         C03PacketPlayer.C04PacketPlayerPosition(54.5, 6.0, 44.5, true)
     )
 
+    private val startPositions = listOf(ORANGE_PACKETS.first().toVec3(), RED_PACKETS.first().toVec3())
+
     @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {
         pickedUpRelic = false
@@ -122,10 +128,11 @@ object Relics: Module(
     }
 
     private fun doBlinkLogic() {
+        if (!doBlink) return
         if (mc.thePlayer.capabilities.walkSpeed < 0.5) return modMessage("need 500 speed for blink")
 
-        if (mc.thePlayer.positionVector.distanceSqTo(ORANGE_PACKETS.first()) < 1.96) doRelicBlink(ORANGE_PACKETS)
-        else if (mc.thePlayer.positionVector.distanceSqTo(RED_PACKETS.first()) < 1.96) doRelicBlink(RED_PACKETS)
+        if (mc.thePlayer.positionVector.squareDistanceTo(ORANGE_PACKETS.first().toVec3()) < 1.96) doRelicBlink(ORANGE_PACKETS)
+        else if (mc.thePlayer.positionVector.squareDistanceTo(RED_PACKETS.first().toVec3()) < 1.96) doRelicBlink(RED_PACKETS)
     }
 
     private fun doRelicBlink(packets: List<C03PacketPlayer.C04PacketPlayerPosition>) {
@@ -142,8 +149,18 @@ object Relics: Module(
         SwapManager.swapToSlot(8)
     }
 
-    private fun Vec3.distanceSqTo(c04: C03PacketPlayer.C04PacketPlayerPosition): Double {
-        return this.squareDistanceTo(Vec3(c04.positionX, c04.positionY, c04.positionZ))
+    @SubscribeEvent
+    fun onRender(event: RenderWorldLastEvent) {
+        if (BossEventDispatcher.currentBossPhase != Phase.P5 || pickedUpRelic || placedRelic) return
+
+        for (pos in startPositions) {
+            val color = if (mc.thePlayer.distanceSquaredTo(pos) < 1.96 && mc.thePlayer.onGround && mc.thePlayer.posY == 6.0) Color.GREEN else Color.RED
+            Renderer.drawCylinder(pos, 1.4, 1.4, -0.03, 100, 1, 90, 0, 0, color, depth = true, )
+        }
+    }
+
+    private fun C03PacketPlayer.C04PacketPlayerPosition.toVec3(): Vec3 {
+        return Vec3(this.positionX, this.positionY, this.positionZ)
     }
 
     @SubscribeEvent
