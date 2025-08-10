@@ -47,9 +47,8 @@ object LeverAura: Module(
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.isNotStart || !inF7Boss) return
         val eyePos = mc.thePlayer.getPositionEyes(0f)
-        for (i in levers.indices) {
-            val lever = levers[i]
 
+        for (lever in levers) {
             if (eyePos.distanceTo(lever.coords.toVec3()) > range) continue
             if (System.currentTimeMillis() - lever.lastClick < cooldown * 1000) continue
             AuraManager.clickBlock(AuraManager.BlockAura(lever.coords, false) {})
