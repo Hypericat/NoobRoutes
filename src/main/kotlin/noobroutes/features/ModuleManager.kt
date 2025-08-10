@@ -96,7 +96,8 @@ object ModuleManager {
         IceFill,
         SecretAura,
         AutoClose,
-        AutoRoute
+        AutoRoute,
+        Relics
     )
 
     init {
