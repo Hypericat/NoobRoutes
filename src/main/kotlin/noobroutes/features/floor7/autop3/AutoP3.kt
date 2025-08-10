@@ -91,7 +91,6 @@ object AutoP3: Module (
     private val resetInterval by NumberSetting(name = "clear interval", description = "delete packets periodically", min = 1, max = 300, default = 200, unit = "t").withDependency { x_y0uMode && blinkShit }
     private val resetAmount by NumberSetting(name = "clear amount", description = "delete packets periodically", min = 1, max = 400, default = 50).withDependency { x_y0uMode && blinkShit }
     private val nonSilentRotates by BooleanSetting("Non-Silent look", description = "Makes it so rings with the rotate argument rotate client side.")
-    private val stateNumber by NumberSetting(name = "State Number", description = "delete packets periodically", min = 1, max = 8, default = 50).withDependency { x_y0uMode && blinkShit }
 
 
     var waitingRing: Ring? = null
@@ -240,15 +239,14 @@ object AutoP3: Module (
         }
     }
 
+    // || mc.thePlayer?.heldItem?.displayName?.contains("leap", ignoreCase = true) != true
     @SubscribeEvent
     fun onLeap(event: PacketEvent.Receive) {
-        if (!inF7Boss || event.packet !is S08PacketPlayerPosLook || mc.thePlayer?.heldItem?.displayName?.contains("leap", ignoreCase = true) != true) return
+        if (!inF7Boss || event.packet !is S08PacketPlayerPosLook) return
 
-        mc.thePlayer.posX = event.packet.x
-        mc.thePlayer.posY = event.packet.y
-        mc.thePlayer.posZ = event.packet.z
+        val packetPos = Vec3(event.packet.x, event.packet.y, event.packet.z)
 
-        val blinkRing = rings[route]?.find { it is BlinkRing && it.inRing() } ?: return
+        val blinkRing = rings[route]?.find { it is BlinkRing && it.inRing(packetPos) } ?: return
         waitedTicks = 10
         activeBlink = blinkRing as BlinkRing
     }
@@ -356,21 +354,21 @@ object AutoP3: Module (
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (mc.thePlayer == null || !event.isStart || movementPackets.isNotEmpty()) return
 
+        if (resetPacketExceptionState) modMessage(activeBlink)
         activeBlink?.let {
             if (it.inRing()) {
                 it.doRing()
             }
             else activeBlink = null
         }
-        if (resetPacketExceptionState > 1) {
-            logger.info("tick")
-            resetPacketExceptionState--
-            if (resetPacketExceptionState == 1) {
-                Scheduler.schedulePreTickTask {
-                    resetPacketExceptionState = 0
-                    cancelled = stateNumber - 1
-                }
+        if (resetPacketExceptionState) {
+            modMessage("tick | ${System.currentTimeMillis()}")
+
+            Scheduler.schedulePreTickTask {
+                resetPacketExceptionState = false
+                cancelled = 0
             }
+
         }
     }
 
@@ -393,13 +391,13 @@ object AutoP3: Module (
         toReset--
     }
 
-    private var resetPacketExceptionState = 0
+    private var resetPacketExceptionState = false
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun cancelC03s(event: PacketEvent.Send) {
         if (!inF7Boss || event.packet !is C03PacketPlayer) return
-        if (resetPacketExceptionState < 1) {
-            logger.info("sending packet: ${event.packet.javaClass.simpleName}")
+        if (resetPacketExceptionState) {
+            modMessage("sending packet: ${event.packet.javaClass.simpleName} | ${System.currentTimeMillis()}")
         }
 
         if (movementPackets.isNotEmpty()) {
@@ -444,12 +442,13 @@ object AutoP3: Module (
         } else {
 
             if (event.packet is C03PacketPlayer.C06PacketPlayerPosLook && event.packet.isResponseToLastS08()) {
-                resetPacketExceptionState = stateNumber
+                resetPacketExceptionState = true
+                modMessage("C06 Response | ${System.currentTimeMillis()}")
                 //Scheduler.schedulePostTickTask { cancelledLogic() }
                 //Scheduler.scheduleFrameTask {  }
                 return
             }
-            if (resetPacketExceptionState > 0) return
+            if (resetPacketExceptionState) return
             cancelledLogic()
         }
     }
