@@ -19,6 +19,7 @@ import noobroutes.events.impl.*
 object Scheduler {
     var runTime = 0L
 
+
     private val scheduledPreTickTasks = Tasks()
     private val scheduledPostTickTasks = Tasks()
     private val scheduledHighPreTickTasks = Tasks()

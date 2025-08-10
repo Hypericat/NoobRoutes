@@ -5,6 +5,7 @@ package noobroutes.utils
 import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
+import noobroutes.Core.logger
 import noobroutes.Core.mc
 
 
@@ -26,7 +27,8 @@ object PacketUtils {
     }
 
     fun C03PacketPlayer.C06PacketPlayerPosLook.isResponseToLastS08(): Boolean {
-         return lastResponse === this
+       // logger.info("last: ${System.identityHashCode(lastResponse)} | current: ${System.identityHashCode(this)}")
+        return lastResponse === this
     }
 
     fun C03PacketPlayer.C06PacketPlayerPosLook.generateString(): String{

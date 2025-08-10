@@ -33,7 +33,7 @@ import kotlin.math.floor
 object Zpew : Module(
     name = "Zpew",
     category = Category.MOVE,
-    description = "If you don't know what this is you probably shouldn't be using this mod"
+    description = "This is made for single player testing and is non-functional on Hypixel."
 ) {
     private val zpew by BooleanSetting("Zero Ping Etherwarp", description = "Zero ping teleport for right clicking aotv")
     private val zpt by BooleanSetting("Zero Ping Aotv", description = "Zero ping teleport for right clicking aotv")

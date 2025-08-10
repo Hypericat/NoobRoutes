@@ -88,9 +88,10 @@ object AutoP3: Module (
     private val movementMode by DualSetting("Movement Mode","Playback", "Silent", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
     val x_y0uMode by BooleanSetting("x_y0u Mode", description = "While its faster it also probably flags timer and will lobby you sometimes. (We Jew the Packets -x_y0u)").withDependency { blinkShit }
     val blinkCooldown by NumberSetting("Blink Cooldown", 5, 0, 10, description = "how many ticks to wait after entering a blink ring before allowing blink").withDependency { x_y0uMode && blinkShit }
-    private val resetInterval by NumberSetting(name = "clear intervall", description = "delete packets periodically", min = 1, max = 300, default = 200, unit = "t").withDependency { x_y0uMode && blinkShit }
+    private val resetInterval by NumberSetting(name = "clear interval", description = "delete packets periodically", min = 1, max = 300, default = 200, unit = "t").withDependency { x_y0uMode && blinkShit }
     private val resetAmount by NumberSetting(name = "clear amount", description = "delete packets periodically", min = 1, max = 400, default = 50).withDependency { x_y0uMode && blinkShit }
     private val nonSilentRotates by BooleanSetting("Non-Silent look", description = "Makes it so rings with the rotate argument rotate client side.")
+    private val stateNumber by NumberSetting(name = "State Number", description = "delete packets periodically", min = 1, max = 8, default = 50).withDependency { x_y0uMode && blinkShit }
 
 
     var waitingRing: Ring? = null
@@ -165,6 +166,7 @@ object AutoP3: Module (
             }
             else it.triggered = false
         }
+
     }
 
     @SubscribeEvent
@@ -360,6 +362,16 @@ object AutoP3: Module (
             }
             else activeBlink = null
         }
+        if (resetPacketExceptionState > 1) {
+            logger.info("tick")
+            resetPacketExceptionState--
+            if (resetPacketExceptionState == 1) {
+                Scheduler.schedulePreTickTask {
+                    resetPacketExceptionState = 0
+                    cancelled = stateNumber - 1
+                }
+            }
+        }
     }
 
     fun setBlinkRotation(yaw: Float, pitch: Float) {
@@ -381,9 +393,14 @@ object AutoP3: Module (
         toReset--
     }
 
+    private var resetPacketExceptionState = 0
+
     @SubscribeEvent(priority = EventPriority.LOW)
     fun cancelC03s(event: PacketEvent.Send) {
         if (!inF7Boss || event.packet !is C03PacketPlayer) return
+        if (resetPacketExceptionState < 1) {
+            logger.info("sending packet: ${event.packet.javaClass.simpleName}")
+        }
 
         if (movementPackets.isNotEmpty()) {
             if (!x_y0uMode) cancelled = 0
@@ -427,10 +444,12 @@ object AutoP3: Module (
         } else {
 
             if (event.packet is C03PacketPlayer.C06PacketPlayerPosLook && event.packet.isResponseToLastS08()) {
-                Scheduler.schedulePreMoveEntityWithHeadingTask { cancelledLogic() }
+                resetPacketExceptionState = stateNumber
+                //Scheduler.schedulePostTickTask { cancelledLogic() }
                 //Scheduler.scheduleFrameTask {  }
                 return
             }
+            if (resetPacketExceptionState > 0) return
             cancelledLogic()
         }
     }

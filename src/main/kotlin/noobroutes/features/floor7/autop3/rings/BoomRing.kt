@@ -36,6 +36,6 @@ class BoomRing(
     override fun doRing() {
         SwapManager.swapFromName("TNT")
         //AuraManager.auraBlock(block, force = true)
-        Scheduler.schedulePreTickTask(0) { AuraManager.auraBlock(block, force = true) }
+        Scheduler.scheduleFrameTask { AuraManager.auraBlock(block, force = true) }
     }
 }
