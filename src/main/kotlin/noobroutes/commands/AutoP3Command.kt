@@ -21,19 +21,23 @@ class AutoP3Command: CommandBase() {
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Edit, Delete, clearWaypoints, Start, Load, Undo, Redo")
+        if (args == null || args.isEmpty()) return modMessage("Usages: Add, Edit, Delete, clearWaypoints, Start, Load, Undo, Redo, em")
         when (args[0].lowercase()) {
-            "add" -> {
+            "add", "erect" -> {
                 if (!args.requirement(2)) return modMessage("Rings: ${getCommandGeneratedRings()}")
                 val ringType = RingType.getTypeFromName(args[1])
                     ?: return modMessage("Rings: ${getCommandGeneratedRings()}")
                 val ring = (ringType.ringClass.companionObjectInstance as? CommandGenerated)?.generateRing(args) ?: return
                 AutoP3.addRing(ring)
             }
+            "editmode", "em" -> {
+                AutoP3.toggleEditMode()
+            }
+
             "edit" -> {
                 AutoP3.handleEdit(args)
             }
-            "delete" -> {
+            "delete", "remove" -> {
                 AutoP3.handleDelete(args)
             }
             "redo" -> {
@@ -58,6 +62,8 @@ class AutoP3Command: CommandBase() {
                 AutoP3.loadRings()
                 modMessage("loaded rings")
             }
+
+
             else -> modMessage("Usages: Add, Edit, Delete, clearWaypoints, Start, Load, Undo, Redo")
         }
     }

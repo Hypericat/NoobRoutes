@@ -123,6 +123,7 @@ object  ClickGUIModule: Module(
     }
 
     override fun onEnable() {
+        if (mc.currentScreen != null) return
         Core.display = ClickGui
         super.onEnable()
         toggle()

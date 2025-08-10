@@ -15,7 +15,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.utils.BlockUtils.collisionRayTrace
-import noobroutes.utils.skyblock.PlayerUtils.isZeroTickSwapping
 
 object AuraManager {
     class EntityAura(val entity: Entity, val action: Action)

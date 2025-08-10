@@ -11,17 +11,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.Core.mc
-import noobroutes.events.impl.DeathTickEvent
-import noobroutes.events.impl.MotionUpdateEvent
-import noobroutes.events.impl.MoveEntityWithHeadingEvent
-import noobroutes.events.impl.PacketEvent
-import noobroutes.events.impl.ServerTickEvent
+import noobroutes.events.impl.*
 
 /**
  * Taken from meow
  */
 object Scheduler {
     var runTime = 0L
+
 
     private val scheduledPreTickTasks = Tasks()
     private val scheduledPostTickTasks = Tasks()

@@ -143,6 +143,18 @@ object Utils {
     var lastPlayerPos = Vec3(0.0, 0.0, 0.0)
     var lastPlayerSpeed = Vec3(0.0, 0.0, 0.0)
 
+    // Skidded from farm helper
+    fun hasPackageInstalled(name: String?): Boolean {
+        val packages = Package.getPackages()
+
+        for (pack in packages) {
+            if (pack.name.contains(name!!)) {
+                return true
+            }
+        }
+        return false
+    }
+
     @SubscribeEvent
     fun beforeMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Pre) {
         if (mc.thePlayer == null) return

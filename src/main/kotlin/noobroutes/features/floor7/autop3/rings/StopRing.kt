@@ -1,9 +1,8 @@
 package noobroutes.features.floor7.autop3.rings
 
-import noobroutes.features.floor7.autop3.CommandGenerated
-import noobroutes.features.floor7.autop3.Ring
-import noobroutes.features.floor7.autop3.RingBase
-import noobroutes.features.floor7.autop3.RingType
+import net.minecraft.util.Vec3
+import noobroutes.Core.mc
+import noobroutes.features.floor7.autop3.*
 import noobroutes.utils.skyblock.PlayerUtils
 
 class StopRing(
@@ -15,8 +14,31 @@ class StopRing(
         }
     }
 
-    override fun doRing() {
-        super.doRing()
+
+
+    override fun run() {
+        AutoP3MovementHandler.resetShit()
         PlayerUtils.stopVelocity()
+        if (center && !mc.thePlayer.onGround) return
+        triggered = true
+
+
+        if (rotate) {
+            AutoP3.setBlinkRotation(yaw, 0f)
+        }
+
+        if (center) {
+            center()
+            if (isAwait) await()
+            return
+        }
+
+        if (isAwait) {
+            await()
+            return
+        }
+    }
+    override fun inRing(pos: Vec3): Boolean {
+        return checkInBoundsWithSpecifiedHeight(pos, height)
     }
 }

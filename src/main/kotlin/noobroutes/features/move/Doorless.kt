@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
+import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
@@ -26,6 +27,7 @@ import noobroutes.utils.skyblock.sendChatMessage
 import noobroutes.utils.toBlockPos
 import org.lwjgl.input.Keyboard
 
+@DevOnly
 object Doorless: Module(
     name = "Doorless",
     Keyboard.KEY_NONE,

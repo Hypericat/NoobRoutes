@@ -101,7 +101,7 @@ abstract class UiElement(var x: Float, var y: Float) {
         return onScroll(amount)
     }
 
-    fun handleMouseClicked(mouseButton: Int): Boolean{
+    open fun handleMouseClicked(mouseButton: Int): Boolean{
         if (!enabled || !visible) return false
 
         for (i in uiChildren.indices) {

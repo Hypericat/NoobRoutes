@@ -372,7 +372,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
 
 
     fun saveConfig() {
-        saveAreaConfig(floorConfig, "floorConfig")
+        saveAreaConfig(floorConfig, "floorsConfig")
         saveAreaConfig(roomConfig, "roomConfig")
     }
 

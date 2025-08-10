@@ -14,7 +14,7 @@ class HClipRing(
 ) : Ring(ringBase, RingType.H_CLIP) {
     companion object : CommandGenerated {
         override fun generateRing(args: Array<out String>): Ring? {
-            val insta = args.any {it == "insta"}
+            val insta = args.any {it.lowercase() == "insta"}
             return HClipRing(generateRingBaseFromArgs(args), getWalkFromArgs(args), insta)
         }
     }

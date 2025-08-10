@@ -34,8 +34,11 @@ class BoomRing(
     }
 
     override fun doRing() {
-        SwapManager.swapFromName("TNT")
-        //AuraManager.auraBlock(block, force = true)
-        Scheduler.schedulePreTickTask(0) { AuraManager.auraBlock(block, force = true) }
+        val swapped = SwapManager.swapFromName("TNT")
+        if (swapped == SwapManager.SwapState.ALREADY_HELD) {
+            AuraManager.auraBlock(block, force = true)
+            return
+        }
+        Scheduler.schedulePreTickTask(1) { AuraManager.auraBlock(block, force = true) }
     }
 }

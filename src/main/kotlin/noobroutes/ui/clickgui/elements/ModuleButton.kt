@@ -90,13 +90,17 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
         }
 
         var drawY = BUTTON_HEIGHT
-        for (i in uiChildren.indices) {
-            uiChildren[i].apply {
-                visible = true
-                updatePosition(0f, drawY)
-                drawY += (this as SettingElement<*>).getHeight()
+        for (child in uiChildren) {
+            val setting = child as SettingElement<*>
+            if (!setting.setting.shouldBeVisible) {
+                setting.visible = false
+                continue
             }
+            setting.visible = true
+            setting.updatePosition(0f, drawY)
+            drawY += setting.getHeight()
         }
+
 
         val scissor = scissor(x + getEffectiveX() - 3f, BUTTON_HEIGHT + getEffectiveY(), width * getEffectiveXScale() + 3, (drawY - BUTTON_HEIGHT) * extendAnim.get(0f, 1f, !extended) * getEffectiveYScale())
         doDrawChildren()
@@ -123,7 +127,7 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
     fun updateElements() {
         uiChildren.clear()
         for (setting in module.settings) {
-            if (setting.shouldBeVisible) run addElement@{
+            run addElement@{
                 if (uiChildren.any { it.settingElement.setting === setting }) return@addElement
                 if (setting.devOnly && !Core.DEV_MODE) {
                     setting.reset()
