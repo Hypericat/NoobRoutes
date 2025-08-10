@@ -11,6 +11,7 @@ import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
 import net.minecraftforge.client.event.GuiOpenEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
 import noobroutes.Core.scope
@@ -96,6 +97,16 @@ object EventDispatcher {
     fun onS2D(event: S2DEvent) {
         val title = event.packet.windowTitle.unformattedText
         if (System.currentTimeMillis() - lastEntityClick < 400 && termNames.any{regex -> regex.matches(title)}) TermOpenEvent().postAndCatch()
+    }
+
+    @SubscribeEvent
+    fun onWorldUnload(event: WorldEvent.Unload){
+        WorldChangeEvent().postAndCatch()
+    }
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        WorldChangeEvent().postAndCatch()
     }
 
 }

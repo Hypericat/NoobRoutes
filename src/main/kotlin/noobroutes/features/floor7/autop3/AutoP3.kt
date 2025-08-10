@@ -209,6 +209,7 @@ object AutoP3: Module (
     fun handleMissingWaypoint() {
         modMessage("the blink waypoint was deleted while recording. dont do that shit. bad boy")
         recordingPacketList = mutableListOf()
+        recording = false
     }
 
     @SubscribeEvent
@@ -301,12 +302,7 @@ object AutoP3: Module (
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
-        resetShit(true)
-    }
-
-    @SubscribeEvent
-    fun onWorldUnload(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldChangeEvent) {
         resetShit(true)
     }
 
@@ -354,7 +350,6 @@ object AutoP3: Module (
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (mc.thePlayer == null || !event.isStart || movementPackets.isNotEmpty()) return
 
-        if (resetPacketExceptionState) modMessage(activeBlink)
         activeBlink?.let {
             if (it.inRing()) {
                 it.doRing()
@@ -362,8 +357,6 @@ object AutoP3: Module (
             else activeBlink = null
         }
         if (resetPacketExceptionState) {
-            modMessage("tick | ${System.currentTimeMillis()}")
-
             Scheduler.schedulePreTickTask {
                 resetPacketExceptionState = false
                 cancelled = 0
@@ -396,9 +389,6 @@ object AutoP3: Module (
     @SubscribeEvent(priority = EventPriority.LOW)
     fun cancelC03s(event: PacketEvent.Send) {
         if (!inF7Boss || event.packet !is C03PacketPlayer) return
-        if (resetPacketExceptionState) {
-            modMessage("sending packet: ${event.packet.javaClass.simpleName} | ${System.currentTimeMillis()}")
-        }
 
         if (movementPackets.isNotEmpty()) {
             if (!x_y0uMode) cancelled = 0
@@ -443,9 +433,6 @@ object AutoP3: Module (
 
             if (event.packet is C03PacketPlayer.C06PacketPlayerPosLook && event.packet.isResponseToLastS08()) {
                 resetPacketExceptionState = true
-                modMessage("C06 Response | ${System.currentTimeMillis()}")
-                //Scheduler.schedulePostTickTask { cancelledLogic() }
-                //Scheduler.scheduleFrameTask {  }
                 return
             }
             if (resetPacketExceptionState) return
@@ -477,6 +464,15 @@ object AutoP3: Module (
     fun setActiveBlinkWaypoint(ring: BlinkWaypoint?) {
         recentActionStack.add(EditRingAction(RingAction.ChangeActiveBlinkWaypoint, null, route, BlinkWaypointState(ring, activeBlinkWaypoint)))
         activeBlinkWaypoint = ring
+    }
+
+    fun toggleEditMode(){
+        editMode = !editMode
+        if (editMode) {
+            modMessage("AutoP3 Edit Mode §aEnabled")
+        } else {
+            modMessage("AutoP3 Edit Mode §cDisabled")
+        }
     }
 
     fun addRing(ring: Ring){

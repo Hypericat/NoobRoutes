@@ -151,7 +151,6 @@ object AutoP3MovementHandler {
         direction = null
     }
 
-
     fun setMotionTicks(ticks: Int) {
         motionTicks = ticks
     }
