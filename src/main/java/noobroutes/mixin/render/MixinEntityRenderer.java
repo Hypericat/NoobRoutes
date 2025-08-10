@@ -26,7 +26,7 @@ abstract public class MixinEntityRenderer implements IResourceManagerReloadListe
 
     @Inject(method = "renderWorld", at = @At("HEAD"))
     private void noobRoutes$beforeRenderWorld(float partialTicks, long finishTimeNano, CallbackInfo ci){
-        FreeCam.INSTANCE.onBeforeRenderWorld();
+        FreeCam.INSTANCE.onBeforeRenderWorld(partialTicks);
     }
 
     @Inject(method = "renderWorld", at = @At("TAIL"))

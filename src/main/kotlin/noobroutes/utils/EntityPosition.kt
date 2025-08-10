@@ -110,4 +110,8 @@ class EntityPosition(
         this.z += mutableVec3.z
     }
 
+    fun getPosition(): Vec3 {
+        return Vec3(this.x, this.y, this.z)
+    }
+
 }

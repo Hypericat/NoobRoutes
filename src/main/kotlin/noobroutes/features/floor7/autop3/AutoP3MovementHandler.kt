@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.gameevent.InputEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.S08Event
+import noobroutes.features.render.FreeCam
 import noobroutes.utils.Utils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
@@ -118,7 +119,7 @@ object AutoP3MovementHandler {
 
     @SubscribeEvent
     fun onKeyInput(event: InputEvent.KeyInputEvent) {
-        if (!Keyboard.getEventKeyState()) return
+        if (FreeCam.enabled || !Keyboard.getEventKeyState()) return
         val keyCode = Keyboard.getEventKey()
         if (!PlayerUtils.keyBindings.map { it.keyCode }.contains(keyCode) && keyCode != mc.gameSettings.keyBindSneak.keyCode) return
 

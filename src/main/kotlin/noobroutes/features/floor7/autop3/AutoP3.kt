@@ -33,8 +33,8 @@ import noobroutes.utils.PacketUtils.isResponseToLastS08
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.*
-import noobroutes.utils.render.RenderUtils.renderVec
 import noobroutes.utils.skyblock.LocationUtils
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.modMessage
@@ -170,7 +170,8 @@ object AutoP3: Module (
     @SubscribeEvent
     fun onFrameRing(event: RenderWorldLastEvent) {
         if (!inF7Boss || editMode || movementPackets.isNotEmpty() || mc.thePlayer.isSneaking || !onFrame) return
-        handleRings(mc.thePlayer.renderVec)
+        logger.info(PlayerUtils.getEffectiveViewPosition())
+        handleRings(PlayerUtils.getEffectiveViewPosition())
     }
 
 
