@@ -49,7 +49,6 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     private var scrollWheelMultiplier = 2.0
     private var lastRenderPos = Vec3(0.0,0.0,0.0)
 
-
     override fun onEnable() {
         speedVector = Vec3(0.0, 0.0, 0.0)
         oldCameraType = mc.gameSettings.thirdPersonView
@@ -141,8 +140,6 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         onDisable()
     }
 
-
-
     @SubscribeEvent
     fun onClick(event: ClickEvent.All) {
         event.isCanceled = true
@@ -155,10 +152,11 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         pos = lastRenderPos
     }
 
-    fun onBeforeRenderWorld(){
+    fun onBeforeRenderWorld(partialTicks: Float){
         if (!enabled) return
         shouldOverride = true
         val renderEntity = mc.renderViewEntity ?: return
+        eyePositionWithPartialTicks = renderEntity.getPositionEyes(partialTicks)
         playerPosition.copyFromEntity(renderEntity, true)
         freeCamPosition.copyToEntity(renderEntity, false)
         oldNoClip = renderEntity.noClip
@@ -168,10 +166,10 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
     fun onAfterRenderWorld(){
         if (shouldOverride) {
             looking = mc.objectMouseOver
-            val cameraEntity = mc.renderViewEntity ?: return
-            playerPosition.copyToEntity(cameraEntity, true)
+            val renderEntity = mc.renderViewEntity ?: return
+            playerPosition.copyToEntity(renderEntity, true)
             shouldOverride = false
-            cameraEntity.noClip = oldNoClip
+            renderEntity.noClip = oldNoClip
         }
     }
 
@@ -207,6 +205,11 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
         freeCamPosition.yaw = MathHelper.wrapAngleTo180_float(((yaw * 0.15f) + freeCamPosition.yaw))
         freeCamPosition.pitch = MathHelper.clamp_float((freeCamPosition.pitch - pitch * 0.15f), -90f, 90f)
         lookVec = RotationUtils.yawAndPitchVector(freeCamPosition.yaw, freeCamPosition.pitch).toMutableVec3()
-
     }
+
+    private var eyePositionWithPartialTicks = Vec3(0.0, 0.0, 0.0)
+    fun getPlayerPositionVec(): Vec3 {
+        return eyePositionWithPartialTicks
+    }
+
 }

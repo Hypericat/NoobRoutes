@@ -33,9 +33,11 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
     private val rangeDropDown by DropdownSetting("Range Settings")
     private val chestRange by NumberSetting("Range", 6.2, 4.0, 6.5, 0.1, description = "Range for Blocks inside dungeons.").withDependency { rangeDropDown }
     private val essenceRange by NumberSetting("Skull Range", 4.5, 2.0, 5.0, 0.1, description = "Range for Skulls inside dungeons.").withDependency { rangeDropDown }
-    private val swapOn by SelectorSetting("Swap On", "Skulls", options = arrayListOf("None", "Skulls", "All"), description = "Swaps")
-    private val swapTo by NumberSetting("Swap Slot", 1, 1, 9, 1, description = "The hotbar slot that the Secret Aura swaps to on click.").withDependency { swapOn != "None" }
-    private val swapBack by BooleanSetting("Swap Back", description = "Determines whether the Secret Aura swaps back to the original slot after clicking").withDependency { swapOn != "None" }
+    
+    private val swapSettings by DropdownSetting("Swap Settings")
+    private val swapOn by SelectorSetting("Swap On", "Skulls", options = arrayListOf("None", "Skulls", "All"), description = "Swaps").withDependency { swapSettings }
+    private val swapTo by NumberSetting("Swap Slot", 1, 1, 9, 1, description = "The hotbar slot that the Secret Aura swaps to on click.").withDependency { swapOn != "None" && swapSettings }
+    private val swapBack by BooleanSetting("Swap Back", description = "Determines whether the Secret Aura swaps back to the original slot after clicking").withDependency { swapOn != "None" && swapSettings }
     private val roomDropDown by DropdownSetting("Room Blacklist")
     private val blaze by BooleanSetting("Blaze").withDependency { roomDropDown }
     private val creeperBeams by BooleanSetting("Creeper Beams").withDependency { roomDropDown }
@@ -46,6 +48,8 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
     private val iceFill by BooleanSetting("Ice Fill").withDependency { roomDropDown }
     private val tpMaze by BooleanSetting("Tp Maze").withDependency { roomDropDown }
     private val ticTacToe by BooleanSetting("Tic Tac Toe").withDependency { roomDropDown }
+
+
 
     private const val REDSTONE_KEY_ID = "fed95410-aba1-39df-9b95-1d4f361eb66e"
     private const val WITHER_ESSENCE_ID = "e0f3e929-869e-3dca-9504-54c666ee6f23"

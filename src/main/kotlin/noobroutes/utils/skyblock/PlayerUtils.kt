@@ -10,8 +10,10 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
+import noobroutes.features.render.FreeCam
 import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.PacketUtils
+import noobroutes.utils.render.RenderUtils.renderVec
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -22,6 +24,14 @@ object PlayerUtils {
     const val STAND_EYE_HEIGHT = 1.6200000047683716
     const val SNEAK_EYE_HEIGHT = 1.5399999618530273
     const val SNEAK_HEIGHT_INVERTED = 0.0800000429153443
+
+    fun getEffectiveViewPosition(): Vec3 {
+        return if (FreeCam.enabled) {
+            FreeCam.getPlayerPositionVec().subtract(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0)
+        } else {
+            mc.thePlayer.renderVec
+        }
+    }
 
     /**
      * Plays a sound at a specified volume and pitch, bypassing the default volume setting.
