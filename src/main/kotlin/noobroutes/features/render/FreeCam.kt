@@ -170,6 +170,10 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
             playerPosition.copyToEntity(renderEntity, true)
             shouldOverride = false
             renderEntity.noClip = oldNoClip
+            setPosition?.let {
+                mc.thePlayer.setPosition(it.xCoord, it.yCoord, it.zCoord)
+                setPosition = null
+            }
         }
     }
 
@@ -199,6 +203,11 @@ object FreeCam : Module("Free Cam", description = "FME free cam", category = Cat
 
     fun shouldOverrideSpectator(player: AbstractClientPlayer): Boolean {
         return player == mc.renderViewEntity && shouldOverride && !renderingEntities
+    }
+
+    var setPosition: Vec3? = null
+    fun setPosition(x: Double, y: Double, z: Double){
+        setPosition = Vec3(x, y, z)
     }
 
     fun setAngles(yaw: Float, pitch: Float) {

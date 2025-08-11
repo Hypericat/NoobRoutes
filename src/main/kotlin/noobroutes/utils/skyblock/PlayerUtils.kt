@@ -149,13 +149,19 @@ object PlayerUtils {
 
     inline val playerControlsKeycodes get() = keyBindings.map { it.keyCode}
 
-    fun unPressKeys() {
+    fun unPressKeys(excludeSpace: Boolean = false) {
         Keyboard.enableRepeatEvents(false)
-        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, false) }
+        keyBindings.forEach {
+            if (excludeSpace && it.keyCode == mc.gameSettings.keyBindJump.keyCode) return@forEach
+            KeyBinding.setKeyBindState(it.keyCode, false)
+        }
     }
 
-    fun rePressKeys() {
-        keyBindings.forEach { KeyBinding.setKeyBindState(it.keyCode, Keyboard.isKeyDown(it.keyCode)) }
+    fun rePressKeys(excludeSpace: Boolean = false) {
+        keyBindings.forEach {
+            if (excludeSpace && it.keyCode == mc.gameSettings.keyBindJump.keyCode) return@forEach
+            KeyBinding.setKeyBindState(it.keyCode, Keyboard.isKeyDown(it.keyCode))
+        }
     }
 
     val gameSpeedAccessor = mc as TimerFieldAccessor

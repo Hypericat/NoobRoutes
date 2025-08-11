@@ -17,7 +17,7 @@ import noobroutes.utils.Utils.lastPlayerSpeed
 import noobroutes.utils.toBlockPos
 import org.lwjgl.input.Keyboard
 
-@DevOnly
+
 object BarPhase: Module(
     name = "Bar Phase",
     Keyboard.KEY_NONE,

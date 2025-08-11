@@ -65,13 +65,13 @@ object HClip: Module(
         if (mc.thePlayer == null) return
         mc.thePlayer.motionX = 0.0
         mc.thePlayer.motionZ = 0.0
-        PlayerUtils.unPressKeys()
+        PlayerUtils.unPressKeys(true)
         Scheduler.scheduleC03Task {
             val speed = PlayerUtils.getPlayerWalkSpeed() * 2.806
             val renderEntity = mc.renderViewEntity
             mc.thePlayer.motionX = speed * Utils.xPart(renderEntity.rotationYawHead + yawChange())
             mc.thePlayer.motionZ = speed * Utils.zPart(renderEntity.rotationYawHead + yawChange())
-            PlayerUtils.rePressKeys()
+            PlayerUtils.rePressKeys(true)
         }
         if (!shouldSpam) toggle()
     }

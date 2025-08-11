@@ -24,6 +24,7 @@ import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
 import noobroutes.features.floor7.autop3.rings.HClipRing
 import noobroutes.features.floor7.autop3.rings.LavaClipRing
+import noobroutes.features.render.FreeCam
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.ColorPalette
@@ -170,7 +171,6 @@ object AutoP3: Module (
     @SubscribeEvent
     fun onFrameRing(event: RenderWorldLastEvent) {
         if (!inF7Boss || editMode || movementPackets.isNotEmpty() || mc.thePlayer.isSneaking || !onFrame) return
-        logger.info(PlayerUtils.getEffectiveViewPosition())
         handleRings(PlayerUtils.getEffectiveViewPosition())
     }
 
@@ -336,14 +336,22 @@ object AutoP3: Module (
         }
         event.isCanceled = true
         blinkMovementPacketSkip = true
-        PacketUtils.sendPacket(movementPackets[0])
+        val movePacket = movementPackets[0]
+        PacketUtils.sendPacket(movePacket)
 
-        if (!AutoP3.movementMode) mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)
+        if (!this.movementMode) setPos(movePacket.positionX, movePacket.positionY, movePacket.positionZ)
         if (movementPackets.size == 1) {
             mc.thePlayer.motionY = endY
-            mc.thePlayer.setPosition(movementPackets[0].positionX, movementPackets[0].positionY, movementPackets[0].positionZ)
+            setPos(movePacket.positionX, movePacket.positionY, movePacket.positionZ)
         }
         lastMovementedC03 = movementPackets.removeFirst()
+    }
+
+    private fun setPos(x: Double, y: Double, z: Double){
+        if (FreeCam.enabled) {
+            FreeCam.setPosition(x, y, z)
+        }
+        mc.thePlayer.setPosition(x, y, z)
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

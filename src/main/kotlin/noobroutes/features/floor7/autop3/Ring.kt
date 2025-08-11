@@ -5,6 +5,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.rings.BlinkRing
+import noobroutes.features.render.FreeCam
 import noobroutes.utils.*
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
@@ -186,7 +187,7 @@ abstract class Ring(
     protected fun center() {
         PlayerUtils.stopVelocity()
         mc.thePlayer.isSprinting = false
-        PlayerUtils.unPressKeys()
+        if (!FreeCam.enabled) PlayerUtils.unPressKeys()
         AutoP3MovementHandler.resetShit()
 
         Scheduler.schedulePostMoveEntityWithHeadingTask {
