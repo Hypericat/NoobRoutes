@@ -48,8 +48,9 @@ object LeverAura: Module(
         val eyePos = mc.thePlayer.getPositionEyes(0f)
 
         for (lever in levers) {
-            if (eyePos.distanceTo(lever.coords.toVec3()) > range) continue
+            if (eyePos.distanceTo(lever.coords.toVec3(0.5, 0.5, 0.5)) > range) continue
             if (System.currentTimeMillis() - lever.lastClick < cooldown * 1000) continue
+
             AuraManager.clickBlock(AuraManager.BlockAura(lever.coords, false) {})
             lever.lastClick = System.currentTimeMillis()
             return
