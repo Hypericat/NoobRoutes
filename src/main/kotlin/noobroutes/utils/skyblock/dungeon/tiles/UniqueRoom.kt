@@ -3,6 +3,7 @@ package noobroutes.utils.skyblock.dungeon.tiles
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
+import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.events.impl.BloodRoomSpawnEvent
 import noobroutes.utils.Vec2i
@@ -48,6 +49,19 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
         }
         calculateCenter()
     }
+
+    // Make sure current room != null
+    public fun contains(pos: Vec3): Boolean {
+        if (this.roomComponents.none {
+                pos.xCoord <= it.first.x + 16.5 &&
+                        pos.xCoord >= it.first.x - 16.5 &&
+                        pos.zCoord <= it.first.z + 16.5 &&
+                        pos.zCoord >= it.first.z - 16.5
+            }) return false;
+        return true;
+    }
+
+
     private fun addToTiles(x: Int, y: Int, tile: Room) {
         if (mainRoom.data.name == "Unknown") {
             if (tile.data.name != "Unknown") {
