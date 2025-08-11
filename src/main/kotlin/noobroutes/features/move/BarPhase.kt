@@ -34,15 +34,15 @@ object BarPhase: Module(
 
 
     @SubscribeEvent
-    fun doShit(event: MoveEntityWithHeadingEvent) {
+    fun doShit(event: MoveEntityWithHeadingEvent.Post) {
         if (mc.thePlayer == null || !mc.thePlayer.onGround || mc.thePlayer.isSneaking) return
+
         if (skip) {
             skip = false
             return
         }
+
         val playerPosVector = mc.thePlayer.positionVector.toBlockPos()
-
-
         if (
             mc.theWorld.getBlockState(playerPosVector.up()).block != Blocks.iron_bars &&
             (mc.theWorld.getBlockState(playerPosVector).block != Blocks.iron_bars || mc.theWorld.isAirBlock(playerPosVector.up(2)))
@@ -51,10 +51,8 @@ object BarPhase: Module(
         val decX = getDecimal(mc.thePlayer.posX)
         val decZ = getDecimal(mc.thePlayer.posZ)
 
-
         var xOffset = 0
         var zOffset = 0
-
         when {
             Utils.isClose(decX, COLLIDED_WITH_IRON_BAR_DECIMAL_LOW) -> xOffset++
             Utils.isClose(decX, COLLIDED_WITH_IRON_BAR_DECIMAL_HIGH) -> xOffset--
@@ -82,7 +80,8 @@ object BarPhase: Module(
             if (mc.theWorld.getBlockState(it).block == Blocks.iron_bars) mc.theWorld.setBlockToAir(it)
         }
 
-        changePos(mc.thePlayer.posX + xOffset * 0.0625, mc.thePlayer.posZ + zOffset * 0.0625)
+        xToChange = mc.thePlayer.posX + xOffset * 0.0624
+        zToChange = mc.thePlayer.posZ + zOffset * 0.0624
 
         mc.thePlayer.setPosition(lastPlayerPos.xCoord, lastPlayerPos.yCoord, lastPlayerPos.zCoord)
         mc.thePlayer.setVelocity(lastPlayerSpeed.xCoord, lastPlayerSpeed.yCoord, lastPlayerSpeed.zCoord)
@@ -98,11 +97,6 @@ object BarPhase: Module(
         var decimal = number - number.toInt()
         if (decimal < 0) decimal = 1 + decimal
         return decimal
-    }
-
-    private fun changePos(x: Double, z: Double) {
-        xToChange = x
-        zToChange = z
     }
 
     @SubscribeEvent
