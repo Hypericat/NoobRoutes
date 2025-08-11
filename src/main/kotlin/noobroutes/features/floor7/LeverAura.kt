@@ -22,10 +22,10 @@ object LeverAura: Module(
     class Lever (val coords: BlockPos, var lastClick: Long)
 
     private val range by NumberSetting(name = "range", description = "how much reach the aura should have", min = 5f, max = 6.5f, default = 6f, increment = 0.1f)
-    private val cooldown by NumberSetting(name = "cooldown", description = "how long to wait beetween presses", min = 0.1, max = 20, default = 10, unit = "s", increment = 0.1)
+    private val cooldown by NumberSetting(name = "cooldown", description = "how long to wait between presses", min = 0.1, max = 20, default = 10, unit = "s", increment = 0.1)
 
 
-    private val levers = listOf<Lever>(
+    private val levers = listOf(
         Lever(BlockPos(106, 124, 113), System.currentTimeMillis()),
         Lever(BlockPos(94, 124, 113), System.currentTimeMillis()),
         Lever(BlockPos(23, 132, 138), System.currentTimeMillis()),
@@ -40,7 +40,6 @@ object LeverAura: Module(
         Lever(BlockPos(60, 134, 142), System.currentTimeMillis()),
         Lever(BlockPos(58, 136, 142), System.currentTimeMillis()),
         Lever(BlockPos(58, 133, 142), System.currentTimeMillis())
-
     )
 
     @SubscribeEvent

@@ -28,7 +28,7 @@ object WaterBoard : Module("WaterBoard", Keyboard.KEY_NONE, Category.DUNGEON, de
     private val silent by BooleanSetting("Silent", description = "use silent roations")
 
     init {
-        val isr = WaterBoard::class.java.getResourceAsStream("/waterSolutions.json")?.let { InputStreamReader(it, StandardCharsets.UTF_8) }
+        val isr = WaterBoard::class.java.getResourceAsStream("/waterSolution.json")?.let { InputStreamReader(it, StandardCharsets.UTF_8) }
         waterSolutions = JsonParser().parse(isr).asJsonObject
         execute(500) {
             if (enabled) scan(true)

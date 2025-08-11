@@ -8,6 +8,8 @@ import net.minecraft.block.BlockSkull
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
@@ -73,6 +75,14 @@ fun getBlockPosWithinAABB(aabb: AxisAlignedBB) : List<BlockPos> {
     }
     return blocks;
 }
+
+fun getSBMaxHealth(entity: EntityLivingBase?): Float {
+    if (entity == null) return -1f
+
+    val attribute = entity.getEntityAttribute(SharedMonsterAttributes.maxHealth) ?: return -1f
+    return attribute.baseValue.toFloat()
+}
+
 
 // Skidded from odin
 fun getMobEntity(armorStand: EntityArmorStand): Entity? {
