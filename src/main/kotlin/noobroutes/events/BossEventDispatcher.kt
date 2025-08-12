@@ -86,6 +86,7 @@ object BossEventDispatcher {
             }
             "[BOSS] Necron: All this, for nothing..." -> {
                 BossEvent.PhaseChange(DungeonUtils.floor, Phase.P5)
+                currentBossPhase = Phase.P5
             }
         }
         if (necronStartRegex.matchEntire(event.message)?.groupValues != null) {
