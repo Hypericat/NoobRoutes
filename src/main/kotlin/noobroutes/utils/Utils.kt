@@ -1,3 +1,4 @@
+
 package noobroutes.utils
 
 import net.minecraft.block.state.IBlockState
@@ -106,9 +107,6 @@ object Utils {
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣦⣤⣤⣤⣶⣦⣿⣿⣶⣾⣿⣥⣤⣤⣬⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
     )
 
-    private const val DEV_STRING = "@DEV_MODE@"
-    private const val PROD_STRING = "@PROD@"
-
     fun testFunctions(args: Array<out String>) {
         if (args.size < 2) {
             modMessage("Test: rel, relp")
@@ -126,12 +124,6 @@ object Utils {
                 val pos = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector) ?: return
                 GuiScreen.setClipboardString("Vec3(${pos.xCoord}, ${pos.yCoord}, ${pos.zCoord})")
                 modMessage(pos)
-            }
-
-            "dev" -> {
-                modMessage(DEV_STRING)
-                modMessage(PROD_STRING)
-
             }
 
             else -> {

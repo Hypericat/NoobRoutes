@@ -94,7 +94,7 @@ object BossEventDispatcher {
             currentBossPhase = Phase.P4
             currentTerminalPhase = TerminalPhase.Unknown
         }
-        if (event.message.contains("Defeated Maxor, Storm, Goldor, and Necron in.")) {
+        if (event.message.contains("Defeated Maxor, Storm, Goldor, and Necron in")) {
             currentBossPhase = Phase.Unknown
             currentTerminalPhase = TerminalPhase.Unknown
             BossEvent.BossFinish(DungeonUtils.floor).postAndCatch()
