@@ -84,6 +84,9 @@ object BossEventDispatcher {
                 BossEvent.TerminalPhaseChange(DungeonUtils.floor, TerminalPhase.GoldorFight).postAndCatch()
                 currentTerminalPhase = TerminalPhase.GoldorFight
             }
+            "[BOSS] Necron: All this, for nothing..." -> {
+                BossEvent.PhaseChange(DungeonUtils.floor, Phase.P5)
+            }
         }
         if (necronStartRegex.matchEntire(event.message)?.groupValues != null) {
             BossEvent.PhaseChange(DungeonUtils.floor, Phase.P4).postAndCatch()
