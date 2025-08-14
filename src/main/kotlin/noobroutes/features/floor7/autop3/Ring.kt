@@ -13,9 +13,11 @@ import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.SyncData
 import noobroutes.utils.json.syncdata.*
 import noobroutes.utils.render.Color
+import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
+import java.awt.Stroke
 
 
 data class RingBase(
@@ -149,7 +151,43 @@ abstract class Ring(
     }
 
 
-    fun renderRing(color: Color) {
+    fun renderRing(color: Color, renderMode: String) {
+        if (renderMode.hashCode() == "BBG".hashCode()) {
+            renderBBGRing(color)
+            return
+        }
+        renderBoxRing(color)
+    }
+
+    private fun renderBBGRing(color: Color) {
+        val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
+        var dDia = diameter.toDouble();
+        var offset = offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5);
+
+        val vertices = listOf(offset, offset.add(dDia, 0.0, 0.0), offset.add(dDia, 0.0, dDia), offset.add(0.0, 0.0, dDia), offset);
+        RenderUtils.drawLines(vertices, color, 6f, true)
+        RenderUtils.drawFilledVertices(vertices.subList(0, 4), color.withAlpha(0.333f), 6f, true)
+
+        dDia *= 0.8;
+        offset = offsetCoords.subtract(dDia * 0.5, -0.02, dDia * 0.5)
+        RenderUtils.drawLines(listOf(offset, offset.add(dDia, 0.0, 0.0), offset.add(dDia, 0.0, dDia), offset.add(0.0, 0.0, dDia), offset), color, 4f, true)
+
+        Renderer.drawStringInWorld(this.ringName, this.coords.add(Vec3(0.0, 0.3, 0.0)), Color.DARK_GRAY, depth = false, shadow = true, scale = 0.022f)
+
+        if (this.renderYawVector) Renderer.draw3DLine(
+            listOf(
+                this.coords.add(0.0, PlayerUtils.STAND_EYE_HEIGHT, 0.0),
+                Vec3(this.yaw.xPart, 0.0, this.yaw.zPart).multiply(1.8).add(
+                    this.coords.xCoord,
+                    this.coords.yCoord + PlayerUtils.STAND_EYE_HEIGHT,
+                    this.coords.zCoord
+                )
+            ),
+            color
+        )
+    }
+
+    private fun renderBoxRing(color: Color) {
         val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
         RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), color, thickness = 3, depth = true)
         if (this.renderYawVector) Renderer.draw3DLine(

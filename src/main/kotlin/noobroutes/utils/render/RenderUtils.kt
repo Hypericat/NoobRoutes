@@ -198,6 +198,34 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
+    /**
+     *
+     * @param points The vertices to fill.
+     * @param color The color to use for drawing.
+     * @param thickness The thickness of the outline.
+     * @param depth Whether to enable depth testing.
+     */
+    fun drawFilledVertices(points: Collection<Vec3>, color: Color, thickness: Number = 3f, depth: Boolean = false, smoothLines: Boolean = true) {
+        if (color.isTransparent) return
+
+        GlStateManager.pushMatrix()
+        GlStateManager.disableCull()
+        preDraw()
+        depth(depth)
+        color.bind()
+        worldRenderer {
+            begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_NORMAL)
+            for (point in points) {
+                addVertex(point.xCoord, point.yCoord, point.zCoord, 0.0f, -1.0f, 0.0f)
+            }
+        }
+        tessellator.draw();
+        if (!depth) resetDepth()
+        postDraw()
+        GlStateManager.enableCull()
+        GlStateManager.popMatrix()
+    }
+
     fun drawLines(points: Collection<Vec3>, color: Color, lineWidth: Float, depth: Boolean) {
         if (points.size < 2) return
 

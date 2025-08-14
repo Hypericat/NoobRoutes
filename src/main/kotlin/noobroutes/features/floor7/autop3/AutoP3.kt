@@ -42,6 +42,7 @@ import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import java.util.*
+import kotlin.collections.ArrayList
 
 @Suppress("Unused")
 object AutoP3: Module (
@@ -92,6 +93,8 @@ object AutoP3: Module (
     private val resetAmount by NumberSetting(name = "clear amount", description = "delete packets periodically", min = 1, max = 400, default = 50).withDependency { x_y0uMode && blinkShit }
     private val nonSilentRotates by BooleanSetting("Non-Silent look", description = "Makes it so rings with the rotate argument rotate client side.")
 
+    private val renderMode by SelectorSetting("Render Mode", "Box", arrayListOf("Box", "BBG"), description = "Ring render type")
+
 
     var waitingRing: Ring? = null
 
@@ -138,7 +141,7 @@ object AutoP3: Module (
         if (!inF7Boss) return
 
         rings[route]?.forEachIndexed { i, ring ->
-            ring.renderRing(ringColor)
+            ring.renderRing(ringColor, renderMode)
 
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), ringColor, depth = true, shadow = false)
 
@@ -149,7 +152,7 @@ object AutoP3: Module (
             RenderUtils.drawGradient3DLine(ring.packets.map { Vec3(it.positionX, it.positionY + 0.03, it.positionZ) }, ringColor, Color.RED, 1F, true)
         }
 
-        activeBlinkWaypoint?.renderRing(Color.WHITE)
+        activeBlinkWaypoint?.renderRing(Color.WHITE, renderMode)
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
