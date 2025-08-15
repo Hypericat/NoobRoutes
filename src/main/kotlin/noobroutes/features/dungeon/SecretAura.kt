@@ -25,6 +25,7 @@ import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.utils.*
 import noobroutes.utils.Utils.isNotStart
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 
 
@@ -33,6 +34,7 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
     private val rangeDropDown by DropdownSetting("Range Settings")
     private val chestRange by NumberSetting("Range", 6.2, 4.0, 6.5, 0.1, description = "Range for Blocks inside dungeons.").withDependency { rangeDropDown }
     private val essenceRange by NumberSetting("Skull Range", 4.5, 2.0, 5.0, 0.1, description = "Range for Skulls inside dungeons.").withDependency { rangeDropDown }
+    private val clickDelay by NumberSetting("Click Delay", 150, 100, 4000,50, description = "Delay before clicking a block.")
     
     private val swapSettings by DropdownSetting("Swap Settings")
     private val swapOn by SelectorSetting("Swap On", "Skulls", options = arrayListOf("None", "Skulls", "All"), description = "Swaps").withDependency { swapSettings }
@@ -110,13 +112,17 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
 
         for (pos in getBlockPosWithinAABB(box)) {
             if (blocksDone.contains(pos)) continue
-            val lastClickTime = clickedBlocks[pos]
-            if (lastClickTime != null && lastClickTime + 500 > System.currentTimeMillis()) continue
-
-
-
             val currentBlock = mc.theWorld.getBlockState(pos).block
             if (!isValidBlock(currentBlock, pos)) continue
+
+            val nextClickTime = clickedBlocks[pos]
+            if (clickDelay > 0 && nextClickTime == null) {
+                clickedBlocks[pos] = System.currentTimeMillis() + clickDelay;
+                continue
+            }
+
+            if (nextClickTime != null && nextClickTime > System.currentTimeMillis()) continue
+
             val currentDistanceSq = eyePos.squareDistanceTo(Vec3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5))
 
             if ((currentBlock == Blocks.skull && currentDistanceSq > sqEssence) || currentDistanceSq > sqChest) continue
@@ -149,7 +155,7 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
         }
 
 
-        clickedBlocks[blockCandidate.pos] = System.currentTimeMillis()
+        clickedBlocks[blockCandidate.pos] = System.currentTimeMillis() + 500 // Click delay
         AuraManager.auraBlock(blockCandidate.pos)
     }
 
