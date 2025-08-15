@@ -47,6 +47,8 @@ class NoobRoutes {
             //EtherwarpTestCommand(),
             AutoRouteCommand(),
             DynamicRouteCommand(),
+            LookCommand(),
+            CenterCommand(),
             YawPitchCommand(),
             BrushCommand()
         ).forEach {

@@ -63,7 +63,7 @@ object AutoP3: Module (
     private val recentActionStack = Stack<EditRingAction>()
     private val recentUndoActionStack = Stack<EditRingAction>()
 
-    val route by StringSetting("Route", "", description = "Route to use")
+    var route by StringSetting("Route", "", description = "Route to use")
     private val ringColor by ColorSetting("Ring Color", Color.GREEN, false, description = "color of the rings")
     private val onFrame by BooleanSetting("Check on frame", description = "Checks on frame if you are in a ring. Use if you are lazy.")
 
