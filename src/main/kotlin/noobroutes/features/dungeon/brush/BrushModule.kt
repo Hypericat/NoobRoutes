@@ -240,9 +240,12 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
 
             val blockList = getBlockList(room)
             val pos = room?.getRelativeCoords(target) ?: target
-            removeBlockFromChunk(pos)
-            setBlock(pos, IBlockStateUtils.airIBlockState)
-            addBlockToChunk(pos, IBlockStateUtils.airIBlockState)
+            removeBlockFromChunk(target)
+            setBlock(target, IBlockStateUtils.airIBlockState)
+            val removed = blockList.removeFirstOrNull { it.second == pos } != null
+            if (removed) removed
+
+            addBlockToChunk(target, IBlockStateUtils.airIBlockState)
             blockList.add(IBlockStateUtils.airIBlockState to pos)
             return
         }

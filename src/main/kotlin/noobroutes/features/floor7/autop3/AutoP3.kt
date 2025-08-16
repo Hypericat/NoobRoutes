@@ -177,7 +177,7 @@ object AutoP3: Module (
     }
 
 
-    private fun handleRings(pos: Vec3) {
+    fun handleRings(pos: Vec3) {
         val ringList = rings[route] ?: return
         for (ring in ringList) {
             if (ring.inRing(pos)) {

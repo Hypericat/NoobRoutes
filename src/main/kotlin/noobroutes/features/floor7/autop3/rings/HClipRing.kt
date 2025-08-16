@@ -21,6 +21,7 @@ class HClipRing(
 
     init {
         addBoolean("walk", {walk}, {walk = it})
+        addBoolean("Insta", {insta}, {insta = it})
     }
 
     override fun doRing() {

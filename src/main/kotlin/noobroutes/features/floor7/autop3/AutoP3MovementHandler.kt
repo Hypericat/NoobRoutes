@@ -71,7 +71,6 @@ object AutoP3MovementHandler {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun doMotioning(event: MoveEntityWithHeadingEvent.Pre) {
         if (direction == null || motionTicks == -1) return;
-        modMessage(motionTicks)
         doMotionTick();
         motionTicks++
 
