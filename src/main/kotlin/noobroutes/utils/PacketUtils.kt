@@ -20,13 +20,11 @@ object PacketUtils {
         lastResponse = packet as C03PacketPlayer.C06PacketPlayerPosLook;
     }
 
-
     fun C03PacketPlayer.C06PacketPlayerPosLook.matches(s08: S08PacketPlayerPosLook): Boolean {
         return s08.x == this.positionX && s08.y == this.positionY && s08.z == this.positionZ && angleMatches(s08.yaw, this.yaw) && angleMatches(s08.pitch, this.pitch)
     }
 
     fun C03PacketPlayer.C06PacketPlayerPosLook.isResponseToLastS08(): Boolean {
-       // logger.info("last: ${System.identityHashCode(lastResponse)} | current: ${System.identityHashCode(this)}")
         return lastResponse === this
     }
 
@@ -40,9 +38,5 @@ object PacketUtils {
 
     private fun angleMatches(s08Angle: Float, n2: Float, tolerance: Double = 1e-4): Boolean {
         return kotlin.math.abs(s08Angle - n2) < tolerance || s08Angle == 0f
-    }
-
-    fun C03PacketPlayer.C06PacketPlayerPosLook.matches(c06: C03PacketPlayer.C06PacketPlayerPosLook): Boolean{
-        return this.positionX == c06.positionX
     }
 }

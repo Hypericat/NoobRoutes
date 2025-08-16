@@ -173,9 +173,7 @@ object BlockUtils {
     fun getAABB(block: BlockPos): AxisAlignedBB? {
         val blockState = mc.theWorld.getBlockState(block)
         return when (blockState.block) {
-            Blocks.chest -> AxisAlignedBB(0.0625, 0.0, 0.0625, 0.9375, 0.875, 0.9375)
-            Blocks.trapped_chest -> AxisAlignedBB(0.0625, 0.0, 0.0625, 0.9375, 0.875, 0.9375)
-            Blocks.ender_chest -> AxisAlignedBB(0.0625, 0.0, 0.0625, 0.9375, 0.875, 0.9375)
+            Blocks.chest, Blocks.trapped_chest, Blocks.ender_chest -> AxisAlignedBB(0.0625, 0.0, 0.0625, 0.9375, 0.875, 0.9375)
             Blocks.lever -> {
                 val orientation = blockState.properties[BlockLever.FACING] as EnumOrientation
                 when(orientation) {

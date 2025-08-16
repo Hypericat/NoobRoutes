@@ -2,6 +2,7 @@ package noobroutes.mixin.player;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import noobroutes.events.impl.MovePlayerEvent;
 import noobroutes.features.render.FreeCam;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -9,6 +10,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static noobroutes.utils.UtilsKt.postAndCatch;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity {
@@ -21,5 +24,11 @@ public abstract class MixinEntity {
             FreeCam.INSTANCE.setAngles(yaw, pitch);
             ci.cancel();
         }
+    }
+
+    @Inject(method = "moveEntity", at = @At("HEAD"), cancellable = true)
+    public void noobRoutes$moveEntity(double x, double y, double z, CallbackInfo ci){
+        if (noobRoutes$mc.thePlayer == null || this.entityId != noobRoutes$mc.thePlayer.getEntityId()) return;
+        if (postAndCatch(new MovePlayerEvent())) ci.cancel();
     }
 }

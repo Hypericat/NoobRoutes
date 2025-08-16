@@ -17,7 +17,6 @@ import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
-import java.awt.Stroke
 
 
 data class RingBase(
@@ -228,7 +227,7 @@ abstract class Ring(
         if (!FreeCam.enabled) PlayerUtils.unPressKeys()
         AutoP3MovementHandler.resetShit()
 
-        Scheduler.schedulePostMoveEntityWithHeadingTask {
+        Scheduler.scheduleHighestPostMoveEntityWithHeadingTask {
             PlayerUtils.setPosition(coords.xCoord, coords.zCoord)
             if (isAwait) await() else maybeDoRing()
         }

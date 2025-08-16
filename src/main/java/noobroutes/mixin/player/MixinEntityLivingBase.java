@@ -45,21 +45,23 @@ public abstract class MixinEntityLivingBase {
     @Inject(
             method = {"moveEntityWithHeading"},
             at = @At("HEAD"),
-            require = 0
+            require = 0,
+            cancellable = true
     )
     private void noobRoutes$onMoveEntityWithHeadingPre$noobroutes(float strafe, float forward, CallbackInfo ci) {
         if ((Object) this instanceof EntityPlayerSP) {
-            postAndCatch(new MoveEntityWithHeadingEvent.Pre());
+            if (postAndCatch(new MoveEntityWithHeadingEvent.Pre())) ci.cancel();
         }
     }
     @Inject(
             method = {"moveEntityWithHeading"},
             at = @At("TAIL"),
-            require = 0
+            require = 0,
+            cancellable = true
     )
     private void noobRoutes$onMoveEntityWithHeadingPost$noobroutes(float strafe, float forward, CallbackInfo ci) {
         if ((Object) this instanceof EntityPlayerSP) {
-            postAndCatch(new MoveEntityWithHeadingEvent.Post());
+            if (postAndCatch(new MoveEntityWithHeadingEvent.Post())) ci.cancel();
         }
     }
 

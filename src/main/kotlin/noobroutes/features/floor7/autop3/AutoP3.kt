@@ -42,7 +42,6 @@ import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Suppress("Unused")
 object AutoP3: Module (
@@ -236,7 +235,7 @@ object AutoP3: Module (
             }
             modMessage("everyone leaped")
 
-            Scheduler.schedulePostMoveEntityWithHeadingTask {
+            Scheduler.scheduleHighestPostMoveEntityWithHeadingTask {
                 ring.maybeDoRing()
                 waitingRing = null
             }
@@ -261,7 +260,7 @@ object AutoP3: Module (
             if (!ring.term) return
 
             if (ring.inRing()) {
-                Scheduler.schedulePostMoveEntityWithHeadingTask{
+                Scheduler.scheduleHighestPostMoveEntityWithHeadingTask{
                     ring.maybeDoRing()
                     waitingRing = null
                 }
@@ -276,7 +275,7 @@ object AutoP3: Module (
 
         waitingRing?.let { ring ->
             if (ring.inRing()) {
-                Scheduler.schedulePostMoveEntityWithHeadingTask{
+                Scheduler.scheduleHighestPostMoveEntityWithHeadingTask{
                     ring.maybeDoRing()
                     waitingRing = null
                 }
