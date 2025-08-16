@@ -19,7 +19,8 @@
     "render.MixinEntityRenderer",
     "render.MixinItemRenderer",
     "render.MixinRenderGlobal",
-    "render.MixinRenderManager"
+    "render.MixinRenderManager",
+    "accessors.C08Accessor"
   ],
   "client": [
     "MixinNetHandlerPlayClient",

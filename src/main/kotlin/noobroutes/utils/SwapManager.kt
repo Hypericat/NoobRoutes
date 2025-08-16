@@ -1,12 +1,15 @@
 package noobroutes.utils
 
 import net.minecraft.item.ItemStack
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C09PacketHeldItemChange
+import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
+import noobroutes.mixin.accessors.C08Accessor
 import noobroutes.utils.Utils.ID
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.devMessage
@@ -16,24 +19,54 @@ import noobroutes.utils.skyblock.unformattedName
 
 
 /**
- * Modified CGA code
+ * No longer modified CGA code
  * Thank you CGA for ratting Lux
  */
 object SwapManager {
-    var recentlySwapped = false
+    var serverSlot = -1
 
-    enum class SwapState{
-        SWAPPED, ALREADY_HELD, TOO_FAST, UNKNOWN
+    private var dontSwap = true
+
+    private inline val serverItem: ItemStack
+        get() = mc.thePlayer.inventory.mainInventory[serverSlot]
+
+    @SubscribeEvent
+    fun adjustServer(event: PacketEvent.Send) {
+        if (event.packet !is C09PacketHeldItemChange) return
+
+        if (event.packet.slotId == serverSlot) {
+            event.isCanceled = true
+            return
+        }
+
+        if (dontSwap) {
+            event.isCanceled = true
+            mc.thePlayer.inventory.currentItem = serverSlot
+            devMessage("prevented 0 tick")
+            return
+        }
+
+        serverSlot = event.packet.slotId
     }
 
     @SubscribeEvent
-    fun onPacket(event: PacketEvent.Send){
-        if (event.packet is C09PacketHeldItemChange) recentlySwapped = true
+    fun onC08(event: PacketEvent.Send) {
+        if (event.packet !is C08PacketPlayerBlockPlacement) return
+        dontSwap = true
+
+        if (event.packet.stack == null && event.packet.position == BlockPos(-1, -1, -1)) event.isCanceled = true
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTickEnd(event: TickEvent.ClientTickEvent){
-        if (event.isEnd) recentlySwapped = false
+    fun onTickEnd(event: TickEvent.ClientTickEvent) {
+        if (event.isEnd) {
+            dontSwap = false
+            return
+        }
+    }
+
+    enum class SwapState{
+        SWAPPED, ALREADY_HELD, TOO_FAST, UNKNOWN
     }
 
     fun getItemSlot(item: String, ignoreCase: Boolean = true): Int? =
@@ -72,7 +105,7 @@ object SwapManager {
 
     fun swapToSlot(slot: Int): SwapState {
         return if (mc.thePlayer.inventory.currentItem != slot) {
-            if (recentlySwapped) {
+            if (dontSwap) {
                 modMessage("Error Swapping")
                 SwapState.TOO_FAST
             } else {
@@ -90,7 +123,7 @@ object SwapManager {
             if (!predicate(stack)) continue
             return when {
                 mc.thePlayer.inventory.currentItem == i -> SwapState.ALREADY_HELD
-                recentlySwapped -> {
+                dontSwap -> {
                     modMessage("Tried to 0 tick swap ${stack.displayName ?: stack.skyblockID}")
                     SwapState.TOO_FAST
                 }
@@ -104,8 +137,12 @@ object SwapManager {
         return null
     }
 
-    private fun performSwap(slot: Int) {
-        recentlySwapped = true
+    fun performSwap(slot: Int) {
+        if (slot !in 0..8) return modMessage("not a good index to swap to")
+        //if (dontSwap) return modMessage("tried to 0 tick swap")
+        if (mc.thePlayer.inventory.currentItem == slot) return
+
         mc.thePlayer.inventory.currentItem = slot
+        mc.netHandler.addToSendQueue(C09PacketHeldItemChange(slot))
     }
 }

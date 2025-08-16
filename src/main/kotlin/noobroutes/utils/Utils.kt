@@ -33,6 +33,8 @@ import noobroutes.IS23
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.withAlpha
+import noobroutes.utils.routes.RouteUtils
+import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
@@ -126,10 +128,34 @@ object Utils {
                 modMessage(pos)
             }
 
+            /*"swap" -> {
+                if (args.size < 3) return
+                val slot = args[2].toIntOrNull() ?: return modMessage("no int")
+                SwapManager.performSwap(slot)
+            }
+
+            "swaptest" -> {
+                repeat(60) { Scheduler.schedulePreTickTask(it) { swapToRandom() }}
+                repeat(60) { Scheduler.schedulePreTickTask(it) { swapToRandom() }}
+                repeat(60) { Scheduler.schedulePreTickTask(it) { PlayerUtils.airClick() } }
+                repeat(60) { Scheduler.schedulePreTickTask(it) { swapToRandom() }}
+            }
+
+            "zerotest" -> {
+                SwapManager.performSwap(3)
+                PlayerUtils.airClick()
+                SwapManager.performSwap(7)
+            }*/
+
             else -> {
                 modMessage("All tests passed")
             }
         }
+    }
+
+    private fun swapToRandom() {
+        val randomSlot = (0..8).random()
+        SwapManager.performSwap(randomSlot)
     }
 
     var lastPlayerPos = Vec3(0.0, 0.0, 0.0)
