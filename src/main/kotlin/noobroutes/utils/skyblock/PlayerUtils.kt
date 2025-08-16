@@ -52,6 +52,10 @@ object PlayerUtils {
 
     var slot = -1
 
+    fun getMotionVector(): Vec3 {
+        return Vec3(mc.thePlayer.motionX, mc.thePlayer.motionY, mc.thePlayer.motionZ)
+    }
+
     fun airClick(){
         if (isZeroTickSwapping()) return
         PacketUtils.sendPacket(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
@@ -60,9 +64,20 @@ object PlayerUtils {
     fun stopVelocity(){
         mc.thePlayer.setVelocity(0.0, mc.thePlayer.motionY, 0.0)
     }
+
+    fun setMotionVector(vec: Vec3) {
+        mc.thePlayer.motionX = vec.xCoord
+        mc.thePlayer.motionY = vec.yCoord
+        mc.thePlayer.motionZ = vec.zCoord
+    }
+
     fun setMotion(x: Double, z: Double){
         mc.thePlayer.motionX = x
         mc.thePlayer.motionZ = z
+    }
+
+    fun setPosition(vec: Vec3){
+        mc.thePlayer.setPosition(vec.xCoord, vec.yCoord, vec.zCoord)
     }
 
     fun setPosition(x: Double, z: Double){

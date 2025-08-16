@@ -58,13 +58,18 @@ class AutoP3Command: CommandBase() {
                 AutoP3.setActiveBlinkWaypoint(null)
                 modMessage("cleared the waypoint")
             }
-            "load" -> {
+            "loadfile" -> {
                 AutoP3.loadRings()
                 modMessage("loaded rings")
             }
 
+            "load" -> {
+                if (!args.requirement(2)) return modMessage("Specify the config to load!")
+                AutoP3.route = args[1];
+                modMessage("loading config " + args[1])
+            }
 
-            else -> modMessage("Usages: Add, Edit, Delete, clearWaypoints, Start, Load, Undo, Redo")
+            else -> modMessage("Usages: Add, Edit, Delete, clearWaypoints, Start, LoadFile, Undo, Redo, Load")
         }
     }
 

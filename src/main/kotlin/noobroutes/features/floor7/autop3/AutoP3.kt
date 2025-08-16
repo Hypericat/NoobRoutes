@@ -42,7 +42,6 @@ import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Suppress("Unused")
 object AutoP3: Module (
@@ -63,7 +62,7 @@ object AutoP3: Module (
     private val recentActionStack = Stack<EditRingAction>()
     private val recentUndoActionStack = Stack<EditRingAction>()
 
-    val route by StringSetting("Route", "", description = "Route to use")
+    var route by StringSetting("Route", "", description = "Route to use")
     private val ringColor by ColorSetting("Ring Color", Color.GREEN, false, description = "color of the rings")
     private val onFrame by BooleanSetting("Check on frame", description = "Checks on frame if you are in a ring. Use if you are lazy.")
 
@@ -178,7 +177,7 @@ object AutoP3: Module (
     }
 
 
-    private fun handleRings(pos: Vec3) {
+    fun handleRings(pos: Vec3) {
         val ringList = rings[route] ?: return
         for (ring in ringList) {
             if (ring.inRing(pos)) {
@@ -236,7 +235,7 @@ object AutoP3: Module (
             }
             modMessage("everyone leaped")
 
-            Scheduler.schedulePostMoveEntityWithHeadingTask {
+            Scheduler.scheduleHighestPostMoveEntityWithHeadingTask {
                 ring.maybeDoRing()
                 waitingRing = null
             }
@@ -261,7 +260,7 @@ object AutoP3: Module (
             if (!ring.term) return
 
             if (ring.inRing()) {
-                Scheduler.schedulePostMoveEntityWithHeadingTask{
+                Scheduler.scheduleHighestPostMoveEntityWithHeadingTask{
                     ring.maybeDoRing()
                     waitingRing = null
                 }
@@ -276,7 +275,7 @@ object AutoP3: Module (
 
         waitingRing?.let { ring ->
             if (ring.inRing()) {
-                Scheduler.schedulePostMoveEntityWithHeadingTask{
+                Scheduler.scheduleHighestPostMoveEntityWithHeadingTask{
                     ring.maybeDoRing()
                     waitingRing = null
                 }

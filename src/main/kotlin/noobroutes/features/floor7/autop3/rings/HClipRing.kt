@@ -21,6 +21,7 @@ class HClipRing(
 
     init {
         addBoolean("walk", {walk}, {walk = it})
+        addBoolean("Insta", {insta}, {insta = it})
     }
 
     override fun doRing() {
@@ -28,18 +29,15 @@ class HClipRing(
 
         if (insta) {
             if (mc.thePlayer.motionX != 0.0 || mc.thePlayer.motionZ != 0.0) return modMessage("must be not moving in x/z")
-
             setMaxSpeed()
-
-            if (walk) Scheduler.schedulePostMoveEntityWithHeadingTask { AutoP3MovementHandler.setDirection(yaw) }
+            if (walk) Scheduler.scheduleHighestPostMoveEntityWithHeadingTask { AutoP3MovementHandler.setDirection(yaw) }
             return
         }
 
         PlayerUtils.stopVelocity()
+        Scheduler.scheduleHighestPostMoveEntityWithHeadingTask { setMaxSpeed() }
 
-        Scheduler.schedulePostMoveEntityWithHeadingTask { setMaxSpeed() }
-
-        if (walk) Scheduler.schedulePostMoveEntityWithHeadingTask(1) { AutoP3MovementHandler.setDirection(yaw) }
+        if (walk) Scheduler.scheduleHighestPostMoveEntityWithHeadingTask(1) { AutoP3MovementHandler.setDirection(yaw) }
     }
 
     private fun setMaxSpeed() {

@@ -97,7 +97,8 @@ object ModuleManager {
         SecretAura,
         AutoClose,
         AutoRoute,
-        Relics
+        Relics,
+        TickControl
     )
 
     init {

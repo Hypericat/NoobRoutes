@@ -71,7 +71,6 @@ object AutoP3MovementHandler {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun doMotioning(event: MoveEntityWithHeadingEvent.Pre) {
         if (direction == null || motionTicks == -1) return;
-
         doMotionTick();
         motionTicks++
 
@@ -144,6 +143,19 @@ object AutoP3MovementHandler {
     @SubscribeEvent
     fun onUnload(event: WorldEvent.Unload) {
         resetShit()
+    }
+
+    data class AutoP3MovementState(val airTicks: Int, val motionTicks: Int, val jumping: Boolean, val direction: Float?, val scale: Float, val lastSpeed: Double)
+    fun getState(): AutoP3MovementState {
+        return AutoP3MovementState(airTicks, motionTicks, jumping, direction, scale, lastSpeed)
+    }
+    fun setState(state: AutoP3MovementState) {
+        airTicks = state.airTicks
+        motionTicks = state.motionTicks
+        jumping = state.jumping
+        direction = state.direction
+        scale = state.scale
+        lastSpeed = state.lastSpeed
     }
 
     fun resetShit() {
