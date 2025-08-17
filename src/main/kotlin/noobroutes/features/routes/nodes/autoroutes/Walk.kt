@@ -79,7 +79,7 @@ class Walk(
 
     override fun updateTick() {
         val room = currentRoom ?: return
-        PlayerUtils.unSneak()
+        PlayerUtils.unSneak(true)
         val yaw = room.getRealYaw(yaw)
         if (!isSilent()) mc.thePlayer.rotationYaw = yaw
     }
@@ -87,7 +87,7 @@ class Walk(
     override fun run() {
         val room = currentRoom ?: return
 
-        PlayerUtils.unSneak()
+        PlayerUtils.unSneak(true)
         val yaw = room.getRealYaw(yaw)
         if (RouteUtils.serverSneak) {
             Scheduler.schedulePreTickTask {

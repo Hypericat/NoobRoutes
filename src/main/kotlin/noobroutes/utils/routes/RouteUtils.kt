@@ -52,7 +52,6 @@ object RouteUtils {
         PlayerUtils.stopVelocity()
         setRotation(yaw, pitch, silent)
         AutoP3MovementHandler.resetShit()
-        PlayerUtils.unSneak()
         lastRoute = System.currentTimeMillis()
         ether()
     }
@@ -106,20 +105,12 @@ object RouteUtils {
 
     fun unsneak(){
         unsneakRegistered = true
-        aotvTarget = null
-        PlayerUtils.unSneak()
+        PlayerUtils.unSneak(true)
     }
 
     fun ether() {
         sneakRegistered = true
-        PlayerUtils.sneak()
-    }
-
-    var aotvTarget: BlockPos? = null
-    fun aotv(pos: BlockPos?) {
-        aotvTarget = pos
-        unsneakRegistered = true
-        PlayerUtils.unSneak()
+        PlayerUtils.sneak(true)
     }
 
     var clipDistance = 0
@@ -171,10 +162,9 @@ object RouteUtils {
     @SubscribeEvent
     fun unsneak(event: RenderWorldLastEvent) {
         if (!unsneakRegistered) return
-        if (mc.thePlayer.isSneaking) PlayerUtils.unSneak()
+        if (mc.thePlayer.isSneaking) PlayerUtils.unSneak(true)
         if (serverSneak) return
         PlayerUtils.airClick()
-        aotvTarget?.let { Zpew.doZeroPingAotv(it) }
         unsneakRegistered = false
         PlayerUtils.resyncSneak()
     }
@@ -190,7 +180,7 @@ object RouteUtils {
     @SubscribeEvent
     fun sneak(event: RenderWorldLastEvent) {
         if (!sneakRegistered) return
-        if (!mc.thePlayer.isSneaking) PlayerUtils.sneak()
+        if (!mc.thePlayer.isSneaking) PlayerUtils.sneak(true)
         if (!serverSneak) return
         PlayerUtils.airClick()
         sneakRegistered = false
@@ -202,6 +192,7 @@ object RouteUtils {
         rotatingPitch = null
         rotatingYaw = null
     }
+
     fun setRotation(yaw: Float?, pitch: Float?, silent: Boolean) {
         if (!silent) RotationUtils.setAngles(yaw, pitch)
         rotating = true
@@ -210,9 +201,9 @@ object RouteUtils {
     }
 
 
-    var rotating = false
-    var rotatingYaw: Float? = null
-    var rotatingPitch: Float? = null
+    private var rotating = false
+    private var rotatingYaw: Float? = null
+    private var rotatingPitch: Float? = null
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun motion(event: MotionUpdateEvent.Pre) {
         if (PlayerUtils.movementKeysPressed) {
@@ -287,7 +278,21 @@ object RouteUtils {
                     )
                 }
                 "aotv" -> {
-                    return@forEach
+                    val yaw = data.get("yaw").asFloat
+                    val pitch = data.get("pitch").asFloat
+                    routeMap.getOrPut(room) {mutableListOf()} .add(
+                        Aotv(
+                            coords,
+                            yaw,
+                            pitch,
+                            await,
+                            delay,
+                            false,
+                            false,
+                            false,
+                            false
+                        )
+                    )
                 }
                 "bat" -> {
                     val yaw = data.get("yaw").asFloat
@@ -295,7 +300,6 @@ object RouteUtils {
                     routeMap.getOrPut(room) {mutableListOf()} .add(
                         Bat(
                             coords,
-                            null,
                             yaw,
                             pitch,
                             await,

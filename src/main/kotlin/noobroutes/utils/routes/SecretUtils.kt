@@ -16,8 +16,6 @@ import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.utils.*
 import noobroutes.utils.Utils.getEntitiesOfType
 import noobroutes.utils.Utils.isEnd
-import noobroutes.utils.routes.RouteUtils.aotv
-import noobroutes.utils.routes.RouteUtils.aotvTarget
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.devMessage
 
@@ -106,8 +104,8 @@ object SecretUtils {
         val bats = mc.theWorld.getEntitiesOfType<EntityBat>()
         for (bat in bats) {
             if (bat.positionVector.distanceToPlayerSq > 225) continue
+            RouteUtils.unsneak()
             devMessage("Bat Spawned")
-            aotvTarget?.let { it1 -> aotv(it1) }
             batSpawnRegistered = false
         }
     }

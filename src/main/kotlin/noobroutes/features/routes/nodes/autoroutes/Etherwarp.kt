@@ -127,7 +127,6 @@ class Etherwarp(
         swapToEtherwarp()
         RouteUtils.setRotation(angles.first,angles.second, isSilent())
         stopWalk()
-        PlayerUtils.unSneak()
         RouteUtils.ether()
     }
 

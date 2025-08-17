@@ -127,6 +127,15 @@ object Utils {
                 GuiScreen.setClipboardString("Vec3(${pos.xCoord}, ${pos.yCoord}, ${pos.zCoord})")
                 modMessage(pos)
             }
+            "sneak" -> {
+                PlayerUtils.sneak(true)
+            }
+            "unsneak" -> {
+                PlayerUtils.unSneak(true)
+            }
+            "resync" -> {
+                PlayerUtils.resyncSneak()
+            }
 
             /*"swap" -> {
                 if (args.size < 3) return

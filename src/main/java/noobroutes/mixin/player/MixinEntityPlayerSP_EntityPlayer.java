@@ -7,14 +7,17 @@ import net.minecraft.world.World;
 import noobroutes.events.BossEventDispatcher;
 import noobroutes.events.impl.MotionUpdateEvent;
 import noobroutes.features.misc.NoDebuff;
+import noobroutes.utils.skyblock.PlayerUtils;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static noobroutes.utils.UtilsKt.postAndCatch;
 
@@ -24,6 +27,9 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 @Mixin(value = {EntityPlayerSP.class})
 public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
     @Shadow private int positionUpdateTicks;
+
+    @Shadow public abstract boolean isSneaking();
+
     @Unique
     private double noobRoutes$oldPosX;
     @Unique
@@ -71,6 +77,23 @@ public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
         this.rotationPitch = motionUpdateEvent.pitch;
 
         this.onGround = motionUpdateEvent.onGround;
+    }
+    /*
+    @Inject(method = "isSneaking", at = @At("HEAD"), cancellable = true)
+    public void isSneaking$noobRoutes(CallbackInfoReturnable<Boolean> cir){
+        if (PlayerUtils.INSTANCE.getServerSideSneak()) {
+            cir.setReturnValue(PlayerUtils.INSTANCE.getLastSetSneakState() && !this.sleeping);
+        }
+    }
+
+     */
+
+    @Redirect(method = "onUpdateWalkingPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;isSneaking()Z"))
+    public boolean isSneaking$noobRoutes(EntityPlayerSP instance){
+        if (PlayerUtils.INSTANCE.getServerSideSneak()) {
+            return PlayerUtils.INSTANCE.getLastSetSneakState() && !this.sleeping;
+        }
+        return instance.isSneaking();
     }
 
     @Inject(

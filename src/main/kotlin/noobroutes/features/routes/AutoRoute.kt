@@ -2,8 +2,6 @@ package noobroutes.features.routes
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import net.minecraft.network.play.server.S08PacketPlayerPosLook
-import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -11,24 +9,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.config.DataManager
-import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
-import noobroutes.features.routes.nodes.autoroutes.Aotv
-import noobroutes.features.routes.nodes.autoroutes.Bat
 import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.features.settings.impl.DropdownSetting
 import noobroutes.features.settings.impl.KeybindSetting
-import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.coerceMax
-import noobroutes.utils.equalsOneOf
-import noobroutes.utils.floor
 import noobroutes.utils.render.Color
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.routes.SecretUtils
@@ -37,8 +29,6 @@ import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
-import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeYaw
 import noobroutes.utils.skyblock.dungeon.RoomData
 import noobroutes.utils.skyblock.dungeon.tiles.Room
 import noobroutes.utils.skyblock.dungeon.tiles.RoomType
@@ -190,6 +180,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         if (event.isEnd || mc.thePlayer == null) return
         val room = DungeonUtils.currentRoom ?: roomReplacement
         if (PlayerUtils.movementKeysPressed) {
+            if (nodesToRun.isNotEmpty()) PlayerUtils.resyncSneak()
             nodesToRun.clear()
             return
         }
@@ -325,73 +316,13 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                         addNode(room, NodeType.USE_ITEM.loader?.generateFromArgs(args, room) ?: return)
                     }
 
-                    "aotv", "teleport", "hype", "bat" -> {
-                        modMessage("recording Aotv do not move!")
-                        val timeClicked = System.currentTimeMillis()
-                        val yaw = room.getRelativeYaw(mc.thePlayer.rotationYaw)
-                        val pitch = mc.thePlayer.rotationPitch
-                        PlayerUtils.airClick()
-                        Scheduler.scheduleLowS08Task {
-                            if (timeClicked + 5000 < System.currentTimeMillis()) {
-                                modMessage("recording timed out")
-                                return@scheduleLowS08Task
-                            }
-                            val event = (it as? PacketEvent.Receive) ?: return@scheduleLowS08Task
-                            val s08 = event.packet as S08PacketPlayerPosLook
-                            val flag = s08.func_179834_f()
-                            if (
-                                flag.contains(S08PacketPlayerPosLook.EnumFlags.X) ||
-                                flag.contains(S08PacketPlayerPosLook.EnumFlags.Y) ||
-                                flag.contains(S08PacketPlayerPosLook.EnumFlags.Z) ||
-                                event.isCanceled ||
-                                s08.y - s08.y.floor() != 0.0
-                            ) {
-                                modMessage("Invalid Packet")
-                                return@scheduleLowS08Task
-                            }
-                            val generalNodeArgs = AutorouteNode.getGeneralNodeArgs(room, args)
-                            val target = room.getRelativeCoords(BlockPos(s08.x, s08.y, s08.z))
-                            Scheduler.schedulePreTickTask {
-                                if (args[1].lowercase().equalsOneOf("aotv", "teleport")) {
-                                    addNode(
-                                        room,
-                                        Aotv(
-                                            generalNodeArgs.pos,
-                                            target,
-                                            yaw,
-                                            pitch,
-                                            generalNodeArgs.awaitSecrets,
-                                            generalNodeArgs.delay,
-                                            generalNodeArgs.center,
-                                            generalNodeArgs.stop,
-                                            generalNodeArgs.chain,
-                                            generalNodeArgs.reset
-                                        )
-                                    )
-                                }
-                                else if (args[1].lowercase().equalsOneOf("bat", "hype")) {
-                                    addNode(
-                                        room,
-                                        Bat(
-                                            generalNodeArgs.pos,
-                                            target,
-                                            yaw,
-                                            pitch,
-                                            generalNodeArgs.awaitSecrets,
-                                            generalNodeArgs.delay,
-                                            generalNodeArgs.center,
-                                            generalNodeArgs.stop,
-                                            generalNodeArgs.chain,
-                                            generalNodeArgs.reset
-                                        )
-                                    )
-                                }
-
-                            }
-
-
-                        }
+                    "aotv", "teleport", "tp" -> {
+                        addNode(room, NodeType.AOTV.loader?.generateFromArgs(args, room) ?: return)
                     }
+                    "bat", "hype" -> {
+                        addNode(room, NodeType.BAT.loader?.generateFromArgs(args, room) ?: return)
+                    }
+
                     else -> {
                         modMessage("Usages: Add, Delete, Edit, Load")
                     }

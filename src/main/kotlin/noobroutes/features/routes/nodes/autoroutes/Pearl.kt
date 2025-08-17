@@ -103,7 +103,7 @@ class Pearl(
     override fun updateTick() {
         val room = currentRoom ?: return
         RouteUtils.setRotation(room.getRealYaw(yaw),pitch + RotationUtils.offset, isSilent())
-        PlayerUtils.unSneak()
+        PlayerUtils.unSneak(true)
     }
 
     override fun run() {

@@ -233,7 +233,7 @@ object Zpew : Module(
             doZeroPingEtherWarp(info.distance)
             return
         }
-        if (RouteUtils.routing) return
+        //if (RouteUtils.routing) return  - this check is no longer needed because of zpew patch
         val prediction = predictTeleport(info.distance) ?: return
         devMessage(info.distance)
         doZeroPingAotv(prediction.toBlockPos())
