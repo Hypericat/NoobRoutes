@@ -86,6 +86,7 @@ object RouteUtils {
         //rightClick()
     }
 
+    /*
     @SubscribeEvent
     fun onKeyInputEvent(event: InputEvent.KeyInputEvent){
         val key = Keyboard.getEventKey()
@@ -93,6 +94,8 @@ object RouteUtils {
             PlayerUtils.setSneak(PlayerUtils.lastSetSneakState)
         }
     }
+
+     */
 
     var pearlSoundRegistered = false
     var sneakRegistered = false

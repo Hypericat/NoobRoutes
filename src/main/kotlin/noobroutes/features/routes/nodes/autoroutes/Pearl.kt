@@ -115,7 +115,6 @@ class Pearl(
             modMessage("Tried to 0 tick swap gg")
             return
         }
-        PlayerUtils.sneak()
         RouteUtils.setRotation(room.getRealYaw(yaw), pitch, isSilent())
         RouteUtils.unsneak()
         RouteUtils.pearls = count - 1

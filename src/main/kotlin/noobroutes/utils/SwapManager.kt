@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.WorldChangeEvent
 import noobroutes.mixin.accessors.C08Accessor
 import noobroutes.utils.Utils.ID
 import noobroutes.utils.Utils.isEnd
@@ -50,6 +51,15 @@ object SwapManager {
     }
 
     @SubscribeEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        resetSwap()
+    }
+
+    fun resetSwap() {
+        serverSlot = -1
+    }
+
+    @SubscribeEvent
     fun onC08(event: PacketEvent.Send) {
         if (event.packet !is C08PacketPlayerBlockPlacement) return
         dontSwap = true
@@ -57,6 +67,10 @@ object SwapManager {
         if (event.packet.stack == null && event.packet.position == BlockPos(-1, -1, -1)) event.isCanceled = true
     }
 
+    fun onPreRunTick(){
+        dontSwap = false
+    }
+/*
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTickEnd(event: TickEvent.ClientTickEvent) {
         if (event.isEnd) {
@@ -64,6 +78,8 @@ object SwapManager {
             return
         }
     }
+
+ */
 
     enum class SwapState{
         SWAPPED, ALREADY_HELD, TOO_FAST, UNKNOWN

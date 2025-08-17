@@ -40,7 +40,6 @@ class DynamicNode(
         RouteUtils.lastRoute = System.currentTimeMillis()
         RouteUtils.setRotation(angles.first, angles.second, isSilent())
         stopWalk()
-        PlayerUtils.unSneak()
         RouteUtils.ether()
     }
 

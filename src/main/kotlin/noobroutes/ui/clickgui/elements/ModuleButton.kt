@@ -48,8 +48,10 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
 
     private fun getOptionsHeight(): Float {
         var drawY = 0f
-        for (i in 0 until uiChildren.size) {
-            drawY += uiChildren[i].settingElement.getHeight()
+        for (child in uiChildren) {
+            val setting = child.settingElement
+            if (!setting.setting.shouldBeVisible) continue
+            drawY += setting.getHeight()
         }
         return drawY
     }

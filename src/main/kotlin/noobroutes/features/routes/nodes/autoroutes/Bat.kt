@@ -88,7 +88,7 @@ class Bat(
 
     override fun updateTick() {
         val room = currentRoom ?: return
-        PlayerUtils.unSneak()
+        PlayerUtils.unSneak(true)
         RouteUtils.setRotation(room.getRealYaw(yaw),pitch + offset, AutoRoute.silent)
     }
 
