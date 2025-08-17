@@ -100,7 +100,7 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
 
 
     @SubscribeEvent
-    fun onPostTick(event: ClientTickEvent) {
+    fun onPreTick(event: ClientTickEvent) {
         if (event.isNotStart || mc.thePlayer == null || mc.theWorld == null || mc.currentScreen != null || BossEventDispatcher.inF7Boss || isInDisabledRoom() || inValidArea) return
 
         var blockCandidate = BlockDistance(Blocks.air, BlockPos(Int.MAX_VALUE, 69, Int.MIN_VALUE), Double.POSITIVE_INFINITY)

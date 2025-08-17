@@ -243,7 +243,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
             removeBlockFromChunk(target)
             setBlock(target, IBlockStateUtils.airIBlockState)
             val removed = blockList.removeFirstOrNull { it.second == pos } != null
-            if (removed) removed
+            if (removed) return
 
             addBlockToChunk(target, IBlockStateUtils.airIBlockState)
             blockList.add(IBlockStateUtils.airIBlockState to pos)

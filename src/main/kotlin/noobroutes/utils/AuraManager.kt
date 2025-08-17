@@ -91,7 +91,6 @@ object AuraManager {
 
 
     fun clickBlock(aura: BlockAura, removeFirst: Boolean = false) {
-        //if (isZeroTickSwapping()) return
         var aabb = BlockUtils.getAABB(aura.pos)
         if (aura.force && aabb == null) {
             aabb = AxisAlignedBB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)

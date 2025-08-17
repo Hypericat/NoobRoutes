@@ -137,7 +137,7 @@ object Utils {
                 PlayerUtils.resyncSneak()
             }
 
-            /*"swap" -> {
+            "swap" -> {
                 if (args.size < 3) return
                 val slot = args[2].toIntOrNull() ?: return modMessage("no int")
                 SwapManager.performSwap(slot)
@@ -154,7 +154,7 @@ object Utils {
                 SwapManager.performSwap(3)
                 PlayerUtils.airClick()
                 SwapManager.performSwap(7)
-            }*/
+            }
 
             else -> {
                 modMessage("All tests passed")
@@ -163,7 +163,7 @@ object Utils {
     }
 
     private fun swapToRandom() {
-        val randomSlot = (0..8).random()
+        val randomSlot = (0..7).random()
         SwapManager.performSwap(randomSlot)
     }
 

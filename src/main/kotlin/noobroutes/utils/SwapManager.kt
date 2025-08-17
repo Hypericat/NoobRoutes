@@ -52,10 +52,6 @@ object SwapManager {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldChangeEvent) {
-        resetSwap()
-    }
-
-    fun resetSwap() {
         serverSlot = -1
     }
 
