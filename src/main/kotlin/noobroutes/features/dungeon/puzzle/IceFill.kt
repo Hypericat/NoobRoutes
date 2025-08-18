@@ -161,7 +161,7 @@ object IceFill: Module(
 
     @SubscribeEvent
     fun onSetBlock(event: BlockChangeEvent) {
-        if (DungeonUtils.currentRoom == null || DungeonUtils.currentRoom!!.name != "Ice Fill") return
+        if (DungeonUtils.currentRoom?.name != "Ice Fill") return
 
         val newBlock: IBlockState = event.update
         if (newBlock.block != Blocks.packed_ice || event.pos != Minecraft.getMinecraft().thePlayer.positionVector.toBlockPos().down()) return; // Check that the block is under the player

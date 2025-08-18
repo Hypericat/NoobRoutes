@@ -27,6 +27,7 @@ object SwapManager {
     var serverSlot = -1
 
     private var dontSwap = true
+    private var hasSwapped = false
 
     private inline val serverItem: ItemStack
         get() = mc.thePlayer.inventory.mainInventory[serverSlot]
@@ -47,6 +48,7 @@ object SwapManager {
             return
         }
 
+        hasSwapped = true
         serverSlot = event.packet.slotId
     }
 
@@ -58,21 +60,19 @@ object SwapManager {
     @SubscribeEvent
     fun onC08(event: PacketEvent.Send) {
         if (event.packet !is C08PacketPlayerBlockPlacement) return
-        dontSwap = true
+        if (hasSwapped) dontSwap = true
 
         if (event.packet.stack == null && event.packet.position == BlockPos(-1, -1, -1)) event.isCanceled = true
     }
 
     fun onPreRunTick(){
         dontSwap = false
+        hasSwapped = false
     }
 /*
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTickEnd(event: TickEvent.ClientTickEvent) {
-        if (event.isEnd) {
-            dontSwap = false
-            return
-        }
+        if (event.isEnd) dontSwap = false
     }
 
  */

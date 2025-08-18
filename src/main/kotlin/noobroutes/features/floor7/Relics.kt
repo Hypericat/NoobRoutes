@@ -14,6 +14,7 @@ import noobroutes.events.impl.Phase
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.floor7.autop3.AutoP3
+import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
@@ -145,6 +146,7 @@ object Relics : Module(
         val lastPacket = packets.last()
 
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
+        AutoP3MovementHandler.resetShit()
 
         SwapManager.swapToSlot(8)
     }
