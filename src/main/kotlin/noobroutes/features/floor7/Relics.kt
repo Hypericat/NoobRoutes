@@ -33,7 +33,6 @@ import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 import kotlin.math.pow
 
-@DevOnly //untested
 object Relics : Module(
     name = "Relics",
     Keyboard.KEY_NONE,

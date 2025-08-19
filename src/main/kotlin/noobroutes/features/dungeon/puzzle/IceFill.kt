@@ -36,14 +36,13 @@ import noobroutes.utils.skyblock.modMessage
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-@DevOnly
 object IceFill: Module(
     "Auto Icefill",
     category = Category.DUNGEON,
     description = "Does Icefill"
 ) {
 
-    private val simulate by BooleanSetting("Simulate", default = false, description = "Simulates Ice Fill in singleplayer");
+    private val simulate by BooleanSetting("Simulate", default = false, description = "Simulates Ice Fill in singleplayer")
     private val ping by NumberSetting("Simulation Tick Delay", default = 0, description = "Adds x ticks of delay to simulation", min = 0, max = 50).withDependency { simulate }
     private val packetMode by BooleanSetting("Packet Mode", default = false, description = "Scary")
 

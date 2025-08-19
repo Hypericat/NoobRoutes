@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core
 import noobroutes.config.DataManager
+import noobroutes.events.impl.RoomEnterEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.routes.nodes.AutorouteNode
@@ -67,9 +68,10 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     val useItemColor by ColorSetting("Use Item", default = Color.GREEN, description = "Color of Use Item nodes").withDependency { renderRoutes && colorSettings }
     private var editMode by BooleanSetting("Edit Mode", description = "Prevents nodes from triggering")
     val editModeBind by KeybindSetting("Edit Mode Toggle", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress { editMode = !editMode }
-    val placewarp by KeybindSetting("warp", Keyboard.KEY_NONE, description = "Toggles Edit Mode").onPress {
+    private val placeBinds by DropdownSetting("Edit Binds")
+    val placewarp by KeybindSetting("warp", Keyboard.KEY_NONE, description = "Places an Etherwarp Target").onPress {
         handleAutoRouteCommand(arrayOf("add", "ew"))
-    }
+    }.withDependency { placeBinds }
 
     private val roomReplacement
         get() = UniqueRoom(0, 0, Room(0, 0, RoomData(LocationUtils.currentArea.name, RoomType.NORMAL, listOf(), 0, 0))).apply { rotation =
@@ -102,10 +104,13 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
         }
     }
 
-
-
-
-
+    @SubscribeEvent
+    fun onEnterRoom(event: RoomEnterEvent) {
+        if (event.room == null) return
+        for (node in nodes[event.room.name] ?: return) {
+            node.meowConvert(event.room)
+        }
+    }
 
     fun loadFile() {
         nodes.clear()
@@ -121,7 +126,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                     val obj = it.asJsonObject
                     val name = obj.get("name")?.asString ?: return@forEach
                     val node = NodeType.getFromName(name)
-                    roomAutorouteNodes.add(((node?.loader ?: return@forEach)).loadNodeInfo(obj))
+                    val autorouteNode = (node?.loader ?: return@forEach).loadNodeInfo(obj)
+                    autorouteNode.meowOdinTransform = obj.has("meow_convert")
+                    roomAutorouteNodes.add(autorouteNode)
                 }
                 nodes[key] = roomAutorouteNodes
             }
@@ -321,6 +328,9 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                     }
                     "bat", "hype" -> {
                         addNode(room, NodeType.BAT.loader?.generateFromArgs(args, room) ?: return)
+                    }
+                    "blockclip", "block" -> {
+                        addNode(room, NodeType.BLOCK_CLIP.loader?.generateFromArgs(args, room) ?: return)
                     }
 
                     else -> {

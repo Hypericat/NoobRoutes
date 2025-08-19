@@ -4,27 +4,71 @@ import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.features.routes.AutoRoute
 import noobroutes.utils.Utils.containsOneOf
+import noobroutes.utils.add
 import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getOdinRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
+import noobroutes.utils.skyblock.modMessage
 import kotlin.math.abs
 
-abstract class AutorouteNode(
-    pos: Vec3,
+data class AutoRouteNodeBase(
     var awaitSecrets: Int = 0,
     var delay: Long = 0,
     var center: Boolean = false,
     var stop: Boolean = false,
     var chain: Boolean = false,
     var reset: Boolean = false
+) {
+    constructor() : this(0, 0, false, false, false, false)
+}
+
+abstract class AutorouteNode(
+    pos: Vec3,
+    val base: AutoRouteNodeBase
 ) : Node(pos) {
 
+    inline var awaitSecrets: Int
+        get() = base.awaitSecrets
+        set(value) {
+            base.awaitSecrets = value
+        }
+    inline var delay: Long
+        get() = base.delay
+        set(value) {
+            base.delay = value
+        }
+    inline var center: Boolean
+        get() = base.center
+        set(value) {
+            base.center = value
+        }
+    inline var stop: Boolean
+        get() = base.stop
+        set(value) {
+            base.stop = value
+        }
+    inline var chain: Boolean
+        get() = base.chain
+        set(value) {
+            base.chain = value
+        }
+    inline var reset: Boolean
+        get() = base.reset
+        set(value) {
+            base.reset = value
+        }
+
+
+
     var currentRoom: UniqueRoom?
+
+    var meowOdinTransform = false
 
     var delayTriggered = false
     var secretTriggered = false
@@ -32,23 +76,17 @@ abstract class AutorouteNode(
     var resetTriggered = false
 
     companion object {
-        fun getGeneralNodeArgsFromObj(obj: JsonObject): GeneralNodeArgs {
-            val pos = obj.get("position").asVec3
+        fun getBaseFromObj(obj: JsonObject): AutoRouteNodeBase {
             val awaitSecrets = obj.get("secrets")?.asInt ?: 0
             val delay = obj.get("delay")?.asLong ?: 0L
             val center = obj.has("center")
             val stop = obj.has("stop")
             val chain = obj.has("chain")
             val reset = obj.has("reset")
-            return GeneralNodeArgs(pos, awaitSecrets, delay, center, stop, chain, reset)
+            return AutoRouteNodeBase(awaitSecrets, delay, center, stop, chain, reset)
         }
 
-        fun getGeneralNodeArgs(room: UniqueRoom, args: Array<out String>): GeneralNodeArgs{
-            val playerCoords = room.getRelativeCoords(
-                kotlin.math.floor(PlayerUtils.posX) + 0.5,
-                kotlin.math.floor(PlayerUtils.posY),
-                kotlin.math.floor(PlayerUtils.posZ) + 0.5
-            )
+        fun getBaseFromArgs(args: Array<out String>): AutoRouteNodeBase {
             val reset = args.containsOneOf("reset", ignoreCase = true)
             val center = args.containsOneOf("center", "align", ignoreCase = true)
             val chain = args.containsOneOf("chain", ignoreCase = true)
@@ -59,14 +97,25 @@ abstract class AutorouteNode(
             val delay =
                 args.firstOrNull { it.startsWith("delay:", ignoreCase = true) }?.substringAfter("delay:")?.toLongOrNull()
                     ?: 0L
-            return GeneralNodeArgs(playerCoords, awaitSecrets, delay, center, stop, chain, reset)
+            return AutoRouteNodeBase(awaitSecrets, delay, center, stop, chain, reset)
         }
     }
-    data class GeneralNodeArgs(val pos: Vec3, val awaitSecrets: Int, val delay: Long, val center: Boolean, val stop: Boolean, val chain: Boolean, val reset: Boolean)
-
 
     init {
         currentRoom = DungeonUtils.currentRoom
+    }
+
+    open fun meowConvert(room: UniqueRoom) {
+        transformCoordinates(room)
+    }
+
+    protected fun transformCoordinates(room: UniqueRoom){
+        if (meowOdinTransform) {
+            meowOdinTransform = false
+            modMessage("converting")
+            val fromOdinReal = room.getOdinRealCoords(pos).add(0.5, 0.0, 0.5)
+            this.pos = room.getRelativeCoords(fromOdinReal)
+        }
     }
 
     override fun reset() {
@@ -88,6 +137,7 @@ abstract class AutorouteNode(
             if (stop) addProperty("stop", true)
             if (chain) addProperty("chain", true)
             if (reset) addProperty("reset", true)
+            if (meowOdinTransform) addProperty("meow_convert", true)
         }
         nodeAddInfo(obj)
         return obj

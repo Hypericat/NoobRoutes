@@ -84,6 +84,10 @@ object PlayerUtils {
         mc.thePlayer.setPosition(x, mc.thePlayer.posY, z)
     }
 
+    fun shift(x: Double, z: Double) {
+        mc.thePlayer.setPosition(x + posX, posY, z + posZ)
+    }
+
     inline val movementKeysPressed: Boolean get() = (mc.thePlayer.moveForward != 0.0f || mc.thePlayer.moveStrafing != 0.0f || mc.thePlayer.movementInput.jump) && mc.currentScreen == null
 
 

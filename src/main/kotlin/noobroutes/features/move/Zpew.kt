@@ -24,7 +24,6 @@ import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.utils.*
 import noobroutes.utils.Utils.ID
-import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import kotlin.math.floor
@@ -66,7 +65,6 @@ object Zpew : Module(
 
     private const val FAILWATCHPERIOD: Int = 20
     private const val MAXFAILSPERFAILPERIOD: Int = 3
-    //private const val MAXQUEUEDPACKETS: Int = 5
 
     private var updatePosition = true
     private val recentlySentC06s = mutableListOf<SentC06>()
@@ -334,7 +332,7 @@ object Zpew : Module(
         val sentAt: Long
     )
 
-    val steps = 100
+    const val steps = 100
 
     private fun predictTeleport(distance: Float): Vec3? {
         var cur = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ)

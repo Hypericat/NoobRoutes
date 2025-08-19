@@ -5,6 +5,7 @@ import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.routes.AutoRoute
+import noobroutes.features.routes.nodes.AutoRouteNodeBase
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.Scheduler
@@ -19,35 +20,20 @@ import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 class Walk(
     pos: Vec3,
     var yaw: Float,
-    awaitSecrets: Int = 0,
-    delay: Long = 0,
-    center: Boolean = false,
-    stop: Boolean = false,
-    chain: Boolean = false,
-    reset: Boolean = false,
+    base: AutoRouteNodeBase
 ) : AutorouteNode(
     pos,
-    awaitSecrets,
-    delay,
-    center,
-    stop,
-    chain,
-    reset
+    base
 ) {
     companion object : NodeLoader {
         override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
-            val general =  getGeneralNodeArgsFromObj(obj)
+            val base = getBaseFromObj(obj)
             val yaw = obj.get("yaw").asFloat
 
             return Walk(
-                general.pos,
+                obj.getCoords(),
                 yaw,
-                general.awaitSecrets,
-                general.delay,
-                general.center,
-                general.stop,
-                general.chain,
-                general.reset,
+                base
             )
         }
 
@@ -55,16 +41,11 @@ class Walk(
             args: Array<out String>,
             room: UniqueRoom
         ): AutorouteNode? {
-            val generalNodeArgs = getGeneralNodeArgs(room, args)
+            val base = getBaseFromArgs(args)
             return Walk(
-                generalNodeArgs.pos,
+                getCoords(room),
                 room.getRelativeYaw(mc.thePlayer.rotationYaw.round(14).toFloat()),
-                generalNodeArgs.awaitSecrets,
-                generalNodeArgs.delay,
-                generalNodeArgs.center,
-                generalNodeArgs.stop,
-                generalNodeArgs.chain,
-                generalNodeArgs.reset
+                base
             )
         }
     }
@@ -79,7 +60,7 @@ class Walk(
 
     override fun updateTick() {
         val room = currentRoom ?: return
-        PlayerUtils.unSneak(true)
+        PlayerUtils.unSneak(isSilent())
         val yaw = room.getRealYaw(yaw)
         if (!isSilent()) mc.thePlayer.rotationYaw = yaw
     }
@@ -87,7 +68,7 @@ class Walk(
     override fun run() {
         val room = currentRoom ?: return
 
-        PlayerUtils.unSneak(true)
+        PlayerUtils.unSneak(isSilent())
         val yaw = room.getRealYaw(yaw)
         if (RouteUtils.serverSneak) {
             Scheduler.schedulePreTickTask {

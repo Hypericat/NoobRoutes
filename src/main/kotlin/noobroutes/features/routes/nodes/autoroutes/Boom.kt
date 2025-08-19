@@ -5,6 +5,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.routes.AutoRoute
+import noobroutes.features.routes.nodes.AutoRouteNodeBase
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.*
@@ -20,34 +21,19 @@ import noobroutes.utils.skyblock.modMessage
 class Boom(
     pos: Vec3,
     var target: BlockPos,
-    awaitSecret: Int = 0,
-    delay: Long = 0,
-    center: Boolean = false,
-    stop: Boolean = false,
-    chain: Boolean = false,
-    reset: Boolean = false,
+    base: AutoRouteNodeBase
 ) : AutorouteNode(
     pos,
-    awaitSecret,
-    delay,
-    center,
-    stop,
-    chain,
-    reset
+    base
 ) {
     companion object : NodeLoader {
         override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
-            val general = getGeneralNodeArgsFromObj(obj)
+            val base = getBaseFromObj(obj)
             val target = obj.get("target").asBlockPos
             return Boom(
-                general.pos,
+                obj.getCoords(),
                 target,
-                general.awaitSecrets,
-                general.delay,
-                general.center,
-                general.stop,
-                general.chain,
-                general.reset
+                base
             )
         }
 
@@ -60,16 +46,11 @@ class Boom(
                 modMessage("must look at a block")
                 return null
             }
-            val generalNodeArgs = getGeneralNodeArgs(room, args)
+            val base = getBaseFromArgs( args)
             return Boom(
-                generalNodeArgs.pos,
+                getCoords(room),
                 room.getRelativeCoords(block),
-                generalNodeArgs.awaitSecrets,
-                generalNodeArgs.delay,
-                generalNodeArgs.center,
-                generalNodeArgs.stop,
-                generalNodeArgs.chain,
-                generalNodeArgs.reset
+                base
             )
         }
     }

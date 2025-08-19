@@ -3,6 +3,7 @@ package noobroutes.features.routes.nodes.autoroutes
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.features.routes.AutoRoute
+import noobroutes.features.routes.nodes.AutoRouteNodeBase
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.render.Color
@@ -17,34 +18,19 @@ import kotlin.math.absoluteValue
 class PearlClip(
     pos: Vec3,
     var distance: Int,
-    awaitSecrets: Int = 0,
-    delay: Long = 0,
-    center: Boolean = false,
-    stop: Boolean = false,
-    chain: Boolean = false,
-    reset: Boolean = false,
+    base: AutoRouteNodeBase
 ): AutorouteNode(
     pos,
-    awaitSecrets,
-    delay,
-    center,
-    stop,
-    chain,
-    reset
+    base
 ) {
     companion object : NodeLoader {
         override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
             val distance = obj.get("distance").asInt
-            val general = getGeneralNodeArgsFromObj(obj)
+            val base = getBaseFromObj(obj)
             return PearlClip(
-                general.pos,
+                obj.getCoords(),
                 distance,
-                general.awaitSecrets,
-                general.delay,
-                general.center,
-                general.stop,
-                general.chain,
-                general.reset
+                base
             )
         }
 
@@ -65,16 +51,11 @@ class PearlClip(
                 modMessage("Invalid Number, has to be greater than 0")
                 return null
             }
-            val generalNodeArgs = getGeneralNodeArgs(room, args)
+            val base = getBaseFromArgs(args)
             return PearlClip(
-                generalNodeArgs.pos,
+                getCoords(room),
                 distance,
-                generalNodeArgs.awaitSecrets,
-                generalNodeArgs.delay,
-                generalNodeArgs.center,
-                generalNodeArgs.stop,
-                generalNodeArgs.chain,
-                generalNodeArgs.reset
+                base
             )
         }
     }

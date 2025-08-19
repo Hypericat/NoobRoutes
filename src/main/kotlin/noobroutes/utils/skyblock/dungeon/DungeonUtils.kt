@@ -272,6 +272,22 @@ object DungeonUtils {
         return MathHelper.wrapAngleTo180_float(relativeYaw)
     }
 
+
+    /**
+     * taken from odin
+     */
+    fun Vec3.rotateAroundNorth(rotation: Rotations): Vec3 =
+        when (rotation) {
+            Rotations.NORTH -> Vec3(-this.xCoord, this.yCoord, -this.zCoord)
+            Rotations.WEST ->  Vec3(-this.zCoord, this.yCoord, this.xCoord)
+            Rotations.SOUTH -> Vec3(this.xCoord, this.yCoord, this.zCoord)
+            Rotations.EAST ->  Vec3(this.zCoord, this.yCoord, -this.xCoord)
+            else -> this
+        }
+
+    fun UniqueRoom.getOdinRealCoords(pos: BlockPos) = this.getOdinRealCoords(pos.toVec3())
+    fun UniqueRoom.getOdinRealCoords(pos: Vec3) = pos.rotateAroundNorth(rotation).addVec(x = clayPos.x, z = clayPos.z)
+
     fun UniqueRoom.getRelativeCoords(pos: BlockPos) = getRelativeCoords(Vec3(pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5)).toBlockPos()
     fun UniqueRoom.getRealCoords(pos: BlockPos) = getRealCoords(Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())).toBlockPos()
     fun UniqueRoom.getRelativeCoords(x: Int, y: Int, z: Int) = getRelativeCoords(Vec3(x.toDouble(), y.toDouble(), z.toDouble())).toBlockPos()

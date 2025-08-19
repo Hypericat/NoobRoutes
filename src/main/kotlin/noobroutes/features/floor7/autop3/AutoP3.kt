@@ -97,8 +97,6 @@ object AutoP3: Module (
 
     var waitingRing: Ring? = null
 
-    private var leapedIds = mutableSetOf<Int>() //hyper pls forgive me but duplicates would murder me
-
     private var dontCancelNextC03 = false
     private var blinkSetRotation: Pair<Float, Float>? = null
     var cancelled = 0
@@ -214,33 +212,6 @@ object AutoP3: Module (
         recording = false
     }
 
-    @SubscribeEvent
-    fun awaitingLeap(event: PacketEvent.Receive) {
-        if (waitingRing?.leap != true || event.packet !is S18PacketEntityTeleport) return
-        val ring = waitingRing ?: return
-
-        val entity  = mc.theWorld.getEntityByID(event.packet.entityId)
-        if (entity !is EntityPlayer) return
-
-        val x = event.packet.x shr 5
-        val y = event.packet.y shr 5
-        val z = event.packet.z shr 5
-
-        if (mc.thePlayer.getDistanceSq(x.toDouble(), y.toDouble(), z.toDouble()) < 5) leapedIds.add(event.packet.entityId)
-        if (leapedIds.size == leapPlayers()) {
-
-            if (!ring.inRing()) {
-                waitingRing = null
-                return
-            }
-            modMessage("everyone leaped")
-
-            Scheduler.scheduleHighestPostMoveEntityWithHeadingTask {
-                ring.maybeDoRing()
-                waitingRing = null
-            }
-        }
-    }
 
     // || mc.thePlayer?.heldItem?.displayName?.contains("leap", ignoreCase = true) != true
     @SubscribeEvent
@@ -254,43 +225,7 @@ object AutoP3: Module (
         activeBlink = blinkRing as BlinkRing
     }
 
-    @SubscribeEvent
-    fun awaitingTerm(event: TermOpenEvent) {
-        waitingRing?.let { ring ->
-            if (!ring.term) return
 
-            if (ring.inRing()) {
-                Scheduler.scheduleHighestPostMoveEntityWithHeadingTask{
-                    ring.maybeDoRing()
-                    waitingRing = null
-                }
-            }
-            else waitingRing = null
-        }
-    }
-
-    @SubscribeEvent
-    fun awaitingLeft(event: InputEvent.MouseInputEvent) {
-        if (Mouse.getEventButton() != 0 || !Mouse.getEventButtonState()) return
-
-        waitingRing?.let { ring ->
-            if (ring.inRing()) {
-                Scheduler.scheduleHighestPostMoveEntityWithHeadingTask{
-                    ring.maybeDoRing()
-                    waitingRing = null
-                }
-            }
-            else waitingRing = null
-        }
-    }
-
-    private fun leapPlayers(): Int {
-        return when {
-            BossEventDispatcher.currentBossPhase == Phase.P2 -> 1 //core
-            BossEventDispatcher.currentTerminalPhase == TerminalPhase.S3 -> 3 //ee3
-            else -> 4
-        }
-    }
 
     fun getClosestRingToPlayer(): Ring? {
         return rings[route]?.minBy { it.coords.subtract(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0).distanceToPlayerSq }
