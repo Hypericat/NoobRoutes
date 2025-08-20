@@ -141,7 +141,7 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
             }
             return
         }
-        //Coercing the value should be pointless, but just in case the user somehow sets it to a higher or lower value than possible
+
         when (swapOn) {
             "None" -> {}
             "Skulls" -> {
@@ -161,6 +161,7 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
         AuraManager.auraBlock(blockCandidate.pos)
     }
 
+    //Coercing the value should be pointless, but just in case the user somehow sets it to a higher or lower value than possible
     private fun handleSwap(): SwapManager.SwapState {
         if (previousSlot == -1 && swapBack) previousSlot = mc.thePlayer.inventory.currentItem
         //devMessage("Secret Aura Swap: ${System.currentTimeMillis()}")

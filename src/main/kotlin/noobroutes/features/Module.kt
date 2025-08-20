@@ -84,12 +84,20 @@ abstract class Module(
 
     open fun onKeybind() {
         toggle()
-        if (ClickGUIModule.enableNotification) {
+        if (ClickGUIModule.enableNotification && canToggle.invoke()) {
             modMessage("$name ${if (enabled) "§aenabled" else "§cdisabled"}.")
         }
     }
 
+    protected open val canToggle: () -> Boolean = {true}
+
+    protected fun disable() {
+        enabled = false
+        onDisable()
+    }
+
     fun toggle() {
+        if (!canToggle.invoke()) return
         enabled = !enabled
         if (enabled) onEnable()
         else onDisable()

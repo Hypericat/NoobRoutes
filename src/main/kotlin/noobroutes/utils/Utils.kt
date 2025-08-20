@@ -33,7 +33,6 @@ import noobroutes.IS23
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.withAlpha
-import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
@@ -210,6 +209,19 @@ fun <T> Array<T>.requirement(req: Int): Boolean {
 fun <T> requirement(req: Int, args: Array<T>): Boolean {
     return args.size >= req
 }
+
+fun <T: Number> Number.roundToNearest(vararg numberList: T): T {
+    return this.roundToNearest(numberList.toList())
+}
+
+
+fun <T : Number> Number.roundToNearest(numberList: List<T>): T {
+    require(numberList.isNotEmpty()) { "List cannot be empty" }
+
+    val input = this.toDouble()
+    return numberList.minByOrNull { abs(input - it.toDouble()) }!!
+}
+
 
 /**
  * Writes the given text to the clipboard.

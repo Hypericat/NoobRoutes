@@ -3,6 +3,7 @@ package noobroutes.features.routes.nodes.autoroutes
 import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.features.routes.AutoRoute
+import noobroutes.features.routes.nodes.AutoRouteNodeBase
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.RotationUtils
@@ -18,7 +19,9 @@ import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.routes.RouteUtils.swapToEtherwarp
 import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.PlayerUtils.SNEAK_EYE_HEIGHT
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
@@ -26,41 +29,54 @@ import kotlin.math.absoluteValue
 
 class Etherwarp(
     pos: Vec3,
-    val target: Vec3,
-    awaitSecrets: Int = 0,
-    delay: Long = 0,
-    center: Boolean = false,
-    stop: Boolean = false,
-    chain: Boolean = false,
-    reset: Boolean = false,
+    var target: Vec3,
+    base: AutoRouteNodeBase
 ) : AutorouteNode(
     pos,
-    awaitSecrets,
-    delay,
-    center,
-    stop,
-    chain,
-    reset
+    base
 ) {
+    var meowYawPitch: Pair<Float, Float>? = null
+
+    override fun meowConvert(room: UniqueRoom) {
+        super.meowConvert(room)
+        meowYawPitch?.let {
+            val realCoords = room.getRealCoords(pos)
+            val raytrace = EtherWarpHelper.rayTraceBlock(
+                200,
+                1f,
+                room.getRealYaw(it.first),
+                it.second,
+                realCoords.xCoord,
+                realCoords.yCoord + SNEAK_EYE_HEIGHT,
+                realCoords.zCoord
+            ) ?: run {
+                modMessage("No Target Found")
+                return
+            }
+            meowYawPitch = null
+            val target = room.getRelativeCoords(raytrace)
+            this.target = target
+        }
+    }
 
     companion object : NodeLoader{
         override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
-            val general =  getGeneralNodeArgsFromObj(obj)
+            val base = getBaseFromObj(obj)
             val target = obj.get("target").asVec3
+            val yaw = obj.get("yaw")?.asFloat
+            val pitch = obj.get("pitch")?.asFloat
+            val meowLook = if (yaw != null && pitch != null) Pair(yaw, pitch) else null
             return Etherwarp(
-                general.pos,
+                obj.getCoords(),
                 target,
-                general.awaitSecrets,
-                general.delay,
-                general.center,
-                general.stop,
-                general.chain,
-                general.reset
-            )
+                base
+            ).apply {
+                meowYawPitch = meowLook
+            }
         }
 
         override fun generateFromArgs(args: Array<out String>, room: UniqueRoom): AutorouteNode? {
-            val generalNodeArgs = getGeneralNodeArgs(room, args)
+            val base = getBaseFromArgs(args)
             val raytrace = EtherWarpHelper.rayTraceBlock(200, 1f)
             if (raytrace == null) {
                 modMessage("No Target Found")
@@ -68,14 +84,9 @@ class Etherwarp(
             }
             val target = room.getRelativeCoords(raytrace)
             return Etherwarp(
-                generalNodeArgs.pos,
+                getCoords(room),
                 target,
-                generalNodeArgs.awaitSecrets,
-                generalNodeArgs.delay,
-                generalNodeArgs.center,
-                generalNodeArgs.stop,
-                generalNodeArgs.chain,
-                generalNodeArgs.reset
+                base
             )
         }
     }
@@ -117,6 +128,10 @@ class Etherwarp(
 
     override fun nodeAddInfo(obj: JsonObject) {
         obj.addProperty("target", target)
+        meowYawPitch?.let {
+            obj.addProperty("yaw", it.first)
+            obj.addProperty("pitch", it.second)
+        }
     }
 
 
@@ -127,13 +142,14 @@ class Etherwarp(
         swapToEtherwarp()
         RouteUtils.setRotation(angles.first,angles.second, isSilent())
         stopWalk()
-        RouteUtils.ether()
+        RouteUtils.ether(isSilent())
     }
 
     override fun updateTick() {
         val room = currentRoom ?: return
         val angles = RotationUtils.getYawAndPitch(room.getRealCoords(target), true)
         RouteUtils.setRotation(angles.first + offset,angles.second, isSilent())
+        PlayerUtils.sneak(isSilent())
     }
 
     override fun getType(): NodeType {

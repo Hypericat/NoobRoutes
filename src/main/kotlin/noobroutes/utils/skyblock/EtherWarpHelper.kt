@@ -155,10 +155,10 @@ object EtherWarpHelper {
         playerX: Double? = null, playerY: Double? = null, playerZ: Double? = null
     ): Vec3? {
         val eyeX = playerX ?: (mc.thePlayer.lastTickPosX + (mc.thePlayer.posX - mc.thePlayer.lastTickPosX) * partialTicks)
-
         val eyeY = playerY
             ?: ((mc.thePlayer.lastTickPosY + (mc.thePlayer.posY - mc.thePlayer.lastTickPosY) * partialTicks) + SNEAK_EYE_HEIGHT)
         val eyeZ = playerZ ?: (mc.thePlayer.lastTickPosZ + (mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ) * partialTicks)
+
         val roundedYaw = (yaw.round(14) * DEGREES_TO_RADIAN).toDouble()
         val roundedPitch = (pitch.round(14) * DEGREES_TO_RADIAN).toDouble()
         val cosPitch = cos(roundedPitch)

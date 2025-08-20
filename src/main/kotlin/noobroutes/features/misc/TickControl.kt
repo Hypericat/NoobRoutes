@@ -27,6 +27,7 @@ object TickControl : Module("Tick Control", category = Category.MISC, descriptio
 
     private val rewindTick by KeybindSetting("Rewind Tick", key = Keyboard.KEY_LEFT, description = "").onPress {
         if (!enabled) return@onPress modMessage("Tick Control Must Be Enabled")
+        if (!mc.isSingleplayer) return@onPress modMessage("Must be in Single Player")
         if (stateStack.isEmpty()) return@onPress modMessage("Can't Rewind Further")
         val state = stateStack.pop()
         PlayerUtils.setPosition(state.pos)
@@ -41,15 +42,14 @@ object TickControl : Module("Tick Control", category = Category.MISC, descriptio
 
     private val advanceTick by KeybindSetting("Advance Tick", key = Keyboard.KEY_RIGHT, description = "Triggers a game tick").onPress {
         if (!enabled) return@onPress modMessage("Tick Control Must Be Enabled")
+        if (!mc.isSingleplayer) return@onPress modMessage("Must be in Single Player")
         canTick = true
     }
     private var canTick = false
     private val stateStack = Stack<PlayerState>()
 
-    override fun onEnable() {
-        if (!mc.isSingleplayer) return
-        super.onEnable()
-    }
+    override val canToggle: () -> Boolean
+        get() = {mc.isSingleplayer}
 
     override fun onDisable() {
         stateStack.clear()
@@ -63,7 +63,7 @@ If this breaks with hclip it has something to do with event priority in the sche
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onMoveEntityWithHeadingPre(event: MoveEntityWithHeadingEvent.Pre) {
         if (!mc.isSingleplayer) {
-            toggle()
+            disable()
             return
         }
         if (canTick) {

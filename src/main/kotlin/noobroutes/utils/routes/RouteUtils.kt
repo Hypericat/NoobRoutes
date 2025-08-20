@@ -18,6 +18,8 @@ import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.move.Zpew
+import noobroutes.features.routes.AutoRoute
+import noobroutes.features.routes.nodes.AutoRouteNodeBase
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.autoroutes.*
 import noobroutes.utils.RotationUtils
@@ -106,14 +108,14 @@ object RouteUtils {
         rightClickRegistered = true
     }
 
-    fun unsneak(){
+    fun unsneak(silent: Boolean = false){
         unsneakRegistered = true
-        PlayerUtils.unSneak(true)
+        PlayerUtils.unSneak(silent)
     }
 
-    fun ether() {
+    fun ether(silent: Boolean = false) {
         sneakRegistered = true
-        PlayerUtils.sneak(true)
+        PlayerUtils.sneak(silent)
     }
 
     var clipDistance = 0
@@ -183,7 +185,7 @@ object RouteUtils {
     @SubscribeEvent
     fun sneak(event: RenderWorldLastEvent) {
         if (!sneakRegistered) return
-        if (!mc.thePlayer.isSneaking) PlayerUtils.sneak(true)
+        if (!mc.thePlayer.isSneaking) PlayerUtils.sneak(AutoRoute.silent)
         if (!serverSneak) return
         PlayerUtils.airClick()
         sneakRegistered = false
@@ -245,6 +247,7 @@ object RouteUtils {
     fun onMouse(event: MouseEvent){
         if (event.button == 1 && event.buttonstate && routing) {
             event.isCanceled = true
+            return
         }
         if ((event.dx != 0 || event.dy != 0) && !routing) resetRotation()
     }
@@ -260,24 +263,38 @@ object RouteUtils {
             val coords = Vec3(route.get("x").asDouble, route.get("y").asDouble, route.get("z").asDouble)
             val args = route.get("args").asJsonObject
             val data = route.get("data").asJsonObject
-            val await = if (args.has("await_secret")) 1 else 0
+            val await = if (args.has("await_secret")) args.get("await_secret").asInt else 0
             val delay = args.get("delay")?.asInt?.toLong() ?: 0L
+            val odinTransform = args.get("odin_transform")?.asBoolean == true
+
+            val base = AutoRouteNodeBase(await, delay)
 
             if (routeMap[room] == null) routeMap[room] = mutableListOf()
             when (meowType) {
+                "etherwarp" -> {
+                    val yaw = data.get("yaw").asFloat
+                    val pitch = data.get("pitch").asFloat
+                    routeMap[room]?.add(
+                        Etherwarp(
+                            coords,
+                            Vec3(0.0, 0.0, 0.0),
+                            base
+                        ).apply {
+                            this.meowOdinTransform = odinTransform
+                            this.meowYawPitch = Pair(yaw, pitch)
+                        }
+                    )
+                }
                 "etherwarp_target" -> {
                     val target = Vec3(data.get("x").asDouble, data.get("y").asDouble, data.get("z").asDouble)
                     routeMap[room]?.add(
                         Etherwarp(
                             coords,
                             target,
-                            await,
-                            delay,
-                            false,
-                            false,
-                            false,
-                            false
-                        )
+                            base
+                        ).apply {
+                            this.meowOdinTransform = odinTransform
+                        }
                     )
                 }
                 "aotv" -> {
@@ -288,13 +305,10 @@ object RouteUtils {
                             coords,
                             yaw,
                             pitch,
-                            await,
-                            delay,
-                            false,
-                            false,
-                            false,
-                            false
-                        )
+                            base
+                        ).apply {
+                            this.meowOdinTransform = odinTransform
+                        }
                     )
                 }
                 "bat" -> {
@@ -305,13 +319,10 @@ object RouteUtils {
                             coords,
                             yaw,
                             pitch,
-                            await,
-                            delay,
-                            false,
-                            false,
-                            false,
-                            false
-                        )
+                            base
+                        ).apply {
+                            this.meowOdinTransform = odinTransform
+                        }
                     )
                 }
                 "pearl_clip" -> {
@@ -320,13 +331,10 @@ object RouteUtils {
                         PearlClip(
                             coords,
                             distance - 1,
-                            await,
-                            delay,
-                            false,
-                            false,
-                            false,
-                            false
-                        )
+                            base
+                        ).apply {
+                            this.meowOdinTransform = odinTransform
+                        }
                     )
                 }
                 "use_item" -> {
@@ -340,13 +348,10 @@ object RouteUtils {
                                 1,
                                 yaw,
                                 pitch,
-                                await,
-                                delay,
-                                false,
-                                false,
-                                false,
-                                false
-                            )
+                                base
+                            ).apply {
+                                this.meowOdinTransform = odinTransform
+                            }
                         )
 
                     } else {
@@ -356,13 +361,10 @@ object RouteUtils {
                                 name,
                                 yaw,
                                 pitch,
-                                await,
-                                delay,
-                                false,
-                                false,
-                                false,
-                                false
-                            )
+                                base
+                            ).apply {
+                                this.meowOdinTransform = odinTransform
+                            }
                         )
                     }
                 }
@@ -372,13 +374,10 @@ object RouteUtils {
                         Walk(
                             coords,
                             yaw,
-                            await,
-                            delay,
-                            false,
-                            false,
-                            false,
-                            false
-                        )
+                            base
+                        ).apply {
+                            this.meowOdinTransform = odinTransform
+                        }
                     )
                 }
                 else -> {}

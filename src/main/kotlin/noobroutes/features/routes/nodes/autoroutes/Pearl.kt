@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.routes.AutoRoute
+import noobroutes.features.routes.nodes.AutoRouteNodeBase
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.RotationUtils
@@ -21,20 +22,10 @@ class Pearl(
     var count: Int = 0,
     val yaw : Float,
     val pitch: Float,
-    awaitSecrets: Int = 0,
-    delay: Long = 0,
-    center: Boolean = false,
-    stop: Boolean = false,
-    chain: Boolean = false,
-    reset: Boolean = false
+    base: AutoRouteNodeBase
 ) :  AutorouteNode(
     pos,
-    awaitSecrets,
-    delay,
-    center,
-    stop,
-    chain,
-    reset
+    base
 ) {
 
     companion object : NodeLoader {
@@ -42,19 +33,14 @@ class Pearl(
             val count = obj.get("count").asInt
             val yaw = obj.get("yaw").asFloat
             val pitch = obj.get("pitch").asFloat
-            val general = getGeneralNodeArgsFromObj(obj)
+            val base = getBaseFromObj(obj)
 
             return Pearl(
-                general.pos,
+                obj.getCoords(),
                 count,
                 yaw,
                 pitch,
-                general.awaitSecrets,
-                general.delay,
-                general.center,
-                general.stop,
-                general.chain,
-                general.reset
+                base
             )
         }
 
@@ -66,7 +52,7 @@ class Pearl(
                 modMessage("Pearl Count")
                 return null
             }
-            val generalNodeArgs = getGeneralNodeArgs(room, args)
+            val base = getBaseFromArgs(args)
             val count = args[2].toIntOrNull()
             if (count == null) {
                 modMessage("Input a number")
@@ -75,16 +61,11 @@ class Pearl(
             val yaw = room.getRelativeYaw(mc.thePlayer.rotationYaw)
             val pitch = mc.thePlayer.rotationPitch
             return Pearl(
-                generalNodeArgs.pos,
+                getCoords(room),
                 count,
                 yaw,
                 pitch,
-                generalNodeArgs.awaitSecrets,
-                generalNodeArgs.delay,
-                generalNodeArgs.center,
-                generalNodeArgs.stop,
-                generalNodeArgs.chain,
-                generalNodeArgs.reset
+                base
             )
         }
     }
@@ -103,7 +84,7 @@ class Pearl(
     override fun updateTick() {
         val room = currentRoom ?: return
         RouteUtils.setRotation(room.getRealYaw(yaw),pitch + RotationUtils.offset, isSilent())
-        PlayerUtils.unSneak(true)
+        PlayerUtils.unSneak(isSilent())
     }
 
     override fun run() {

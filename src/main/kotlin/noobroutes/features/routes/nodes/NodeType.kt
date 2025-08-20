@@ -11,6 +11,7 @@ enum class NodeType(val displayName: String, val loader: NodeLoader?) {
     PEARL_CLIP("PearlClip", PearlClip.Companion),
     USE_ITEM("UseItem", UseItem.Companion),
     WALK("Walk", Walk.Companion),
+    BLOCK_CLIP("Clip", BlockClip.Companion),
     DYNAMIC("DynamicNode", null);
     companion object {
         fun getFromName(name: String) : NodeType? {

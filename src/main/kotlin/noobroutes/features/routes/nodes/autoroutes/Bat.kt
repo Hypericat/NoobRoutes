@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.routes.AutoRoute
+import noobroutes.features.routes.nodes.AutoRouteNodeBase
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.RotationUtils.offset
@@ -22,21 +23,11 @@ class Bat(
     pos: Vec3,
     val yaw : Float,
     val pitch: Float,
-    awaitSecrets: Int = 0,
-    delay: Long = 0,
-    center: Boolean = false,
-    stop: Boolean = false,
-    chain: Boolean = false,
-    reset: Boolean = false
+    base: AutoRouteNodeBase
 
 ) : AutorouteNode(
     pos,
-    awaitSecrets,
-    delay,
-    center,
-    stop,
-    chain,
-    reset
+    base
 ) {
     override val priority: Int = 4
 
@@ -44,17 +35,12 @@ class Bat(
         override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
             val yaw = obj.get("yaw").asFloat
             val pitch = obj.get("pitch").asFloat
-            val general = getGeneralNodeArgsFromObj(obj)
+            val general = getBaseFromObj(obj)
             return Bat(
-                general.pos,
+                obj.getCoords(),
                 yaw,
                 pitch,
-                general.awaitSecrets,
-                general.delay,
-                general.center,
-                general.stop,
-                general.chain,
-                general.reset
+                general
             )
         }
 
@@ -64,17 +50,12 @@ class Bat(
         ): AutorouteNode? {
             val yaw = room.getRelativeYaw(mc.thePlayer.rotationYaw)
             val pitch = mc.thePlayer.rotationPitch
-            val generalNodeArgs = getGeneralNodeArgs(room, args)
+            val ringBase = getBaseFromArgs(args)
             return Bat(
-                generalNodeArgs.pos,
+                getCoords(room),
                 yaw,
                 pitch,
-                generalNodeArgs.awaitSecrets,
-                generalNodeArgs.delay,
-                generalNodeArgs.center,
-                generalNodeArgs.stop,
-                generalNodeArgs.chain,
-                generalNodeArgs.reset
+                ringBase
             )
         }
     }
@@ -88,7 +69,7 @@ class Bat(
 
     override fun updateTick() {
         val room = currentRoom ?: return
-        PlayerUtils.unSneak(true)
+        PlayerUtils.unSneak(isSilent())
         RouteUtils.setRotation(room.getRealYaw(yaw),pitch + offset, AutoRoute.silent)
     }
 

@@ -145,7 +145,6 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
                     }
                 }
             } ?: return //rotation not found
-            devMessage(rotation)
         }
 
 

@@ -82,7 +82,7 @@ class AutoP3Command: CommandBase() {
     }
 
     override fun getCommandAliases(): List<String?>? {
-        return listOf("ap3", "sigma69420autop3gamertime", "autop3", "autophase3", "autophasethree")
+        return listOf("ap3", "sigma69420autop3gamertime", "autop3", "autophase3", "autophasethree", "n", "nb")
     }
 
     override fun addTabCompletionOptions(
@@ -91,7 +91,7 @@ class AutoP3Command: CommandBase() {
         pos: BlockPos
     ): List<String?>? {
         return when (args.size) {
-            0 -> getListOfStringsMatchingLastWord(args, listOf("ap3", "p3", "sigma69420autop3gamertime"))
+            0 -> getListOfStringsMatchingLastWord(args, listOf("ap3", "p3", "sigma69420autop3gamertime", "n"))
             1 -> getListOfStringsMatchingLastWord(args, listOf("add", "delete", "clearwaypoints", "start", "restore", "load", "edit"))
             2 -> when (args[0]) { //I hate the amount of nesting here
                 "add" -> getListOfStringsMatchingLastWord(args, RingType.entries.filter { it.commandGenerated }.map { it.ringName })

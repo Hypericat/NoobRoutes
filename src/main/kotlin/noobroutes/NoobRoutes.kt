@@ -13,6 +13,7 @@ import noobroutes.events.BossEventDispatcher
 import noobroutes.events.EventDispatcher
 import noobroutes.features.ModuleManager
 import noobroutes.features.floor7.autop3.AutoP3
+import noobroutes.features.floor7.autop3.AutoP3AwaitHandler
 import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.move.AutoPath
 import noobroutes.ui.clickgui.ClickGui
@@ -78,7 +79,8 @@ class NoobRoutes {
             Dungeon,
             DungeonUtils,
             AutoP3MovementHandler,
-            PlayerUtils
+            PlayerUtils,
+            AutoP3AwaitHandler
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }
