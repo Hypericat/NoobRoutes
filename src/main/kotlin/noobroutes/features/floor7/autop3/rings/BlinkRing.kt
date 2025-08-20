@@ -29,6 +29,12 @@ class BlinkRing(
                 modMessage("Why are you calling this while recording a blink")
                 return null
             }
+
+            if (AutoP3.endBlinkOnKey) {
+                AutoP3.setActiveBlinkWaypoint(BlinkWaypoint(generateRingBaseFromArgs(args), 0).apply { triggered = true })
+                return null
+            }
+
             if (args.size < 3) {
                 modMessage("need a length arg (positive number)")
                 return null
@@ -88,17 +94,17 @@ class BlinkRing(
         mc.thePlayer.isSprinting = false
         if (!FreeCam.enabled) PlayerUtils.unPressKeys()
 
-        if (AutoP3.waitedTicks < AutoP3.blinkCooldown && AutoP3.x_y0uMode) {
+        /*if (AutoP3.waitedTicks < AutoP3.blinkCooldown && AutoP3.x_y0uMode) {
             AutoP3.waitedTicks++
             return
-        }
+        }*/
 
         if (!AutoP3.blinkToggle || (AutoP3.blinksThisInstance + packets.size > AutoP3.getMaxBlinks() && AutoP3.isBlinkLimitEnabled) ) {
             doMovement()
             return
         }
 
-        if (AutoP3.cancelled < packets.size) {
+        if (!enoughPackets()) {
             PlayerUtils.stopVelocity()
             return
         }
@@ -133,8 +139,9 @@ class BlinkRing(
         }
 
         AutoP3.blinksThisInstance += packets.size
-        if (AutoP3.x_y0uMode) AutoP3.cancelled -= packets.size
-        else AutoP3.cancelled = 0
+        //if (AutoP3.x_y0uMode) AutoP3.cancelled -= packets.size
+        //else AutoP3.cancelled = 0
+        AutoP3.cancelled = 0
 
         packets.forEach { PacketUtils.sendPacket(it) }
 
@@ -153,5 +160,9 @@ class BlinkRing(
 
     override fun inRing(pos: Vec3): Boolean {
         return checkInBoundsWithSpecifiedHeight(pos,0f) && mc.thePlayer.onGround
+    }
+
+    private fun enoughPackets(): Boolean {
+        return if (AutoP3.dontChargeAll) AutoP3.cancelled >= packets.size * AutoP3.percentageChargeAmount * 0.01 else AutoP3.cancelled >= packets.size
     }
 }

@@ -3,6 +3,7 @@ package noobroutes.features.floor7.autop3
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.init.Items
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S18PacketEntityTeleport
@@ -65,7 +66,8 @@ object AutoP3: Module (
     var route by StringSetting("Route", "", description = "Route to use")
     private val ringColor by ColorSetting("Ring Color", Color.GREEN, false, description = "color of the rings")
     private val onFrame by BooleanSetting("Check on frame", description = "Checks on frame if you are in a ring. Use if you are lazy.")
-
+    private val nonSilentRotates by BooleanSetting("Non-Silent look", description = "Makes it so rings with the rotate argument rotate client side.")
+    private val renderMode by SelectorSetting("Render Mode", "Box", arrayListOf("Box", "BBG"), description = "Ring render type")
 
     private val editShit by DropdownSetting("Edit Settings", false)
     private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes").withDependency { editShit }
@@ -84,15 +86,18 @@ object AutoP3: Module (
         if (inF7Boss) text(cancelled.toString(), 1f, 1f, ColorPalette.textColor, 13f)
         getTextWidth("400", 13f) to getTextHeight("400", 13f)
     }.withDependency { blinkShit }
-    private val cancelC05s by BooleanSetting("Cancel C05s", default = false, description = "Allows the cancelling of rotation packets.").withDependency { blinkShit }
+    private val cancelC05Mode by SelectorSetting("Rot Mode", "Always", arrayListOf("Always", "On Blink/Holding Leap", "Never"), description = "when to cancel Rotations").withDependency { blinkShit }
     private val movementMode by DualSetting("Movement Mode","Playback", "Silent", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
-    val x_y0uMode by BooleanSetting("x_y0u Mode", description = "While its faster it also probably flags timer and will lobby you sometimes. (We Jew the Packets -x_y0u)").withDependency { blinkShit }
-    val blinkCooldown by NumberSetting("Blink Cooldown", 5, 0, 10, description = "how many ticks to wait after entering a blink ring before allowing blink").withDependency { x_y0uMode && blinkShit }
-    private val resetInterval by NumberSetting(name = "clear interval", description = "delete packets periodically", min = 1, max = 300, default = 200, unit = "t").withDependency { x_y0uMode && blinkShit }
-    private val resetAmount by NumberSetting(name = "clear amount", description = "delete packets periodically", min = 1, max = 400, default = 50).withDependency { x_y0uMode && blinkShit }
-    private val nonSilentRotates by BooleanSetting("Non-Silent look", description = "Makes it so rings with the rotate argument rotate client side.")
-
-    private val renderMode by SelectorSetting("Render Mode", "Box", arrayListOf("Box", "BBG"), description = "Ring render type")
+    //val x_y0uMode by BooleanSetting("x_y0u Mode", description = "While its faster it also probably flags timer and will lobby you sometimes. (We Jew the Packets -x_y0u)").withDependency { blinkShit }
+    //val blinkCooldown by NumberSetting("Blink Cooldown", 5, 0, 10, description = "how many ticks to wait after entering a blink ring before allowing blink").withDependency { x_y0uMode && blinkShit }
+    //private val resetInterval by NumberSetting(name = "clear interval", description = "delete packets periodically", min = 1, max = 300, default = 200, unit = "t").withDependency { x_y0uMode && blinkShit }
+    //private val resetAmount by NumberSetting(name = "clear amount", description = "delete packets periodically", min = 1, max = 400, default = 50).withDependency { x_y0uMode && blinkShit }
+    val dontChargeAll by BooleanSetting("Dont Charge All", description = "Instead of charging all the packets required for a blink only charge some").withDependency { blinkShit }
+    val percentageChargeAmount by NumberSetting("Charge Amount", default = 69, min = 30, max = 100, description = "how many percent of the required packets to charge", unit = "%").withDependency { blinkShit &&  dontChargeAll }
+    val endBlinkOnKey by BooleanSetting("End On Key", description = "stops recording on keypress instead of having to input the amount").withDependency { blinkShit }
+    private val endKey by KeybindSetting("End Keybind", Keyboard.KEY_NONE, "Ends Blink Recording on press").withDependency { blinkShit && endBlinkOnKey }.onPress {
+        if (endBlinkOnKey) endBlinkRecording(activeBlinkWaypoint ?: return@onPress)
+    }
 
 
     var waitingRing: Ring? = null
@@ -201,14 +206,16 @@ object AutoP3: Module (
         recordingPacketList.add(c04ToAdd)
         modMessage("recording, ${recordingPacketList.size}")
 
-        if (recordingPacketList.size >= blinkWaypoint.length) {
-            addRing(BlinkRing(blinkWaypoint.base, recordingPacketList, mc.thePlayer.motionY))
-            recordingPacketList = mutableListOf()
-            recording = false
-        }
+        if (recordingPacketList.size >= blinkWaypoint.length && !endBlinkOnKey) endBlinkRecording(blinkWaypoint)
     }
 
-    fun handleMissingWaypoint() {
+    private fun endBlinkRecording(blinkWaypoint: BlinkWaypoint) {
+        addRing(BlinkRing(blinkWaypoint.base, recordingPacketList, mc.thePlayer.motionY))
+        recordingPacketList = mutableListOf()
+        recording = false
+    }
+
+    private fun handleMissingWaypoint() {
         modMessage("the blink waypoint was deleted while recording. dont do that shit. bad boy")
         recordingPacketList = mutableListOf()
         recording = false
@@ -384,7 +391,7 @@ object AutoP3: Module (
         dontCancelNextC03 = true
     }
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     fun resetter(event: TickEvent.ClientTickEvent) {
         if (!event.isStart || !inF7Boss || !x_y0uMode) return
         if (toReset <= 0) {
@@ -392,7 +399,7 @@ object AutoP3: Module (
             toReset = resetInterval
         }
         toReset--
-    }
+    }*/
 
     private var resetPacketExceptionState = false
 
@@ -401,13 +408,15 @@ object AutoP3: Module (
         if (!inF7Boss || event.packet !is C03PacketPlayer) return
 
         if (movementPackets.isNotEmpty()) {
-            if (!x_y0uMode) cancelled = 0
+            //if (!x_y0uMode) cancelled = 0
+            cancelled = 0
             return
         }
 
         if (dontCancelNextC03) {
             dontCancelNextC03 = false
-            if (!x_y0uMode) cancelled = 0
+            //if (!x_y0uMode) cancelled = 0
+            cancelled = 0
             return
         }
 
@@ -435,7 +444,7 @@ object AutoP3: Module (
             return
         }
 
-        if (event.packet.isOnGround && !event.packet.isMoving && movementPackets.isEmpty() && (!event.packet.rotating || cancelC05s)) {
+        if (event.packet.isOnGround && !event.packet.isMoving && movementPackets.isEmpty() && (!event.packet.rotating || currentlyCancelRotations())) {
             event.isCanceled = true
             if (cancelled < 400) cancelled++
             return
@@ -450,9 +459,20 @@ object AutoP3: Module (
         }
     }
 
+    private fun currentlyCancelRotations(): Boolean {
+        return when (cancelC05Mode) {
+            "Always" -> true
+            "On Blink/Holding Leap" -> mc.thePlayer.heldItem?.displayName?.contains("leap", true) == true ||
+                    rings[route]?.any {it is BlinkRing && it.inRing(mc.thePlayer.positionVector)} == true
+            else -> false
+
+        }
+    }
+
     private fun cancelledLogic(){
-        if (x_y0uMode) cancelled.coerceAtMost(200)
-        else cancelled = 0
+        //if (x_y0uMode) cancelled.coerceAtMost(200)
+        //else cancelled = 0
+        cancelled = 0
     }
 
     fun getMaxBlinks(): Int {
