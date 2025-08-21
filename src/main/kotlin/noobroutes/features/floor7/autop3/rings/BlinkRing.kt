@@ -8,6 +8,7 @@ import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.*
 import noobroutes.features.render.FreeCam
+import noobroutes.mixin.accessors.LastReportedAccessor
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
@@ -149,7 +150,13 @@ class BlinkRing(
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
         mc.thePlayer.setVelocity(0.0, endYVelo, 0.0)
 
-        modMessage("used §c${packets.size}§f packets,  §7(${AutoP3.getMaxBlinks() - AutoP3.blinksThisInstance} left on this instance)")
+        val accessor = mc.thePlayer as LastReportedAccessor
+
+        accessor.setLastReportedPosX(lastPacket.positionX)
+        accessor.setLastReportedPosY(lastPacket.positionY)
+        accessor.setLastReportedPosZ(lastPacket.positionZ)
+
+        modMessage("used §c${packets.size}§f packets, §7(${AutoP3.getMaxBlinks() - AutoP3.blinksThisInstance} left on this instance)")
     }
 
     fun drawEnd() {

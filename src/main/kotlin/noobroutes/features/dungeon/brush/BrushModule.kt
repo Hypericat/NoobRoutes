@@ -77,6 +77,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
     private val roomConfig = ConcurrentHashMap<String, MutableList<Pair<IBlockState, BlockPos>>>()
 
     var forceRotation by BooleanSetting("Force Rotation", description = "Forces the rotation of the Selected Block while placing. Enables when you control middle click a block")
+    private var forceF7 by BooleanSetting("Force F7", description = "Forces Brush to think its in f7 even on servers")
     var selectedBlockState: IBlockState = IBlockStateUtils.airIBlockState
     private var lastPlace = System.currentTimeMillis()
 
@@ -313,6 +314,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
     }
 
     private fun getLocation(): String {
+        if (forceF7) return "7"
         val location = LocationUtils.currentArea
         return when (location) {
             Island.Dungeon -> {

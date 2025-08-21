@@ -18,6 +18,7 @@ import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.NumberSetting
+import noobroutes.mixin.accessors.LastReportedAccessor
 import noobroutes.utils.AuraManager
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.Scheduler
@@ -74,7 +75,7 @@ object Relics : Module(
         C03PacketPlayer.C04PacketPlayerPosition(57.90262250707492, 6.0, 45.24341101905258, true),
         C03PacketPlayer.C04PacketPlayerPosition(56.5328554372625, 6.0, 44.939853488331515, true),
         C03PacketPlayer.C04PacketPlayerPosition(55.16308836745007, 6.0, 44.63629595761045, true),
-        C03PacketPlayer.C04PacketPlayerPosition(54.5, 6.0, 44.5, true)
+        C03PacketPlayer.C06PacketPlayerPosLook(54.5, 6.0, 44.5, 180f, 0f, true)
     )
 
     private val RED_PACKETS = listOf(
@@ -103,7 +104,7 @@ object Relics : Module(
         C03PacketPlayer.C04PacketPlayerPosition(51.944180829170236, 6.170787077218802, 45.45293113738371, false),
         C03PacketPlayer.C04PacketPlayerPosition(52.93410596607414, 6.0155550727022, 45.044335464360536, false),
         C03PacketPlayer.C04PacketPlayerPosition(53.85897111679178, 6.0, 44.6625935683066, true),
-        C03PacketPlayer.C04PacketPlayerPosition(54.5, 6.0, 44.5, true)
+        C03PacketPlayer.C06PacketPlayerPosLook(54.5, 6.0, 44.5, 180f, 0f, true)
     )
 
     private val startPositions = listOf(ORANGE_PACKETS.first().toVec3(), RED_PACKETS.first().toVec3())
@@ -135,7 +136,7 @@ object Relics : Module(
         else if (mc.thePlayer.positionVector.squareDistanceTo(RED_PACKETS.first().toVec3()) < 1.96) doRelicBlink(RED_PACKETS)
     }
 
-    private fun doRelicBlink(packets: List<C03PacketPlayer.C04PacketPlayerPosition>) {
+    private fun doRelicBlink(packets: List<C03PacketPlayer>) {
         if (packets.size > AutoP3.cancelled) return modMessage("not enough packets, stand still next time")
 
         if (mc.thePlayer.posY != 6.0 || !mc.thePlayer.onGround) return
@@ -145,6 +146,13 @@ object Relics : Module(
         val lastPacket = packets.last()
 
         mc.thePlayer.setPosition(lastPacket.positionX, lastPacket.positionY, lastPacket.positionZ)
+
+        val accessor = mc.thePlayer as LastReportedAccessor
+
+        accessor.setLastReportedPosX(lastPacket.positionX)
+        accessor.setLastReportedPosY(lastPacket.positionY)
+        accessor.setLastReportedPosZ(lastPacket.positionZ)
+
         AutoP3MovementHandler.resetShit()
 
         SwapManager.swapToSlot(8)
@@ -160,7 +168,7 @@ object Relics : Module(
         }
     }
 
-    private fun C03PacketPlayer.C04PacketPlayerPosition.toVec3(): Vec3 {
+    private fun C03PacketPlayer.toVec3(): Vec3 {
         return Vec3(this.positionX, this.positionY, this.positionZ)
     }
 

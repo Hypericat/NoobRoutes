@@ -179,7 +179,6 @@ object AutoP3: Module (
         handleRings(PlayerUtils.getEffectiveViewPosition())
     }
 
-
     fun handleRings(pos: Vec3) {
         val ringList = rings[route] ?: return
         for (ring in ringList) {
