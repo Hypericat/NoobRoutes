@@ -29,7 +29,7 @@ import noobroutes.features.render.FreeCam
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.editUI.EditUI
+import noobroutes.ui.editgui.EditGui
 import noobroutes.utils.*
 import noobroutes.utils.PacketUtils.isResponseToLastS08
 import noobroutes.utils.Utils.isStart
@@ -538,7 +538,9 @@ object AutoP3: Module (
     }
 
     fun handleEdit(args: Array<out String>) {
-        EditUI.openUI(getModifyingRingFromArgs(args) ?: return)
+        val ring = getModifyingRingFromArgs(args) ?: return
+
+        EditGui.openEditGui(ring.getEditGuiBase())
     }
 
     fun handleDelete(args: Array<out String>) {

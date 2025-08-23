@@ -9,6 +9,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
+import noobroutes.utils.MutableVec3
 import noobroutes.utils.addVec
 import noobroutes.utils.fastEyeHeight
 import noobroutes.utils.getBlockAt

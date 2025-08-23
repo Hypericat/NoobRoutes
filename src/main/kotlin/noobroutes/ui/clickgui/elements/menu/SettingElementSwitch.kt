@@ -37,7 +37,7 @@ class SettingElementSwitch(setting: BooleanSetting) : SettingElement<BooleanSett
 
     override fun draw() {
         GlStateManager.pushMatrix()
-        GlStateManager.translate(x, y, 0f)
+        translate(x, y)
         roundedRectangle(0f, 0f, w, h, elementBackground)
         text(name, TEXT_OFFSET, h * 0.5, textColor, 12f, FontRenderer.REGULAR)
         GlStateManager.popMatrix()

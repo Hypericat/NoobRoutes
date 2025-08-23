@@ -45,6 +45,8 @@ object SecretUtils {
     var awaitingAutorouteNode: AutorouteNode? = null
     var canSendC08 = true
     var batSpawnRegistered = false
+    var forceBat = false
+
     @SubscribeEvent
     fun item(event: PacketEvent.Receive) {
         if (event.packet !is S0DPacketCollectItem) return
@@ -97,14 +99,24 @@ object SecretUtils {
         secretCount++
     }
 
+
+
     @SubscribeEvent
     fun onBat(event: ClientTickEvent) {
         if (event.isEnd || AutoRoute.canRoute) return
+        if (forceBat && batSpawnRegistered) {
+            RouteUtils.unsneak(AutoRoute.silent)
+            batSpawnRegistered = false
+            forceBat = false
+            return
+        }
+        forceBat = false
+
         if (!batSpawnRegistered) return
         val bats = mc.theWorld.getEntitiesOfType<EntityBat>()
         for (bat in bats) {
             if (bat.positionVector.distanceToPlayerSq > 225) continue
-            RouteUtils.unsneak()
+            RouteUtils.unsneak(AutoRoute.silent)
             devMessage("Bat Spawned")
             batSpawnRegistered = false
         }

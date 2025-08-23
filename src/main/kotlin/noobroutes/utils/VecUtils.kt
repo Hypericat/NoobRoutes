@@ -31,7 +31,6 @@ fun BlockPos.add(vec: Vec2): BlockPos = this.add(vec.x, 0.0, vec.z)
 
 fun BlockPos.add(vec: Vec2i): BlockPos = this.add(vec.x, 0, vec.z)
 
-
 operator fun Vec3.component1(): Double = xCoord
 
 operator fun Vec3.component2(): Double = yCoord

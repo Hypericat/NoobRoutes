@@ -1,53 +1,59 @@
-package noobroutes.ui.clickgui
+package noobroutes.ui.editgui
 
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.config.Config
-import noobroutes.features.render.ClickGUIModule
+import noobroutes.Core
 import noobroutes.ui.Screen
-import noobroutes.ui.clickgui.elements.ClickGUIBase
-import noobroutes.ui.clickgui.elements.SearchBar
-import noobroutes.ui.util.shader.GaussianBlurShader
 import org.lwjgl.input.Mouse
-import org.lwjgl.opengl.GL11
 import kotlin.math.sign
 
-object ClickGui : Screen() {
+object EditGui : Screen() {
+
+    private var activeEditGuiBase: EditGuiBase? = null
+    var x = 100f
+    var y = 200f
+
+
+    fun openEditGui(editGuiBase: EditGuiBase){
+        editGuiBase.updatePosition(x, y)
+        activeEditGuiBase = editGuiBase
+        Core.display = this
+    }
+
     override fun draw() {
         GlStateManager.pushMatrix()
         scaleUI()
         setupBlending()
-
         backgroundCapture()
-        ClickGUIBase.doHandleDraw()
+        activeEditGuiBase?.doHandleDraw()
         backgroundCleanup()
         GlStateManager.popMatrix()
     }
 
     override fun onScroll(amount: Int) {
         if (Mouse.getEventDWheel() == 0) return
-        ClickGUIBase.handleScroll(amount.sign * 16)
+        activeEditGuiBase?.handleScroll(amount.sign * 16)
     }
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
-        ClickGUIBase.handleMouseClicked(mouseButton)
+        activeEditGuiBase?.handleMouseClicked(mouseButton)
     }
 
     override fun keyTyped(typedChar: Char, keyCode: Int) {
-        if (ClickGUIBase.doHandleKeyTyped(typedChar, keyCode)) return
+        if (activeEditGuiBase?.doHandleKeyTyped(typedChar, keyCode) == true) return
         super.keyTyped(typedChar, keyCode)
     }
 
     override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
         if (state != 0) return
-        ClickGUIBase.handleMouseReleased()
+        activeEditGuiBase?.handleMouseReleased()
     }
+
     override fun initGui() {
-        ClickGUIBase.onGuiInit()
+        activeEditGuiBase?.onOpen
     }
 
     override fun onGuiClosed() {
-        SearchBar.onGuiClosed()
-        Config.save()
+        activeEditGuiBase?.onClose
+        activeEditGuiBase = null
     }
-
 }

@@ -20,7 +20,7 @@ import noobroutes.utils.render.roundedRectangle
 class SettingElementDual(setting: DualSetting) : SettingElement<DualSetting>(
     setting, ElementType.DUAL
 ) {
-    val dualElement = DualElement(setting.left, setting.right, w * 0.5f, h * 0.5f - y, 0.9f, 0.9f, setting.enabled).apply {
+    val dualElement = DualElement(setting.left, setting.right, w * 0.5f, h * 0.5f, 0.9f, 0.9f, setting.enabled).apply {
         addValueChangeListener { setting.enabled = it }
     }
 
@@ -30,7 +30,7 @@ class SettingElementDual(setting: DualSetting) : SettingElement<DualSetting>(
 
     override fun draw() {
         GlStateManager.pushMatrix()
-        GlStateManager.translate(x, y, 0f)
+        translate(x, y)
         roundedRectangle(0f, 0f, w, h, elementBackground)
         GlStateManager.popMatrix()
     }

@@ -132,6 +132,10 @@ class TextBoxElement(
                 invokeValueChangeListeners()
                 listening = false
             }
+            Keyboard.KEY_DELETE -> {
+                if (elementValue.isEmpty()) return true
+
+            }
             Keyboard.KEY_BACK -> {
                 if (elementValue.isEmpty()) return true
                 if (hasSelection) {
@@ -358,9 +362,9 @@ class TextBoxElement(
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (mouseButton != 0) return false
         if (!isHovered) {
-            listening = false
             resetSelection()
-            invokeValueChangeListeners()
+            if (listening) invokeValueChangeListeners()
+            listening = false
             return false
         }
         if (resetClickStageClock.hasTimePassed(false)) clickSelectStage = 0
@@ -503,7 +507,6 @@ class TextBoxElement(
             TextAlign.Right -> -width
         }
 
-
         translate(boxOffset, 0f)
         val textOrigin = when (textAlign) {
             TextAlign.Right -> width - textPadding
@@ -527,8 +530,6 @@ class TextBoxElement(
             align = textAlign,
             verticalAlign = verticalAlign
         )
-
-
         gapOutline(
             x,
             y,
@@ -542,7 +543,6 @@ class TextBoxElement(
             nameWidth,
             boxThickness
         )
-
 
         GlStateManager.popMatrix()
     }

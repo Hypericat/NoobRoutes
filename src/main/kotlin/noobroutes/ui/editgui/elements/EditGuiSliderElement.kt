@@ -1,12 +1,14 @@
-package noobroutes.ui.clickgui.elements.menu
+package noobroutes.ui.editgui.elements
 
 import net.minecraft.client.renderer.GlStateManager
-import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
-import noobroutes.ui.clickgui.elements.ElementType
-import noobroutes.ui.clickgui.elements.SettingElement
+import noobroutes.ui.clickgui.elements.SettingElement.Companion.BORDER_OFFSET
+import noobroutes.ui.clickgui.elements.menu.SettingElementSlider
+import noobroutes.ui.editgui.EditGuiBase
+import noobroutes.ui.editgui.EditGuiElement
+import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.SliderElement
 import noobroutes.ui.util.elements.textElements.NumberBoxElement
 import noobroutes.ui.util.elements.textElements.TextBoxElement
@@ -16,52 +18,58 @@ import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
 import noobroutes.utils.round
 
-/**
- * Renders all the modules.
- *
- * Backend made by Aton, with some changes
- * Design mostly made by Stivais
- *
- * @author Stivais, Aton
- * @see [SettingElement]
- */
-class SettingElementSlider(setting: NumberSetting<*>) :
-    SettingElement<NumberSetting<*>>(setting, ElementType.SLIDER) {
+class EditGuiSliderElement(
+    val name: String,
+    min: Double,
+    max: Double,
+    increment: Double,
+    roundTo: Int,
+    val getter: () -> Double,
+    val setter: (Double) -> Unit
+) : UiElement(0f, 0f), EditGuiElement {
+    override val priority: Int = 5
+    override val isDoubleWidth: Boolean = true
+    override val height: Float = 80f
+
+    private inline var value
+        get() = getter.invoke()
+        set(value) = setter(value)
 
     companion object {
-        private const val TEXT_BOX_HEIGHT = 21.5f
+        private const val TEXT_BOX_HEIGHT = 28.6f
         private const val HALF_TEXT_BOX_HEIGHT = TEXT_BOX_HEIGHT * 0.5f
         private const val SLIDER_HEIGHT = 7f
-        private const val Y_PADDING = 12f
-        private const val NUMBER_BOX_MIN_WIDTH = 28f
+        private const val Y_PADDING = -2f
+        private const val NUMBER_BOX_MIN_WIDTH = 37.333f
         private const val NUMBER_BOX_RADIUS = 6f
         private const val NUMBER_BOX_PADDING = 9f
         private const val TEXT_BOX_THICKNESS = 2f
+        private const val BASE_WIDTH = EditGuiBase.WIDTH - 60f
     }
 
     val sliderElement = SliderElement(
         BORDER_OFFSET,
-        40f,
-        w - BORDER_OFFSET * 2,
+        32f,
+        BASE_WIDTH - BORDER_OFFSET * 2f,
         SLIDER_HEIGHT,
-        setting.valueDouble,
-        setting.min,
-        setting.max,
-        setting.increment,
-        if (setting.value is Int) 0 else 2
+        value,
+        min,
+        max,
+        increment,
+        roundTo
     ).apply {
         addValueChangeListener { sliderValue ->
-            setting.setValueFromNumber(sliderValue)
+            elementValue = sliderValue
             updateValues(sliderValue)
         }
     }
     val numberBoxElement = NumberBoxElement(
         "",
-        w - BORDER_OFFSET,
+        BASE_WIDTH - BORDER_OFFSET,
         Y_PADDING - TEXT_BOX_HEIGHT * 0.5f + 6f,
         NUMBER_BOX_MIN_WIDTH,
         TEXT_BOX_HEIGHT,
-        12f,
+        16f,
         TextAlign.Right,
         NUMBER_BOX_RADIUS,
         NUMBER_BOX_PADDING,
@@ -69,14 +77,22 @@ class SettingElementSlider(setting: NumberSetting<*>) :
         8,
         TextBoxElement.TextBoxType.NORMAL,
         TEXT_BOX_THICKNESS,
-        setting.roundTo,
-        setting.min,
-        setting.max,
-        setting.valueDouble
+        roundTo,
+        min,
+        max,
+        value
     ).apply {
         addValueChangeListener { boxValue ->
-            setting.setValueFromNumber(boxValue)
             updateValues(boxValue)
+        }
+    }
+
+    fun updateValues(sliderValue: Double) {
+        value = sliderValue
+        sliderElement.elementValue = sliderValue
+        numberBoxElement.apply {
+            elementValue = sliderValue.round(roundTo).toDouble()
+            updateTextBoxValue()
         }
     }
 
@@ -84,21 +100,11 @@ class SettingElementSlider(setting: NumberSetting<*>) :
         addChildren(numberBoxElement, sliderElement)
     }
 
-    fun updateValues(sliderValue: Double) {
-        sliderElement.elementValue = sliderValue
-        numberBoxElement.apply {
-            elementValue = setting.valueDouble.round(roundTo).toDouble()
-            updateTextBoxValue()
-        }
-    }
-
     override fun draw() {
         GlStateManager.pushMatrix()
         translate(x, y)
-        roundedRectangle(0f, 0f, w, h, elementBackground)
-        roundedRectangle(0f, 0f, w, h, elementBackground)
-
-        text(name, TEXT_OFFSET, Y_PADDING + HALF_TEXT_BOX_HEIGHT * 0.5f, textColor, 12f)
+        text(name, TEXT_OFFSET,Y_PADDING + HALF_TEXT_BOX_HEIGHT * 0.5f, textColor, 16f)
         GlStateManager.popMatrix()
     }
+
 }

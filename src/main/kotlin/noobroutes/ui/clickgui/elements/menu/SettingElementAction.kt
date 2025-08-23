@@ -23,11 +23,12 @@ import noobroutes.utils.render.text
  */
 class SettingElementAction(setting: ActionSetting) : SettingElement<ActionSetting>(setting, ElementType.ACTION) {
     override val isHovered: Boolean
-        get() = isAreaHovered(x + 20f, y, w - 40f, h - 10f)
+        get() = isAreaHovered(20f, 0f, w - 40f, h - 10f)
 
     override fun draw() {
-        roundedRectangle(x, y, w, h, elementBackground)
-        text(name, x + w * 0.5, y + h * 0.5, if (isHovered) textColor.darker() else textColor, 12f , FontRenderer.REGULAR, TextAlign.Middle, TextPos.Middle)
+        translate(x, y)
+        roundedRectangle(0f, 0f, w, h, elementBackground)
+        text(name, w * 0.5,h * 0.5, if (isHovered) textColor.darker() else textColor, 12f , FontRenderer.REGULAR, TextAlign.Middle, TextPos.Middle)
 
 
     }

@@ -55,8 +55,6 @@ class SettingElementColor(setting: ColorSetting) :
         private const val GAP = (Panel.WIDTH - COLOR_POPOUT_GAP * 2f - COLOR_BOX_SIZE - ColorElementsConstants.COLOR_SLIDER_WIDTH * 2f) / 3f
         private const val COLOR_SLIDER_X_POSITION = COLOR_POPOUT_GAP * 2f + COLOR_BOX_SIZE + ColorElementsConstants.COLOR_SLIDER_WIDTH_HALF
         private const val ALPHA_SLIDER_X_POSITION = COLOR_POPOUT_GAP * 3f + COLOR_BOX_SIZE + ColorElementsConstants.COLOR_SLIDER_WIDTH * 1.5f
-
-
     }
 
 
@@ -71,8 +69,8 @@ class SettingElementColor(setting: ColorSetting) :
 
     val hexElement = TextBoxElement(
         "HEX",
-        0f,
-        0f,
+        COLOR_POPOUT_GAP + HEX_WIDTH * 0.5f + SHIFT,
+        COLOR_POPOUT_GAP * 3f + TEXT_BOX_HEIGHT + COLOR_BOX_SIZE + ModuleButton.BUTTON_HEIGHT,
         HEX_WIDTH,
         TEXT_BOX_HEIGHT,
         12f, TextAlign.Middle, 5f, 6f,
@@ -126,7 +124,7 @@ class SettingElementColor(setting: ColorSetting) :
             }
         )
     }
-    private val colorBox = ColorBoxElement(0f, 0f, color).apply { addValueChangeListener { updateHexElement() } }
+    private val colorBox = ColorBoxElement(GAP + SHIFT + ColorElementsConstants.COLOR_BOX_SIZE_HALF, ColorElementsConstants.COLOR_BOX_SIZE_HALF + ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP, color).apply { addValueChangeListener { updateHexElement() } }
     private val colorSlider = ColorSliderElement(0f, 0f, color).apply { addValueChangeListener { updateHexElement() } }
     private val alphaSlider = if (setting.allowAlpha) AlphaSliderElement(0f, 0f, color).apply { addValueChangeListener { updateHexElement() } } else null
 
@@ -175,11 +173,7 @@ class SettingElementColor(setting: ColorSetting) :
                     COLOR_POPOUT_GAP * 2f + COLOR_BOX_SIZE + ModuleButton.BUTTON_HEIGHT
                 )
             }
-            hexElement.updatePosition(COLOR_POPOUT_GAP + HEX_WIDTH * 0.5f + SHIFT, COLOR_POPOUT_GAP * 3f + TEXT_BOX_HEIGHT + COLOR_BOX_SIZE + ModuleButton.BUTTON_HEIGHT)
-            colorBox.updatePosition(
-                GAP + SHIFT + ColorElementsConstants.COLOR_BOX_SIZE_HALF,
-                ColorElementsConstants.COLOR_BOX_SIZE_HALF + ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP
-            )
+
             colorSlider.updatePosition(
                 COLOR_SLIDER_X_POSITION,
                 ColorElementsConstants.COLOR_BOX_SIZE_HALF + ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP

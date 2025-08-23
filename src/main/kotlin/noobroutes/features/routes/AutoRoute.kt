@@ -85,6 +85,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
     @SubscribeEvent
     fun onKeyInput(event: MouseEvent) {
         if (event.button == 0 && event.buttonstate) {
+            if (SecretUtils.batSpawnRegistered) SecretUtils.forceBat = true
             if (SecretUtils.secretCount < 0) {
                 SecretUtils.secretCount = 0;
                 event.isCanceled = true
@@ -313,7 +314,7 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                     "walk" -> {
                         addNode(room, NodeType.WALK.loader?.generateFromArgs(args, room) ?: return)
                     }
-                    "pearlclip", "clip" -> {
+                    "pearlclip", "vclip" -> {
                         addNode(room, NodeType.PEARL_CLIP.loader?.generateFromArgs(args, room) ?: return)
                     }
                     "pearl" -> {
@@ -326,11 +327,17 @@ object AutoRoute : Module("Autoroute", description = "Ak47 modified", category =
                     "aotv", "teleport", "tp" -> {
                         addNode(room, NodeType.AOTV.loader?.generateFromArgs(args, room) ?: return)
                     }
-                    "bat", "hype" -> {
+                    "bat" -> {
                         addNode(room, NodeType.BAT.loader?.generateFromArgs(args, room) ?: return)
                     }
                     "blockclip", "block" -> {
                         addNode(room, NodeType.BLOCK_CLIP.loader?.generateFromArgs(args, room) ?: return)
+                    }
+                    "clip" -> {
+                        addNode(room, NodeType.CLIP.loader?.generateFromArgs(args, room) ?: return)
+                    }
+                    "hype" -> {
+                        addNode(room, NodeType.HYPE.loader?.generateFromArgs(args, room) ?: return)
                     }
 
                     else -> {

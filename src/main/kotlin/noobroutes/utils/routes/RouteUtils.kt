@@ -22,6 +22,7 @@ import noobroutes.features.routes.AutoRoute
 import noobroutes.features.routes.nodes.AutoRouteNodeBase
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.autoroutes.*
+import noobroutes.utils.LookVec
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
@@ -55,7 +56,7 @@ object RouteUtils {
         setRotation(yaw, pitch, silent)
         AutoP3MovementHandler.resetShit()
         lastRoute = System.currentTimeMillis()
-        ether()
+        ether(AutoRoute.silent)
     }
 
 
@@ -238,7 +239,7 @@ object RouteUtils {
         }
         pearls--
         lastRoute = System.currentTimeMillis()
-        unsneak()
+        unsneak(AutoRoute.silent)
     }
 
 
@@ -281,7 +282,7 @@ object RouteUtils {
                             base
                         ).apply {
                             this.meowOdinTransform = odinTransform
-                            this.meowYawPitch = Pair(yaw, pitch)
+                            this.meowYawPitch = LookVec(yaw, pitch)
                         }
                     )
                 }
@@ -302,6 +303,20 @@ object RouteUtils {
                     val pitch = data.get("pitch").asFloat
                     routeMap.getOrPut(room) {mutableListOf()} .add(
                         Aotv(
+                            coords,
+                            yaw,
+                            pitch,
+                            base
+                        ).apply {
+                            this.meowOdinTransform = odinTransform
+                        }
+                    )
+                }
+                "hype" -> {
+                    val yaw = data.get("yaw").asFloat
+                    val pitch = data.get("pitch").asFloat
+                    routeMap.getOrPut(room) {mutableListOf()} .add(
+                        Hype(
                             coords,
                             yaw,
                             pitch,
@@ -379,6 +394,26 @@ object RouteUtils {
                             this.meowOdinTransform = odinTransform
                         }
                     )
+                }
+                "clip" -> {
+                    val yaw = data.get("yaw").asFloat
+                    val distance = data.get("distance").asDouble
+                    routeMap[room]?.add(
+                        Clip(coords, distance, yaw, base).apply {
+                            this.meowOdinTransform = odinTransform
+                        }
+                    )
+                }
+                "boom" -> {
+                    val yaw = data.get("yaw").asFloat
+                    val pitch = data.get("pitch").asFloat
+                    routeMap[room]?.add(
+                        Boom(coords, null, base).apply {
+                            this.lookVec = LookVec(yaw, pitch)
+                            this.meowOdinTransform = odinTransform
+                        }
+                    )
+
                 }
                 else -> {}
             }
