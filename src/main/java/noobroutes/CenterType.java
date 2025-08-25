@@ -23,7 +23,6 @@ public enum CenterType {
     ),
     POS("POS",
             () -> centerX(false),
-            CenterType::centerY,
             () -> centerZ(false)
     ),
     X("X", () -> centerX(false)),

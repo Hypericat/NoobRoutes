@@ -6,6 +6,7 @@ import net.minecraft.util.BlockPos
 import noobroutes.Core.display
 import noobroutes.features.dungeon.AutoBloodRush
 import noobroutes.features.misc.SexAura
+import noobroutes.features.misc.TickControl
 import noobroutes.ui.clickgui.ClickGui
 import noobroutes.utils.Utils
 import noobroutes.utils.skyblock.dungeon.Dungeon
@@ -31,6 +32,7 @@ class NoobRoutesCommand : CommandBase() {
             "pickup" -> SexAura.pickupLineByName(args)
             "test" -> Utils.testFunctions(args)
             "snipe" -> AutoBloodRush.snipeCommand(args)
+            "tick" -> TickControl.tick(args.getOrNull(1)?.toIntOrNull() ?: return modMessage("Invalid usage!"))
             else -> modMessage("Usages: Rat, Pickup, Snipe, Test")
         }
     }

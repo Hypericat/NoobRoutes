@@ -3,6 +3,7 @@ package noobroutes.features.misc
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.MovePlayerEvent
 import noobroutes.features.Category
@@ -12,6 +13,7 @@ import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.AutoP3MovementHandler
 import noobroutes.features.settings.NotPersistent
 import noobroutes.features.settings.impl.KeybindSetting
+import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
@@ -26,9 +28,59 @@ object TickControl : Module("Tick Control", category = Category.MISC, descriptio
     private data class PlayerState(val pos: Vec3, val velocity: Vec3, val ground: Boolean, val p3State: AutoP3MovementHandler.AutoP3MovementState, val lavaState: Simulation.SimulationLavaState)
 
     private val rewindTick by KeybindSetting("Rewind Tick", key = Keyboard.KEY_LEFT, description = "").onPress {
-        if (!enabled) return@onPress modMessage("Tick Control Must Be Enabled")
-        if (!mc.isSingleplayer) return@onPress modMessage("Must be in Single Player")
-        if (stateStack.isEmpty()) return@onPress modMessage("Can't Rewind Further")
+        rewindTick();
+    }
+
+    private val advanceTick by KeybindSetting("Advance Tick", key = Keyboard.KEY_RIGHT, description = "Triggers a game tick").onPress {
+        advanceTick();
+    }
+
+    private var canTick = false
+    private var tick = 0;
+    private val stateStack = Stack<PlayerState>()
+
+    override val canToggle: () -> Boolean
+        get() = {mc.isSingleplayer}
+
+    override fun onDisable() {
+        stateStack.clear()
+        super.onDisable()
+    }
+
+    fun tick(count: Int) {
+        if (tick != 0) return modMessage("Current ticking already in progress!")
+        tick = count;
+    }
+
+    private fun advanceTick() {
+        if (!enabled)  {
+            tick = 0;
+            return modMessage("Tick Control Must Be Enabled")
+        }
+        if (!mc.isSingleplayer) {
+            tick = 0;
+            return modMessage("Must be in Single Player")
+        }
+
+        canTick = true
+    }
+
+    private fun rewindTick() {
+        if (!enabled)  {
+            tick = 0;
+            return modMessage("Tick Control Must Be Enabled")
+        }
+
+        if (!mc.isSingleplayer) {
+            tick = 0;
+            return modMessage("Must be in Single Player")
+        }
+
+        if (stateStack.isEmpty()) {
+            tick = 0;
+            return modMessage("Can't Rewind Further")
+        }
+
         val state = stateStack.pop()
         PlayerUtils.setPosition(state.pos)
 
@@ -40,25 +92,23 @@ object TickControl : Module("Tick Control", category = Category.MISC, descriptio
         AutoP3.handleRings(mc.thePlayer.positionVector)
     }
 
-    private val advanceTick by KeybindSetting("Advance Tick", key = Keyboard.KEY_RIGHT, description = "Triggers a game tick").onPress {
-        if (!enabled) return@onPress modMessage("Tick Control Must Be Enabled")
-        if (!mc.isSingleplayer) return@onPress modMessage("Must be in Single Player")
-        canTick = true
-    }
-    private var canTick = false
-    private val stateStack = Stack<PlayerState>()
-
-    override val canToggle: () -> Boolean
-        get() = {mc.isSingleplayer}
-
-    override fun onDisable() {
-        stateStack.clear()
-        super.onDisable()
-    }
-
     /*
 If this breaks with hclip it has something to do with event priority in the scheduler. idk.
  */
+
+    @SubscribeEvent
+    fun onTick(event: ClientTickEvent) {
+        if (event.isEnd || tick == 0) return
+        if (tick > 0) {
+            tick--;
+            advanceTick();
+            return
+        }
+
+        tick++;
+        rewindTick();
+        return
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onMoveEntityWithHeadingPre(event: MoveEntityWithHeadingEvent.Pre) {
