@@ -115,11 +115,8 @@ class EditGuiBase() : UiElement(0f, 0f) {
     }
 
     companion object {
-        var editGuiBaseX = DEFAULT_X
-        var editGuiBaseY = DEFAULT_Y
-
-        private const val DEFAULT_X = 100f
-        private const val DEFAULT_Y = 200f
+        var editGuiBaseX = 0f
+        var editGuiBaseY = 0f
 
         private const val X_ALIGNMENT_LEFT = 30f
         private const val X_ALIGNMENT_RIGHT = 300f

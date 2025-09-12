@@ -11,6 +11,7 @@ import noobroutes.features.settings.impl.*
 import noobroutes.font.FontType
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.clickgui.ClickGui
+import noobroutes.ui.editgui.EditGuiBase.Companion.DEFAULT_X
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
@@ -78,9 +79,9 @@ object  ClickGUIModule: Module(
         private set
     var searchBarY = +NumberSetting<Float>("searchBarY", 0f, hidden = true, description = "")
         private set
-    var editGuiX = +NumberSetting<Float>("editGuiX", 0f, hidden = true, description = "")
+    var editGuiX = +NumberSetting<Float>("editGuiX", 100f, hidden = true, description = "")
         private set
-    var editGuiY = +NumberSetting<Float>("editGuiY", 0f, hidden = true, description = "")
+    var editGuiY = +NumberSetting<Float>("editGuiY", 200f, hidden = true, description = "")
         private set
 
 
