@@ -2,6 +2,7 @@ package noobroutes.ui.editgui
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core
+import noobroutes.features.render.ClickGUIModule
 import noobroutes.ui.Screen
 import org.lwjgl.input.Mouse
 import kotlin.math.sign
@@ -9,12 +10,14 @@ import kotlin.math.sign
 object EditGui : Screen() {
 
     private var activeEditGuiBase: EditGuiBase? = null
-    var x = 100f
-    var y = 200f
+
+    init {
+        EditGuiBase.editGuiBaseX = ClickGUIModule.editGuiX.value
+        EditGuiBase.editGuiBaseY = ClickGUIModule.editGuiY.value
+    }
 
 
     fun openEditGui(editGuiBase: EditGuiBase){
-        editGuiBase.updatePosition(x, y)
         activeEditGuiBase = editGuiBase
         Core.display = this
     }
@@ -55,5 +58,7 @@ object EditGui : Screen() {
     override fun onGuiClosed() {
         activeEditGuiBase?.onClose
         activeEditGuiBase = null
+        ClickGUIModule.editGuiX.value = EditGuiBase.editGuiBaseX
+        ClickGUIModule.editGuiY.value = EditGuiBase.editGuiBaseY
     }
 }

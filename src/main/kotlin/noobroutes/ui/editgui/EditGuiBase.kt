@@ -4,10 +4,12 @@ import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.editgui.elements.EditGuiSliderElement
 import noobroutes.ui.editgui.elements.EditGuiSwitchElement
+import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
+import kotlin.math.floor
 
 class EditGuiBase() : UiElement(0f, 0f) {
     var height = 0f
@@ -72,15 +74,40 @@ class EditGuiBase() : UiElement(0f, 0f) {
             base.height = currentY + 75f
             base.onOpen = this.onOpen
             base.onClose = this.onClose
+            base.updatePosition(editGuiBaseX, editGuiBaseY)
             return base
         }
+    }
+
+    var dragging = false
+    var x2 = 0f
+    var y2 = 0f
+    override fun mouseClicked(mouseButton: Int): Boolean {
+        if (mouseButton != 0) return false
+        if (isAreaHovered(0f, 0f, 600f, 70f)) {
+            x2 = x - MouseUtils.mouseX
+            y2 = y - MouseUtils.mouseY
+            dragging = true
+            return true
+        }
+        return false
+    }
+
+    override fun mouseReleased(): Boolean {
+        dragging = false
+        return false
     }
 
 
     override fun draw() {
         GlStateManager.pushMatrix()
-        blurRoundedRectangle(x, y, 600f, height, 20f, 20f, 20f, 20f, 0.5f)
+        if (dragging) {
+            updatePosition(x2 + MouseUtils.mouseX, y2 + MouseUtils.mouseY)
+            editGuiBaseX = x
+            editGuiBaseY = y
+        }
         translate(x, y)
+        blurRoundedRectangle(0f, 0f, 600f, height, 20f, 20f, 20f, 20f, 0.5f)
         roundedRectangle(0f, 0f, 600, 70, ColorPalette.titlePanelColor,  ColorPalette.titlePanelColor, Color.TRANSPARENT, 0, 20f, 20f, 0f, 0f, 0f)
         roundedRectangle(0f, 0f, 600, height, ColorPalette.buttonColor, radius = 20)
         text(name, X_ALIGNMENT_LEFT - 10, 37.5, Color.WHITE, size = 30)
@@ -88,6 +115,9 @@ class EditGuiBase() : UiElement(0f, 0f) {
     }
 
     companion object {
+        var editGuiBaseX = DEFAULT_X
+        var editGuiBaseY = DEFAULT_Y
+
         private const val DEFAULT_X = 100f
         private const val DEFAULT_Y = 200f
 

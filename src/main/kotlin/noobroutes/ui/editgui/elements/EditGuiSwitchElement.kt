@@ -32,8 +32,9 @@ class EditGuiSwitchElement(
 
     override fun draw() {
         GlStateManager.pushMatrix()
-        translate(x, y)
-        text(name, BORDER_OFFSET, 0f, ColorPalette.textColor, 16f)
+        translate(x + BORDER_OFFSET, y)
+        switch.x = SwitchElement.SWITCH_WIDTH + 120f
+        text(name, 0f, 0f, ColorPalette.textColor, 16f)
         GlStateManager.popMatrix()
     }
 

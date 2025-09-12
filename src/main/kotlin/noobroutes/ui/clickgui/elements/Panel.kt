@@ -26,6 +26,7 @@ import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 
 class Panel(val name: String, val category: Category, val icon: DynamicTexture) : UiElement(ClickGUIModule.panelX[category]!!.value, ClickGUIModule.panelY[category]!!.value) {
+
     companion object {
         const val WIDTH = 240f
         const val HEIGHT = 40f

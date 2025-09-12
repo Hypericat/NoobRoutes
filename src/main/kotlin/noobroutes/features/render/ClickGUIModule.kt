@@ -74,9 +74,13 @@ object  ClickGUIModule: Module(
     val panelX = mutableMapOf<Category, NumberSetting<Float>>()
     val panelY = mutableMapOf<Category, NumberSetting<Float>>()
     val panelExtended = mutableMapOf<Category, BooleanSetting>()
-    var searchBarX = NumberSetting<Float>("", 0f, hidden = true, description = "")
+    var searchBarX = +NumberSetting<Float>("searchBarX", 0f, hidden = true, description = "")
         private set
-    var searchBarY = NumberSetting<Float>("", 0f, hidden = true, description = "")
+    var searchBarY = +NumberSetting<Float>("searchBarY", 0f, hidden = true, description = "")
+        private set
+    var editGuiX = +NumberSetting<Float>("editGuiX", 0f, hidden = true, description = "")
+        private set
+    var editGuiY = +NumberSetting<Float>("editGuiY", 0f, hidden = true, description = "")
         private set
 
 
