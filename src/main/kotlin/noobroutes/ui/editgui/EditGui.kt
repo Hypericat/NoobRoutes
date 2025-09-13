@@ -2,6 +2,7 @@ package noobroutes.ui.editgui
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.Core
+import noobroutes.config.Config
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.ui.Screen
 import org.lwjgl.input.Mouse
@@ -60,5 +61,6 @@ object EditGui : Screen() {
         activeEditGuiBase = null
         ClickGUIModule.editGuiX.value = EditGuiBase.editGuiBaseX
         ClickGUIModule.editGuiY.value = EditGuiBase.editGuiBaseY
+        Config.save()
     }
 }

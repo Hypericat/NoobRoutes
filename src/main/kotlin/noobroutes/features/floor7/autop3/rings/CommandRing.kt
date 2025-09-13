@@ -1,6 +1,7 @@
 package noobroutes.features.floor7.autop3.rings
 
 import noobroutes.features.floor7.autop3.*
+import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.requirement
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.sendCommand
@@ -64,5 +65,7 @@ class CommandRing(ringBase: RingBase = RingBase(), var walk: Boolean = false, va
     private fun hasArgs(): Boolean{
         return term || leap || left || center || rotate || walk
     }
-
+    override fun extraArgs(builder: EditGuiBase.EditGuiBaseBuilder) {
+        builder.addSwitch("Walk", {walk}, {walk = it})
+    }
 }

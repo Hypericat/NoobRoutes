@@ -174,6 +174,12 @@ abstract class Ring(
         )
     }
 
+    private fun renderCircularRing(color: Color) {
+        val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
+        RenderUtils.drawCylinder(offsetCoords, diameter,)
+        RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), color, thickness = 3, depth = true)
+    }
+
     private fun renderBBGRing(color: Color) {
         val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
         var dDia = diameter.toDouble();
@@ -320,12 +326,20 @@ abstract class Ring(
         }
     }
 
+
+    protected open val includeY = true
+    protected open val includeHeight = true
+
+    open fun extraArgs(builder: EditGuiBase.EditGuiBaseBuilder) {
+    }
+
     open fun getEditGuiBase(): EditGuiBase {
         val builder = EditGuiBase.EditGuiBaseBuilder()
         builder.addYaw()
-        builder.addXYZ(true)
-        builder.addDiameterAndHeight(true)
+        builder.addXYZ(includeY)
+        builder.addDiameterAndHeight(includeHeight)
         builder.addArgs()
+        extraArgs(builder)
         builder.setName(ringName)
         builder.addOnCloseAndOpen()
         return builder.build()

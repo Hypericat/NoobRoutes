@@ -9,6 +9,7 @@ import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.*
 import noobroutes.features.render.FreeCam
 import noobroutes.mixin.accessors.LastReportedAccessor
+import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
@@ -23,7 +24,6 @@ class BlinkRing(
     var packets: List<C04PacketPlayerPosition> = listOf(),
     var endYVelo: Double = 0.0
 ) : Ring(ringBase, RingType.BLINK) {
-
     companion object : CommandGenerated {
         override fun generateRing(args: Array<out String>): Ring? {
             if (AutoP3.recordingPacketList.isNotEmpty()) {
@@ -85,8 +85,6 @@ class BlinkRing(
         }
         packets = packetsLoaded
     }
-
-
 
     override fun doRing() {
         super.doRing()
@@ -172,4 +170,8 @@ class BlinkRing(
     private fun enoughPackets(): Boolean {
         return if (AutoP3.dontChargeAll) AutoP3.cancelled >= packets.size * AutoP3.percentageChargeAmount * 0.01 else AutoP3.cancelled >= packets.size
     }
+
+    override val includeHeight = false
+    override val includeY = false
+
 }

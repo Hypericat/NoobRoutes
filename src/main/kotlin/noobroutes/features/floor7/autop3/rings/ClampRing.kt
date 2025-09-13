@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3.rings
 
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.*
+import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
 
@@ -37,5 +38,8 @@ class ClampRing(
         val scale = minOf(scaleX, scaleZ)
         mc.thePlayer.motionX = xPart(yaw) * scale
         mc.thePlayer.motionZ = zPart(yaw) * scale
+    }
+    override fun extraArgs(builder: EditGuiBase.EditGuiBaseBuilder) {
+        builder.addSwitch("Walk", {walk}, {walk = it})
     }
 }

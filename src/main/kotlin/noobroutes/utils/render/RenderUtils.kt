@@ -2,6 +2,7 @@ package noobroutes.utils.render
 
 import gg.essential.universal.shader.BlendState
 import gg.essential.universal.shader.UShader
+import javafx.scene.shape.Circle
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper

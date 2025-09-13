@@ -11,7 +11,6 @@ import noobroutes.features.settings.impl.*
 import noobroutes.font.FontType
 import noobroutes.ui.ColorPalette
 import noobroutes.ui.clickgui.ClickGui
-import noobroutes.ui.editgui.EditGuiBase.Companion.DEFAULT_X
 import noobroutes.ui.hud.EditHUDGui
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
