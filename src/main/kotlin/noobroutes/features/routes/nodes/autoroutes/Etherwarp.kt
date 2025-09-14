@@ -6,6 +6,7 @@ import noobroutes.features.routes.AutoRoute
 import noobroutes.features.routes.nodes.AutoRouteNodeBase
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
+import noobroutes.utils.LookVec
 import noobroutes.utils.RotationUtils
 import noobroutes.utils.RotationUtils.offset
 import noobroutes.utils.Utils.xPart
@@ -35,7 +36,7 @@ class Etherwarp(
     pos,
     base
 ) {
-    var meowYawPitch: Pair<Float, Float>? = null
+    var meowYawPitch: LookVec? = null
 
     override fun meowConvert(room: UniqueRoom) {
         super.meowConvert(room)
@@ -44,8 +45,8 @@ class Etherwarp(
             val raytrace = EtherWarpHelper.rayTraceBlock(
                 200,
                 1f,
-                room.getRealYaw(it.first),
-                it.second,
+                room.getRealYaw(it.yaw),
+                it.pitch,
                 realCoords.xCoord,
                 realCoords.yCoord + SNEAK_EYE_HEIGHT,
                 realCoords.zCoord
@@ -65,7 +66,7 @@ class Etherwarp(
             val target = obj.get("target").asVec3
             val yaw = obj.get("yaw")?.asFloat
             val pitch = obj.get("pitch")?.asFloat
-            val meowLook = if (yaw != null && pitch != null) Pair(yaw, pitch) else null
+            val meowLook = if (yaw != null && pitch != null) LookVec(yaw, pitch) else null
             return Etherwarp(
                 obj.getCoords(),
                 target,
@@ -129,8 +130,8 @@ class Etherwarp(
     override fun nodeAddInfo(obj: JsonObject) {
         obj.addProperty("target", target)
         meowYawPitch?.let {
-            obj.addProperty("yaw", it.first)
-            obj.addProperty("pitch", it.second)
+            obj.addProperty("yaw", it.yaw)
+            obj.addProperty("pitch", it.pitch)
         }
     }
 

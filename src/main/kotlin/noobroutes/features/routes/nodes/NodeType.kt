@@ -5,13 +5,15 @@ import noobroutes.features.routes.nodes.autoroutes.*
 enum class NodeType(val displayName: String, val loader: NodeLoader?) {
     ETHERWARP("Etherwarp", Etherwarp.Companion),
     AOTV("Aotv", Aotv.Companion),
+    HYPE("Hype", Hype.Companion),
     BAT("Bat", Bat.Companion),
     BOOM("Boom", Boom.Companion),
     PEARL("Pearl", Pearl.Companion),
     PEARL_CLIP("PearlClip", PearlClip.Companion),
     USE_ITEM("UseItem", UseItem.Companion),
     WALK("Walk", Walk.Companion),
-    BLOCK_CLIP("Clip", BlockClip.Companion),
+    BLOCK_CLIP("BlockClip", BlockClip.Companion),
+    CLIP("Clip", Clip.Companion),
     DYNAMIC("DynamicNode", null);
     companion object {
         fun getFromName(name: String) : NodeType? {

@@ -91,7 +91,7 @@ class UseItem(
             return
         }
         RouteUtils.setRotation(room.getRealYaw(yaw), pitch, AutoRoute.silent)
-        RouteUtils.unsneak()
+        RouteUtils.unsneak(AutoRoute.silent)
     }
 
 

@@ -25,11 +25,12 @@ import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.floor7.autop3.rings.BlinkWaypoint
 import noobroutes.features.floor7.autop3.rings.HClipRing
 import noobroutes.features.floor7.autop3.rings.LavaClipRing
+import noobroutes.features.misc.TickControl
 import noobroutes.features.render.FreeCam
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.ui.ColorPalette
-import noobroutes.ui.editUI.EditUI
+import noobroutes.ui.editgui.EditGui
 import noobroutes.utils.*
 import noobroutes.utils.PacketUtils.isResponseToLastS08
 import noobroutes.utils.Utils.isStart
@@ -63,11 +64,14 @@ object AutoP3: Module (
     private val recentActionStack = Stack<EditRingAction>()
     private val recentUndoActionStack = Stack<EditRingAction>()
 
+
+    private val RING_HASHCODE = "Ring".hashCode()
     var route by StringSetting("Route", "", description = "Route to use")
     private val ringColor by ColorSetting("Ring Color", Color.GREEN, false, description = "color of the rings")
+    private val secondaryRingColor by ColorSetting("Secondary Ring Color", Color.DARK_GRAY, false, description = "The secondary color of the ring for Ring rendering mode").withDependency { renderMode.hashCode() == RING_HASHCODE }
     private val onFrame by BooleanSetting("Check on frame", description = "Checks on frame if you are in a ring. Use if you are lazy.")
     private val nonSilentRotates by BooleanSetting("Non-Silent look", description = "Makes it so rings with the rotate argument rotate client side.")
-    private val renderMode by SelectorSetting("Render Mode", "Box", arrayListOf("Box", "BBG"), description = "Ring render type")
+    private val renderMode by SelectorSetting("Render Mode", "Box", arrayListOf("Box", "BBG", "Simple Ring", "Ring"), description = "Ring render type")
 
     private val editShit by DropdownSetting("Edit Settings", false)
     private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes").withDependency { editShit }
@@ -143,7 +147,7 @@ object AutoP3: Module (
         if (!inF7Boss) return
 
         rings[route]?.forEachIndexed { i, ring ->
-            ring.renderRing(ringColor, renderMode)
+            ring.renderRing(ringColor, secondaryRingColor, renderMode)
 
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), ringColor, depth = true, shadow = false)
 
@@ -154,7 +158,7 @@ object AutoP3: Module (
             RenderUtils.drawGradient3DLine(ring.packets.map { Vec3(it.positionX, it.positionY + 0.03, it.positionZ) }, ringColor, Color.RED, 1F, true)
         }
 
-        activeBlinkWaypoint?.renderRing(Color.WHITE, renderMode)
+        activeBlinkWaypoint?.renderRing(Color.WHITE, secondaryRingColor, renderMode)
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -382,7 +386,7 @@ object AutoP3: Module (
             event.isCanceled = true
             if (cancelled < 400) cancelled++
             return
-        } else {
+        } else {7
 
             if (event.packet is C03PacketPlayer.C06PacketPlayerPosLook && event.packet.isResponseToLastS08()) {
                 resetPacketExceptionState = true
@@ -440,7 +444,8 @@ object AutoP3: Module (
     }
 
     fun addRing(ring: Ring){
-        rings.getOrPut(route) { mutableListOf() }.add(ring.apply { triggered = true })
+        //nicer to use if it is false while using tick control
+        rings.getOrPut(route) { mutableListOf() }.add(ring.apply { triggered = !TickControl.enabled })
         saveRings()
         if (ring is BlinkRing) {
             recentActionStack.add(EditRingAction(
@@ -538,7 +543,9 @@ object AutoP3: Module (
     }
 
     fun handleEdit(args: Array<out String>) {
-        EditUI.openUI(getModifyingRingFromArgs(args) ?: return)
+        val ring = getModifyingRingFromArgs(args) ?: return
+
+        EditGui.openEditGui(ring.getEditGuiBase())
     }
 
     fun handleDelete(args: Array<out String>) {

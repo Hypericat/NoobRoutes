@@ -50,14 +50,8 @@ abstract class UiElement(var x: Float, var y: Float) {
     open fun updateChildren(){}
 
     open fun updatePosition(x: Float, y: Float){
-        val deltaX = x - this.x
-        val deltaY = y - this.y
         this.x = x
         this.y = y
-        for (i in uiChildren.indices) {
-            val child = uiChildren[i]
-            child.updatePosition(child.x + deltaX, child.y + deltaY)
-        }
     }
 
     open fun doHandleDraw() {

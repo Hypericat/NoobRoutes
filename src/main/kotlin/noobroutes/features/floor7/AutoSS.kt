@@ -57,7 +57,7 @@ object AutoSS : Module(
     @DevOnly
     private val i1ClickAmount by NumberSetting("i1 clicks", 24, 9, 36, 3, description = "how often i1 should click (triple of 3 man i1)")
     @DevOnly
-    private val i1Delay by NumberSetting("i1 delay", 42, 5, 60, description = "how long to wait beetween click bursts")
+    private val i1Delay by NumberSetting("i1 delay", 42, 5, 60, description = "how long to wait between click bursts")
     @DevOnly
     private val i1People by NumberSetting("i1 fake people", 2, 0, 5, description = "how many extra people it should click for")
 

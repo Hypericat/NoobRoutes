@@ -1,5 +1,6 @@
 package noobroutes.ui.clickgui.elements.menu
 
+import net.minecraft.client.renderer.GlStateManager
 import noobroutes.features.settings.impl.SelectorSetting
 import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette.TEXT_OFFSET
@@ -66,7 +67,7 @@ class SettingElementSelector(setting: SelectorSetting) :
 
         for (i in 0 until size) {
             val y = y + 38 + 32 * i
-            text(setting.options[i].lowercase().capitalizeFirst(), x + w / 2f, y + 6f, textColor, 12f, FontRenderer.REGULAR, TextAlign.Middle, TextPos.Top)
+            text(setting.options[i].lowercase().capitalizeFirst(), x + w * 0.5f, y + 6f, textColor, 12f, FontRenderer.REGULAR, TextAlign.Middle, TextPos.Top)
             if (isSettingHovered(i)) rectangleOutline(x + 5, y - 1f, w - 11.5f, 32.5f, clickGUIColor.darker(), 4f, 3f)
         }
         resetScissor(scissor)

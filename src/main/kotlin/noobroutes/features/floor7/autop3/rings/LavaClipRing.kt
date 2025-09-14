@@ -6,6 +6,7 @@ import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.features.move.LavaClip
+import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.Scheduler
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.absoluteValue
@@ -48,5 +49,9 @@ class LavaClipRing(
     private fun resetTriggered() {//TODO: make actual good logic
         triggered = true
         Scheduler.schedulePreTickTask(60) { triggered = false }
+    }
+
+    override fun extraArgs(builder: EditGuiBase.EditGuiBaseBuilder) {
+        builder.addSlider("Length", 3.0, 40.0, 1.0, 0, {length}, {length = it})
     }
 }

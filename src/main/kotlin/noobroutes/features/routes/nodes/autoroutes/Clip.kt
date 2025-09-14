@@ -1,93 +1,77 @@
 package noobroutes.features.routes.nodes.autoroutes
 
 import com.google.gson.JsonObject
+import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
-import noobroutes.features.floor7.autop3.AutoP3MovementHandler
-import noobroutes.features.routes.AutoRoute
 import noobroutes.features.routes.nodes.AutoRouteNodeBase
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.Scheduler
-import noobroutes.utils.render.Color
-import noobroutes.utils.round
-import noobroutes.utils.routes.RouteUtils
+import noobroutes.utils.Utils.xPart
+import noobroutes.utils.Utils.zPart
+import noobroutes.utils.requirement
+import noobroutes.utils.roundToNearest
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeYaw
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
+import noobroutes.utils.skyblock.modMessage
 
-class Walk(
-    pos: Vec3,
-    var yaw: Float,
-    base: AutoRouteNodeBase
-) : AutorouteNode(
-    pos,
-    base
-) {
+class Clip(pos: Vec3, val distance: Double, val yaw: Float, base: AutoRouteNodeBase) : AutorouteNode(pos, base) {
     companion object : NodeLoader {
         override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
             val base = getBaseFromObj(obj)
             val yaw = obj.get("yaw").asFloat
-
-            return Walk(
-                obj.getCoords(),
-                yaw,
-                base
-            )
+            val distance = obj.get("distance").asDouble
+            return Clip(obj.getCoords(), distance, yaw, base)
         }
 
         override fun generateFromArgs(
             args: Array<out String>,
             room: UniqueRoom
         ): AutorouteNode? {
+            if (!args.requirement(3)) {
+                modMessage("requires distance arg")
+                return null
+            }
+            val distance = args[2].toDoubleOrNull() ?: run {
+                modMessage("invalid distance")
+                return null
+            }
             val base = getBaseFromArgs(args)
-            return Walk(
-                getCoords(room),
-                room.getRelativeYaw(mc.thePlayer.rotationYaw.round(14).toFloat()),
-                base
-            )
-        }
-    }
 
+            return Clip(getCoords(room), distance, room.getRelativeYaw(mc.thePlayer.rotationYaw), base)
+        }
+
+    }
 
     override val priority: Int = 4
     override fun nodeAddInfo(obj: JsonObject) {
         obj.addProperty("yaw", yaw)
+        obj.addProperty("distance", distance)
     }
 
-
-
     override fun updateTick() {
-        val room = currentRoom ?: return
         PlayerUtils.unSneak(isSilent())
-        val yaw = room.getRealYaw(yaw)
-        if (!isSilent()) mc.thePlayer.rotationYaw = yaw
     }
 
     override fun run() {
         val room = currentRoom ?: return
+        val realCoords = room.getRealCoords(pos)
+        val realYaw = room.getRealYaw(yaw)
         PlayerUtils.unSneak(isSilent())
-        val yaw = room.getRealYaw(yaw)
-
-
-        if (RouteUtils.serverSneak) {
-            Scheduler.schedulePreTickTask {
-                AutoP3MovementHandler.setDirection(yaw)
-            }
-            return
+        PlayerUtils.setPosition(realCoords.xCoord + realYaw.xPart * distance, realCoords.zCoord + realYaw.zPart * distance)
+        Scheduler.scheduleC03Task {
+            PlayerUtils.resyncSneak()
         }
-        AutoP3MovementHandler.setDirection(yaw)
     }
 
     override fun getType(): NodeType {
-        return NodeType.WALK
+        return NodeType.CLIP
     }
 
-
-    override fun getRenderColor(): Color {
-        return AutoRoute.walkColor
-    }
 
 
 }

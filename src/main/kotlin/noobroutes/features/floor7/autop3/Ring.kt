@@ -6,6 +6,7 @@ import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.render.FreeCam
+import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.*
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
@@ -17,6 +18,7 @@ import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
+import kotlin.math.sin
 
 
 data class RingBase(
@@ -41,6 +43,16 @@ abstract class Ring(
     val base: RingBase,
     val type: RingType
 ) {
+
+    //"Simple Ring", "Ring"
+    companion object {
+        val BBG_HASHCODE: Int = "BBG".hashCode()
+        val BOX_HASHCODE = "Box".hashCode()
+        val SIMPLE_RING_HASHCODE = "Simple Ring".hashCode()
+        val RING_HASHCODE = "Ring".hashCode()
+        const val ONE_THREE_HUNDREDTH = 1 / 300.0
+
+    }
     inline val ringName get() = type.ringName
 
     inline var coords: Vec3
@@ -93,7 +105,7 @@ abstract class Ring(
         get() = (term || leap || left)
 
 
-    var renderYawVector = false
+    var isEditingRing = false
     var triggered = false
     val internalRingData = mutableListOf<SyncData>()
 
@@ -149,13 +161,43 @@ abstract class Ring(
         internalRingData.add(SyncLong(name, getter, setter))
     }
 
-
-    fun renderRing(color: Color, renderMode: String) {
-        if (renderMode.hashCode() == "BBG".hashCode()) {
-            renderBBGRing(color)
-            return
+    fun renderRing(color: Color, secondaryColor: Color, renderMode: String) {
+        when(renderMode.hashCode()) {
+            BBG_HASHCODE -> renderBBGRing(color)
+            BOX_HASHCODE -> renderBoxRing(color)
+            RING_HASHCODE -> renderCircularRing(color, secondaryColor)
+            SIMPLE_RING_HASHCODE -> renderSimpleCircularRing(color)
         }
-        renderBoxRing(color)
+        drawRingEditing(color)
+    }
+
+    protected open fun drawRingEditing(color: Color){
+        if (this.isEditingRing) Renderer.draw3DLine(
+            listOf(
+                this.coords.add(0.0, PlayerUtils.STAND_EYE_HEIGHT, 0.0),
+                Vec3(this.yaw.xPart, 0.0, this.yaw.zPart).multiply(1.8).add(
+                    this.coords.xCoord,
+                    this.coords.yCoord + PlayerUtils.STAND_EYE_HEIGHT,
+                    this.coords.zCoord
+                )
+            ),
+            color
+        )
+    }
+
+    private fun renderCircularRing(color1: Color, color2: Color) {
+        val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
+        val r = diameter * 0.6f
+        RenderUtils.drawFlatCylinder(offsetCoords.add(0.0, (0.45 * sin(System.currentTimeMillis().toDouble() * ONE_THREE_HUNDREDTH)) + 0.528 , 0.0), r, 24, 90, 0, 0, color1, true, 5f)
+        RenderUtils.drawFlatCylinder(offsetCoords.add(0.0, (-0.45 * sin(System.currentTimeMillis().toDouble() * ONE_THREE_HUNDREDTH)) + 0.528 , 0.0), r, 24, 90, 0, 0, color1, true, 5f)
+        RenderUtils.drawFlatCylinder(offsetCoords.add(0.0, 0.503, 0.0), r, 24, 90, 0, 0, color1, true, 5f)
+        RenderUtils.drawFlatCylinder(offsetCoords.add(0.0, 0.03, 0.0), r, 24, 90, 0, 0, color2, true, 5f)
+        RenderUtils.drawFlatCylinder(offsetCoords.add(0.0, 1.03, 0.0), r, 24, 90, 0, 0, color2, true, 5f)
+    }
+
+    private fun renderSimpleCircularRing(color: Color) {
+        val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
+        RenderUtils.drawFlatCylinder(offsetCoords,  diameter * 0.6f, 24, 90, 0, 0, color, true, 5f)
     }
 
     private fun renderBBGRing(color: Color) {
@@ -172,37 +214,14 @@ abstract class Ring(
         RenderUtils.drawLines(listOf(offset, offset.add(dDia, 0.0, 0.0), offset.add(dDia, 0.0, dDia), offset.add(0.0, 0.0, dDia), offset), color, 4f, true)
 
         Renderer.drawStringInWorld(this.ringName, this.coords.add(Vec3(0.0, 0.3, 0.0)), Color.DARK_GRAY, depth = false, shadow = true, scale = 0.022f)
-
-        if (this.renderYawVector) Renderer.draw3DLine(
-            listOf(
-                this.coords.add(0.0, PlayerUtils.STAND_EYE_HEIGHT, 0.0),
-                Vec3(this.yaw.xPart, 0.0, this.yaw.zPart).multiply(1.8).add(
-                    this.coords.xCoord,
-                    this.coords.yCoord + PlayerUtils.STAND_EYE_HEIGHT,
-                    this.coords.zCoord
-                )
-            ),
-            color
-        )
     }
 
     private fun renderBoxRing(color: Color) {
         val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
         RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), color, thickness = 3, depth = true)
-        if (this.renderYawVector) Renderer.draw3DLine(
-            listOf(
-                this.coords.add(0.0, PlayerUtils.STAND_EYE_HEIGHT, 0.0),
-                Vec3(this.yaw.xPart, 0.0, this.yaw.zPart).multiply(1.8).add(
-                    this.coords.xCoord,
-                    this.coords.yCoord + PlayerUtils.STAND_EYE_HEIGHT,
-                    this.coords.zCoord
-                )
-            ),
-            color
-        )
     }
 
-    open fun addRingData(obj: JsonObject) {}
+    protected open fun addRingData(obj: JsonObject) {}
 
     open fun doRing() {
         AutoP3MovementHandler.resetShit()
@@ -239,8 +258,8 @@ abstract class Ring(
         AutoP3.waitingRing = this
     }
 
-    open fun run() {
 
+    open fun run() {
         triggered = true
 
         if (rotate) {
@@ -264,5 +283,86 @@ abstract class Ring(
     fun maybeDoRing() {
         if (this !is BlinkRing) doRing()
         else AutoP3.setActiveBlink(this)
+    }
+
+    protected fun EditGuiBase.EditGuiBaseBuilder.addXYZ(includeY: Boolean) {
+        this.addSlider(
+            "Ring X",
+            coords.xCoord - 3,
+            coords.xCoord + 3,
+            0.1,
+            1,
+            { coords.xCoord },
+            {
+                coords = Vec3(it, coords.yCoord, coords.zCoord)
+            }
+        )
+        if (includeY) this.addSlider(
+            "Ring Y",
+            coords.yCoord - 3,
+            coords.yCoord + 3,
+            0.1,
+            1,
+            { coords.yCoord },
+            {
+                coords = Vec3(coords.xCoord, it, coords.zCoord)
+            }
+        )
+        this.addSlider(
+            "Ring Z",
+            coords.zCoord - 3,
+            coords.zCoord + 3,
+            0.1,
+            1,
+            { coords.zCoord },
+            {
+                coords = Vec3(coords.xCoord, coords.yCoord, it)
+            }
+        )
+    }
+    protected fun EditGuiBase.EditGuiBaseBuilder.addYaw(){
+        this.addSlider("Yaw", yaw - 5.0, yaw + 5.0, 0.1, 2, {yaw.toDouble()}, {yaw = it.toFloat()})
+    }
+
+    protected fun EditGuiBase.EditGuiBaseBuilder.addDiameterAndHeight(includeHeight: Boolean) {
+        this.addSlider("Diameter", min = 0.0, max = 3.0, 0.1, 2, {diameter.toDouble()}, {diameter = it.toFloat()})
+        if (includeHeight) this.addSlider("Height", min = 0.0, max = 3.0, 0.1, 2, {height.toDouble()}, {height = it.toFloat()})
+    }
+
+    protected fun EditGuiBase.EditGuiBaseBuilder.addArgs(){
+        this.addSwitch("Center", {center}, {center = it})
+        this.addSwitch("Rotate", {rotate}, {rotate = it})
+        this.addSwitch("Left", {left}, {left= it})
+        this.addSwitch("Term", {term}, {term = it})
+        this.addSwitch("Leap", {leap}, {leap = it})
+    }
+
+    protected fun EditGuiBase.EditGuiBaseBuilder.addOnCloseAndOpen(){
+        this.setOnOpen {
+            isEditingRing = true
+        }
+        this.setOnClose {
+            AutoP3.saveRings()
+            isEditingRing = false
+        }
+    }
+
+
+    protected open val includeY = true
+    protected open val includeHeight = true
+
+    open fun extraArgs(builder: EditGuiBase.EditGuiBaseBuilder) {
+    }
+
+    open fun getEditGuiBase(): EditGuiBase {
+        val builder = EditGuiBase.EditGuiBaseBuilder()
+        builder.addYaw()
+        builder.addXYZ(includeY)
+        builder.addDiameterAndHeight(includeHeight)
+        builder.addArgs()
+        extraArgs(builder)
+        builder.setName(ringName)
+        builder.addOnCloseAndOpen()
+        return builder.build()
     }
 }

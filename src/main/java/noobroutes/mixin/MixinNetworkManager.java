@@ -47,7 +47,7 @@ public class MixinNetworkManager implements INetwork {
 
     @Inject(method = {"sendPacket(Lnet/minecraft/network/Packet;)V"}, at = {@At("HEAD")}, cancellable = true)
     private void noobRoutes$onSendPacket(Packet<?> packet, CallbackInfo ci) {
-        if (!ServerUtils.handleSendPacket(packet))
+        if (!ServerUtils.handleSendPacket(packet) && !ServerUtils.isServerPacket(packet))
             if (postAndCatch(new PacketEvent.Send(packet)) && !ci.isCancelled()) ci.cancel();
     }
 

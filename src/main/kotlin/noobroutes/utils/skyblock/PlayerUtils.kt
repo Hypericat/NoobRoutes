@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.render.FreeCam
+import noobroutes.mixin.accessors.EntityLivingBaseAccessor
 import noobroutes.mixin.accessors.TimerFieldAccessor
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.RenderUtils.renderVec
@@ -51,6 +52,16 @@ object PlayerUtils {
     }
 
     var slot = -1
+
+    /**
+     * Swings the player's arm, does not send a C0APacketAnimation
+     */
+    fun swing(){
+        if (!mc.thePlayer.isSwingInProgress || mc.thePlayer.swingProgressInt >= (mc.thePlayer as EntityLivingBaseAccessor).callGetArmSwingAnimationEnd() / 2 || mc.thePlayer.swingProgressInt < 0) {
+            mc.thePlayer.swingProgressInt = -1
+            mc.thePlayer.isSwingInProgress = true
+        }
+    }
 
     fun getMotionVector(): Vec3 {
         return Vec3(mc.thePlayer.motionX, mc.thePlayer.motionY, mc.thePlayer.motionZ)
