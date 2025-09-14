@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin({AbstractClientPlayer.class})
-public abstract class MixinAbstractClientPlayer{
+public abstract class MixinAbstractClientPlayer {
     @Inject(
             at = {@At("HEAD")},
             method = {"isSpectator()Z"},

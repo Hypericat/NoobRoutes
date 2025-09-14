@@ -18,6 +18,7 @@ import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
+import kotlin.math.sin
 
 
 data class RingBase(
@@ -42,6 +43,16 @@ abstract class Ring(
     val base: RingBase,
     val type: RingType
 ) {
+
+    //"Simple Ring", "Ring"
+    companion object {
+        val BBG_HASHCODE: Int = "BBG".hashCode()
+        val BOX_HASHCODE = "Box".hashCode()
+        val SIMPLE_RING_HASHCODE = "Simple Ring".hashCode()
+        val RING_HASHCODE = "Ring".hashCode()
+        const val ONE_THREE_HUNDREDTH = 1 / 300.0
+
+    }
     inline val ringName get() = type.ringName
 
     inline var coords: Vec3
@@ -150,13 +161,13 @@ abstract class Ring(
         internalRingData.add(SyncLong(name, getter, setter))
     }
 
-    fun renderRing(color: Color, renderMode: String) {
-        if (renderMode.hashCode() == "BBG".hashCode()) {
-            renderBBGRing(color)
-            drawRingEditing(color)
-            return
+    fun renderRing(color: Color, secondaryColor: Color, renderMode: String) {
+        when(renderMode.hashCode()) {
+            BBG_HASHCODE -> renderBBGRing(color)
+            BOX_HASHCODE -> renderBoxRing(color)
+            RING_HASHCODE -> renderCircularRing(color, secondaryColor)
+            SIMPLE_RING_HASHCODE -> renderSimpleCircularRing(color)
         }
-        renderBoxRing(color)
         drawRingEditing(color)
     }
 
@@ -174,10 +185,19 @@ abstract class Ring(
         )
     }
 
-    private fun renderCircularRing(color: Color) {
+    private fun renderCircularRing(color1: Color, color2: Color) {
         val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
-        RenderUtils.drawCylinder(offsetCoords, diameter,)
-        RenderUtils.drawOutlinedAABB(offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5).toAABB(diameter, height, diameter), color, thickness = 3, depth = true)
+        val r = diameter * 0.6f
+        RenderUtils.drawFlatCylinder(offsetCoords.add(0.0, (0.45 * sin(System.currentTimeMillis().toDouble() * ONE_THREE_HUNDREDTH)) + 0.528 , 0.0), r, 24, 90, 0, 0, color1, true, 5f)
+        RenderUtils.drawFlatCylinder(offsetCoords.add(0.0, (-0.45 * sin(System.currentTimeMillis().toDouble() * ONE_THREE_HUNDREDTH)) + 0.528 , 0.0), r, 24, 90, 0, 0, color1, true, 5f)
+        RenderUtils.drawFlatCylinder(offsetCoords.add(0.0, 0.503, 0.0), r, 24, 90, 0, 0, color1, true, 5f)
+        RenderUtils.drawFlatCylinder(offsetCoords.add(0.0, 0.03, 0.0), r, 24, 90, 0, 0, color2, true, 5f)
+        RenderUtils.drawFlatCylinder(offsetCoords.add(0.0, 1.03, 0.0), r, 24, 90, 0, 0, color2, true, 5f)
+    }
+
+    private fun renderSimpleCircularRing(color: Color) {
+        val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
+        RenderUtils.drawFlatCylinder(offsetCoords,  diameter * 0.6f, 24, 90, 0, 0, color, true, 5f)
     }
 
     private fun renderBBGRing(color: Color) {
@@ -322,7 +342,8 @@ abstract class Ring(
             isEditingRing = true
         }
         this.setOnClose {
-            isEditingRing
+            AutoP3.saveRings()
+            isEditingRing = false
         }
     }
 

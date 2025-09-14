@@ -12,6 +12,7 @@ import noobroutes.mixin.accessors.LastReportedAccessor
 import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.Color
+import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
@@ -160,6 +161,7 @@ class BlinkRing(
     fun drawEnd() {
         val lastPacket = packets.last()
         val endCoords = Vec3(lastPacket.positionX, lastPacket.positionY + 0.01, lastPacket.positionZ)
+        RenderUtils.drawFlatCylinder(endCoords, 0.5, 24, 90, 0, 0, Color.RED, true, 5f)
         Renderer.drawCylinder(endCoords, 0.5, 0.5, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
     }
 

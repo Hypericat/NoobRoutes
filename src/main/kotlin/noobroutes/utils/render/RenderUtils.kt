@@ -26,6 +26,7 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13
 import org.lwjgl.util.glu.Cylinder
+import org.lwjgl.util.glu.PartialDisk
 import java.awt.image.BufferedImage
 import kotlin.math.cos
 import kotlin.math.floor
@@ -384,6 +385,54 @@ object RenderUtils {
         if (!depth) resetDepth()
         GlStateManager.popMatrix()
     }
+
+    fun drawFlatCylinder(
+        pos: Vec3, radius: Number,
+        slices: Number, rot1: Number, rot2: Number, rot3: Number,
+        color: Color, depth: Boolean = false, thickness: Float = 3f
+    ){
+        GlStateManager.pushMatrix()
+        GlStateManager.disableCull()
+
+        GL11.glLineWidth(thickness)
+        preDraw()
+        depth(depth)
+        color.bind()
+
+
+        GlStateManager.translate(pos.xCoord, pos.yCoord, pos.zCoord)
+
+        //I am subtracting 90 so that the rotations match with the lwjgl Cylinder rotation
+        GlStateManager.rotate(rot1.toFloat() - 90f, 1f, 0f, 0f)
+        GlStateManager.rotate(rot2.toFloat(), 0f, 0f, 1f)
+        GlStateManager.rotate(rot3.toFloat(), 0f, 1f, 0f)
+
+        val tessellator = Tessellator.getInstance()
+        val worldrenderer = tessellator.worldRenderer
+
+
+
+        worldrenderer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION)
+
+        val r = radius.toFloat()
+        val sliceCount = slices.toInt()
+
+        for (i in 0 until sliceCount) {
+            val angle = (i * 2.0 * Math.PI / sliceCount)
+            val x = cos(angle).toFloat() * r
+            val z = sin(angle).toFloat() * r
+
+            worldrenderer.pos(x.toDouble(), 0.0, z.toDouble()).endVertex()
+        }
+        tessellator.draw()
+
+        postDraw()
+        GL11.glLineWidth(1.0F)
+        GlStateManager.enableCull()
+        if (!depth) resetDepth()
+        GlStateManager.popMatrix()
+    }
+
 
     /**
      * Draws a Texture modal rectangle at the specified position.

@@ -2,17 +2,18 @@ package noobroutes.features.floor7.autop3
 
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S18PacketEntityTeleport
+import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
-import noobroutes.events.impl.PacketEvent
-import noobroutes.features.floor7.autop3.AutoP3.waitingRing
-import noobroutes.utils.Scheduler
-import noobroutes.utils.skyblock.modMessage
 import noobroutes.Core.mc
 import noobroutes.events.BossEventDispatcher
+import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.Phase
 import noobroutes.events.impl.TermOpenEvent
 import noobroutes.events.impl.TerminalPhase
+import noobroutes.features.floor7.autop3.AutoP3.waitingRing
+import noobroutes.utils.Scheduler
+import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Mouse
 
 object AutoP3AwaitHandler {
@@ -73,11 +74,13 @@ object AutoP3AwaitHandler {
     }
 
     @SubscribeEvent
-    fun awaitingLeft(event: InputEvent.MouseInputEvent) {
+    fun awaitingLeft(event: MouseEvent) {
         if (Mouse.getEventButton() != 0 || !Mouse.getEventButtonState()) return
 
         waitingRing?.let { ring ->
             if (ring.inRing()) {
+                event.isCanceled = true
+                PlayerUtils.swing()
                 Scheduler.scheduleHighestPostMoveEntityWithHeadingTask{
                     ring.maybeDoRing()
                     waitingRing = null

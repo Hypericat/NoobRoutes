@@ -22,6 +22,13 @@ object ServerUtils {
         return packets.remove(packet)
     }
 
+    private val serverPacketRegex = Regex("^S\\d+")
+
+    @JvmStatic
+    fun isServerPacket(packet: Packet<*>): Boolean {
+        return serverPacketRegex.containsMatchIn(packet.javaClass.simpleName)
+    }
+
     private fun sendPacketNoEvent(packet: Packet<*>) {
         packets.add(packet)
         mc.netHandler?.addToSendQueue(packet)
