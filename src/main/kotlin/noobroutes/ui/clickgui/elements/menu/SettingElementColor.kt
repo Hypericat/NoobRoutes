@@ -92,8 +92,21 @@ class SettingElementColor(setting: ColorSetting) :
         }
     }
     val rgbElements = listOf("R", "G", "B").mapIndexed { index, label ->
+
+        val y = ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP * 2f + COLOR_BOX_SIZE
+        val x = COLOR_POPOUT_GAP + RGB_BOX_GAP * index + SHIFT + COLOR_POPOUT_GAP_THIRD * (-1 * (-index + 1))
+
+        /*
+                    for (i in rgbElements.indices) {
+                rgbElements[i].updatePosition(
+                    COLOR_POPOUT_GAP + RGB_BOX_GAP * i + SHIFT + COLOR_POPOUT_GAP_THIRD * (-1 * (-i + 1)),
+                    COLOR_POPOUT_GAP * 2f + COLOR_BOX_SIZE + ModuleButton.BUTTON_HEIGHT
+                )
+            }
+         */
+
         AccessorBasedNumberBoxElement(
-            label, 0f, 0f,
+            label, x, y,
             RGB_BOX_WIDTH, ColorElementsConstants.TEXT_BOX_HEIGHT,
             12f, TextAlign.Left, 5f, 6f,
             ColorPalette.textColor,
@@ -124,9 +137,21 @@ class SettingElementColor(setting: ColorSetting) :
             }
         )
     }
-    private val colorBox = ColorBoxElement(GAP + SHIFT + ColorElementsConstants.COLOR_BOX_SIZE_HALF, ColorElementsConstants.COLOR_BOX_SIZE_HALF + ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP, color).apply { addValueChangeListener { updateHexElement() } }
-    private val colorSlider = ColorSliderElement(0f, 0f, color).apply { addValueChangeListener { updateHexElement() } }
-    private val alphaSlider = if (setting.allowAlpha) AlphaSliderElement(0f, 0f, color).apply { addValueChangeListener { updateHexElement() } } else null
+    private val colorBox = ColorBoxElement(
+        GAP + SHIFT + ColorElementsConstants.COLOR_BOX_SIZE_HALF,
+        ColorElementsConstants.COLOR_BOX_SIZE_HALF + ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP,
+        color
+    ).apply { addValueChangeListener { updateHexElement() } }
+    private val colorSlider = ColorSliderElement(
+        COLOR_SLIDER_X_POSITION,
+        ColorElementsConstants.COLOR_BOX_SIZE_HALF + ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP,
+        color
+    ).apply { addValueChangeListener { updateHexElement() } }
+    private val alphaSlider = if (setting.allowAlpha) AlphaSliderElement(
+        ALPHA_SLIDER_X_POSITION,
+        ColorElementsConstants.COLOR_BOX_SIZE_HALF + ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP,
+        color
+    ).apply { addValueChangeListener { updateHexElement() } } else null
 
     fun updateHexElement(){
         hexElement.elementValue = getHex()
@@ -167,21 +192,8 @@ class SettingElementColor(setting: ColorSetting) :
         if (extended || extendAnimation.isAnimating()) {
             roundedRectangle(0f, ModuleButton.BUTTON_HEIGHT, w, getHeight() - ModuleButton.BUTTON_HEIGHT, elementBackground, 15f)
             stencilRoundedRectangle(2f, 0f, w, getHeight(), 0f, 0f, 0f, 0f, 0.5f, false)
-            for (i in rgbElements.indices) {
-                rgbElements[i].updatePosition(
-                    COLOR_POPOUT_GAP + RGB_BOX_GAP * i + SHIFT + COLOR_POPOUT_GAP_THIRD * (-1 * (-i + 1)),
-                    COLOR_POPOUT_GAP * 2f + COLOR_BOX_SIZE + ModuleButton.BUTTON_HEIGHT
-                )
-            }
 
-            colorSlider.updatePosition(
-                COLOR_SLIDER_X_POSITION,
-                ColorElementsConstants.COLOR_BOX_SIZE_HALF + ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP
-            )
-            alphaSlider?.updatePosition(
-                ALPHA_SLIDER_X_POSITION,
-                ColorElementsConstants.COLOR_BOX_SIZE_HALF + ModuleButton.BUTTON_HEIGHT + COLOR_POPOUT_GAP
-            )
+
             for (i in uiChildren.indices) {
                 uiChildren[i].apply {
                     visible = true
