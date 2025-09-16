@@ -1,5 +1,6 @@
 package noobroutes.ui.clickgui.elements.menu
 
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
 import noobroutes.Core
 import noobroutes.features.render.ClickGUIModule
@@ -47,31 +48,34 @@ class SettingElementHud(setting: HudSetting) : SettingElement<HudSetting>(
     private val linearAnimation = LinearAnimation<Float>(200)
 
     override fun draw() {
-        roundedRectangle(x, y, w, h, elementBackground)
-        text(name, x + TEXT_OFFSET, y + 18f, textColor, 12f, FontRenderer.REGULAR)
+        GlStateManager.pushMatrix()
+        translate(x, y)
+        roundedRectangle(0f, 0f, w, h, elementBackground)
+        text(name, TEXT_OFFSET, 18f, textColor, 12f, FontRenderer.REGULAR)
 
         var offset = 30f
         if (setting.displayToggle) {
             val color = colorAnim.get(clickGUIColor, buttonColor, setting.enabled)//.brighter()
             if (!ClickGUIModule.switchType) {
-                roundedRectangle(x + w - offset, y + 5f, 21f, 20f, color, 5f)
-                rectangleOutline(x + w - offset, y + 5f, 21f, 20f, clickGUIColor, 5f, 3f)
+                roundedRectangle(w - offset, 5f, 21f, 20f, color, 5f)
+                rectangleOutline(w - offset, 5f, 21f, 20f, clickGUIColor, 5f, 3f)
                 offset = 60f
             } else {
 
-                roundedRectangle(x + w - 43f, y + 4f, 34f, 20f, buttonColor, 9f)
-                if (setting.enabled || linearAnimation.isAnimating()) roundedRectangle(x + w - 43f, y + 4f, linearAnimation.get(34f, 9f, setting.enabled), 20f, color, 9f)
+                roundedRectangle(w - 43f, 4f, 34f, 20f, buttonColor, 9f)
+                if (setting.enabled || linearAnimation.isAnimating()) roundedRectangle(w - 43f, 4f, linearAnimation.get(34f, 9f, setting.enabled), 20f, color, 9f)
 
-                if (isHovered) rectangleOutline(x + w - 43f, y + 4f, 34f, 20f, color.darker(.85f), 9f, 3f)
-                circle(x + w - linearAnimation.get(33f, 17f, !setting.enabled), y + 14f, 6f,
+                if (isHovered) rectangleOutline(w - 43f, 4f, 34f, 20f, color.darker(.85f), 9f, 3f)
+                circle(w - linearAnimation.get(33f, 17f, !setting.enabled), 14f, 6f,
                     Color(220, 220, 220).darkerIf(isHovered, 0.9f)
                 )
                 offset = 70f
             }
         }
         drawDynamicTexture(
-            movementIcon, x + w - offset, y + 5f, 20f, 20f
+            movementIcon, w - offset, 5f, 20f, 20f
         )
+        GlStateManager.popMatrix()
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {

@@ -34,7 +34,8 @@ class TextBoxElement(
     override var elementValue: String,
     val keyWhiteList: List<Int>,
     val placeHolder: String = "",
-    val verticalAlign: TextPos = TextPos.Middle
+    val verticalAlign: TextPos = TextPos.Middle,
+    val unit: String = ""
 ) : UiElement(x, y), ElementValue<String> {
     constructor(
         name: String,
@@ -492,7 +493,7 @@ class TextBoxElement(
 
     private fun drawTextBoxWithGapTitle() {
         GlStateManager.pushMatrix()
-        val displayString = elementValue.ifBlank { placeHolder }
+        val displayString = elementValue.ifBlank { placeHolder } + unit
         val width = stringWidth(displayString, textScale, minWidth, textPadding)
         val nameWidth = getTextWidth(name, textScale) + textPadding
         val nameOrigin = when (textAlign) {
@@ -548,7 +549,7 @@ class TextBoxElement(
     }
     private fun drawTextBox(){
         GlStateManager.pushMatrix()
-        val displayString = elementValue.ifBlank { placeHolder }
+        val displayString = elementValue.ifBlank { placeHolder } + unit
         val width = stringWidth(displayString, textScale, minWidth, textPadding)
 
         val boxOffset = when (textAlign) {
@@ -578,7 +579,7 @@ class TextBoxElement(
     }
     private fun drawTextBoxNoBox(){
         GlStateManager.pushMatrix()
-        val displayString = elementValue.ifBlank { placeHolder }
+        val displayString = elementValue.ifBlank { placeHolder } + unit
         val width = stringWidth(displayString, textScale, minWidth, textPadding)
 
         val boxOffset = when (textAlign) {

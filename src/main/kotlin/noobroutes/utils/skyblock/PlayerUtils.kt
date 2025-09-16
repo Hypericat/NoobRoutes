@@ -1,6 +1,7 @@
 package noobroutes.utils.skyblock
 
 import net.minecraft.block.Block
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C09PacketHeldItemChange
@@ -50,6 +51,8 @@ object PlayerUtils {
             shouldBypassVolume = false
         }
     }
+
+    inline val EntityPlayerSP.lastPosition: Vec3 get() = Vec3(this.lastTickPosX, this.lastTickPosY, this.lastTickPosZ)
 
     var slot = -1
 

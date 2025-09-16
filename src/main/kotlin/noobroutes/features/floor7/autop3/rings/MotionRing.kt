@@ -39,7 +39,8 @@ class MotionRing(
             triggered = false
             return
         }
-        else mc.thePlayer.jump()
+
+        mc.thePlayer.jump()
 
         devMessage("${System.currentTimeMillis()}, motion ring")
 

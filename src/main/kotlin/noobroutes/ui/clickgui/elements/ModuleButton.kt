@@ -69,8 +69,6 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
         if (System.currentTimeMillis() - lastButtonHovered > 1000L) {
             ClickGUIBase.setDescription(module.description, getEffectiveX(), getEffectiveY())
         }
-
-
     }
 
     override fun doHandleDraw() {

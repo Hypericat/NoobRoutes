@@ -165,9 +165,8 @@ class BlinkRing(
         Renderer.drawCylinder(endCoords, 0.5, 0.5, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
     }
 
-    override fun inRing(pos: Vec3): Boolean {
-        return checkInBoundsWithSpecifiedHeight(pos,0f) && mc.thePlayer.onGround
-    }
+    override fun getRingHeight(): Float = 0f
+    override fun meetsGroundRequirements(): Boolean = mc.thePlayer.onGround
 
     private fun enoughPackets(): Boolean {
         return if (AutoP3.dontChargeAll) AutoP3.cancelled >= packets.size * AutoP3.percentageChargeAmount * 0.01 else AutoP3.cancelled >= packets.size

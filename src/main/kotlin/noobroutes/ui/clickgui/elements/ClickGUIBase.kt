@@ -2,6 +2,7 @@ package noobroutes.ui.clickgui.elements
 
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
+import noobroutes.Core.logger
 import noobroutes.features.Category
 import noobroutes.features.render.ClickGUIModule
 import noobroutes.font.FontRenderer.wrappedTextBounds

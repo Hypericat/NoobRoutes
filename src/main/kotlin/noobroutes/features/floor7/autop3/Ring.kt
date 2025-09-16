@@ -18,6 +18,9 @@ import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 
 
@@ -231,9 +234,57 @@ abstract class Ring(
         triggered = false
     }
 
+    protected open fun meetsGroundRequirements(): Boolean = !center || mc.thePlayer.onGround
+
+    protected open fun getRingHeight(): Float = if (center) 0f else height
+
+     fun intersectedWithRing(oldPos: Vec3, newPos: Vec3): Boolean {
+        if (!meetsGroundRequirements()) return false
+
+        val direction = newPos - oldPos
+
+        val height = getRingHeight()
+
+        if (direction.length < 1e-8f) {
+            return checkInBoundsWithSpecifiedHeight(newPos, height)
+        }
+
+        val halfWidth = diameter * 0.5
+        val min = this.coords.subtract(halfWidth, 0.0, halfWidth)
+        val max = this.coords.add(halfWidth, height.toDouble(), halfWidth)
+
+        var tMin = 0.0
+        var tMax = 1.0
+
+        for (axis in 0..2) {
+            if (abs(direction[axis]) < 1e-8f) {
+                if (oldPos[axis] < min[axis] || oldPos[axis] > max[axis]) {
+                    return false
+                }
+            } else {
+                var t1 = (min[axis] - oldPos[axis]) / direction[axis]
+                var t2 = (max[axis] - oldPos[axis]) / direction[axis]
+
+                if (t1 > t2) {
+                    val temp = t1
+                    t1 = t2
+                    t2 = temp
+                }
+
+                tMin = max(tMin, t1)
+                tMax = min(tMax, t2)
+
+                if (tMin > tMax) {
+                    return false
+                }
+            }
+        }
+
+        return true
+    }
+
     open fun inRing(pos: Vec3 = mc.thePlayer.positionVector): Boolean {
-        if (center) return checkInBoundsWithSpecifiedHeight(pos,0f) && mc.thePlayer.onGround
-        return checkInBoundsWithSpecifiedHeight(pos, height)
+        return meetsGroundRequirements() && checkInBoundsWithSpecifiedHeight(pos, getRingHeight())
     }
 
     protected fun checkInBoundsWithSpecifiedHeight(pos: Vec3, heightToUse: Float): Boolean{

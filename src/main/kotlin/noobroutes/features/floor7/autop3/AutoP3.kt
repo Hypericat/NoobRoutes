@@ -69,7 +69,6 @@ object AutoP3: Module (
     var route by StringSetting("Route", "", description = "Route to use")
     private val ringColor by ColorSetting("Ring Color", Color.GREEN, false, description = "color of the rings")
     private val secondaryRingColor by ColorSetting("Secondary Ring Color", Color.DARK_GRAY, false, description = "The secondary color of the ring for Ring rendering mode").withDependency { renderMode.hashCode() == RING_HASHCODE }
-    private val onFrame by BooleanSetting("Check on frame", description = "Checks on frame if you are in a ring. Use if you are lazy.")
     private val nonSilentRotates by BooleanSetting("Non-Silent look", description = "Makes it so rings with the rotate argument rotate client side.")
     private val renderMode by SelectorSetting("Render Mode", "Box", arrayListOf("Box", "BBG", "Simple Ring", "Ring"), description = "Ring render type")
 
@@ -96,7 +95,7 @@ object AutoP3: Module (
     //val blinkCooldown by NumberSetting("Blink Cooldown", 5, 0, 10, description = "how many ticks to wait after entering a blink ring before allowing blink").withDependency { x_y0uMode && blinkShit }
     //private val resetInterval by NumberSetting(name = "clear interval", description = "delete packets periodically", min = 1, max = 300, default = 200, unit = "t").withDependency { x_y0uMode && blinkShit }
     //private val resetAmount by NumberSetting(name = "clear amount", description = "delete packets periodically", min = 1, max = 400, default = 50).withDependency { x_y0uMode && blinkShit }
-    val dontChargeAll by BooleanSetting("Dont Charge All", description = "Instead of charging all the packets required for a blink only charge some").withDependency { blinkShit }
+    val dontChargeAll by BooleanSetting("Don't Charge All", description = "Instead of charging all the packets required for a blink only charge some").withDependency { blinkShit }
     val percentageChargeAmount by NumberSetting("Charge Amount", default = 69, min = 30, max = 100, description = "how many percent of the required packets to charge", unit = "%").withDependency { blinkShit &&  dontChargeAll }
     val endBlinkOnKey by BooleanSetting("End On Key", description = "stops recording on keypress instead of having to input the amount").withDependency { blinkShit }
     private val endKey by KeybindSetting("End Keybind", Keyboard.KEY_NONE, "Ends Blink Recording on press").withDependency { blinkShit && endBlinkOnKey }.onPress {
@@ -161,14 +160,23 @@ object AutoP3: Module (
         activeBlinkWaypoint?.renderRing(Color.WHITE, secondaryRingColor, renderMode)
     }
 
+
+    private var lastPos = Vec3(0.0, 0.0, 0.0)
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
-        if (!inF7Boss || editMode || movementPackets.isNotEmpty() || mc.thePlayer.isSneaking) return
+        if (!inF7Boss || editMode || movementPackets.isNotEmpty()) return
 
-        if (!onFrame) handleRings(mc.thePlayer.positionVector)
+        if (mc.thePlayer.isSneaking) {
+            lastPos = mc.thePlayer.positionVector
+            return
+        }
+        
+        handleRings(mc.thePlayer.positionVector)
+
+
 
         activeBlinkWaypoint?.let { //this needs to be on tick otherwise shit breaks
-            if (it.inRing(mc.thePlayer.positionVector)) {
+            if (it.intersectedWithRing(lastPos, mc.thePlayer.positionVector)) {
                 if (!it.triggered) recording = true
                 it.triggered = true
             }
@@ -177,22 +185,17 @@ object AutoP3: Module (
 
     }
 
-    @SubscribeEvent
-    fun onFrameRing(event: RenderWorldLastEvent) {
-        if (!inF7Boss || editMode || movementPackets.isNotEmpty() || mc.thePlayer.isSneaking || !onFrame) return
-        handleRings(PlayerUtils.getEffectiveViewPosition())
-    }
-
     fun handleRings(pos: Vec3) {
         val ringList = rings[route] ?: return
         for (ring in ringList) {
-            if (ring.inRing(pos)) {
+            if (ring.intersectedWithRing(lastPos, pos)) {
                 if (ring.triggered) continue
                 ring.run()
             } else {
                 ring.runTriggeredLogic()
             }
         }
+        lastPos = mc.thePlayer.positionVector
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -223,7 +226,6 @@ object AutoP3: Module (
     }
 
 
-    // || mc.thePlayer?.heldItem?.displayName?.contains("leap", ignoreCase = true) != true
     @SubscribeEvent
     fun onLeap(event: PacketEvent.Receive) {
         if (!inF7Boss || event.packet !is S08PacketPlayerPosLook) return
@@ -241,7 +243,10 @@ object AutoP3: Module (
         return rings[route]?.minBy { it.coords.subtract(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0).distanceToPlayerSq }
     }
 
-
+    @JvmStatic
+    fun setLastPosition(vec: Vec3){
+        lastPos = vec
+    }
 
     @SubscribeEvent
     fun onS08(event: S08Event) {
@@ -308,8 +313,9 @@ object AutoP3: Module (
         activeBlink?.let {
             if (it.inRing()) {
                 it.doRing()
+            } else {
+                activeBlink = null
             }
-            else activeBlink = null
         }
         if (resetPacketExceptionState) {
             Scheduler.schedulePreTickTask {

@@ -22,11 +22,12 @@ class JumpRing (
     override fun doRing() {
         super.doRing()
 
-        if (mc.thePlayer.onGround) mc.thePlayer.jump()
-        else {
+        if (!mc.thePlayer.onGround) {
             triggered = false
             return
         }
+
+        mc.thePlayer.jump()
 
         if (walk) {
             AutoP3MovementHandler.setDirection(yaw)

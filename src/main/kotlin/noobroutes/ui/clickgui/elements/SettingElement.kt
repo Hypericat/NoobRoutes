@@ -26,7 +26,7 @@ open class SettingElement<S : Setting<*>>(val setting: S, val type: ElementType)
 
     var extended = false
 
-    val isDescriptionHovered get() = isAreaHovered(x, y, w, h)
+    val isDescriptionHovered get() = isAreaHovered(0f, 0f, w, h)
 
 
     var lastSettingHovered = -1L
@@ -43,7 +43,7 @@ open class SettingElement<S : Setting<*>>(val setting: S, val type: ElementType)
         if (lastSettingHovered == -1L) lastSettingHovered = System.currentTimeMillis()
 
         if (System.currentTimeMillis() - lastSettingHovered > 1000L) {
-            ClickGUIBase.setDescription(setting.description, getEffectiveX(), getEffectiveY() + y)
+            ClickGUIBase.setDescription(setting.description, getEffectiveX(), getEffectiveY())
         }
     }
 
@@ -53,7 +53,7 @@ open class SettingElement<S : Setting<*>>(val setting: S, val type: ElementType)
     }
 
     open val isHovered
-        get() = isAreaHovered(x, y, w, h)
+        get() = isAreaHovered(0f, 0f, w, h)
 
     open fun getHeight(): Float {
         return if (visible) h else 0f

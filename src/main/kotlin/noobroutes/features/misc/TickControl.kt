@@ -23,7 +23,7 @@ import java.util.Stack
 
 
 @NotPersistent
-object TickControl : Module("Tick Control", category = Category.MISC, description = "Makes the game tick on keypress instead of every 50ms.") {
+object TickControl : Module("Tick Control", category = Category.MISC, description = "Makes the game tick on keypress instead of every 50ms. Only works in SinglePlayer, useful for configing.") {
 
     private data class PlayerState(val pos: Vec3, val velocity: Vec3, val ground: Boolean, val p3State: AutoP3MovementHandler.AutoP3MovementState, val lavaState: Simulation.SimulationLavaState)
 

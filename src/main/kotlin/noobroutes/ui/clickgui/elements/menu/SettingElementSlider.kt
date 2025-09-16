@@ -72,7 +72,8 @@ class SettingElementSlider(setting: NumberSetting<*>) :
         setting.roundTo,
         setting.min,
         setting.max,
-        setting.valueDouble
+        setting.valueDouble,
+        setting.unit
     ).apply {
         addValueChangeListener { boxValue ->
             setting.setValueFromNumber(boxValue)

@@ -17,7 +17,6 @@ object EditGui : Screen() {
         EditGuiBase.editGuiBaseY = ClickGUIModule.editGuiY.value
     }
 
-
     fun openEditGui(editGuiBase: EditGuiBase){
         activeEditGuiBase = editGuiBase
         Core.display = this

@@ -27,6 +27,7 @@ class NumberBoxElement(
     val min: Double,
     val max: Double,
     override var elementValue: Double,
+    val unit: String = ""
 ) : UiElement(x, y), ElementValue<Double> {
     override val elementValueChangeListeners = mutableListOf<(Double) -> Unit>()
 
@@ -46,7 +47,8 @@ class NumberBoxElement(
         boxThickness,
         if (roundTo == 0) this.elementValue.toInt().toString() else this.elementValue.round(roundTo).toString(),
         numberKeyWhiteList,
-        ""
+        "",
+        unit = unit
     ).apply {
         addValueChangeListener {
             textUnlisten(it)
