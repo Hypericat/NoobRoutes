@@ -55,11 +55,11 @@ object AutoSS : Module(
     @DevOnly
     private val i1Keybind by KeybindSetting("i1 test", Keyboard.KEY_NONE, "tries to i1 on press").onPress { tryI1() }
     @DevOnly
-    private val i1ClickAmount by NumberSetting("i1 clicks", 24, 9, 36, 3, description = "how often i1 should click (triple of 3 man i1)")
+    private val i1ClickAmount by NumberSetting("i1 clicks", 24, 9, 36, description = "how often i1 should click")
     @DevOnly
     private val i1Delay by NumberSetting("i1 delay", 42, 5, 60, description = "how long to wait between click bursts")
     @DevOnly
-    private val i1People by NumberSetting("i1 fake people", 2, 0, 5, description = "how many extra people it should click for")
+    private val i1People by NumberSetting("i1 fake people", 2, 0, 5, description = "how many extra people it should click for (so it would be click this + 1 many times, wait delay, repeat")
 
     private val autoStart by BooleanSetting("Autostart", true, description = "Automatically starts autoSS")
     private val autoStartDelay by NumberSetting("Autostart delay", 125.0, 50.0, 200.0, 1.0, unit = "ms", description = "The delay used for starting autoSS")
@@ -100,11 +100,6 @@ object AutoSS : Module(
 
 
         Thread{
-            if (i1ClickAmount % 3 != 0) {
-                modMessage("invalid click amount")
-                return@Thread
-            }
-
             var i1ClicksLeft = i1ClickAmount
 
             while (i1ClicksLeft > 2) {

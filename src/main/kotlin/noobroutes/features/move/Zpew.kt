@@ -4,9 +4,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
+import net.minecraft.network.Packet
+import net.minecraft.network.play.client.C00PacketKeepAlive
+import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C0BPacketEntityAction
+import net.minecraft.network.play.client.C0FPacketConfirmTransaction
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
@@ -16,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.WorldChangeEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.render.ClickGUIModule
@@ -26,22 +31,23 @@ import noobroutes.utils.*
 import noobroutes.utils.Utils.ID
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
+import java.lang.Thread.sleep
 import kotlin.math.floor
 
 @DevOnly
 object Zpew : Module(
-    name = "Zpew",
+    name = "ZZZpew (Dangerous)",
     category = Category.MOVE,
-    description = "This is made for single player testing and is non-functional on Hypixel."
+    description = "Blink Based \"Zpew\". Does not work with autoroutes. (At least no Proxy needed)"
 ) {
     private val zpew by BooleanSetting("Zero Ping Etherwarp", description = "Zero ping teleport for right clicking aotv")
     private val zpt by BooleanSetting("Zero Ping Aotv", description = "Zero ping teleport for right clicking aotv")
     private val zph by BooleanSetting("Zero Ping Hyperion", description = "Zero Ping Hyperion wow")
 
-    private val sendPacket by BooleanSetting("Send Packet", description = "You send a C06 Packet, aka, it is actual zpew")
     private val sendTPCommand by BooleanSetting("Send Tp Command", description = "Used for Single Player")
     private val hideFuckingTeleports by BooleanSetting("Hide Tp Messages", description = "Hides the fucking annoying tp messages").withDependency { Minecraft.getMinecraft().isSingleplayer && sendTPCommand }
-    private val zpewOffset by BooleanSetting("Offset", description = "Offsets your position onto the block instead of 0.05 blocks above it")
+    //private val zpewOffset by BooleanSetting("Offset", description = "Offsets your position onto the block instead of 0.05 blocks above it")
+    private val blinkLimit by NumberSetting("Max Blink Length", 25, 5, 30, 1, description = "")
     private val dingdingding by BooleanSetting("dingdingding", false, description = "")
 
     private val soundOptions = arrayListOf(
@@ -61,14 +67,6 @@ object Zpew : Module(
         PlayerUtils.playLoudSound(getSound(), volume.toFloat(), pitch.toFloat())
     }).withDependency { dingdingding }
 
-    private val maxQueuePackets by NumberSetting("Max Queueueueue", 5, 3, 20, description = "how many packets it can q")
-
-    private const val FAILWATCHPERIOD: Int = 20
-    private const val MAXFAILSPERFAILPERIOD: Int = 3
-
-    private var updatePosition = true
-    private val recentlySentC06s = mutableListOf<SentC06>()
-    private val recentFails = mutableListOf<Long>()
     private val blackListedBlocks = arrayListOf(Blocks.chest, Blocks.trapped_chest, Blocks.enchanting_table, Blocks.hopper, Blocks.furnace, Blocks.crafting_table)
 
     private var lastPitch: Float = 0f
@@ -78,17 +76,9 @@ object Zpew : Module(
     private var lastZ: Double = 0.0
     private var isSneaking: Boolean = false
 
-    private fun checkAllowedFails(): Boolean {
-        if(LocationUtils.currentArea.isArea(Island.SinglePlayer)) return true;
+    private var waitingList = mutableListOf<S08Blink>()
 
-        if (recentlySentC06s.size >= maxQueuePackets) return false
-
-        while (recentFails.isNotEmpty() && System.currentTimeMillis() - recentFails[0] > FAILWATCHPERIOD * 1000) recentFails.removeFirst()
-
-        return recentFails.size < MAXFAILSPERFAILPERIOD
-    }
-
-
+    private var skipPacketCount = 0
 
     fun holdingTeleportItem(): Boolean {
         val held = mc.thePlayer.heldItem
@@ -106,9 +96,11 @@ object Zpew : Module(
         return scrollsString.containsAll(listOf("IMPLOSION_SCROLL", "WITHER_SHIELD_SCROLL", "SHADOW_WARP_SCROLL"))
     }
 
-    fun doZeroPingAotv(pos: BlockPos){
-        if (!holdingTeleportItem() || !checkAllowedFails() || !enabled) return
+    private fun doZeroPingAotv(pos: BlockPos){
+        if (!holdingTeleportItem() || !enabled) return
         if (isSneaking && mc.thePlayer.heldItem.skyblockID.equalsOneOf("ASPECT_OF_THE_VOID", "ASPECT_OF_THE_END")) return
+
+
         var yaw = lastYaw
         val pitch = lastPitch
 
@@ -120,33 +112,8 @@ object Zpew : Module(
         val y = pos.y.toDouble()
         val z = pos.z + 0.5
 
-        lastX = x
-        lastY = y
-        lastZ = z
-        updatePosition = false
-
-        Scheduler.schedulePreTickTask {
-            recentlySentC06s.add(SentC06(yaw, pitch, x, y, z, System.currentTimeMillis()))
-            if (dingdingding) PlayerUtils.playLoudSound(getSound(), volume.toFloat(), Zpew.pitch.toFloat())
-            if (sendTPCommand && LocationUtils.isSinglePlayer) { sendChatMessage("/tp $x $y $z")}
-            if (sendPacket) Scheduler.scheduleHighPreTickTask {
-                mc.netHandler.addToSendQueue(
-                    C03PacketPlayer.C06PacketPlayerPosLook(
-                        x,
-                        y,
-                        z,
-                        yaw,
-                        pitch,
-                        mc.thePlayer.onGround
-                    )
-                )
-                mc.thePlayer.setPosition(x, y, z)
-                mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
-            }
-            updatePosition = true
-        }
+        doTp(x, y, z, yaw, pitch)
     }
-
 
     private fun doZeroPingEtherWarp(distance: Float = 57f) {
         val etherBlock = EtherWarpHelper.getEtherPosOrigin(
@@ -162,7 +129,7 @@ object Zpew : Module(
         val pos = etherBlock.pos!!
 
         val x: Double = pos.x.toDouble() + 0.5
-        var y: Double = pos.y.toDouble() + 1.05
+        val y: Double = pos.y.toDouble() + 1.05
         val z: Double = pos.z.toDouble() + 0.5
 
         var yaw = lastYaw
@@ -172,91 +139,104 @@ object Zpew : Module(
         if (yaw < 0) yaw += 360
         if (yaw > 360) yaw -= 360
 
-        lastX = x
-        lastY = y
-        lastZ = z
-        updatePosition = false
+        doTp(x, y, z, yaw, pitch)
+    }
 
-        recentlySentC06s.add(SentC06(yaw, pitch, x, y, z, System.currentTimeMillis()))
+    private fun scheduleTp(x: Double, y: Double, z: Double) {
+        Thread {
+            sleep(500 + (Math.random() * 50).toLong())
+            sendChatMessage("/tp $x $y $z")
+        }.start()
+    }
 
+    private fun doTp(x: Double, y: Double, z: Double, yaw: Float, pitch: Float) {
         if (dingdingding) PlayerUtils.playLoudSound(getSound(), volume.toFloat(), Zpew.pitch.toFloat())
-        if (sendTPCommand && LocationUtils.isSinglePlayer) { sendChatMessage("/tp $x $y $z")}
-        if (sendPacket) Scheduler.schedulePreTickTask(0) {
-            PacketUtils.sendPacket(
-                C03PacketPlayer.C06PacketPlayerPosLook(
-                    x,
-                    y,
-                    z,
-                    yaw,
-                    pitch,
-                    false
-                )
-            )
-            if (zpewOffset) y -= (0.05 - (if (y == 32.05) 0.00001 else 0.0))
+        if (sendTPCommand && LocationUtils.isSinglePlayer) {
+            scheduleTp(x, y, z)
+
+        }
+        Scheduler.scheduleHighPostTickTask {
+            val speedVec = Vec3(mc.thePlayer.motionX, mc.thePlayer.motionY, mc.thePlayer.motionZ)
+            waitingList.add(S08Blink(C03PacketPlayer.C06PacketPlayerPosLook(x, y, z, yaw, pitch, false), mutableListOf(), mc.thePlayer.positionVector, speedVec))
+
             mc.thePlayer.setPosition(x, y, z)
             mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
         }
-
-        updatePosition = true
     }
-
-    private fun isWithinTolerance(n1: Float, n2: Float, tolerance: Double = 1e-4): Boolean {
-        return kotlin.math.abs(n1 - n2) < tolerance
-    }
-
 
     @SubscribeEvent
     fun onChatMessage(event: ChatPacketEvent) {
-        if (!hideFuckingTeleports || !Minecraft.getMinecraft().isSingleplayer || !sendTPCommand) return;
-        if (event.message.startsWith("Teleported " + Minecraft.getMinecraft().thePlayer.name)) event.isCanceled = true;
+        if (!hideFuckingTeleports || !Minecraft.getMinecraft().isSingleplayer || !sendTPCommand) return
+        if (event.message.startsWith("Teleported " + Minecraft.getMinecraft().thePlayer.name)) event.isCanceled = true
     }
 
-
-
-
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onC08(event: PacketEvent.Send) {
+        if (skipPacketCount > 0) return
         if (mc.thePlayer == null || event.packet !is C08PacketPlayerBlockPlacement) return
         val dir = event.packet.placedBlockDirection
         if (dir != 255) return
         val info = getTeleportInfo() ?: return
-        if(!checkAllowedFails()) {
-            modMessage("§cZero ping teleport aborted.")
-            modMessage("§c${recentFails.size} fails last ${FAILWATCHPERIOD}s")
-            modMessage("§c${recentlySentC06s.size} C06's queued currently")
-            return
-        }
 
         if (!LocationUtils.isInSkyblock && !ClickGUIModule.forceHypixel) return
+
         if (info.ether) {
             doZeroPingEtherWarp(info.distance)
             return
         }
-        //if (RouteUtils.routing) return  - this check is no longer needed because of zpew patch
+
         val prediction = predictTeleport(info.distance) ?: return
-        devMessage(info.distance)
         doZeroPingAotv(prediction.toBlockPos())
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onPacket(event: PacketEvent.Send) {
+        if (event.packet.javaClass.name.contains("server")) return //i cba to fix wadeys packet event rn
+        if (skipPacketCount > 0) {
+            skipPacketCount--
+            return
+        }
+
+        if (waitingList.isEmpty()) return
+        if (event.packet is C0FPacketConfirmTransaction || event.packet is C00PacketKeepAlive || event.packet is C01PacketChatMessage) return
+
+        event.isCanceled = true
+        waitingList.last().packets.add(event.packet)
+
+        if (waitingList.last().packets.filter { it is C03PacketPlayer }.size > blinkLimit) {
+            val listToSend = mutableListOf<Packet<*>>()
+
+            for (s08Response in waitingList) {
+                s08Response.packets.filter { it !is C03PacketPlayer && it !is C08PacketPlayerBlockPlacement }.forEach { listToSend.add(it) }
+            }
+
+            val lastKnownPos = waitingList.first().startPos
+            val lastKnownSpeed = waitingList.first().startSpeed
+
+            waitingList = mutableListOf()
+
+            listToSend.forEach { PacketUtils.sendPacket(it) }
+
+            mc.thePlayer.setPosition(lastKnownPos.xCoord, lastKnownPos.yCoord, lastKnownPos.zCoord)
+            mc.thePlayer.setVelocity(lastKnownSpeed.xCoord, lastKnownSpeed.yCoord, lastKnownSpeed.zCoord)
+
+            modMessage("fuck this shit im out")
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun onC03(event: PacketEvent.Send) {
-        if (event.packet !is C03PacketPlayer) return
-        if (!updatePosition) return
-        val x = event.packet.positionX
-        val y = event.packet.positionY
-        val z = event.packet.positionZ
-        val yaw = event.packet.yaw
-        val pitch = event.packet.pitch
+        if (skipPacketCount > 0 || event.packet !is C03PacketPlayer) return
 
         if (event.packet.isMoving) {
-            lastX = x
-            lastY = y
-            lastZ = z
+            lastX = event.packet.positionX
+            lastY = event.packet.positionY
+            lastZ = event.packet.positionZ
         }
 
         if (event.packet.rotating) {
-            lastYaw = yaw
-            lastPitch = pitch
+            lastYaw = event.packet.yaw
+            lastPitch = event.packet.pitch
         }
     }
 
@@ -269,45 +249,39 @@ object Zpew : Module(
 
     @SubscribeEvent
     fun onS08(event: PacketEvent.Receive) {
-        if (event.packet !is S08PacketPlayerPosLook) return
-        if (inBoss || (!LocationUtils.isInSkyblock && ClickGUIModule.forceHypixel)) return
-        if (recentlySentC06s.isEmpty()) return
+        if (event.packet !is S08PacketPlayerPosLook || waitingList.isEmpty()) return
 
-        val sentC06 = recentlySentC06s[0]
-        recentlySentC06s.removeFirst()
+        val firstS08 = waitingList.removeFirst()
 
-        val newYaw = event.packet.yaw
-        val newPitch = event.packet.pitch
-        val newX = event.packet.x
-        val newY = event.packet.y
-        val newZ = event.packet.z
-
-        val isCorrect = (
-                (isWithinTolerance(sentC06.yaw, newYaw) || newYaw == 0f) &&
-                        (isWithinTolerance(sentC06.pitch, newPitch) || newPitch == 0f) &&
-                        newX == sentC06.x &&
-                        newY == sentC06.y &&
-                        newZ == sentC06.z
-                )
-
-        if (isCorrect) {
-            if (sendPacket) event.isCanceled = true
+        if (event.packet.x != firstS08.c06.positionX || event.packet.y != firstS08.c06.positionY || event.packet.z != firstS08.c06.positionZ) {
+            devMessage("Position mismatch - X: ${event.packet.x} vs ${firstS08.c06.positionX}, Y: ${event.packet.y} vs ${firstS08.c06.positionY}, Z: ${event.packet.z} vs ${firstS08.c06.positionZ}")
+            modMessage("failed zpew")
+            for (s08Response in waitingList) {
+                s08Response.packets.filter { it !is C03PacketPlayer && it !is C08PacketPlayerBlockPlacement }.forEach { PacketUtils.sendPacket(it) }
+            }
+            waitingList = mutableListOf()
             return
         }
 
-        devMessage("receivedS08($newX, $newY, $newZ)")
-        devMessage("sentC06(${sentC06.x}, ${sentC06.y}, ${sentC06.z})")
-        devMessage("Failed")
+        event.isCanceled = true
 
-        recentFails.add(System.currentTimeMillis())
-        while (recentlySentC06s.isNotEmpty()) recentlySentC06s.removeFirst()
+        Scheduler.schedulePreTickTask {
+            skipPacketCount = firstS08.packets.size + 1
+            PacketUtils.sendPacket(firstS08.c06)
+            for (packet in firstS08.packets) { PacketUtils.sendPacket(packet) }
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        waitingList = mutableListOf()
     }
 
     @SubscribeEvent
     fun onS29(event: PacketEvent.Receive) {
         if (event.packet !is S29PacketSoundEffect) return
         val packet: S29PacketSoundEffect = event.packet
-        if (packet.soundName != "mob.enderdragon.hit" || packet.volume != 1f || packet.pitch != 0.53968257f || !checkAllowedFails()) return
+        if (packet.soundName != "mob.enderdragon.hit" || packet.volume != 1f || packet.pitch != 0.53968257f) return
         event.isCanceled = true
     }
 
@@ -322,27 +296,23 @@ object Zpew : Module(
     }
 
 
-
-
-    data class SentC06(
-        val yaw: Float,
-        val pitch: Float,
-        val x: Double,
-        val y: Double,
-        val z: Double,
-        val sentAt: Long
+    data class S08Blink(
+        val c06: C03PacketPlayer.C06PacketPlayerPosLook,
+        val packets: MutableList<Packet<*>>,
+        val startPos: Vec3,
+        val startSpeed: Vec3
     )
 
-    const val steps = 100
+    const val STEPS = 100
 
     private fun predictTeleport(distance: Float): Vec3? {
         var cur = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ)
-        val forward = RotationUtils.yawAndPitchVector(lastYaw, lastPitch).multiply(1f / steps)
+        val forward = RotationUtils.yawAndPitchVector(lastYaw, lastPitch).multiply(1f / STEPS)
         var stepsTaken = 0
-        for (i in 0 until (distance * steps).toInt() + 1) {
-            if (i % steps == 0 && !cur.isSpecial && !cur.blockAbove.isSpecial) {
+        for (i in 0 until (distance * STEPS).toInt() + 1) {
+            if (i % STEPS == 0 && !cur.isSpecial && !cur.blockAbove.isSpecial) {
                 if (!cur.isIgnored || !cur.blockAbove.isIgnored) {
-                    cur = cur.add(forward.multiply(-steps))
+                    cur = cur.add(forward.multiply(-STEPS))
                     if (i == 0 || !cur.isIgnored || !cur.blockAbove.isIgnored) {
                         return null
                     }
@@ -350,7 +320,7 @@ object Zpew : Module(
                 }
             }
             if ((!cur.isIgnored2 && cur.inBB) || (!cur.blockAbove.isIgnored2 && cur.blockAbove.inBB)) {
-                cur = cur.add(forward.multiply(-steps))
+                cur = cur.add(forward.multiply(-STEPS))
                 if (i == 0 || (!cur.isIgnored && cur.inBB) || (!cur.blockAbove.isIgnored && cur.blockAbove.inBB)) {
                     return null
                 }
@@ -360,7 +330,7 @@ object Zpew : Module(
             cur = cur.add(forward)
             stepsTaken = i
         }
-        val multiplicationFactor = floor(stepsTaken.toFloat() / steps)
+        val multiplicationFactor = floor(stepsTaken.toFloat() / STEPS)
         val pos = Vec3(lastX, lastY + mc.thePlayer.eyeHeight, lastZ).add(RotationUtils.yawAndPitchVector(lastYaw, lastPitch).multiply(
             multiplicationFactor
         ))
