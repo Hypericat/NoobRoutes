@@ -27,7 +27,7 @@ class EditGuiSliderElement(
     val getter: () -> Double,
     val setter: (Double) -> Unit
 ) : UiElement(0f, 0f), EditGuiElement {
-    override val priority: Int = 5
+    override val priority: Int = 2
     override val isDoubleWidth: Boolean = true
     override val height: Float = 80f
 

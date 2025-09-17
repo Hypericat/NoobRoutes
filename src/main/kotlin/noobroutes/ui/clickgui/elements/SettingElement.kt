@@ -33,6 +33,7 @@ open class SettingElement<S : Setting<*>>(val setting: S, val type: ElementType)
 
 
     private fun handleDescription(){
+        if (!visible) return
         if (!isDescriptionHovered) {
             if (lastSettingHovered != -1L) {
                 ClickGUIBase.wipeDescription()

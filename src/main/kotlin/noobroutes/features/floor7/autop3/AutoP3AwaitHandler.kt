@@ -20,7 +20,6 @@ object AutoP3AwaitHandler {
 
     private var leapedIds = mutableSetOf<Int>()
 
-
     private fun leapPlayers(): Int {
         return when {
             BossEventDispatcher.currentBossPhase == Phase.P2 -> 1 //core

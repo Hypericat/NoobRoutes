@@ -29,7 +29,7 @@ class SettingElementSelector(setting: SelectorSetting) :
     SettingElement<SelectorSetting>(setting, ElementType.SELECTOR) {
 
     override val isHovered: Boolean
-        get() = isAreaHovered(x, y, w, DEFAULT_HEIGHT)
+        get() = isAreaHovered(0f, 0f, w, DEFAULT_HEIGHT)
 
     val display: String
         inline get() = setting.selected
@@ -40,13 +40,14 @@ class SettingElementSelector(setting: SelectorSetting) :
     private val settingAnim = CubicBezierAnimation(200, 0.4, 0, 0.2, 1)
 
     private val isSettingHovered: (Int) -> Boolean = {
-        isAreaHovered(x, y + 38f + 32f * it, w, 32f)
+        isAreaHovered(0f, 38f + 32f * it, w, 32f)
     }
 
     private val color: Color
         get() = buttonColor.brighterIf(isHovered)
 
     override fun draw() {
+
         GlStateManager.pushMatrix()
         translate(x, y)
         h = settingAnim.get(32f, size * 36f + DEFAULT_HEIGHT, !extended)
@@ -59,7 +60,10 @@ class SettingElementSelector(setting: SelectorSetting) :
         text(name, TEXT_OFFSET, 16f, textColor, 12f, FontRenderer.REGULAR)
         text(display, w - 14f - width, 8f, textColor, 12f, FontRenderer.REGULAR, TextAlign.Left, TextPos.Top)
 
-        if (!extended && !settingAnim.isAnimating()) return
+        if (!extended && !settingAnim.isAnimating()) {
+            GlStateManager.popMatrix()
+            return
+        }
 
         rectangleOutline(w - 20f - width, 4f, width + 12f, 22f, clickGUIColor, 5f, 1.5f)
 
@@ -74,6 +78,8 @@ class SettingElementSelector(setting: SelectorSetting) :
         }
         resetScissor(scissor)
         GlStateManager.popMatrix()
+
+
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {

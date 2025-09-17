@@ -332,8 +332,11 @@ abstract class Ring(
     }
 
     fun maybeDoRing() {
-        if (this !is BlinkRing) doRing()
-        else AutoP3.setActiveBlink(this)
+        if (this !is BlinkRing) {
+            doRing()
+            return
+        }
+        AutoP3.setActiveBlink(this)
     }
 
     protected fun EditGuiBase.EditGuiBaseBuilder.addXYZ(includeY: Boolean) {
