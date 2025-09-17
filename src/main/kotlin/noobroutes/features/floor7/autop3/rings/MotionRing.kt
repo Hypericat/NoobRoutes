@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3.rings
 
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.*
+import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 
@@ -38,12 +39,17 @@ class MotionRing(
             triggered = false
             return
         }
-        else mc.thePlayer.jump()
+
+        mc.thePlayer.jump()
 
         devMessage("${System.currentTimeMillis()}, motion ring")
 
         AutoP3MovementHandler.setDirection(yaw)
         AutoP3MovementHandler.setMotionTicks(0)
         AutoP3MovementHandler.setScale(scale)
+    }
+    override fun extraArgs(builder: EditGuiBase.EditGuiBaseBuilder) {
+        builder.addSwitch("Walk", {far}, {far = it})
+        builder.addSlider("Scale", 0.7, 1.0, 0.05, 2, {scale.toDouble()}, {scale = it.toFloat()})
     }
 }

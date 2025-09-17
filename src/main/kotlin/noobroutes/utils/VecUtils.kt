@@ -31,7 +31,6 @@ fun BlockPos.add(vec: Vec2): BlockPos = this.add(vec.x, 0.0, vec.z)
 
 fun BlockPos.add(vec: Vec2i): BlockPos = this.add(vec.x, 0, vec.z)
 
-
 operator fun Vec3.component1(): Double = xCoord
 
 operator fun Vec3.component2(): Double = yCoord
@@ -43,6 +42,10 @@ operator fun Vec3i.component1(): Int = x
 operator fun Vec3i.component2(): Int = y
 
 operator fun Vec3i.component3(): Int = z
+
+operator fun Vec3.minus(other: Vec3): Vec3 = Vec3(this.xCoord - other.xCoord, this.yCoord - other.yCoord, this.zCoord - other.zCoord)
+
+operator fun Vec3.times(scalar: Float): Vec3 = Vec3(this.xCoord * scalar, this.yCoord * scalar, this.zCoord * scalar)
 
 fun Entity.distanceSquaredTo(pos: Vec3): Double =
     (posX - pos.xCoord).pow(2.0) + (posY - pos.yCoord).pow(2.0) + (posZ - pos.zCoord).pow(2.0)
@@ -64,8 +67,6 @@ fun Vec3.bloomNormalize(): Vec3 {
     val len =  1 / this.length
     return Vec3(this.xCoord * len, this.yCoord * len, this.zCoord * len)
 }
-
-
 
 /**
  * Gets the eye height of the player

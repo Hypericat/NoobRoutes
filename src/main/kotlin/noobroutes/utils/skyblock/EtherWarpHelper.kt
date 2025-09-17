@@ -73,7 +73,36 @@ object EtherWarpHelper {
         return traverseVoxels(origin, endPos).takeUnless { it == EtherPos.NONE && returnEnd } ?: EtherPos(true, endPos.toBlockPos())
     }
 
+    fun raytraceBlockPos(start: Vec3, yaw: Float, pitch: Float, distance: Double): BlockPos? {
+        val endPosition = getLook(yaw, pitch).normalize().multiply(distance)
 
+        val direction = endPosition.subtract(start)
+        val step = IntArray(3) { sign(direction[it]).toInt() }
+        val invDirection = DoubleArray(3) { if (direction[it] != 0.0) 1.0 / direction[it] else Double.MAX_VALUE }
+        val tDelta = DoubleArray(3) { invDirection[it] * step[it] }
+        val currentPos = IntArray(3) { floor(start[it]).toInt() }
+        val endPos = IntArray(3) { floor(endPosition[it]).toInt() }
+        val tMax = DoubleArray(3) {
+            val startCoord = start[it]
+            abs((floor(startCoord) + max(step[it], 0) - startCoord) * invDirection[it])
+        }
+
+        repeat(1000) {
+            val pos = BlockPos(currentPos[0], currentPos[1], currentPos[2])
+            if (getBlockIdAt(pos) != 0) return pos
+            if (currentPos.contentEquals(endPos)) return null
+
+            val minIndex = if (tMax[0] <= tMax[1])
+                if (tMax[0] <= tMax[2]) 0 else 2
+            else
+                if (tMax[1] <= tMax[2]) 1 else 2
+
+            tMax[minIndex] += tDelta[minIndex]
+            currentPos[minIndex] += step[minIndex]
+        }
+
+        return null
+    }
 
     /**
      * Gets the position of an entity in the "ether" based on the player's view direction.
@@ -222,6 +251,19 @@ object EtherWarpHelper {
 
         return getBlockAt(pos.up(2)).registryName in validEtherwarpFeetBlocks
     }
+
+    /*
+        fun getEtherPosOrigin(pos: Vec3, yaw: Float, pitch: Float, distance: Double = 61.0, returnEnd: Boolean = false, sneaking: Boolean = mc.thePlayer.isSneaking): EtherPos {
+        mc.thePlayer ?: return EtherPos.NONE
+
+        val startPos: Vec3 = getPositionEyes(pos, sneaking)
+        val endPos = getLook(yaw = yaw, pitch = pitch).normalize().multiply(factor = distance).add(startPos)
+
+        return traverseVoxels(startPos, endPos).takeUnless { it == EtherPos.NONE && returnEnd } ?: EtherPos(true, endPos.toBlockPos())
+    }
+     */
+
+
 
     private val validEtherwarpFeetBlocks = setOf(
         "minecraft:air",

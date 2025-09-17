@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3.rings
 
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.*
+import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils
 import noobroutes.utils.skyblock.PlayerUtils
@@ -43,5 +44,10 @@ class HClipRing(
     private fun setMaxSpeed() {
         mc.thePlayer.motionX = AutoP3MovementHandler.DEFAULT_SPEED * PlayerUtils.getPlayerWalkSpeed() * Utils.xPart(yaw)
         mc.thePlayer.motionZ = AutoP3MovementHandler.DEFAULT_SPEED * PlayerUtils.getPlayerWalkSpeed() * Utils.zPart(yaw)
+    }
+
+    override fun extraArgs(builder: EditGuiBase.EditGuiBaseBuilder) {
+        builder.addSwitch("Insta", {insta}, {insta = it})
+        builder.addSwitch("Walk", {walk}, {walk = it})
     }
 }

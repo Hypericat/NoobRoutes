@@ -18,7 +18,7 @@ import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeYaw
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 
-class Aotv(
+class Hype(
     pos: Vec3,
     val yaw : Float,
     val pitch: Float,
@@ -34,7 +34,7 @@ class Aotv(
             val yaw = obj.get("yaw").asFloat
             val pitch = obj.get("pitch").asFloat
 
-            return Aotv(
+            return Hype(
                 obj.getCoords(),
                 yaw,
                 pitch,
@@ -49,7 +49,7 @@ class Aotv(
             val yaw = room.getRelativeYaw(mc.thePlayer.rotationYaw)
             val pitch = mc.thePlayer.rotationPitch
             val ringBase = getBaseFromArgs(args)
-            return Aotv(
+            return Hype(
                 getCoords(room),
                 yaw,
                 pitch,
@@ -74,7 +74,7 @@ class Aotv(
 
     override fun run() {
         val room = currentRoom ?: return
-        val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(277) else SwapManager.swapFromSBId("ASPECT_OF_THE_VOID")
+        val state = if (LocationUtils.isSinglePlayer) SwapManager.swapFromId(267) else SwapManager.swapFromSBId("HYPERION", "ASTRAEA", "VALKYRIE", "SCYLLA", "NECRON_BLADE")
         stopWalk()
         if (state == SwapManager.SwapState.UNKNOWN) return
         if (state == SwapManager.SwapState.TOO_FAST) {

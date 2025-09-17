@@ -120,7 +120,8 @@ object Zpew : Module(
             Vec3(lastX, lastY, lastZ),
             lastYaw,
             lastPitch,
-            distance.toDouble()
+            distance.toDouble(),
+            sneaking = true
         )
 
         if (!etherBlock.succeeded) return

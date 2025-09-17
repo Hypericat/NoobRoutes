@@ -66,23 +66,6 @@ object DungeonUtils {
         return floorNumber in options
     }
 
-    /**
-     * Gets the current phase of floor 7 boss.
-     *
-     * @return The current phase of floor 7 boss, or `null` if the player is not in the boss room.
-     */
-    fun getF7Phase(): M7Phases {
-        if ((!isFloor(7) || !inBoss) && LocationUtils.isOnHypixel) return M7Phases.Unknown
-
-        return when {
-            PlayerUtils.posY > 210 -> M7Phases.P1
-            PlayerUtils.posY > 155 -> M7Phases.P2
-            PlayerUtils.posY > 100 -> M7Phases.P3
-            PlayerUtils.posY > 45 -> M7Phases.P4
-            else -> M7Phases.P5
-        }
-    }
-
     fun getMageCooldownMultiplier(): Double {
         return if (currentDungeonPlayer.clazz != DungeonClass.Mage) 1.0
         else 1 - 0.25 - (floor(currentDungeonPlayer.clazzLvl / 2.0) / 100) * if (dungeonTeammates.count { it.clazz == DungeonClass.Mage } == 1) 2 else 1

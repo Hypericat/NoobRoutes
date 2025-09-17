@@ -1,6 +1,7 @@
 package noobroutes.features.routes.nodes.autoroutes
 
 import com.google.gson.JsonObject
+import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.NodeType
@@ -14,6 +15,7 @@ import noobroutes.utils.roundToNearest
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeYaw
 
 class BlockClip(
     pos: Vec3,
@@ -38,8 +40,8 @@ class BlockClip(
             room: UniqueRoom
         ): AutorouteNode? {
             val base = getBaseFromArgs(args)
-            val yaw = (mc.thePlayer.rotationYaw + 180).roundToNearest(90f, 180f, 270f, 360f)
-            return BlockClip(getCoords(room), yaw, base)
+            val yaw = (MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw) + 180f).roundToNearest(0f, 90f, 180f, 270f, 360f) - 180f
+            return BlockClip(getCoords(room), room.getRelativeYaw(yaw), base)
         }
 
     }
@@ -49,15 +51,23 @@ class BlockClip(
         obj.addProperty("yaw", yaw)
     }
 
-    override fun updateTick() {}
+    override fun updateTick() {
+        PlayerUtils.unSneak(isSilent())
+    }
 
     override fun run() {
         val room = currentRoom ?: return
         val realCoords = room.getRealCoords(pos)
         val realYaw = room.getRealYaw(yaw)
+        PlayerUtils.unSneak(isSilent())
+
+
         PlayerUtils.setPosition(realCoords.xCoord + realYaw.xPart * INITIAL_DISTANCE, realCoords.zCoord + realYaw.zPart * INITIAL_DISTANCE)
         Scheduler.scheduleHighPreTickTask {
             PlayerUtils.setPosition(realCoords.xCoord + realYaw.xPart * SECOND_DISTANCE, realCoords.zCoord + realYaw.zPart * SECOND_DISTANCE)
+            Scheduler.scheduleC03Task {
+                PlayerUtils.resyncSneak()
+            }
         }
     }
 

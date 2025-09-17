@@ -11,6 +11,8 @@
     "MixinModList",
     "MixinNetworkManager",
     "MixinWorldClient",
+    "accessors.C08Accessor",
+    "accessors.EntityLivingBaseAccessor",
     "accessors.TimerFieldAccessor",
     "player.MixinAbstractClientPlayer",
     "player.MixinEntity",
@@ -19,14 +21,13 @@
     "render.MixinEntityRenderer",
     "render.MixinItemRenderer",
     "render.MixinRenderGlobal",
-    "render.MixinRenderManager",
-    "accessors.C08Accessor",
-    "accessors.LastReportedAccessor"
+    "render.MixinRenderManager"
   ],
   "client": [
     "MixinNetHandlerPlayClient",
     "MixinRenderGlobal",
     "MixinS23PacketBlockChange",
-    "accessors.ChunkListingFieldAccessor"
+    "accessors.ChunkListingFieldAccessor",
+    "accessors.LastReportedAccessor"
   ]
 }

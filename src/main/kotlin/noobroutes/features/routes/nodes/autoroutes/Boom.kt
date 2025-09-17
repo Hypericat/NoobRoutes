@@ -13,28 +13,39 @@ import noobroutes.utils.json.JsonUtils.addProperty
 import noobroutes.utils.json.JsonUtils.asBlockPos
 import noobroutes.utils.render.Color
 import noobroutes.utils.routes.RouteUtils
+import noobroutes.utils.skyblock.EtherWarpHelper
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
+import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealYaw
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRelativeCoords
 import noobroutes.utils.skyblock.dungeon.tiles.UniqueRoom
 import noobroutes.utils.skyblock.modMessage
 
 class Boom(
     pos: Vec3,
-    var target: BlockPos,
+    var target: BlockPos?,
     base: AutoRouteNodeBase
 ) : AutorouteNode(
     pos,
     base
 ) {
+    var lookVec: LookVec? = null
+
     companion object : NodeLoader {
         override fun loadNodeInfo(obj: JsonObject): AutorouteNode {
             val base = getBaseFromObj(obj)
-            val target = obj.get("target").asBlockPos
-            return Boom(
+            val target = obj.get("target")?.asBlockPos
+            val yaw = obj.get("yaw")?.asFloat
+            val pitch = obj.get("pitch")?.asFloat
+            val boom =  Boom(
                 obj.getCoords(),
                 target,
                 base
             )
+
+            if (yaw != null && pitch != null) {
+                boom.lookVec = LookVec(yaw, pitch)
+            }
+            return boom
         }
 
         override fun generateFromArgs(
@@ -58,7 +69,24 @@ class Boom(
     override val priority: Int = 9
 
     override fun nodeAddInfo(obj: JsonObject) {
-        obj.addProperty("target", target)
+        lookVec?.let {
+            obj.addProperty("yaw", it.yaw)
+            obj.addProperty("pitch", it.pitch)
+        }
+        target?.let {
+            obj.addProperty("target", it)
+        }
+    }
+
+    override fun meowConvert(room: UniqueRoom) {
+        super.meowConvert(room)
+        lookVec?.let {
+            val block =
+                EtherWarpHelper.raytraceBlockPos(room.getRealCoords(this.pos), room.getRealYaw(it.yaw), it.pitch, 6.2)
+                    ?: return
+            target = room.getRelativeCoords(block)
+            lookVec = null
+        }
     }
 
 
@@ -72,7 +100,7 @@ class Boom(
     override fun run() {
         val room = currentRoom ?: return
 
-        val pos = room.getRealCoords(target)
+        val pos = room.getRealCoords(target ?: return modMessage("Corrupt Boom Node"))
         if (isAir(pos)) {
             return
         }

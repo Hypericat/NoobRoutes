@@ -97,7 +97,7 @@ class Pearl(
             return
         }
         RouteUtils.setRotation(room.getRealYaw(yaw), pitch, isSilent())
-        RouteUtils.unsneak()
+        RouteUtils.unsneak(AutoRoute.silent)
         RouteUtils.pearls = count - 1
     }
 

@@ -34,7 +34,8 @@ class TextBoxElement(
     override var elementValue: String,
     val keyWhiteList: List<Int>,
     val placeHolder: String = "",
-    val verticalAlign: TextPos = TextPos.Middle
+    val verticalAlign: TextPos = TextPos.Middle,
+    val unit: String = ""
 ) : UiElement(x, y), ElementValue<String> {
     constructor(
         name: String,
@@ -131,6 +132,10 @@ class TextBoxElement(
                 resetSelection()
                 invokeValueChangeListeners()
                 listening = false
+            }
+            Keyboard.KEY_DELETE -> {
+                if (elementValue.isEmpty()) return true
+
             }
             Keyboard.KEY_BACK -> {
                 if (elementValue.isEmpty()) return true
@@ -358,9 +363,9 @@ class TextBoxElement(
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (mouseButton != 0) return false
         if (!isHovered) {
-            listening = false
             resetSelection()
-            invokeValueChangeListeners()
+            if (listening) invokeValueChangeListeners()
+            listening = false
             return false
         }
         if (resetClickStageClock.hasTimePassed(false)) clickSelectStage = 0
@@ -488,7 +493,7 @@ class TextBoxElement(
 
     private fun drawTextBoxWithGapTitle() {
         GlStateManager.pushMatrix()
-        val displayString = elementValue.ifBlank { placeHolder }
+        val displayString = elementValue.ifBlank { placeHolder } + unit
         val width = stringWidth(displayString, textScale, minWidth, textPadding)
         val nameWidth = getTextWidth(name, textScale) + textPadding
         val nameOrigin = when (textAlign) {
@@ -502,7 +507,6 @@ class TextBoxElement(
             TextAlign.Middle -> -width * 0.5f
             TextAlign.Right -> -width
         }
-
 
         translate(boxOffset, 0f)
         val textOrigin = when (textAlign) {
@@ -527,8 +531,6 @@ class TextBoxElement(
             align = textAlign,
             verticalAlign = verticalAlign
         )
-
-
         gapOutline(
             x,
             y,
@@ -543,12 +545,11 @@ class TextBoxElement(
             boxThickness
         )
 
-
         GlStateManager.popMatrix()
     }
     private fun drawTextBox(){
         GlStateManager.pushMatrix()
-        val displayString = elementValue.ifBlank { placeHolder }
+        val displayString = elementValue.ifBlank { placeHolder } + unit
         val width = stringWidth(displayString, textScale, minWidth, textPadding)
 
         val boxOffset = when (textAlign) {
@@ -578,7 +579,7 @@ class TextBoxElement(
     }
     private fun drawTextBoxNoBox(){
         GlStateManager.pushMatrix()
-        val displayString = elementValue.ifBlank { placeHolder }
+        val displayString = elementValue.ifBlank { placeHolder } + unit
         val width = stringWidth(displayString, textScale, minWidth, textPadding)
 
         val boxOffset = when (textAlign) {

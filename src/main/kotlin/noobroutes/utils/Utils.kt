@@ -66,7 +66,7 @@ object Utils {
     }
 
     fun zPart(yaw: Float): Double {
-        return cos(yaw * Math.PI /180)
+        return cos(yaw * Math.PI / 180)
     }
 
     inline val TickEvent.isStart get() = this.phase == TickEvent.Phase.START

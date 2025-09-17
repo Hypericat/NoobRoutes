@@ -72,7 +72,6 @@ class NoobRoutes {
             EventDispatcher,
             SwapManager,
             BowUtils,
-            RotationUtils,
             BossEventDispatcher,
             SecretUtils,
             RouteUtils,
