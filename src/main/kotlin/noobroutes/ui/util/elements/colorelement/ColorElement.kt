@@ -33,7 +33,7 @@ class ColorElement(
         const val COLOR_BOX_CIRCLE_RADIUS = 8f
         const val COLOR_BOX_CIRCLE_THICKNESS = COLOR_BOX_CIRCLE_RADIUS * 0.225f
 
-        val ALPHA_BACKGROUND = DynamicTexture(RenderUtils.loadBufferedImage("/assets/ui/alphaBackground.png"))
+        val ALPHA_BACKGROUND = DynamicTexture(RenderUtils.loadBufferedImage("/assets/ui/AlphaBackground.png"))
         val HUE_GRADIENT = DynamicTexture(RenderUtils.loadBufferedImage("/assets/ui/HueGradient.png"))
         const val COLOR_SLIDER_HEIGHT = 150f
         const val COLOR_SLIDER_WIDTH = 14f

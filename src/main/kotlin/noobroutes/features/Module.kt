@@ -26,7 +26,7 @@ abstract class Module(
     key: Int? = Keyboard.KEY_NONE,
     @Transient val category: Category = Category.RENDER,
     @Transient var description: String,
-    @Transient val tag: TagType = TagType.NONE,
+    @Transient val warning: Boolean = false,
     toggled: Boolean = false,
 ) {
 
@@ -172,9 +172,7 @@ abstract class Module(
         Executor(delay, profileName, shouldRun, func).register()
     }
 
-    enum class TagType {
-        NONE, NEW, RISKY, FPSTAX
-    }
+
 
 
 }

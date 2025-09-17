@@ -29,7 +29,7 @@ val matrix = UMatrixStack.Compat
 val scaleFactor get() = ScaledResolution(mc).scaleFactor.toFloat()
 private val arrowIcon = DynamicTexture(
     loadBufferedImage(
-        "/assets/ui/arrow.png"
+        "/assets/ui/Arrow.png"
     )
 )
 
