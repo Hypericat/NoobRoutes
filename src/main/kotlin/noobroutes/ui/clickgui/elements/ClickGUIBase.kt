@@ -63,7 +63,6 @@ object ClickGUIBase : UiElement(0f, 0f) {
             panel.updatingModuleButtons()
         }
         SearchBar.updatePosition(ClickGUIModule.searchBarX.value, ClickGUIModule.searchBarY.value)
-
     }
 
     fun wipeDescription(){

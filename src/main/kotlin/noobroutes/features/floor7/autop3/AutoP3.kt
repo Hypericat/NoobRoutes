@@ -91,10 +91,6 @@ object AutoP3: Module (
     }.withDependency { blinkShit }
     private val cancelC05Mode by SelectorSetting("Rot Mode", "Always", arrayListOf("Always", "On Blink/Holding Leap", "Never"), description = "when to cancel Rotations").withDependency { blinkShit }
     private val movementMode by DualSetting("Movement Mode","Playback", "Silent", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
-    //val x_y0uMode by BooleanSetting("x_y0u Mode", description = "While its faster it also probably flags timer and will lobby you sometimes. (We Jew the Packets -x_y0u)").withDependency { blinkShit }
-    //val blinkCooldown by NumberSetting("Blink Cooldown", 5, 0, 10, description = "how many ticks to wait after entering a blink ring before allowing blink").withDependency { x_y0uMode && blinkShit }
-    //private val resetInterval by NumberSetting(name = "clear interval", description = "delete packets periodically", min = 1, max = 300, default = 200, unit = "t").withDependency { x_y0uMode && blinkShit }
-    //private val resetAmount by NumberSetting(name = "clear amount", description = "delete packets periodically", min = 1, max = 400, default = 50).withDependency { x_y0uMode && blinkShit }
     val dontChargeAll by BooleanSetting("Don't Charge All", description = "Instead of charging all the packets required for a blink only charge some").withDependency { blinkShit }
     val percentageChargeAmount by NumberSetting("Charge Amount", default = 69, min = 30, max = 100, description = "how many percent of the required packets to charge", unit = "%").withDependency { blinkShit &&  dontChargeAll }
     val endBlinkOnKey by BooleanSetting("End On Key", description = "stops recording on keypress instead of having to input the amount").withDependency { blinkShit }
@@ -173,8 +169,6 @@ object AutoP3: Module (
         
         handleRings(mc.thePlayer.positionVector)
 
-
-
         activeBlinkWaypoint?.let { //this needs to be on tick otherwise shit breaks
             if (it.intersectedWithRing(lastPos, mc.thePlayer.positionVector)) {
                 if (!it.triggered) recording = true
@@ -236,8 +230,6 @@ object AutoP3: Module (
         waitedTicks = 10
         activeBlink = blinkRing as BlinkRing
     }
-
-
 
     fun getClosestRingToPlayer(): Ring? {
         return rings[route]?.minBy { it.coords.subtract(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0).distanceToPlayerSq }
@@ -335,16 +327,6 @@ object AutoP3: Module (
         dontCancelNextC03 = true
     }
 
-    /*@SubscribeEvent
-    fun resetter(event: TickEvent.ClientTickEvent) {
-        if (!event.isStart || !inF7Boss || !x_y0uMode) return
-        if (toReset <= 0) {
-            cancelled -= resetAmount.coerceAtMost(cancelled)
-            toReset = resetInterval
-        }
-        toReset--
-    }*/
-
     private var resetPacketExceptionState = false
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -352,14 +334,12 @@ object AutoP3: Module (
         if (!inF7Boss || event.packet !is C03PacketPlayer) return
 
         if (movementPackets.isNotEmpty()) {
-            //if (!x_y0uMode) cancelled = 0
             cancelled = 0
             return
         }
 
         if (dontCancelNextC03) {
             dontCancelNextC03 = false
-            //if (!x_y0uMode) cancelled = 0
             cancelled = 0
             return
         }
@@ -414,8 +394,6 @@ object AutoP3: Module (
     }
 
     private fun cancelledLogic(){
-        //if (x_y0uMode) cancelled.coerceAtMost(200)
-        //else cancelled = 0
         cancelled = 0
     }
 

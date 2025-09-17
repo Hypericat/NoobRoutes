@@ -21,7 +21,8 @@ enum class RingType(
     SPEED("Speed", SpedRing::class, commandGenerated = false, aliases = listOf("sped", "tickshift")),
     STOP("Stop", StopRing::class),
     WALK("Walk", WalkRing::class),
-    COMMAND("Command", CommandRing::class, aliases = listOf("cmd"));
+    COMMAND("Command", CommandRing::class, aliases = listOf("cmd")),
+    SWAP("Swap", SwapRing::class);
 
 
     companion object {

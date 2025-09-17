@@ -15,7 +15,14 @@ class BlinkWaypoint(
 
     }
 
-    override fun inRing(pos: Vec3): Boolean {
-        return checkInBoundsWithSpecifiedHeight(pos,1f) && mc.thePlayer.onGround
+    override fun meetsGroundRequirements(): Boolean {
+        return mc.thePlayer.onGround
     }
+
+    override fun getRingHeight(): Float {
+        return 0f
+    }
+
+    override val includeHeight: Boolean = false
+    override val includeY: Boolean = false
 }

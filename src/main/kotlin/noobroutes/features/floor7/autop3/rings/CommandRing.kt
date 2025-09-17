@@ -53,6 +53,7 @@ class CommandRing(ringBase: RingBase = RingBase(), var walk: Boolean = false, va
 
     init {
         addString("command", {command}, {command = it})
+        addBoolean("walk", {walk}, {walk = it})
     }
 
     override fun doRing() {
