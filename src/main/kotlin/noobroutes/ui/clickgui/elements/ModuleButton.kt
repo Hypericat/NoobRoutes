@@ -7,6 +7,7 @@ import noobroutes.features.Module
 import noobroutes.features.settings.impl.*
 import noobroutes.font.FontRenderer
 import noobroutes.ui.ColorPalette
+import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.clickGUIColor
 import noobroutes.ui.clickgui.elements.menu.*
 import noobroutes.ui.util.UiElement
@@ -83,8 +84,8 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
         roundedRectangle(0f, 0f, width, BUTTON_HEIGHT, ColorPalette.moduleButtonColor)
         text(module.name, width * 0.5, HALF_BUTTON_HEIGHT, color, 14f, FontRenderer.REGULAR, TextAlign.Middle)
 
-        if (module.warning) drawDynamicTexture(warningIcon, width * 0.1f, HALF_BUTTON_HEIGHT, 32f, 32f)
-  
+        if (module.warning) drawDynamicTexture(warningIcon, TEXT_OFFSET, 0f, 28f, 28f)
+
 
         if (!extendAnim.isAnimating() && !extended) {
 
