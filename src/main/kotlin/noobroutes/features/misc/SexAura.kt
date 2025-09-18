@@ -30,11 +30,11 @@ object SexAura : Module(
         max = 15,
         default = 5
     )
-    private val actuallySend by BooleanSetting("Im ready", false, description = "wether to actually start the rizz")
+    private val goodShit by BooleanSetting("Good Shit", false, description = "Use \"better\" lines")
     private val sentList = mutableListOf<String>()
     private var lastMessage = System.currentTimeMillis()
 
-    private val pickupLines = listOf(
+    private val normalLines = listOf(
         "Are you WiFi? Because I’m feeling a strong connection… even though you’re clearly out of my league.",
         "Are you an earthquake? Because every time you’re near, my standards drop lower.",
         "You must be a magician, because whenever you leave, my happiness disappears.",
@@ -69,6 +69,23 @@ object SexAura : Module(
         "Do you like pokemon? Because I wanna shove you in my balls."
     )
 
+    private val goodLines = listOf(
+        "You're so hot your pussy feels like a hot pocket",
+        "doggy style means i get a treat after right",
+        "are you a microwave? because mmmm",
+        "Meow",
+        "i don't care if you're 15",
+        "does it jiggle?",
+        "Wanna be Minecraft without the craft?",
+        "are you a hole because there's a goal",
+        "Are you a goat? Because im hard",
+        "Are you a 10? Because you are gonna drink my piss",
+        "I like kids. Are you a kid because im hard"
+    )
+
+    private inline val lines: List<String> get() =
+        if (goodShit) goodLines else normalLines
+
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
@@ -82,7 +99,7 @@ object SexAura : Module(
     }
 
     private fun sendPickupLine(player: EntityPlayer) {
-        if (actuallySend) sendCommand("msg ${player.name} ${pickupLines.random()}") else modMessage("/msg ${player.name} ${pickupLines.random()}")
+        sendCommand("msg ${player.name} ${lines.random()}")
         sentList.add(player.name)
         Scheduler.schedulePreTickTask(200) { sentList.remove(player.name) }
         lastMessage = System.currentTimeMillis()
@@ -94,7 +111,7 @@ object SexAura : Module(
             return
         }
         //sendCommand("msg ${args[1]} ${pickupLines.random()}")
-        PacketUtils.sendPacket(C01PacketChatMessage("/msg ${args[1]} ${pickupLines.random()}"))
+        PacketUtils.sendPacket(C01PacketChatMessage("/msg ${args[1]} ${lines.random()}"))
     }
 
     private fun getPlayersInRenderDistance(): List<EntityPlayer> {

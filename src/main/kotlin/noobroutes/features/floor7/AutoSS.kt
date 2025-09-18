@@ -273,7 +273,7 @@ object AutoSS : Module(
     }
 
     private fun clickButton(x: Int, y: Int, z: Int) {
-        if (mc.thePlayer.getDistanceSqToCenter(BlockPos(x, y, z)) > 25) return
+        if (mc.thePlayer.getDistanceSqToCenter(BlockPos(x, y, z)) > 36) return devMessage("too far")
         devMessage("Clicked at: x: ${x}, y: ${y}, z: ${z}. Time: ${System.currentTimeMillis()}")
         clickedButton = Vec3(x.toDouble(), y.toDouble(), z.toDouble())
         lastClickAdded = System.currentTimeMillis()

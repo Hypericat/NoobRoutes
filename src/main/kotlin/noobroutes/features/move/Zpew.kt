@@ -48,7 +48,7 @@ object Zpew : Module(
 
     private val sendTPCommand by BooleanSetting("Send Tp Command", description = "Used for Single Player")
     private val hideFuckingTeleports by BooleanSetting("Hide Tp Messages", description = "Hides the fucking annoying tp messages").withDependency { Minecraft.getMinecraft().isSingleplayer && sendTPCommand }
-    //private val zpewOffset by BooleanSetting("Offset", description = "Offsets your position onto the block instead of 0.05 blocks above it")
+    private val zpewOffset by BooleanSetting("Offset", description = "Offsets your position onto the block instead of 0.05 blocks above it")
     private val blinkLimit by NumberSetting("Max Blink Length", 25, 5, 30, 1, description = "")
     private val dingdingding by BooleanSetting("dingdingding", false, description = "")
 
@@ -163,7 +163,9 @@ object Zpew : Module(
             val speedVec = Vec3(mc.thePlayer.motionX, mc.thePlayer.motionY, mc.thePlayer.motionZ)
             waitingList.add(S08Blink(C03PacketPlayer.C06PacketPlayerPosLook(x, y, z, yaw, pitch, false), mutableListOf(), mc.thePlayer.positionVector, speedVec))
 
-            mc.thePlayer.setPosition(x, y, z)
+            val adjustedY = if (zpewOffset) y.toInt().toDouble() else y
+
+            mc.thePlayer.setPosition(x, adjustedY, z)
             mc.thePlayer.setVelocity(0.0, 0.0, 0.0)
         }
     }
