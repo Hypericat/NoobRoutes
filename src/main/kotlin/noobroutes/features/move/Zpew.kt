@@ -15,6 +15,7 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.BossEventDispatcher.inBoss
@@ -79,6 +80,8 @@ object Zpew : Module(
     private var waitingList = mutableListOf<S08Blink>()
 
     private var skipPacketCount = 0
+
+    private var rightClicked = false
 
     fun holdingTeleportItem(): Boolean {
         val held = mc.thePlayer.heldItem
@@ -170,9 +173,16 @@ object Zpew : Module(
         if (event.message.startsWith("Teleported " + Minecraft.getMinecraft().thePlayer.name)) event.isCanceled = true
     }
 
+    @SubscribeEvent
+    fun onRight(event: MouseEvent) {
+        if (event.button != 1 || !event.buttonstate) return
+        rightClicked = true
+        Scheduler.scheduleLowestPostTickTask { rightClicked = false }
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onC08(event: PacketEvent.Send) {
-        if (skipPacketCount > 0) return
+        if (skipPacketCount > 0 || !rightClicked) return
         if (mc.thePlayer == null || event.packet !is C08PacketPlayerBlockPlacement) return
         val dir = event.packet.placedBlockDirection
         if (dir != 255) return

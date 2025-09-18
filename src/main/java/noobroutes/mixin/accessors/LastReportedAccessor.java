@@ -16,4 +16,10 @@ public interface LastReportedAccessor {
 
     @Accessor("lastReportedPosZ")
     void setLastReportedPosZ(double posZ);
+
+    @Accessor("lastReportedYaw")
+    void setLastReportedYaw(float yaw);
+
+    @Accessor("lastReportedPitch")
+    void setLastReportedPitch(float pitch);
 }
