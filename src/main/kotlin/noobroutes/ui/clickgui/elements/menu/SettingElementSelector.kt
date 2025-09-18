@@ -47,7 +47,6 @@ class SettingElementSelector(setting: SelectorSetting) :
         get() = buttonColor.brighterIf(isHovered)
 
     override fun draw() {
-
         GlStateManager.pushMatrix()
         translate(x, y)
         h = settingAnim.get(32f, size * 36f + DEFAULT_HEIGHT, !extended)
@@ -78,8 +77,6 @@ class SettingElementSelector(setting: SelectorSetting) :
         }
         resetScissor(scissor)
         GlStateManager.popMatrix()
-
-
     }
 
     override fun mouseClicked(mouseButton: Int): Boolean {
