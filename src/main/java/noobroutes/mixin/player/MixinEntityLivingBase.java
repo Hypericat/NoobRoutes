@@ -1,14 +1,11 @@
 package noobroutes.mixin.player;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.EntityLivingBase;
 import noobroutes.events.impl.MoveEntityWithHeadingEvent;
 import noobroutes.features.move.QOL;
-import noobroutes.utils.skyblock.LocationUtils;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -17,19 +14,6 @@ import static noobroutes.utils.UtilsKt.postAndCatch;
 
 @Mixin(value = EntityLivingBase.class, priority = 9000)
 public abstract class MixinEntityLivingBase {
-
-    @Shadow protected abstract boolean isPlayer();
-
-
-    @ModifyConstant(
-            method = "jump",
-            constant = @Constant(floatValue = 0.2F)
-    )
-    private float noobRoutes$modifySprintJumpBoost(float constant) {
-        if (!QOL.INSTANCE.getEnabled() || (!LocationUtils.INSTANCE.isInSkyblock() && !Minecraft.getMinecraft().isSingleplayer())) return constant;
-        return QOL.INSTANCE.getSpeed() * Minecraft.getMinecraft().thePlayer.capabilities.getWalkSpeed();
-    }
-
     @ModifyConstant(method = "onLivingUpdate", constant = @Constant(intValue = 10))
     private int noobRoutes$modifyJumpResetTime(int constant) {
         if (!QOL.INSTANCE.getEnabled()) return 10;
@@ -64,6 +48,4 @@ public abstract class MixinEntityLivingBase {
             if (postAndCatch(new MoveEntityWithHeadingEvent.Post())) ci.cancel();
         }
     }
-
-
 }

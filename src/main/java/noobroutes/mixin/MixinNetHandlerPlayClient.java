@@ -35,12 +35,8 @@ public class MixinNetHandlerPlayClient {
 
     @Redirect(method = "handlePlayerPosLook", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;setPositionAndRotation(DDDFF)V"))
     private void fuckRot(EntityPlayer player, double x, double y, double z, float yaw, float pitch) {
-        if (!QOL.INSTANCE.getEnabled() || !QOL.INSTANCE.getNoRot()) {
-            player.setPositionAndRotation(x, y, z, yaw, pitch);
-            return;
-        }
-
-        player.setPosition(x, y, z);
+        if (!QOL.INSTANCE.getEnabled() || !QOL.INSTANCE.getNoRot()) player.setPositionAndRotation(x, y, z, yaw, pitch);
+        else player.setPosition(x, y, z);
 
         Packet<?> c06 = new C03PacketPlayer.C06PacketPlayerPosLook(x, y, z, yaw, pitch, false);
         PacketUtils.INSTANCE.handleC06ResponsePacket(c06);
@@ -56,7 +52,6 @@ public class MixinNetHandlerPlayClient {
 
     @Redirect(method = "handlePlayerPosLook", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkManager;sendPacket(Lnet/minecraft/network/Packet;)V"))
     private void dontSendPacket(NetworkManager manager, Packet<?> packet) {
-        if (!QOL.INSTANCE.getEnabled() || !QOL.INSTANCE.getNoRot()) manager.sendPacket(packet);
         //else dont do anything to not send 2 c06s
     }
 }
