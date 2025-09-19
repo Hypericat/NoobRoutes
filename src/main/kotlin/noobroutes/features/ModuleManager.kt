@@ -98,7 +98,8 @@ object ModuleManager {
         AutoClose,
         AutoRoute,
         Relics,
-        TickControl
+        TickControl,
+        HotBarSwitcher
     )
 
     init {
