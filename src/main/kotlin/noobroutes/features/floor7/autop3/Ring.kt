@@ -27,14 +27,12 @@ import kotlin.math.sin
 data class RingBase(
     var coords: Vec3 = Vec3(mc.thePlayer?.posX ?: 0.0, mc.thePlayer?.posY ?: 0.0, mc.thePlayer?.posZ ?: 0.0),
     var yaw: Float,
-    var term: Boolean,
-    var leap: Boolean,
-    var left: Boolean,
+    var await: RingAwait,
     var center: Boolean,
     var rotate: Boolean,
     var diameter: Float,
     var height: Float) {
-    constructor() : this(Vec3(0.0, 0.0, 0.0), 0f, false, false, false, false, false, 1f, 1f)
+    constructor() : this(Vec3(0.0, 0.0, 0.0), 0f, RingAwait.NONE, false, false, 1f, 1f)
 
     companion object {
         val diameterRegex = Regex("""d:(\d+)""")
@@ -64,33 +62,9 @@ abstract class Ring(
     inline var yaw: Float
         get() = base.yaw
         set(value) {base.yaw = value}
-    inline var term: Boolean
-        get() = base.term
-        set(value) {
-            if (value) {
-                base.left = false
-                base.leap = false
-            }
-            base.term = value
-        }
-    inline var leap: Boolean
-        get() = base.leap
-        set(value) {
-            if (value) {
-                base.term = false
-                base.left = false
-            }
-            base.leap = value
-        }
-    inline var left: Boolean
-        get() = base.left
-        set(value) {
-            if (value) {
-                base.term = false
-                base.leap = false
-            }
-            base.left = value
-        }
+    inline var await
+        get() = base.await
+        set(value) {base.await = value}
     inline var center: Boolean
         get() = base.center
         set(value) {base.center = value}
@@ -105,7 +79,7 @@ abstract class Ring(
         set(value) {base.height = value}
 
     inline val isAwait: Boolean
-        get() = (term || leap || left)
+        get() = (await != RingAwait.NONE)
 
 
     var isEditingRing = false
@@ -117,9 +91,7 @@ abstract class Ring(
             addProperty("type", type.ringName)
             addProperty("coords", coords)
             addProperty("yaw", yaw)
-            if (term) addProperty("term", true)
-            if (leap) addProperty("leap", true)
-            if (left) addProperty("left", true)
+            addProperty("await", await.name)
             if (center) addProperty("center", true)
             if (rotate) addProperty("rotate", true)
             if (diameter != 1f) addProperty("diameter", diameter)
@@ -386,9 +358,6 @@ abstract class Ring(
     protected fun EditGuiBase.EditGuiBaseBuilder.addArgs(){
         this.addSwitch("Center", {center}, {center = it})
         this.addSwitch("Rotate", {rotate}, {rotate = it})
-        this.addSwitch("Left", {left}, {left= it})
-        this.addSwitch("Term", {term}, {term = it})
-        this.addSwitch("Leap", {leap}, {leap = it})
     }
 
     protected fun EditGuiBase.EditGuiBaseBuilder.addOnCloseAndOpen(){
@@ -401,6 +370,9 @@ abstract class Ring(
         }
     }
 
+    protected fun EditGuiBase.EditGuiBaseBuilder.addAwait() {
+        this.addSelector("Await", RingAwait.getOptionsList(), { await.getIndex() }, {await = RingAwait[it]})
+    }
 
     protected open val includeY = true
     protected open val includeHeight = true
@@ -417,6 +389,7 @@ abstract class Ring(
         extraArgs(builder)
         builder.setName(ringName)
         builder.addOnCloseAndOpen()
+        builder.addAwait()
         return builder.build()
     }
 }

@@ -1,6 +1,7 @@
 package noobroutes.ui.editgui.elements
 
 import net.minecraft.client.renderer.GlStateManager
+import noobroutes.ui.ColorPalette
 import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.elementBackground
 import noobroutes.ui.ColorPalette.textColor
@@ -14,6 +15,7 @@ import noobroutes.ui.util.elements.textElements.NumberBoxElement
 import noobroutes.ui.util.elements.textElements.TextBoxElement
 import noobroutes.utils.render.ColorUtil.darker
 import noobroutes.utils.render.TextAlign
+import noobroutes.utils.render.TextPos
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
 import noobroutes.utils.round
@@ -27,9 +29,9 @@ class EditGuiSliderElement(
     val getter: () -> Double,
     val setter: (Double) -> Unit
 ) : UiElement(0f, 0f), EditGuiElement {
-    override val priority: Int = 2
+    override var priority: Int = 3
     override val isDoubleWidth: Boolean = true
-    override val height: Float = 80f
+    override val height: Float = 70f
 
     private inline var value
         get() = getter.invoke()
@@ -39,17 +41,16 @@ class EditGuiSliderElement(
         private const val TEXT_BOX_HEIGHT = 28.6f
         private const val HALF_TEXT_BOX_HEIGHT = TEXT_BOX_HEIGHT * 0.5f
         private const val SLIDER_HEIGHT = 7f
-        private const val Y_PADDING = -2f
         private const val NUMBER_BOX_MIN_WIDTH = 37.333f
         private const val NUMBER_BOX_RADIUS = 6f
         private const val NUMBER_BOX_PADDING = 9f
         private const val TEXT_BOX_THICKNESS = 2f
         private const val BASE_WIDTH = EditGuiBase.WIDTH - 60f
     }
-
+    //48 + 7f + 30f
     val sliderElement = SliderElement(
         BORDER_OFFSET,
-        32f,
+        48f,
         BASE_WIDTH - BORDER_OFFSET * 2f,
         SLIDER_HEIGHT,
         value,
@@ -66,7 +67,7 @@ class EditGuiSliderElement(
     val numberBoxElement = NumberBoxElement(
         "",
         BASE_WIDTH - BORDER_OFFSET,
-        Y_PADDING - TEXT_BOX_HEIGHT * 0.5f + 6f,
+        0f,
         NUMBER_BOX_MIN_WIDTH,
         TEXT_BOX_HEIGHT,
         16f,
@@ -103,7 +104,7 @@ class EditGuiSliderElement(
     override fun draw() {
         GlStateManager.pushMatrix()
         translate(x, y)
-        text(name, TEXT_OFFSET,Y_PADDING + HALF_TEXT_BOX_HEIGHT * 0.5f, textColor, 16f)
+        text(name, TEXT_OFFSET,HALF_TEXT_BOX_HEIGHT, textColor, 16f)
         GlStateManager.popMatrix()
     }
 

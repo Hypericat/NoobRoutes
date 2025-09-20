@@ -19,6 +19,7 @@ enum class Phase {
     P5,
     Unknown
 }
+
 enum class TerminalPhase {
     S1,
     S2,

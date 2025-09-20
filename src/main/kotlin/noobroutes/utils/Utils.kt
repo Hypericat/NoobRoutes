@@ -16,6 +16,7 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.network.INetHandler
 import net.minecraft.network.Packet
+import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
@@ -30,7 +31,15 @@ import noobroutes.Core.logger
 import noobroutes.Core.mc
 import noobroutes.INetwork
 import noobroutes.IS23
+import noobroutes.events.BossEventDispatcher.currentBossPhase
+import noobroutes.events.BossEventDispatcher.currentTerminalPhase
+import noobroutes.events.impl.BossEvent
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
+import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.Phase
+import noobroutes.events.impl.TerminalPhase
+import noobroutes.ui.editgui.EditGui
+import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.skyblock.PlayerUtils
@@ -108,6 +117,8 @@ object Utils {
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣦⣤⣤⣤⣶⣦⣿⣿⣶⣾⣿⣥⣤⣤⣬⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
     )
 
+    private var optionNum = 1
+
     fun testFunctions(args: Array<out String>) {
         if (args.size < 2) {
             modMessage("Test: rel, relp")
@@ -136,6 +147,28 @@ object Utils {
                 PlayerUtils.resyncSneak()
             }
 
+            "p1" -> {
+                currentBossPhase = Phase.P1
+                BossEvent.PhaseChange(DungeonUtils.floor, Phase.P1).postAndCatch()
+            }
+            "p2" -> {
+                currentBossPhase = Phase.P2
+                BossEvent.PhaseChange(DungeonUtils.floor, Phase.P2).postAndCatch()
+            }
+            "p3" -> {
+                BossEvent.PhaseChange(DungeonUtils.floor, Phase.P3).postAndCatch()
+                BossEvent.TerminalPhaseChange(DungeonUtils.floor, TerminalPhase.S1).postAndCatch()
+                currentBossPhase = Phase.P3
+                currentTerminalPhase = TerminalPhase.S1
+            }
+            "goldor" -> {
+                BossEvent.TerminalPhaseChange(DungeonUtils.floor, TerminalPhase.GoldorFight).postAndCatch()
+                currentTerminalPhase = TerminalPhase.GoldorFight
+            }
+            "p5" -> {
+                BossEvent.PhaseChange(DungeonUtils.floor, Phase.P5)
+                currentBossPhase = Phase.P5
+            }
             "swap" -> {
                 if (args.size < 3) return
                 val slot = args[2].toIntOrNull() ?: return modMessage("no int")

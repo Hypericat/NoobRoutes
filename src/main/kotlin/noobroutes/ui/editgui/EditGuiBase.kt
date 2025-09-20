@@ -2,6 +2,7 @@ package noobroutes.ui.editgui
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.ColorPalette
+import noobroutes.ui.editgui.elements.EditGuiSelector
 import noobroutes.ui.editgui.elements.EditGuiSliderElement
 import noobroutes.ui.editgui.elements.EditGuiSwitchElement
 import noobroutes.ui.util.MouseUtils
@@ -9,7 +10,6 @@ import noobroutes.ui.util.UiElement
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
-import kotlin.math.floor
 
 class EditGuiBase() : UiElement(0f, 0f) {
     var height = 0f
@@ -20,17 +20,35 @@ class EditGuiBase() : UiElement(0f, 0f) {
 
     class EditGuiBaseBuilder(){
         val elements = mutableListOf<EditGuiElement>()
-        fun addSlider(name: String, min: Double, max: Double, increment: Double, roundTo: Int, getter: () -> Double, setter: (Double) -> Unit){
+        fun addSlider(name: String, min: Double, max: Double, increment: Double, roundTo: Int, getter: () -> Double, setter: (Double) -> Unit, priority: Int? = null) {
+            val element = EditGuiSliderElement(name, min, max, increment, roundTo, getter, setter)
+            priority?.let {
+                element.priority = it
+            }
             elements.add(
-                EditGuiSliderElement(name, min, max, increment, roundTo, getter, setter)
+                element
             )
         }
 
-        fun addSwitch(name: String, getter: () -> Boolean, setter: (Boolean) -> Unit){
+        fun addSwitch(name: String, getter: () -> Boolean, setter: (Boolean) -> Unit, priority: Int? = null){
+            val element = EditGuiSwitchElement(name, getter, setter)
+            priority?.let {
+                element.priority = it
+            }
             elements.add(
-                EditGuiSwitchElement(name, getter, setter)
+                element
             )
         }
+        fun addSelector(name: String, options: ArrayList<String>, getter: () -> Int, setter: (Int) -> Unit, priority: Int? = null) {
+            val element = EditGuiSelector(name, options, getter, setter)
+            priority?.let {
+                element.priority = it
+            }
+            elements.add(
+                element
+            )
+        }
+
         private var onOpen: () -> Unit = {}
         private var onClose: () -> Unit = {}
         private var name = ""
@@ -46,13 +64,19 @@ class EditGuiBase() : UiElement(0f, 0f) {
 
         fun build(): EditGuiBase {
             val base = EditGuiBase()
-            var currentY = 105f
+            var currentY = 80f
             var currentSide = 0
+            var previousHeight = 0f
+
 
             elements.sortByDescending { it.priority }
             for (element in elements) {
                 element as UiElement
                 if (element.isDoubleWidth) {
+                    if (currentSide == 1) {
+                        currentY += previousHeight
+                        currentSide = 0
+                    }
                     element.updatePosition(X_ALIGNMENT_LEFT, currentY)
                     base.addChild(element)
                     currentY += element.height
@@ -63,6 +87,7 @@ class EditGuiBase() : UiElement(0f, 0f) {
                     element.updatePosition(X_ALIGNMENT_LEFT, currentY)
                     base.addChild(element)
                     currentSide = 1
+                    previousHeight = element.height
                     continue
                 }
                 element.updatePosition(X_ALIGNMENT_RIGHT, currentY)
@@ -71,7 +96,7 @@ class EditGuiBase() : UiElement(0f, 0f) {
                 currentSide = 0
             }
             base.name = name
-            base.height = currentY + 75f
+            base.height = currentY
             base.onOpen = this.onOpen
             base.onClose = this.onClose
             base.updatePosition(editGuiBaseX, editGuiBaseY)
@@ -98,6 +123,37 @@ class EditGuiBase() : UiElement(0f, 0f) {
         return false
     }
 
+    fun updateYPositions(){
+        var currentY = 80f
+        var currentSide = 0
+        var previousHeight = 0f
+        val elements = uiChildren.toMutableList()
+
+        elements.sortByDescending { (it as EditGuiElement).priority }
+        for (element in elements) {
+            element as EditGuiElement
+            if (element.isDoubleWidth) {
+                if (currentSide == 1) {
+                    currentY += previousHeight
+                    currentSide = 0
+                }
+                element.updatePosition(X_ALIGNMENT_LEFT, currentY)
+                currentY += element.height
+                continue
+            }
+
+            if (currentSide == 0) {
+                element.updatePosition(X_ALIGNMENT_LEFT, currentY)
+                currentSide = 1
+                previousHeight = element.height
+                continue
+            }
+            element.updatePosition(X_ALIGNMENT_RIGHT, currentY)
+            currentY += element.height
+            currentSide = 0
+        }
+        this.height = currentY
+    }
 
     override fun draw() {
         GlStateManager.pushMatrix()

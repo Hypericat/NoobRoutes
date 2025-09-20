@@ -72,7 +72,7 @@ class SettingElementSelector(setting: SelectorSetting) :
 
         for (i in 0 until size) {
             val y = 38 + 32 * i
-            text(setting.options[i].lowercase().capitalizeFirst(),w * 0.5f, y + 6f, textColor, 12f, FontRenderer.REGULAR, TextAlign.Middle, TextPos.Top)
+            text(setting.options[i],w * 0.5f, y + 6f, textColor, 12f, FontRenderer.REGULAR, TextAlign.Middle, TextPos.Top)
             if (isSettingHovered(i)) rectangleOutline(5, y - 1f, w - 11.5f, 32.5f, clickGUIColor.darker(), 4f, 3f)
         }
         resetScissor(scissor)

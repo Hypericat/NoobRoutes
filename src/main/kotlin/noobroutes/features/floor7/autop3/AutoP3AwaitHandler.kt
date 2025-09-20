@@ -6,6 +6,8 @@ import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
 import noobroutes.events.BossEventDispatcher
+import noobroutes.events.impl.BossEvent
+import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.Phase
 import noobroutes.events.impl.TermOpenEvent
@@ -28,9 +30,16 @@ object AutoP3AwaitHandler {
         }
     }
 
+    private fun doRingSafe(ring: Ring): Boolean {
+        waitingRing = null
+        if (!ring.inRing(mc.thePlayer.positionVector)) return false
+        Scheduler.schedulePreTickTask { ring.maybeDoRing() }
+        return true
+    }
+
     @SubscribeEvent
     fun awaitingLeap(event: PacketEvent.Receive) {
-        if (waitingRing?.leap != true || event.packet !is S18PacketEntityTeleport) return
+        if (waitingRing?.await != RingAwait.LEAP || event.packet !is S18PacketEntityTeleport) return
         val ring = waitingRing ?: return
 
         val entity  = mc.theWorld.getEntityByID(event.packet.entityId)
@@ -43,50 +52,64 @@ object AutoP3AwaitHandler {
         if (mc.thePlayer.getDistanceSq(x.toDouble(), y.toDouble(), z.toDouble()) < 5) leapedIds.add(event.packet.entityId)
         if (leapedIds.size == leapPlayers()) {
 
-            if (!ring.inRing()) {
-                waitingRing = null
-                return
-            }
             modMessage("everyone leaped")
-
-            Scheduler.scheduleHighestPostMoveEntityWithHeadingTask {
-                ring.maybeDoRing()
-                waitingRing = null
-            }
+            doRingSafe(ring)
         }
     }
 
 
     @SubscribeEvent
     fun awaitingTerm(event: TermOpenEvent) {
-        waitingRing?.let { ring ->
-            if (!ring.term) return
+        val ring = waitingRing ?: return
 
-            if (ring.inRing()) {
-                Scheduler.scheduleHighestPostMoveEntityWithHeadingTask{
-                    ring.maybeDoRing()
-                    waitingRing = null
-                }
-            }
-            else waitingRing = null
-        }
+        if (ring.await != RingAwait.TERM) return
+        doRingSafe(ring)
     }
 
     @SubscribeEvent
     fun awaitingLeft(event: MouseEvent) {
+        val ring = waitingRing ?: return
+
         if (Mouse.getEventButton() != 0 || !Mouse.getEventButtonState()) return
 
-        waitingRing?.let { ring ->
-            if (ring.inRing()) {
-                event.isCanceled = true
-                PlayerUtils.swing()
-                Scheduler.scheduleHighestPostMoveEntityWithHeadingTask{
-                    ring.maybeDoRing()
-                    waitingRing = null
-                }
-            }
-            else waitingRing = null
+        if (doRingSafe(ring)) {
+            event.isCanceled = true
+            PlayerUtils.swing()
         }
+    }
+
+    private val devRegex = Regex("^(\\w+) completed a device! \\(\\d/\\d\\)")
+    private val leverRegex = Regex("^(\\w+) completed a lever! \\(\\d/\\d\\)")
+
+    @SubscribeEvent
+    fun onChat(event: ChatPacketEvent) {
+        val ring = waitingRing ?: return
+
+        val match = when (ring.await) {
+            RingAwait.COMPLETE_DEV -> {devRegex.find(event.message)}
+            RingAwait.COMPLETE_LEVER -> {leverRegex.find(event.message)}
+            else -> return
+        } ?: return
+
+        if (mc.thePlayer.name != match.groups[1].toString()) return
+
+        doRingSafe(ring)
+    }
+
+    @SubscribeEvent
+    fun onTerminalPhaseChange(event: BossEvent.TerminalPhaseChange) {
+        val ring = waitingRing ?: return
+        if (!ring.await.matchesTerminalPhase(event.phase)) return
+        doRingSafe(ring)
+
+    }
+
+    @SubscribeEvent
+    fun onBossPhaseChange(event: BossEvent.PhaseChange) {
+        val ring = waitingRing ?: return
+        if (!ring.await.matchesBossPhase(event.phase)) return
+        doRingSafe(ring)
+
     }
 
 

@@ -14,12 +14,19 @@ interface CommandGenerated {
         val diameter = diameterString?.let { RingBase.diameterRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
         val heightString = args.firstOrNull { RingBase.heightRegex.matches(it) }
         val height = heightString?.let { RingBase.heightRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
+
+        var await = RingAwait.NONE
+        for (arg in args) {
+            val argAwait = RingAwait.getFromNameSafe(arg)
+            if (argAwait != RingAwait.NONE) await = argAwait
+        }
+
+
+
         return RingBase(
             mc.thePlayer.positionVector,
             MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
-            args.any {it.lowercase() == "term"},
-            args.any { it.lowercase() == "leap" },
-            args.any {it.lowercase() == "left"},
+            await,
             args.any {it.lowercase() == "center"},
             args.any {it.lowercase() == "rotate" || it == "look"},
             diameter,

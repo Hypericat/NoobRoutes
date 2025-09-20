@@ -372,8 +372,7 @@ object AutoP3: Module (
             event.isCanceled = true
             if (cancelled < 400) cancelled++
             return
-        } else {7
-
+        } else {
             if (event.packet is C03PacketPlayer.C06PacketPlayerPosLook && event.packet.isResponseToLastS08()) {
                 resetPacketExceptionState = true
                 return
@@ -559,11 +558,25 @@ object AutoP3: Module (
                     val instance: Ring = ringClass.ringClass.java.getDeclaredConstructor().newInstance() ?: return@forEach
                     instance.base.coords = ring.get("coords").asVec3
                     instance.base.yaw = MathHelper.wrapAngleTo180_float(ring.get("yaw")?.asFloat ?: 0f)
-                    instance.base.term = ring.get("term")?.asBoolean == true
-                    instance.base.leap = ring.get("leap")?.asBoolean == true
+                    val await = ring.get("await")?.asString ?: "NONE"
+                    instance.await = RingAwait.getFromName(await)
+
+                    when {
+                        ring.get("term")?.asBoolean == true -> {
+                            instance.await = RingAwait.TERM
+                        }
+
+                        ring.get("leap")?.asBoolean == true -> {
+                            instance.await = RingAwait.LEAP
+                        }
+                        ring.get("left")?.asBoolean == true -> {
+                            instance.await = RingAwait.LEFT
+                        }
+                    }
+
                     instance.base.center = ring.get("center")?.asBoolean == true
                     instance.base.rotate = ring.get("rotate")?.asBoolean == true
-                    instance.base.left = ring.get("left")?.asBoolean == true
+
                     instance.base.diameter = ring.get("diameter")?.asFloat ?: 1f
                     instance.base.height = ring.get("height")?.asFloat ?: 1f
                     instance.loadRingData(ring)
@@ -598,15 +611,28 @@ object AutoP3: Module (
         val ringType = obj.get("type")?.asString ?: return
         val coords = obj.get("coords").asVec3
         val yaw = MathHelper.wrapAngleTo180_float(obj.get("yaw")?.asFloat ?: 0f)
-        val term = obj.get("term")?.asBoolean == true
-        val leap = obj.get("leap")?.asBoolean == true
+
         val center = obj.get("center")?.asBoolean == true
         val rotate = obj.get("rotate")?.asBoolean == true
-        val left = obj.get("left")?.asBoolean == true
         val diameter = obj.get("diameter")?.asFloat ?: 1f
         val height = obj.get("height")?.asFloat ?: 1f
         val walk = obj.get("walk")?.asBoolean == true
-        val ringBase = RingBase(coords, yaw, term, leap, left, center, rotate, diameter, height)
+        val ringBase = RingBase(coords, yaw, RingAwait.NONE, center, rotate, diameter, height)
+        when {
+            obj.get("term")?.asBoolean == true -> {
+                ringBase.await = RingAwait.TERM
+            }
+
+            obj.get("leap")?.asBoolean == true -> {
+                ringBase.await = RingAwait.LEAP
+            }
+            obj.get("left")?.asBoolean == true -> {
+                ringBase.await = RingAwait.LEFT
+            }
+        }
+
+
+
         when (ringType) {
             "Insta" -> {
                 ringsInJson.add(

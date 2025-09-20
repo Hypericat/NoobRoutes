@@ -7,21 +7,22 @@ import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.ui.editgui.EditGuiElement
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.elements.SwitchElement
+import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
 
 class EditGuiSwitchElement(
     val name: String, val getter: () -> Boolean, val setter: (Boolean) -> Unit
 ) : UiElement(0f, 0f), EditGuiElement {
-    override val priority: Int = 1
+    override var priority: Int = 2
     override val isDoubleWidth: Boolean = false
-    override val height: Float = 50f
-
+    override val height: Float = 55f
+    //10f
 
     inline var value
         get() = getter.invoke()
         set(value) = setter(value)
-
-    val switch = SwitchElement(2f, value, 0f, 0f)
+//height * 0.5f -
+    val switch = SwitchElement(1.6f, value, 0f, SwitchElement.SWITCH_HEIGHT)
 
     init {
         switch.addValueChangeListener {
@@ -33,8 +34,9 @@ class EditGuiSwitchElement(
     override fun draw() {
         GlStateManager.pushMatrix()
         translate(x + BORDER_OFFSET, y)
+
         switch.x = SwitchElement.SWITCH_WIDTH + 120f
-        text(name, 0f, 0f, ColorPalette.textColor, 16f)
+        text(name, 0f, SwitchElement.SWITCH_HEIGHT, ColorPalette.textColor, 16f)
         GlStateManager.popMatrix()
     }
 

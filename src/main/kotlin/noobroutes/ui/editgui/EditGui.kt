@@ -55,6 +55,10 @@ object EditGui : Screen() {
         activeEditGuiBase?.onOpen
     }
 
+    fun updateBaseY(){
+        activeEditGuiBase?.updateYPositions()
+    }
+
     override fun onGuiClosed() {
         activeEditGuiBase?.onClose
         activeEditGuiBase = null

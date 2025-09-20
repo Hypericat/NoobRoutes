@@ -3,6 +3,7 @@ package noobroutes.utils
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import net.minecraft.network.Packet
+import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot
@@ -26,6 +27,7 @@ object NettyPacketInterceptor {
                     }
                     is S08PacketPlayerPosLook -> S08Event().postAndCatch()
                     is S2FPacketSetSlot -> S2FPacketSetSlotEvent(msg).postAndCatch()
+                    is S02PacketChat -> ChatPacketEvent(msg.chatComponent.unformattedText.noControlCodes).postAndCatch()
                 }
                 super.channelRead(ctx, msg)
                 }
