@@ -8,6 +8,7 @@ import noobroutes.Core.mc
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.BossEvent
 import noobroutes.events.impl.ChatPacketEvent
+import noobroutes.events.impl.NettyPacketEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.Phase
 import noobroutes.events.impl.TermOpenEvent
@@ -111,7 +112,5 @@ object AutoP3AwaitHandler {
         doRingSafe(ring)
 
     }
-
-
 
 }
