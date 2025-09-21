@@ -89,7 +89,7 @@ object FontRenderer {
             if (getTextWidth(line + word, size) > w) {
                 text(line, x, currentHeight, color, size, type = type, shadow = shadow)
                 line = "$word "
-                currentHeight += getTextHeight(line, size + 7)
+                currentHeight += getTextHeight(line, size) + 7
             }
             else line += "$word "
 
@@ -102,6 +102,7 @@ object FontRenderer {
         var line = ""
         var lines = 1
         var maxWidth = 0f
+        var height = 0f
 
         for (word in words) {
             if (getTextWidth(line + word, size) > width) {
@@ -114,6 +115,6 @@ object FontRenderer {
         }
         maxWidth = max(maxWidth, getTextWidth(line, size))
 
-        return Pair(maxWidth, lines * getTextHeight(line, size + 3))
+        return Pair(maxWidth, lines * getTextHeight(line, size) + 7)
     }
 }

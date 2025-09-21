@@ -88,6 +88,7 @@ class BlinkRing(
     }
 
     override fun doRing() {
+        if (emptyCheck()) return
         super.doRing()
 
         PlayerUtils.stopVelocity()
@@ -163,6 +164,12 @@ class BlinkRing(
         val endCoords = Vec3(lastPacket.positionX, lastPacket.positionY + 0.01, lastPacket.positionZ)
         RenderUtils.drawFlatCylinder(endCoords, 0.5, 24, 90, 0, 0, Color.RED, true, 5f)
         Renderer.drawCylinder(endCoords, 0.5, 0.5, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
+    }
+
+    fun emptyCheck(): Boolean {
+        if (this.packets.isNotEmpty()) return false
+        AutoP3.deleteCorruptedRing(this)
+        return true
     }
 
     override fun getRingHeight(): Float = 0f

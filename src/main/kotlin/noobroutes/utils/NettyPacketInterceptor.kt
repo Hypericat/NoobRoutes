@@ -17,21 +17,16 @@ object NettyPacketInterceptor {
     fun onNetworkEvent(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
         val channel = event.manager.channel()
         val pipeline = channel.pipeline()
-        pipeline.addAfter("fml:packet_handler", "Fuck_U_ChatTriggers", object : ChannelDuplexHandler() {
+        pipeline.addAfter("fml:packet_handler", "noobroutes:Fuck_U_ChatTriggers", object : ChannelDuplexHandler() {
             override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
-                if (msg is Packet<*>) NettyPacketEvent(msg).postAndCatch()
-                when (msg) {
-                    is S2DPacketOpenWindow -> {
-                        S2DEvent(msg).postAndCatch()
-                        if (msg.windowTitle.unformattedText == "Click the button on time!") MelodyOpenEvent(msg).postAndCatch()
+                if (msg is Packet<*>) {
+                    if (NettyPacketEvent(msg).postAndCatch()) {
+                        PacketUtils.cancelNettyPacket(msg)
                     }
-                    is S08PacketPlayerPosLook -> S08Event().postAndCatch()
-                    is S2FPacketSetSlot -> S2FPacketSetSlotEvent(msg).postAndCatch()
-                    is S02PacketChat -> ChatPacketEvent(msg.chatComponent.unformattedText.noControlCodes).postAndCatch()
                 }
                 super.channelRead(ctx, msg)
-                }
             }
+        }
         )
     }
 }

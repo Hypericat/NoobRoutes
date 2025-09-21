@@ -5,10 +5,42 @@ package noobroutes.utils
 import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
+import net.minecraftforge.fml.common.eventhandler.EventPriority
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core.mc
-
+import noobroutes.events.impl.PacketEvent
+import noobroutes.utils.clock.Executor
 
 object PacketUtils {
+
+    init {
+        Executor(10000, "Clear Packet Cache") {
+            for (cancelledPacket in packetCancelList) {
+                if (System.currentTimeMillis() - cancelledPacket.time < 10000) continue
+                packetCancelList.remove(cancelledPacket)
+            }
+        }
+    }
+
+    private data class CanceledPacket(val packet: Packet<*>, val time: Long)
+
+    private var packetCancelList = mutableListOf<CanceledPacket>()
+
+
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onPacket(event: PacketEvent.Send) {
+        for (cancelledPacket in packetCancelList) {
+            if (event.packet != cancelledPacket.packet) continue
+            event.isCanceled = true
+            packetCancelList.remove(cancelledPacket)
+
+        }
+    }
+
+    fun cancelNettyPacket(packet: Packet<*>) {
+        packetCancelList.add(CanceledPacket(packet, System.currentTimeMillis()))
+    }
 
     fun sendPacket(packet: Packet<*>?) {
         mc.netHandler.networkManager.sendPacket(packet)

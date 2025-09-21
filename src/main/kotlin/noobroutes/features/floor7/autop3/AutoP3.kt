@@ -2,21 +2,16 @@ package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.init.Items
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
-import net.minecraft.network.play.server.S18PacketEntityTeleport
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.logger
 import noobroutes.config.DataManager
-import noobroutes.events.BossEventDispatcher
 import noobroutes.events.BossEventDispatcher.inF7Boss
 import noobroutes.events.impl.*
 import noobroutes.features.Category
@@ -37,13 +32,12 @@ import noobroutes.utils.Utils.isStart
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.*
 import noobroutes.utils.skyblock.LocationUtils
-import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import java.util.*
+
 
 @Suppress("Unused")
 object AutoP3: Module (
@@ -67,6 +61,14 @@ object AutoP3: Module (
 
     private val RING_HASHCODE = "Ring".hashCode()
     var route by StringSetting("Route", "", description = "Route to use")
+    private val sweptCollisionDetection by DualSetting(
+        "Detection",
+        "Point",
+        "Swept",
+        default = true,
+        description = "Swept Collision Detection uses your previous and current position to check if the path you traversed intersects with a ring as its activation condition. Point based detection checks if your position every tick is inside a ring, as such it will miss rings if you are not precise."
+    )
+
     private val ringColor by ColorSetting("Ring Color", Color.GREEN, false, description = "color of the rings")
     private val secondaryRingColor by ColorSetting("Secondary Ring Color", Color.DARK_GRAY, false, description = "The secondary color of the ring for Ring rendering mode").withDependency { renderMode.hashCode() == RING_HASHCODE }
     private val nonSilentRotates by BooleanSetting("Non-Silent look", description = "Makes it so rings with the rotate argument rotate client side.")
@@ -141,12 +143,12 @@ object AutoP3: Module (
     fun renderRings(event: RenderWorldLastEvent) {
         if (!inF7Boss) return
 
-        rings[route]?.forEachIndexed { i, ring ->
+        rings[route]?.toList()?.forEachIndexed { i, ring ->
             ring.renderRing(ringColor, secondaryRingColor, renderMode)
 
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), ringColor, depth = true, shadow = false)
 
-            if (ring !is BlinkRing) return@forEachIndexed
+            if (ring !is BlinkRing || ring.emptyCheck()) return@forEachIndexed
 
             ring.drawEnd()
 
@@ -156,6 +158,14 @@ object AutoP3: Module (
         activeBlinkWaypoint?.renderRing(Color.WHITE, secondaryRingColor, renderMode)
     }
 
+
+    private fun detectRing(ring: Ring, oldPos: Vec3, newPos: Vec3): Boolean {
+        return if (sweptCollisionDetection) {
+            ring.intersectedWithRing(oldPos, newPos)
+        } else {
+            ring.inRing(newPos)
+        }
+    }
 
     private var lastPos = Vec3(0.0, 0.0, 0.0)
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -170,7 +180,7 @@ object AutoP3: Module (
         handleRings(mc.thePlayer.positionVector)
 
         activeBlinkWaypoint?.let { //this needs to be on tick otherwise shit breaks
-            if (it.intersectedWithRing(lastPos, mc.thePlayer.positionVector)) {
+            if (detectRing(it, lastPos, mc.thePlayer.positionVector)) {
                 if (!it.triggered) recording = true
                 it.triggered = true
             }
@@ -182,7 +192,7 @@ object AutoP3: Module (
     fun handleRings(pos: Vec3) {
         val ringList = rings[route] ?: return
         for (ring in ringList) {
-            if (ring.intersectedWithRing(lastPos, pos)) {
+            if (detectRing(ring, lastPos, mc.thePlayer.positionVector)) {
                 if (ring.triggered) continue
                 ring.run()
             } else {
@@ -226,13 +236,13 @@ object AutoP3: Module (
 
         val packetPos = Vec3(event.packet.x, event.packet.y, event.packet.z)
 
-        val blinkRing = rings[route]?.find { it is BlinkRing && it.inRing(packetPos) } ?: return
+        val blinkRing = rings[route]?.toList()?.find { it is BlinkRing && it.inRing(packetPos) } ?: return
         waitedTicks = 10
         activeBlink = blinkRing as BlinkRing
     }
 
     fun getClosestRingToPlayer(): Ring? {
-        return rings[route]?.minBy { it.coords.subtract(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0).distanceToPlayerSq }
+        return rings[route]?.toList()?.minBy { it.coords.subtract(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0).distanceToPlayerSq }
     }
 
     @JvmStatic
@@ -386,7 +396,7 @@ object AutoP3: Module (
         return when (cancelC05Mode) {
             "Always" -> true
             "On Blink/Holding Leap" -> mc.thePlayer.heldItem?.displayName?.contains("leap", true) == true ||
-                    rings[route]?.any {it is BlinkRing && it.inRing(mc.thePlayer.positionVector)} == true
+                    rings[route]?.toList()?.any {it is BlinkRing && it.inRing(mc.thePlayer.positionVector)} == true
             else -> false
 
         }
@@ -447,12 +457,19 @@ object AutoP3: Module (
         recentUndoActionStack.clear()
     }
 
+    fun deleteCorruptedRing(ring: Ring) {
+        modMessage("Detected Corrupted Ring: ${ring.ringName}")
+        rings[route]?.remove(ring)
+        recentUndoActionStack.clear()
+        saveRings()
+    }
+
     fun deleteRing(ring: Ring) {
         recentActionStack.add(EditRingAction(RingAction.Delete, ring, route))
-        saveRings()
         modMessage("Deleted: ${ring.ringName}")
         rings[route]?.remove(ring)
         recentUndoActionStack.clear()
+        saveRings()
     }
 
     fun redo() {
@@ -482,6 +499,7 @@ object AutoP3: Module (
             }
         }
         recentActionStack.add(ringAction)
+        saveRings()
     }
 
     fun undo() {
@@ -510,7 +528,9 @@ object AutoP3: Module (
             }
         }
         recentUndoActionStack.add(ringAction)
+        saveRings()
     }
+
     private fun getModifyingRingFromArgs(args: Array<out String>): Ring? {
         val ringList = rings[route]?.toMutableList()?.apply { activeBlinkWaypoint?.let { add(it) } }
         if (ringList.isNullOrEmpty() ) {
