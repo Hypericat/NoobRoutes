@@ -537,8 +537,10 @@ object AutoP3: Module (
             modMessage("No Rings to Delete")
             return null
         }
-        return if (args.requirement(2)) {
-            val index = args[1].toIntOrNull() ?: run { modMessage("Invalid Index"); return null }
+        val arg1 = args.getArg(1, "")
+
+        return if (arg1 != null) {
+            val index = arg1.toIntOrNull() ?: run { modMessage("Invalid Index"); return null }
             ringList.getSafe(index) ?: run { modMessage("Index Out of Bounds"); return null }
         } else {
             ringList.minByOrNull { it.coords.distanceToPlayer } ?: run { modMessage("No Rings to Delete"); return null }

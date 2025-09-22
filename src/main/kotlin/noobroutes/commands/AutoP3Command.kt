@@ -7,7 +7,7 @@ import noobroutes.events.BossEventDispatcher
 import noobroutes.features.floor7.autop3.AutoP3
 import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.RingType
-import noobroutes.utils.requirement
+import noobroutes.utils.getArg
 import noobroutes.utils.skyblock.modMessage
 import kotlin.reflect.full.companionObjectInstance
 
@@ -24,8 +24,8 @@ class AutoP3Command: CommandBase() {
         if (args == null || args.isEmpty()) return modMessage("Usages: Add, Edit, Delete, clearWaypoints, Start, Load, Undo, Redo, em")
         when (args[0].lowercase()) {
             "add", "erect" -> {
-                if (!args.requirement(2)) return modMessage("Rings: ${getCommandGeneratedRings()}")
-                val ringType = RingType.getTypeFromName(args[1])
+                val ringName = args.getArg(1, "Rings: ${getCommandGeneratedRings()}") ?: return
+                val ringType = RingType.getTypeFromName(ringName)
                     ?: return modMessage("Rings: ${getCommandGeneratedRings()}")
                 val ring = (ringType.ringClass.companionObjectInstance as? CommandGenerated)?.generateRing(args) ?: return
                 AutoP3.addRing(ring)
@@ -64,9 +64,9 @@ class AutoP3Command: CommandBase() {
             }
 
             "load" -> {
-                if (!args.requirement(2)) return modMessage("Specify the config to load!")
-                AutoP3.route = args[1];
-                modMessage("loading config " + args[1])
+                val route = args.getArg(1, "Specify the config to load!") ?: return
+                AutoP3.route = route
+                modMessage("loading config $route")
             }
 
             else -> modMessage("Usages: Add, Edit, Delete, clearWaypoints, Start, LoadFile, Undo, Redo, Load")

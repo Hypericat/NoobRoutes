@@ -10,6 +10,7 @@ import noobroutes.features.routes.nodes.NodeType
 import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.xPart
 import noobroutes.utils.Utils.zPart
+import noobroutes.utils.getArg
 import noobroutes.utils.requirement
 import noobroutes.utils.roundToNearest
 import noobroutes.utils.skyblock.PlayerUtils
@@ -32,11 +33,9 @@ class Clip(pos: Vec3, val distance: Double, val yaw: Float, base: AutoRouteNodeB
             args: Array<out String>,
             room: UniqueRoom
         ): AutorouteNode? {
-            if (!args.requirement(3)) {
-                modMessage("requires distance arg")
-                return null
-            }
-            val distance = args[2].toDoubleOrNull() ?: run {
+            val arg2 = args.getArg(2, "requires distance arg") ?: return null
+
+            val distance = arg2.toDoubleOrNull() ?: run {
                 modMessage("invalid distance")
                 return null
             }

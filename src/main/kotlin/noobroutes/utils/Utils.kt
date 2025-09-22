@@ -239,6 +239,14 @@ fun <T> Array<T>.requirement(req: Int): Boolean {
     return requirement(req, this)
 }
 
+fun <T> Array<T>.getArg(index: Int, failMessage: String = "Operation Failed"): T? {
+    if (!this.requirement(index + 1)) {
+        if (failMessage.isNotBlank()) modMessage(failMessage)
+        return null
+    }
+    return this[index]
+}
+
 fun <T> requirement(req: Int, args: Array<T>): Boolean {
     return args.size >= req
 }

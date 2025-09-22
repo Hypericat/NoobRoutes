@@ -5,7 +5,7 @@ import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
 import noobroutes.utils.SwapManager
-import noobroutes.utils.requirement
+import noobroutes.utils.getArg
 import noobroutes.utils.skyblock.modMessage
 
 class SwapRing(
@@ -15,11 +15,8 @@ class SwapRing(
 ) : Ring(ringBase, RingType.SWAP) {
     companion object : CommandGenerated {
         override fun generateRing(args: Array<out String>): Ring? {
-            if (!args.requirement(3)) {
-                modMessage("Need swap criteria: Id, Name")
-                return null
-            }
-            val bySBId = when (args[2].lowercase()) {
+            val criteriaArg = args.getArg(2, "Need swap criteria: Id, Name") ?: return null
+            val bySBId = when (criteriaArg.lowercase()) {
                 "name" -> false
                 "id" -> true
                 else -> {
@@ -27,12 +24,10 @@ class SwapRing(
                     return null
                 }
             }
-            if (!args.requirement(4)) {
-                modMessage("Need item name/SBid")
-                return null
-            }
+            val searchString = args.getArg(3, "Need item name/SBid") ?: return null
 
-            return SwapRing(generateRingBaseFromArgs(args), bySBId, args[3])
+
+            return SwapRing(generateRingBaseFromArgs(args), bySBId, searchString)
         }
 
     }

@@ -4,11 +4,13 @@ import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
 import noobroutes.Core.display
+import noobroutes.features.ModuleManager
 import noobroutes.features.dungeon.AutoBloodRush
 import noobroutes.features.misc.SexAura
 import noobroutes.features.misc.TickControl
 import noobroutes.ui.clickgui.ClickGui
 import noobroutes.utils.Utils
+import noobroutes.utils.requirement
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.modMessage
 
@@ -33,7 +35,29 @@ class NoobRoutesCommand : CommandBase() {
             "test" -> Utils.testFunctions(args)
             "snipe" -> AutoBloodRush.snipeCommand(args)
             "tick" -> TickControl.tick(args.getOrNull(1)?.toIntOrNull() ?: return modMessage("Invalid usage!"))
-            else -> modMessage("Usages: Rat, Pickup, Snipe, Test")
+            "toggle" -> {
+                if (!requirement(2, args)) {
+                    val stringBuilder = StringBuilder()
+                    stringBuilder.appendLine("Requires a Module:")
+
+                    for (module in ModuleManager.modules) {
+                       stringBuilder.appendLine(module.javaClass.simpleName.lowercase())
+                    }
+                    modMessage(stringBuilder.toString())
+                    return
+                }
+
+                for (module in ModuleManager.modules) {
+                    if (module.javaClass.simpleName.lowercase() != args[1].lowercase()) continue
+                    module.toggle()
+                    modMessage("${module.name} ${if (module.enabled) "§aenabled" else "§cdisabled"}.")
+                    return
+                }
+                return modMessage("Invalid Module Name")
+
+            }
+
+            else -> modMessage("Usages: Rat, Pickup, Snipe, Test, Toggle")
         }
     }
 

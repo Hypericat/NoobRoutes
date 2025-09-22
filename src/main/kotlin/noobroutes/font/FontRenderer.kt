@@ -100,21 +100,19 @@ object FontRenderer {
     fun wrappedTextBounds(text: String, width: Float, size: Float): Pair<Float, Float> {
         val words = text.split(" ")
         var line = ""
-        var lines = 1
         var maxWidth = 0f
-        var height = 0f
-
+        var height = 2f
         for (word in words) {
             if (getTextWidth(line + word, size) > width) {
                 maxWidth = max(maxWidth, getTextWidth(line, size))
+                height += getTextHeight(line, size) + 7
                 line = "$word "
-                lines++
             }
             else line += "$word "
 
         }
         maxWidth = max(maxWidth, getTextWidth(line, size))
 
-        return Pair(maxWidth, lines * getTextHeight(line, size) + 7)
+        return Pair(maxWidth, height + 7)
     }
 }

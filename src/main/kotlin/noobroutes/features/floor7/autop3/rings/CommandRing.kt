@@ -6,7 +6,7 @@ import noobroutes.utils.requirement
 import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.sendCommand
 
-class CommandRing(ringBase: RingBase = RingBase(), var walk: Boolean = false, var command: String = "") : Ring(ringBase, RingType.COMMAND) {
+class CommandRing(ringBase: RingBase = RingBase(), var walk: Boolean = false, var clientSide: Boolean = false, var command: String = "") : Ring(ringBase, RingType.COMMAND) {
     companion object : CommandGenerated {
         override fun generateRing(args: Array<out String>): Ring? {
             if (!requirement(3, args)) {
@@ -34,8 +34,8 @@ class CommandRing(ringBase: RingBase = RingBase(), var walk: Boolean = false, va
                 commandStart
             }
             val walk = getWalkFromArgs(args)
-
-            return CommandRing(generateRingBaseFromArgs(args), walk, command)
+            val clientSide = args.any {it.lowercase() == "client"}
+            return CommandRing(generateRingBaseFromArgs(args), walk, clientSide, command)
         }
         fun isArg(text: String): Boolean{
             return when (text) {
@@ -54,13 +54,14 @@ class CommandRing(ringBase: RingBase = RingBase(), var walk: Boolean = false, va
     init {
         addString("command", {command}, {command = it})
         addBoolean("walk", {walk}, {walk = it})
+        addBoolean("client_side", {clientSide}, {clientSide = it})
     }
 
     override fun doRing() {
         if (hasArgs()) super.doRing()
         if (walk) AutoP3MovementHandler.setDirection(yaw)
 
-        sendCommand(command, false)
+        sendCommand(command, clientSide)
     }
 
     private fun hasArgs(): Boolean{
@@ -68,5 +69,6 @@ class CommandRing(ringBase: RingBase = RingBase(), var walk: Boolean = false, va
     }
     override fun extraArgs(builder: EditGuiBase.EditGuiBaseBuilder) {
         builder.addSwitch("Walk", {walk}, {walk = it})
+        builder.addSwitch("Client Side", {clientSide}, {clientSide = it})
     }
 }
