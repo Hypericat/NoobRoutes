@@ -10,13 +10,17 @@ import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import noobroutes.config.DataManager
 import noobroutes.events.impl.NettyPacketEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.WorldChangeEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.DevOnly
+import noobroutes.features.settings.Setting.Companion.withDependency
+import noobroutes.features.settings.impl.ActionSetting
 import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.features.settings.impl.DropdownSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.Utils.isNotStart
@@ -35,19 +39,43 @@ object HotBarSwitcher : Module(
     category = Category.MISC,
     description = "automatically switches hotbar"
 ) {
-    private val startRecording by KeybindSetting("Record Swaps", Keyboard.KEY_NONE, "Starts recording swaps on press. Stops after inv close").onPress { saveHotbar() }
-    private val swapKeybind by KeybindSetting("Swap Items", Keyboard.KEY_NONE, "swaps Items on Press").onPress { generateSwaps(savedHotbar) }
     private val instant by BooleanSetting("Instant Swap", description = "swaps with 0 ms delay, also doesnt actually open inv")
+
+    private val hotbar1Toggle by DropdownSetting("Hotbar 1")
+    private val hotbar1Save by ActionSetting("Save Hotbar", description = "Saves current hotbar as hotbar 1", default = { saveHotbar(0) }).withDependency { hotbar1Toggle }
+    private val hotbar1Keybind by KeybindSetting("Keybind 1", Keyboard.KEY_NONE, "Keybind to select hotbar 1").onPress { generateSwaps(0) }.withDependency { hotbar1Toggle }
+
+    private val hotbar2Toggle by DropdownSetting("Hotbar 2")
+    private val hotbar2Save by ActionSetting("Save Hotbar", description = "Saves current hotbar as hotbar 2", default = { saveHotbar(1) }).withDependency { hotbar2Toggle }
+    private val hotbar2Keybind by KeybindSetting("Keybind 2", Keyboard.KEY_NONE, "Keybind to select hotbar 2").onPress { generateSwaps(1) }.withDependency { hotbar2Toggle }
+
+    private val hotbar3Toggle by DropdownSetting("Hotbar 3")
+    private val hotbar3Save by ActionSetting("Save Hotbar", description = "Saves current hotbar as hotbar 3", default = { saveHotbar(2) }).withDependency { hotbar3Toggle }
+    private val hotbar3Keybind by KeybindSetting("Keybind 3", Keyboard.KEY_NONE, "Keybind to select hotbar 3").onPress { generateSwaps(2) }.withDependency { hotbar3Toggle }
+
+    private val hotbar4Toggle by DropdownSetting("Hotbar 4")
+    private val hotbar4Save by ActionSetting("Save Hotbar", description = "Saves current hotbar as hotbar 4", default = { saveHotbar(3) }).withDependency { hotbar4Toggle }
+    private val hotbar4Keybind by KeybindSetting("Keybind 4", Keyboard.KEY_NONE, "Keybind to select hotbar 4").onPress { generateSwaps(3) }.withDependency { hotbar4Toggle }
+
+    private val hotbar5Toggle by DropdownSetting("Hotbar 5")
+    private val hotbar5Save by ActionSetting("Save Hotbar", description = "Saves current hotbar as hotbar 5", default = { saveHotbar(4) }).withDependency { hotbar5Toggle }
+    private val hotbar5Keybind by KeybindSetting("Keybind 5", Keyboard.KEY_NONE, "Keybind to select hotbar 5").onPress { generateSwaps(4) }.withDependency { hotbar5Toggle }
+
+
 
     private data class Swap(val usedButton: Int, val slotId: Int)
 
     private data class SwappableItem(val uuidHash: Int?, val nameHash: Int, val slot: Int)
 
-    private var savedHotbar = arrayOfNulls<SwappableItem>(8)
-
     private var currentSwapList = mutableListOf<Swap>()
 
     private var inGui = false
+
+    private var hotbarMap = mutableMapOf<Int, Array<SwappableItem>>()
+
+    init {
+        loadHotbarsFromFile()
+    }
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -73,27 +101,31 @@ object HotBarSwitcher : Module(
         mc.displayGuiScreen(GuiInventory(mc.thePlayer))
     }
 
-    private fun saveHotbar() {
-        val hotbar = arrayOfNulls<SwappableItem>(8)
-        for (slot in 0..7) { //no menu
+    private fun saveHotbar(hotbarNumber: Int) {
+        val hotbar = Array(8) { slot ->
             val itemStack = mc.thePlayer.inventory.getStackInSlot(slot) ?: return modMessage("no empty slots allowed in a saved hotbar")
+
             val uuid = itemStack.nullableUuid
             val name = itemStack.unformattedName
-            hotbar[slot] = SwappableItem(uuid.hashCode().takeIf { it != 0 }, name.hashCode(), slot)
+
+            SwappableItem(uuid.hashCode().takeIf { it != 0 }, name.hashCode(), slot)
         }
-        savedHotbar = hotbar
+        hotbarMap[hotbarNumber] = hotbar
         modMessage("Hotbar Saved!")
+        saveHotbarsToFile()
     }
 
-    private fun generateSwaps(hotbar: Array<SwappableItem?>) {
-        if (mc.currentScreen != null || inGui) return
+    private fun generateSwaps(hotbarNumber: Int) {
+        val hotbar = hotbarMap[hotbarNumber] ?: return modMessage("not found")
+
         if (hotbar.size != 8) return modMessage("Invalid Hotbar")
+
+        if (mc.currentScreen != null || inGui) return modMessage("cant be in gui")
 
         val fakeInventory = mc.thePlayer.inventory.mainInventory.copyOf()
 
         val createdList = mutableListOf<Swap>()
         for (item in hotbar) {
-            if (item == null) return modMessage("Invalid Hotbar")
 
             var currentSlot = getItemSlotFromUUIDHashInCustomArray(item.uuidHash, fakeInventory) ?: getItemSlotFromNameHashInCustomArray(item.nameHash, fakeInventory) ?: return modMessage("couldn't find an item")
 
@@ -182,17 +214,32 @@ object HotBarSwitcher : Module(
         return obj
     }
 
-    private fun saveHotbarToFile(hotbar: Array<SwappableItem?>): JsonArray {
+    private fun saveHotbarsToFile() {
+        val jsonHotbars = JsonObject()
+        for (hotbar in hotbarMap) {
+            jsonHotbars.add(hotbar.key.toString(), makeHotbarJsonArray(hotbar.value))
+        }
+        DataManager.saveDataToFile("hotbar", jsonHotbars)
+    }
+
+    private fun loadHotbarsFromFile() {
+        val jsonData = DataManager.loadDataFromFileObject("hotbar")
+        for (jsonHotbar in jsonData) {
+            val normalHotbar = makeJsonArrayHotbar(jsonHotbar.value.asJsonArray)
+            hotbarMap[jsonHotbar.key.toInt()] = normalHotbar
+        }
+    }
+
+    private fun makeHotbarJsonArray(hotbar: Array<SwappableItem>): JsonArray {
         val array = JsonArray()
         for (slot in hotbar) {
-            if (slot == null) continue
             array.add(swappableSlotToJsonObject(slot))
         }
 
         return array
     }
 
-    private fun loadHotbarFromFile(jsonArray: JsonArray): Array<SwappableItem> {
+    private fun makeJsonArrayHotbar(jsonArray: JsonArray): Array<SwappableItem> {
         val list = mutableListOf<SwappableItem>()
 
         for (slot in jsonArray) {
