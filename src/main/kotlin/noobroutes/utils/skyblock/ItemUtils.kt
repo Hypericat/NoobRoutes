@@ -55,6 +55,12 @@ val ItemStack?.tuners: Int?
 val ItemStack?.uuid: String
     get() = this?.extraAttributes?.getString("uuid") ?: ""
 
+/**
+ * Returns uuid for an Item
+ */
+val ItemStack?.nullableUuid: String?
+    get() = this?.extraAttributes?.getString("uuid")
+
  /**
  * Returns if an item has an ability
  */
@@ -97,6 +103,20 @@ fun isHolding(vararg id: String): Boolean =
  */
 fun getItemSlot(item: String, ignoreCase: Boolean = true): Int? =
     mc.thePlayer?.inventory?.mainInventory?.indexOfFirst { it?.unformattedName?.contains(item, ignoreCase) == true }.takeIf { it != -1 }
+
+/**
+ * Returns first slot of an Item with the uuids hash matching the inputs
+ */
+fun getItemSlotFromUUIDHash(uuidHash: Int?): Int? {
+    if (uuidHash == null) return null
+    return mc.thePlayer?.inventory?.mainInventory?.indexOfFirst { it.uuid.hashCode() == uuidHash }.takeIf { it != -1 }
+}
+
+/**
+ * Returns first slot of an Item with the names hash matching the inputs (unformatted name hash needed)
+ */
+fun getItemSlotFromNameHash(nameHash: Int): Int? =
+    mc.thePlayer?.inventory?.mainInventory?.indexOfFirst { it.unformattedName.hashCode() == nameHash }.takeIf { it != -1 }
 
 /**
  * Gets index of an item in a chest.
