@@ -1,14 +1,13 @@
 package noobroutes.features.misc
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.item.ItemStack
-import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C0DPacketCloseWindow
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.events.impl.NettyPacketEvent
@@ -28,7 +27,6 @@ import noobroutes.utils.skyblock.nullableUuid
 import noobroutes.utils.skyblock.unformattedName
 import noobroutes.utils.skyblock.uuid
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 
 @DevOnly
 object HotBarSwitcher : Module(
@@ -129,7 +127,6 @@ object HotBarSwitcher : Module(
             val first = createdList.removeFirst()
 
             PacketUtils.sendPacket(C0EPacketClickWindow(0, first.slotId, first.usedButton, 2, null, actionNumber))
-            //devMessage("slotId: ${first.slotId}, button: ${first.usedButton}")
 
             val lowerSlot = if (first.slotId > 35) first.slotId - 36 else first.slotId
             mc.thePlayer.inventory.mainInventory.swap(lowerSlot, first.usedButton)
@@ -176,4 +173,39 @@ object HotBarSwitcher : Module(
         this[i] = this[j]
         this[j] = tempVal
     }
+
+    private fun swappableSlotToJsonObject(swappableItem: SwappableItem): JsonObject {
+        val obj = JsonObject()
+        obj.addProperty("uuidHash", swappableItem.uuidHash)
+        obj.addProperty("nameHash", swappableItem.nameHash)
+        obj.addProperty("slot", swappableItem.slot)
+        return obj
+    }
+
+    private fun saveHotbarToFile(hotbar: Array<SwappableItem?>): JsonArray {
+        val array = JsonArray()
+        for (slot in hotbar) {
+            if (slot == null) continue
+            array.add(swappableSlotToJsonObject(slot))
+        }
+
+        return array
+    }
+
+    private fun loadHotbarFromFile(jsonArray: JsonArray): Array<SwappableItem> {
+        val list = mutableListOf<SwappableItem>()
+
+        for (slot in jsonArray) {
+            val obj = slot.asJsonObject
+            val uuid = obj.get("uuidHash")?.asInt
+            val nameHash = obj.get("nameHash").asInt
+            val slot = obj.get("slot").asInt
+            list.add(SwappableItem(uuid, nameHash, slot))
+        }
+
+        return list.toTypedArray()
+    }
+
+
+
 }
