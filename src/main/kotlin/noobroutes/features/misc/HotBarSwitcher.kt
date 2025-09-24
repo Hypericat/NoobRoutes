@@ -217,7 +217,7 @@ object HotBarSwitcher : Module(
     private fun saveHotbarsToFile() {
         val jsonHotbars = JsonObject()
         for (hotbar in hotbarMap) {
-            jsonHotbars.add(hotbar.key.toString(), makeHotbarJsonArray(hotbar.value))
+            jsonHotbars.add(hotbar.key.toString(), generateHotbarJsonArray(hotbar.value))
         }
         DataManager.saveDataToFile("hotbar", jsonHotbars)
     }
@@ -225,12 +225,12 @@ object HotBarSwitcher : Module(
     private fun loadHotbarsFromFile() {
         val jsonData = DataManager.loadDataFromFileObject("hotbar")
         for (jsonHotbar in jsonData) {
-            val normalHotbar = makeJsonArrayHotbar(jsonHotbar.value.asJsonArray)
+            val normalHotbar = generateJsonArrayHotbar(jsonHotbar.value.asJsonArray)
             hotbarMap[jsonHotbar.key.toInt()] = normalHotbar
         }
     }
 
-    private fun makeHotbarJsonArray(hotbar: Array<SwappableItem>): JsonArray {
+    private fun generateHotbarJsonArray(hotbar: Array<SwappableItem>): JsonArray {
         val array = JsonArray()
         for (slot in hotbar) {
             array.add(swappableSlotToJsonObject(slot))
@@ -239,7 +239,7 @@ object HotBarSwitcher : Module(
         return array
     }
 
-    private fun makeJsonArrayHotbar(jsonArray: JsonArray): Array<SwappableItem> {
+    private fun generateJsonArrayHotbar(jsonArray: JsonArray): Array<SwappableItem> {
         val list = mutableListOf<SwappableItem>()
 
         for (slot in jsonArray) {
