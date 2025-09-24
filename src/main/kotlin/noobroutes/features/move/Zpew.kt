@@ -1,5 +1,6 @@
 package noobroutes.features.move
 
+import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagList
@@ -18,6 +19,7 @@ import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import noobroutes.Core
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.PacketEvent
@@ -33,6 +35,7 @@ import noobroutes.utils.Utils.ID
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import java.lang.Thread.sleep
+import java.util.BitSet
 import kotlin.math.floor
 
 @DevOnly
@@ -183,12 +186,35 @@ object Zpew : Module(
         Scheduler.scheduleLowestPostTickTask { rightClicked = false }
     }
 
+    private val interactAbleBlocks = BitSet(176).apply {
+        arrayOf(
+            Blocks.chest,
+            Blocks.ender_chest,
+            Blocks.hopper,
+            Blocks.trapped_chest,
+            Blocks.lever,
+            Blocks.stone_button,
+            Blocks.wooden_button
+        ).forEach {
+            set(Block.getIdFromBlock(it))
+        }
+    }
+
+    private fun lookingAtInteractableBlock(): Boolean {
+        val pos = mc.objectMouseOver.blockPos
+        val chunk = Core.mc.theWorld?.chunkProvider?.provideChunk(pos) ?: return false
+        val currentBlock = chunk.getBlock(pos)
+        val currentBlockId = Block.getIdFromBlock(currentBlock)
+        return interactAbleBlocks.get(currentBlockId)
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onC08(event: PacketEvent.Send) {
         if (skipPacketCount > 0 || !rightClicked) return
         if (mc.thePlayer == null || event.packet !is C08PacketPlayerBlockPlacement) return
         val dir = event.packet.placedBlockDirection
-        if (dir != 255) return
+        if (dir != 255 || lookingAtInteractableBlock()) return
+
         val info = getTeleportInfo() ?: return
 
         if (!LocationUtils.isInSkyblock && !ClickGUIModule.forceHypixel) return
@@ -204,7 +230,6 @@ object Zpew : Module(
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onPacket(event: PacketEvent.Send) {
-        if (event.packet.javaClass.name.contains("server")) return //i cba to fix wadeys packet event rn
         if (skipPacketCount > 0) {
             skipPacketCount--
             return
