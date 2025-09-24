@@ -201,7 +201,7 @@ object Zpew : Module(
     }
 
     private fun lookingAtInteractableBlock(): Boolean {
-        val pos = mc.objectMouseOver.blockPos
+        val pos = mc.objectMouseOver.blockPos ?: return false
         val chunk = Core.mc.theWorld?.chunkProvider?.provideChunk(pos) ?: return false
         val currentBlock = chunk.getBlock(pos)
         val currentBlockId = Block.getIdFromBlock(currentBlock)
