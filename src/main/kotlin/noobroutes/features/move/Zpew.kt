@@ -38,7 +38,6 @@ import java.lang.Thread.sleep
 import java.util.BitSet
 import kotlin.math.floor
 
-@DevOnly
 object Zpew : Module(
     name = "ZZZpew",
     category = Category.MOVE,
