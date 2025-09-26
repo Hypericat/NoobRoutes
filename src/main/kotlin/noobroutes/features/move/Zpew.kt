@@ -45,7 +45,9 @@ object Zpew : Module(
     warning = true
 ) {
     private val zpew by BooleanSetting("Zero Ping Etherwarp", description = "Zero ping teleport for right clicking aotv")
+    @DevOnly
     private val zpt by BooleanSetting("Zero Ping Aotv", description = "Zero ping teleport for right clicking aotv")
+    @DevOnly
     private val zph by BooleanSetting("Zero Ping Hyperion", description = "Zero Ping Hyperion wow")
 
     private val sendTPCommand by BooleanSetting("Send Tp Command", description = "Used for Single Player")
