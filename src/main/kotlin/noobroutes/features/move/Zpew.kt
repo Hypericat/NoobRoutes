@@ -210,11 +210,20 @@ object Zpew : Module(
         return interactAbleBlocks.get(currentBlockId)
     }
 
+
+    private fun inBlacklistedArea(): Boolean {
+        return BossEventDispatcher.inF7Boss
+                || DungeonUtils.currentRoomName == "New Trap"
+                || DungeonUtils.currentRoomName == "Old Trap"
+                || DungeonUtils.currentRoomName == "Boulder"
+                || DungeonUtils.currentRoomName == "Teleport Maze"
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onC08(event: PacketEvent.Send) {
         if (skipPacketCount > 0 || !rightClicked) return
         if (event.packet !is C08PacketPlayerBlockPlacement) return
-        if (mc.thePlayer == null || BossEventDispatcher.inF7Boss || DungeonUtils.currentRoomName == "New Trap" || DungeonUtils.currentRoomName == "Old Trap") return
+        if (mc.thePlayer == null || inBlacklistedArea()) return
 
         val dir = event.packet.placedBlockDirection
         if (dir != 255 || lookingAtInteractableBlock()) return
