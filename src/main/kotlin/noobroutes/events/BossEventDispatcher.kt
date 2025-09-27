@@ -48,7 +48,6 @@ object BossEventDispatcher {
         if (!DungeonUtils.inDungeons) return
         val iB = inBossCheck
         if (lastInBoss != iB) {
-            devMessage("something")
             if (iB) {
                 inBoss = true
                 if (DungeonUtils.floorNumber == 7) inF7Boss = true

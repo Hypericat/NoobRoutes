@@ -20,6 +20,7 @@ import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core
+import noobroutes.events.BossEventDispatcher
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.PacketEvent
@@ -212,7 +213,9 @@ object Zpew : Module(
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onC08(event: PacketEvent.Send) {
         if (skipPacketCount > 0 || !rightClicked) return
-        if (mc.thePlayer == null || event.packet !is C08PacketPlayerBlockPlacement) return
+        if (event.packet !is C08PacketPlayerBlockPlacement) return
+        if (mc.thePlayer == null || BossEventDispatcher.inF7Boss || DungeonUtils.currentRoomName == "New Trap" || DungeonUtils.currentRoomName == "Old Trap") return
+
         val dir = event.packet.placedBlockDirection
         if (dir != 255 || lookingAtInteractableBlock()) return
 
