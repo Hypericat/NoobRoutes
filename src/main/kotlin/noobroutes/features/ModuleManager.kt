@@ -72,7 +72,6 @@ object ModuleManager {
         VertJerry,
         SexAura,
         TimerHud,
-        InstantAcceleration,
         InstaMid,
         Auto4,
         LeverAura,

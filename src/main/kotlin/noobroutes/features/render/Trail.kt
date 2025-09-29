@@ -10,6 +10,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.PacketReturnEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.BooleanSetting
@@ -46,10 +47,9 @@ object Trail: Module(
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTick(event: PacketEvent.Send) {
+    fun onTick(event: PacketReturnEvent.Send) {
         if (mc.thePlayer == null) return
         if (event.packet !is C03PacketPlayer) return
-        if (event.isCanceled) return
         if (event.packet !is C04PacketPlayerPosition && event.packet !is C06PacketPlayerPosLook) return
         val c04 = getC04(event.packet)
         if (positions.isEmpty() || positions[positions.size-1] != c04) {

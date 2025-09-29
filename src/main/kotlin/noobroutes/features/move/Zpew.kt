@@ -20,6 +20,7 @@ import net.minecraftforge.client.event.MouseEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import noobroutes.Core
+import noobroutes.events.BossEventDispatcher
 import noobroutes.events.BossEventDispatcher.inBoss
 import noobroutes.events.impl.ChatPacketEvent
 import noobroutes.events.impl.PacketEvent
@@ -38,7 +39,6 @@ import java.lang.Thread.sleep
 import java.util.BitSet
 import kotlin.math.floor
 
-@DevOnly
 object Zpew : Module(
     name = "ZZZpew",
     category = Category.MOVE,
@@ -46,7 +46,9 @@ object Zpew : Module(
     warning = true
 ) {
     private val zpew by BooleanSetting("Zero Ping Etherwarp", description = "Zero ping teleport for right clicking aotv")
+    @DevOnly
     private val zpt by BooleanSetting("Zero Ping Aotv", description = "Zero ping teleport for right clicking aotv")
+    @DevOnly
     private val zph by BooleanSetting("Zero Ping Hyperion", description = "Zero Ping Hyperion wow")
 
     private val sendTPCommand by BooleanSetting("Send Tp Command", description = "Used for Single Player")
@@ -208,10 +210,21 @@ object Zpew : Module(
         return interactAbleBlocks.get(currentBlockId)
     }
 
+
+    private fun inBlacklistedArea(): Boolean {
+        return BossEventDispatcher.inF7Boss
+                || DungeonUtils.currentRoomName == "New Trap"
+                || DungeonUtils.currentRoomName == "Old Trap"
+                || DungeonUtils.currentRoomName == "Boulder"
+                || DungeonUtils.currentRoomName == "Teleport Maze"
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onC08(event: PacketEvent.Send) {
         if (skipPacketCount > 0 || !rightClicked) return
-        if (mc.thePlayer == null || event.packet !is C08PacketPlayerBlockPlacement) return
+        if (event.packet !is C08PacketPlayerBlockPlacement) return
+        if (mc.thePlayer == null || inBlacklistedArea()) return
+
         val dir = event.packet.placedBlockDirection
         if (dir != 255 || lookingAtInteractableBlock()) return
 
