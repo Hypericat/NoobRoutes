@@ -9,6 +9,11 @@ interface CommandGenerated {
     fun getWalkFromArgs(args: Array<out String>): Boolean {
         return args.any {it.lowercase() == "walk"}
     }
+
+    fun getLowFromArgs(args: Array<out String>): Boolean {
+        return args.any {it.lowercase() == "low" || it.lowercase() == "lowhop"}
+    }
+
     fun generateRingBaseFromArgs(args: Array<out String>): RingBase {
         val diameterString = args.firstOrNull { RingBase.diameterRegex.matches(it) }
         val diameter = diameterString?.let { RingBase.diameterRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f

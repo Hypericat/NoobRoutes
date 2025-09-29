@@ -58,7 +58,7 @@ object Utils {
 
 
     fun xPart(yaw: Float): Double {
-        return -sin(yaw * Math.PI /180)
+        return -sin(yaw * Math.PI / 180)
     }
 
     fun Array<out String>.containsOneOf(vararg inputs: String, ignoreCase: Boolean = false): Boolean {

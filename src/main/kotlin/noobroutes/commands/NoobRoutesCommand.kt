@@ -11,6 +11,7 @@ import noobroutes.features.misc.TickControl
 import noobroutes.ui.clickgui.ClickGui
 import noobroutes.utils.Utils
 import noobroutes.utils.requirement
+import noobroutes.utils.skyblock.LowHopUtils
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.modMessage
 
@@ -56,8 +57,13 @@ class NoobRoutesCommand : CommandBase() {
                 return modMessage("Invalid Module Name")
 
             }
+            "startdisabler" -> LowHopUtils.disable()
+            "makemydisablerjustfuckinggopls" -> {
+                modMessage("set disabled to true")
+                LowHopUtils.disabled = true
+            }
 
-            else -> modMessage("Usages: Rat, Pickup, Snipe, Test, Toggle")
+            else -> modMessage("Usages: Rat, Pickup, Snipe, Test, Toggle, makemydisablerjustfuckinggopls")
         }
     }
 
@@ -76,7 +82,7 @@ class NoobRoutesCommand : CommandBase() {
     ): List<String?>? {
 
         return when (args.size) {
-            1 -> getListOfStringsMatchingLastWord(args, listOf( "rat", "pickup", "test", "snipe"))
+            1 -> getListOfStringsMatchingLastWord(args, listOf( "rat", "pickup", "test", "snipe", "startdisabler"))
             2 -> if (args[0] == "snipe") getListOfStringsMatchingLastWord(args, Dungeon.Info.uniqueRooms.map { it.name.replace(" ", "_") } + "Boss") else null
             else -> null
         }

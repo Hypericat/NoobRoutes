@@ -99,7 +99,8 @@ object ModuleManager {
         AutoRoute,
         Relics,
         TickControl,
-        HotBarSwitcher
+        HotBarSwitcher,
+        LowHop
     )
 
     init {

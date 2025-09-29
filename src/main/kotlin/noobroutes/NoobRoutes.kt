@@ -25,6 +25,7 @@ import noobroutes.utils.render.initUIFramebufferStencil
 import noobroutes.utils.routes.RouteUtils
 import noobroutes.utils.routes.SecretUtils
 import noobroutes.utils.skyblock.LocationUtils
+import noobroutes.utils.skyblock.LowHopUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.dungeon.Dungeon
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
@@ -79,7 +80,8 @@ class NoobRoutes {
             DungeonUtils,
             AutoP3MovementHandler,
             PlayerUtils,
-            AutoP3AwaitHandler
+            AutoP3AwaitHandler,
+            LowHopUtils
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }

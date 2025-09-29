@@ -59,7 +59,7 @@ object LavaClip: Module(
         if (!cancelS12 || event.packet !is S12PacketEntityVelocity || (event.packet.motionY != 28000 && event.packet.motionY != 26000) || event.packet.entityID != mc.thePlayer.entityId) return
         event.isCanceled = true
         cancelS12 = false
-        toggle()
+        onDisable()
     }
 
     @SubscribeEvent

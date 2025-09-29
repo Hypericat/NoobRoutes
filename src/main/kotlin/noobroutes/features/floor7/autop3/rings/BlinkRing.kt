@@ -14,6 +14,7 @@ import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
+import noobroutes.utils.skyblock.LowHopUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
@@ -23,7 +24,8 @@ import kotlin.math.pow
 class BlinkRing(
     ringBase: RingBase = RingBase(),
     var packets: List<C04PacketPlayerPosition> = listOf(),
-    var endYVelo: Double = 0.0
+    var endYVelo: Double = 0.0,
+    var needsDisabler: Boolean = false
 ) : Ring(ringBase, RingType.BLINK) {
     companion object : CommandGenerated {
         override fun generateRing(args: Array<out String>): Ring? {
@@ -60,6 +62,7 @@ class BlinkRing(
 
     init {
         addDouble("endYVelo", {endYVelo}, {endYVelo = it})
+        addBoolean("disabler", {needsDisabler}, {needsDisabler = it})
     }
 
     override fun addRingData(obj: JsonObject) {
@@ -99,6 +102,8 @@ class BlinkRing(
             AutoP3.waitedTicks++
             return
         }*/
+
+        if (needsDisabler && !LowHopUtils.disabled) return devMessage("blink needs disabler")
 
         if (!AutoP3.blinkToggle || (AutoP3.blinksThisInstance + packets.size > AutoP3.getMaxBlinks() && AutoP3.isBlinkLimitEnabled) ) {
             doMovement()

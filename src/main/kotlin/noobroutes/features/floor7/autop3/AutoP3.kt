@@ -32,6 +32,7 @@ import noobroutes.utils.Utils.isStart
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.*
 import noobroutes.utils.skyblock.LocationUtils
+import noobroutes.utils.skyblock.LowHopUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
 import noobroutes.utils.skyblock.modMessage
@@ -85,6 +86,7 @@ object AutoP3: Module (
 
     private val blinkShit by DropdownSetting("Blink Settings", false)
     val blinkToggle by BooleanSetting("Blink Toggle", description = "main toggle for blink").withDependency { blinkShit }
+    private var showBlinkLine by BooleanSetting("Show Line", description = "if it should render the line showing where the blink goes", default = true).withDependency { blinkShit }
     private val maxBlink by NumberSetting("Max Blink", 150, 100, 400, description = "How many packets can be blinked on one instance").withDependency { blinkShit }
     val suppressMaxBlink by BooleanSetting("Disable in Singleplayer", description = "Disables the max packets per instance check while in single player").withDependency { blinkShit }
     private val balanceHud by HudSetting("Balance Hud", 400f, 400f, 1f, false) {
@@ -122,6 +124,7 @@ object AutoP3: Module (
     var recordingPacketList = mutableListOf<C03PacketPlayer.C04PacketPlayerPosition>()
         private set
     private var recording = false
+    private var lowHoppedInBlink = false
 
     private fun resetShit(worldChange: Boolean) {
         blinkSetRotation = null
@@ -130,6 +133,7 @@ object AutoP3: Module (
         activeBlink = null
         activeBlinkWaypoint = null
         recordingPacketList = mutableListOf()
+        lowHoppedInBlink = false
 
         if (!worldChange) return
 
@@ -152,7 +156,7 @@ object AutoP3: Module (
 
             ring.drawEnd()
 
-            RenderUtils.drawGradient3DLine(ring.packets.map { Vec3(it.positionX, it.positionY + 0.03, it.positionZ) }, ringColor, Color.RED, 1F, true)
+            if (showBlinkLine) RenderUtils.drawGradient3DLine(ring.packets.map { Vec3(it.positionX, it.positionY + 0.03, it.positionZ) }, ringColor, Color.RED, 1F, true)
         }
 
         activeBlinkWaypoint?.renderRing(Color.WHITE, secondaryRingColor, renderMode)
@@ -206,11 +210,12 @@ object AutoP3: Module (
     fun recordBlink(event: PacketEvent.Send) {
         if (!inF7Boss || editMode || movementPackets.isNotEmpty() || !recording || event.packet !is C03PacketPlayer) return
 
-        if (!event.packet.isMoving) return //this is a useless check, but I don't want to risk it
+        if (!event.packet.isMoving) return
 
         val blinkWaypoint = activeBlinkWaypoint ?: return handleMissingWaypoint()
 
         val c04ToAdd = C03PacketPlayer.C04PacketPlayerPosition(event.packet.positionX, event.packet.positionY, event.packet.positionZ, event.packet.isOnGround)
+        if (LowHopUtils.lowHopThisJump) lowHoppedInBlink = true
         recordingPacketList.add(c04ToAdd)
         modMessage("recording, ${recordingPacketList.size}")
 
@@ -218,9 +223,10 @@ object AutoP3: Module (
     }
 
     private fun endBlinkRecording(blinkWaypoint: BlinkWaypoint) {
-        addRing(BlinkRing(blinkWaypoint.base, recordingPacketList, mc.thePlayer.motionY))
+        addRing(BlinkRing(blinkWaypoint.base, recordingPacketList, mc.thePlayer.motionY, lowHoppedInBlink))
         recordingPacketList = mutableListOf()
         recording = false
+        lowHoppedInBlink = false
     }
 
     private fun handleMissingWaypoint() {
