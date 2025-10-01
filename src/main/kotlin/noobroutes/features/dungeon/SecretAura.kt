@@ -15,6 +15,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.events.BossEventDispatcher
+import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
@@ -99,12 +100,12 @@ object SecretAura : Module("Secret Aura", category = Category.DUNGEON, descripti
 
 
     @SubscribeEvent
-    fun onPreTick(event: ClientTickEvent) {
-        if (event.isNotStart || mc.thePlayer == null || mc.theWorld == null || mc.currentScreen != null || BossEventDispatcher.inF7Boss || isInDisabledRoom() || inValidArea) return
+    fun onPreTick(event: MotionUpdateEvent.Post) {
+        if (mc.thePlayer == null || mc.theWorld == null || mc.currentScreen != null || BossEventDispatcher.inF7Boss || isInDisabledRoom() || inValidArea) return
 
         var blockCandidate = BlockDistance(Blocks.air, BlockPos(Int.MAX_VALUE, 69, Int.MIN_VALUE), Double.POSITIVE_INFINITY)
 
-        val eyePos = mc.thePlayer.getPositionEyes(0f)
+        val eyePos = mc.thePlayer.positionVector.add(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0)
 
         val box: AxisAlignedBB = AxisAlignedBB(eyePos.xCoord, eyePos.yCoord, eyePos.zCoord, eyePos.xCoord, eyePos.yCoord, eyePos.zCoord).expand(chestRange, chestRange, chestRange)
 
