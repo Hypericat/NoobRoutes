@@ -62,7 +62,6 @@ class NoobRoutesCommand : CommandBase() {
                 modMessage("set disabled to true")
                 LowHopUtils.disabled = true
             }
-
             else -> modMessage("Usages: Rat, Pickup, Snipe, Test, Toggle, startdisabler, makemydisablerjustfuckinggopls")
         }
     }
