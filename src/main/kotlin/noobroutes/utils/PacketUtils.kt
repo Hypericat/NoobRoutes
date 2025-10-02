@@ -46,6 +46,8 @@ object PacketUtils {
         mc.netHandler.networkManager.sendPacket(packet)
     }
 
+    fun Packet<*>.send() = sendPacket(this)
+
     var lastResponse: C03PacketPlayer.C06PacketPlayerPosLook = C03PacketPlayer.C06PacketPlayerPosLook()
 
     fun handleC06ResponsePacket(packet: Packet<*>) {

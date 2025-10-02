@@ -33,6 +33,7 @@ import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.Setting.Companion.withDependency
 import noobroutes.features.settings.impl.*
 import noobroutes.utils.*
+import noobroutes.utils.PacketUtils.send
 import noobroutes.utils.Utils.ID
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
@@ -327,28 +328,7 @@ object Zpew : Module(
 
         waitingList.clear()
 
-        val c0BList = packetList.filterIsInstance<C0BPacketEntityAction>()
-        val c09List = packetList.filterIsInstance<C09PacketHeldItemChange>()
-        val sneakList = c0BList.filter { it.action == C0BPacketEntityAction.Action.START_SNEAKING || it.action == C0BPacketEntityAction.Action.STOP_SNEAKING }.toMutableList()
-        while (sneakList.size > 1) {
-            sneakList.removeFirst()
-            sneakList.removeFirst()
-        }
-
-        val sprintList = c0BList.filter { it.action == C0BPacketEntityAction.Action.START_SPRINTING || it.action == C0BPacketEntityAction.Action.STOP_SPRINTING }.toMutableList()
-        while (sprintList.size > 1) {
-            sprintList.removeFirst()
-            sprintList.removeFirst()
-        }
-
-        devMessage("C09 packets: ${c09List.size}")
-        c09List.forEach { PacketUtils.sendPacket(it) }
-
-        devMessage("Sneak packets: ${sneakList.size}")
-        sneakList.forEach { PacketUtils.sendPacket(it) }
-
-        devMessage("Sprint packets: ${sprintList.size}")
-        sprintList.forEach { PacketUtils.sendPacket(it) }
+        sendNeededPackets(packetList)
     }
     @SubscribeEvent
     fun onS29(event: PacketEvent.Receive) {
@@ -456,5 +436,31 @@ object Zpew : Module(
             return TeleportInfo(10f, false)
         }
         return null
+    }
+
+    private fun sendNeededPackets(packetList: List<Packet<*>>) {
+        var lastSneak: C0BPacketEntityAction? = null
+        var sneakCount = 0
+
+        var lastSprint: C0BPacketEntityAction? = null
+        var sprintCount = 0
+
+        for (packet in packetList) {
+            if (packet is C09PacketHeldItemChange) packet.send()
+
+            if (packet !is C0BPacketEntityAction) continue
+
+            if (packet.action == C0BPacketEntityAction.Action.START_SNEAKING || packet.action == C0BPacketEntityAction.Action.STOP_SNEAKING) {
+                sneakCount++
+                lastSneak = if (sneakCount % 2 == 1) packet else null
+            }
+            else if (packet.action == C0BPacketEntityAction.Action.START_SPRINTING || packet.action == C0BPacketEntityAction.Action.STOP_SPRINTING) {
+                sprintCount++
+                lastSprint = if (sprintCount % 2 == 1) packet else null
+            }
+        }
+
+        lastSneak?.send()
+        lastSprint?.send()
     }
 }
