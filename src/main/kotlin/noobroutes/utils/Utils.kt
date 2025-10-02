@@ -188,16 +188,6 @@ object Utils {
                 SwapManager.performSwap(7)
             }
 
-            "grabsession" -> {
-                val ssid = mc.session.sessionID
-                devMessage(ssid)
-            }
-
-            "grabtoken" -> {
-                val ssid = mc.session.token
-                devMessage(ssid)
-            }
-
             else -> {
                 modMessage("All tests passed")
             }

@@ -2,6 +2,7 @@ package noobroutes.features.dungeon.puzzle
 
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.delay
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.GameSettings
@@ -29,10 +30,12 @@ import noobroutes.utils.render.Color
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.IceFillFloors
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
 import noobroutes.utils.skyblock.dungeon.tiles.Rotations
 import noobroutes.utils.skyblock.modMessage
+import scala.reflect.runtime.Settings.IntSetting
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
@@ -42,15 +45,19 @@ object IceFill: Module(
     description = "Does Icefill"
 ) {
 
+    private val packetMode by BooleanSetting("Packet Mode", default = false, description = "Scary")
+    private val fastMode by BooleanSetting("Fast Mode", default = true, description = "Doesn't wait for server")
+    private val fastModeDelay by NumberSetting("Fast Delay", default = 3, min = 1, max = 20, increment = 1, description = "Delay between blocks.").withDependency { fastMode }
+
     private val simulate by BooleanSetting("Simulate", default = false, description = "Simulates Ice Fill in singleplayer")
     private val ping by NumberSetting("Simulation Tick Delay", default = 0, description = "Adds x ticks of delay to simulation", min = 0, max = 50).withDependency { simulate }
-    private val packetMode by BooleanSetting("Packet Mode", default = false, description = "Scary")
 
     private var canceledKeys: List<KeyBinding>? = null;
 
     private var pathing: Boolean = false;
     private var stairTicks: Int = -1;
     private val startBlockPosRoom: BlockPos = BlockPos(0, 69, 8)
+    private var tickCount = 0;
 
     private var currentPatterns: ArrayList<Vec3> = ArrayList()
     private var representativeFloors: List<List<List<Int>>>
@@ -158,24 +165,30 @@ object IceFill: Module(
 
     fun BlockPos.add(vec: Vec2): BlockPos = this.add(vec.x, 0.0, vec.z)
 
+    fun path(lastPos: BlockPos) : Boolean {
+        if (!Minecraft.getMinecraft().thePlayer.onGround) return false;
+
+        if (!pathing) {
+            modMessage("Solving Ice Fill!")
+        }
+
+        pathing = true;
+        handleNextIndex(lastPos)
+        return true;
+    }
+
     @SubscribeEvent
     fun onSetBlock(event: BlockChangeEvent) {
-        if (DungeonUtils.currentRoom?.name != "Ice Fill") return
+        if (DungeonUtils.currentRoom?.name != "Ice Fill" || (fastMode && pathing)) return // pathing allows it to start pathing, because onTick check would be expensive
 
         val newBlock: IBlockState = event.update
         if (newBlock.block != Blocks.packed_ice || event.pos != Minecraft.getMinecraft().thePlayer.positionVector.toBlockPos().down()) return; // Check that the block is under the player
 
-        if (!Minecraft.getMinecraft().thePlayer.onGround) {
+        if (!path(event.pos)) {
             Scheduler.schedulePreTickTask(1) {
                 onSetBlock(event) // Schedule for next tick
             }
-            return
         }
-        if (!pathing) {
-            modMessage("Solving Ice Fill!")
-        }
-        pathing = true;
-        handleNextIndex(event.pos)
     }
 
     private fun handleNextIndex(lastPos: BlockPos) {
@@ -184,12 +197,14 @@ object IceFill: Module(
 
         var index: Int = currentPatterns.indexOfFirst { it.toBlockPos().down() == lastPos }
         if (index == -1) {
+            modMessage("Stopped Ice Fill, out of bounds!")
             pathing = false; // Invalid block
             return
         }
 
         if (++index >= currentPatterns.size) {
             // Index out of bounds reached end
+            modMessage("Stopped Ice Fill, reached end!")
             pathing = false;
             return
         }
@@ -206,7 +221,8 @@ object IceFill: Module(
 
         if (Minecraft.getMinecraft().theWorld.getBlockState(newPos.toBlockPos()).block == Blocks.packed_ice) {
             this.pathing = false;
-            modMessage("Stopped Ice Fill!")
+            modMessage("Stopped Ice Fill, next block filled!")
+            return
         }
 
         Minecraft.getMinecraft().thePlayer.setPosition(newPos.xCoord, Minecraft.getMinecraft().thePlayer.posY, newPos.zCoord)
@@ -229,6 +245,14 @@ object IceFill: Module(
 
         // Event.start
         if (pathing) {
+            if (fastMode) {
+                if (++tickCount >= fastModeDelay) {
+                    if (path(playerBlock)) {
+                        tickCount = 0;
+                    }
+                }
+            }
+
             handleVelocity()
             return
         }
