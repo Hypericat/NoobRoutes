@@ -11,15 +11,19 @@ import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.events.BossEventDispatcher.inF7Boss
+import noobroutes.events.impl.MotionUpdateEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.utils.AuraManager
+import noobroutes.utils.Scheduler
 import noobroutes.utils.Utils.isNotStart
+import noobroutes.utils.add
 import noobroutes.utils.getBlockStateAt
 import noobroutes.utils.getSkull
 import noobroutes.utils.profileID
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.toVec3
 import org.lwjgl.input.Keyboard
 
@@ -54,23 +58,23 @@ object LeverAura: Module(
     )
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.isNotStart || !inF7Boss) return
-        val eyePos = mc.thePlayer.getPositionEyes(0f)
+    fun onTick(event: MotionUpdateEvent.Post) {
+        if (!inF7Boss) return
+        val eyePos = mc.thePlayer.positionVector.add(0.0, mc.thePlayer.eyeHeight.toDouble(), 0.0)
 
         for (lever in levers) {
             if (eyePos.distanceTo(lever.coords.toVec3(0.5, 0.5, 0.5)) > range) continue
             if (System.currentTimeMillis() - lever.lastCompletedClick < cooldown * 1000 || System.currentTimeMillis() - lever.lastClick < 500L) continue
 
-            AuraManager.clickBlock(AuraManager.BlockAura(lever.coords, false) {})
+            AuraManager.auraBlock(lever.coords)
+
             lever.lastClick = System.currentTimeMillis()
             return
         }
     }
     @SubscribeEvent
     fun onPacketReceive(event: PacketEvent.Receive){
-        val packet = event.packet
-        when (packet) {
+        when (val packet = event.packet) {
             is S23PacketBlockChange -> {
                 handleChangedBlock(packet.blockPosition)
             }

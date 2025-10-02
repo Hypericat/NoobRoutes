@@ -10,6 +10,7 @@ import net.minecraft.network.play.client.C00PacketKeepAlive
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.network.play.client.C0BPacketEntityAction
 import net.minecraft.network.play.client.C0FPacketConfirmTransaction
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
@@ -255,23 +256,15 @@ object Zpew : Module(
         waitingList.last().packets.add(event.packet)
 
         if (waitingList.last().packets.filter { it is C03PacketPlayer }.size > blinkLimit) {
-            val listToSend = mutableListOf<Packet<*>>()
-
-            for (s08Response in waitingList) {
-                s08Response.packets.filter { it !is C03PacketPlayer && it !is C08PacketPlayerBlockPlacement }.forEach { listToSend.add(it) }
-            }
+            modMessage("fuck this shit im out")
 
             val lastKnownPos = waitingList.first().startPos
             val lastKnownSpeed = waitingList.first().startSpeed
 
-            waitingList = mutableListOf()
-
-            listToSend.forEach { PacketUtils.sendPacket(it) }
+            fuckThisShitSomethingAintRight()
 
             mc.thePlayer.setPosition(lastKnownPos.xCoord, lastKnownPos.yCoord, lastKnownPos.zCoord)
             mc.thePlayer.setVelocity(lastKnownSpeed.xCoord, lastKnownSpeed.yCoord, lastKnownSpeed.zCoord)
-
-            modMessage("fuck this shit im out")
         }
     }
 
@@ -307,10 +300,8 @@ object Zpew : Module(
         if (event.packet.x != firstS08.c06.positionX || event.packet.y != firstS08.c06.positionY || event.packet.z != firstS08.c06.positionZ) {
             devMessage("Position mismatch - X: ${event.packet.x} vs ${firstS08.c06.positionX}, Y: ${event.packet.y} vs ${firstS08.c06.positionY}, Z: ${event.packet.z} vs ${firstS08.c06.positionZ}")
             modMessage("failed zpew")
-            for (s08Response in waitingList) {
-                s08Response.packets.filter { it !is C03PacketPlayer && it !is C08PacketPlayerBlockPlacement }.forEach { PacketUtils.sendPacket(it) }
-            }
             waitingList = mutableListOf()
+            fuckThisShitSomethingAintRight()
             return
         }
 
@@ -328,6 +319,37 @@ object Zpew : Module(
         waitingList = mutableListOf()
     }
 
+    private fun fuckThisShitSomethingAintRight() {
+        val packetList = mutableListOf<Packet<*>>()
+        for (section in waitingList) {
+            section.packets.forEach { packetList.add(it) }
+        }
+
+        waitingList.clear()
+
+        val c0BList = packetList.filterIsInstance<C0BPacketEntityAction>()
+        val c09List = packetList.filterIsInstance<C09PacketHeldItemChange>()
+        val sneakList = c0BList.filter { it.action == C0BPacketEntityAction.Action.START_SNEAKING || it.action == C0BPacketEntityAction.Action.STOP_SNEAKING }.toMutableList()
+        while (sneakList.size > 1) {
+            sneakList.removeFirst()
+            sneakList.removeFirst()
+        }
+
+        val sprintList = c0BList.filter { it.action == C0BPacketEntityAction.Action.START_SPRINTING || it.action == C0BPacketEntityAction.Action.STOP_SPRINTING }.toMutableList()
+        while (sprintList.size > 1) {
+            sprintList.removeFirst()
+            sprintList.removeFirst()
+        }
+
+        devMessage("C09 packets: ${c09List.size}")
+        c09List.forEach { PacketUtils.sendPacket(it) }
+
+        devMessage("Sneak packets: ${sneakList.size}")
+        sneakList.forEach { PacketUtils.sendPacket(it) }
+
+        devMessage("Sprint packets: ${sprintList.size}")
+        sprintList.forEach { PacketUtils.sendPacket(it) }
+    }
     @SubscribeEvent
     fun onS29(event: PacketEvent.Receive) {
         if (event.packet !is S29PacketSoundEffect) return
