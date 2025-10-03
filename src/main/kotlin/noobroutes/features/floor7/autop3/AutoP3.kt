@@ -604,6 +604,7 @@ object AutoP3: Module (
 
                     instance.base.center = ring.get("center")?.asBoolean == true
                     instance.base.rotate = ring.get("rotate")?.asBoolean == true
+                    instance.base.stopWatch = ring.get("stopwatch")?.asBoolean == true
 
                     instance.base.diameter = ring.get("diameter")?.asFloat ?: 1f
                     instance.base.height = ring.get("height")?.asFloat ?: 1f
@@ -642,10 +643,11 @@ object AutoP3: Module (
 
         val center = obj.get("center")?.asBoolean == true
         val rotate = obj.get("rotate")?.asBoolean == true
+        val stopwatch = obj.get("stopwatch")?.asBoolean == true
         val diameter = obj.get("diameter")?.asFloat ?: 1f
         val height = obj.get("height")?.asFloat ?: 1f
         val walk = obj.get("walk")?.asBoolean == true
-        val ringBase = RingBase(coords, yaw, RingAwait.NONE, center, rotate, diameter, height)
+        val ringBase = RingBase(coords, yaw, RingAwait.NONE, center, rotate, stopwatch, diameter, height)
         when {
             obj.get("term")?.asBoolean == true -> {
                 ringBase.await = RingAwait.TERM

@@ -33,7 +33,8 @@ interface CommandGenerated {
             MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw),
             await,
             args.any {it.lowercase() == "center"},
-            args.any {it.lowercase() == "rotate" || it == "look"},
+            args.any {it.lowercase() == "rotate" || it.lowercase() == "look"},
+            args.any {it.lowercase() == "stopwatch"},
             diameter,
             height
         )

@@ -7,6 +7,7 @@ import net.minecraft.network.play.client.C03PacketPlayer.C04PacketPlayerPosition
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.*
+import noobroutes.features.misc.TimerHud
 import noobroutes.features.render.FreeCam
 import noobroutes.mixin.accessors.LastReportedAccessor
 import noobroutes.ui.editgui.EditGuiBase
@@ -106,6 +107,7 @@ class BlinkRing(
         if (needsDisabler && !LowHopUtils.disabled) return modMessage("blink needs disabler")
 
         if (!AutoP3.blinkToggle || (AutoP3.blinksThisInstance + packets.size > AutoP3.getMaxBlinks() && AutoP3.isBlinkLimitEnabled) ) {
+            if (stopWatch) TimerHud.toggle()
             doMovement()
             return
         }
@@ -115,8 +117,8 @@ class BlinkRing(
             return
         }
 
-        devMessage("doing Blink")
         doBlink()
+        if (stopWatch) TimerHud.toggle()
     }
 
     private fun doMovement() {

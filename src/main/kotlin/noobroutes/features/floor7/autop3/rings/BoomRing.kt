@@ -6,6 +6,7 @@ import noobroutes.features.floor7.autop3.CommandGenerated
 import noobroutes.features.floor7.autop3.Ring
 import noobroutes.features.floor7.autop3.RingBase
 import noobroutes.features.floor7.autop3.RingType
+import noobroutes.features.misc.TimerHud
 import noobroutes.utils.AuraManager
 import noobroutes.utils.Scheduler
 import noobroutes.utils.SwapManager
@@ -35,6 +36,7 @@ class BoomRing(
 
     override fun doRing() {
         val swapped = SwapManager.swapFromName("TNT")
+        if (stopWatch) TimerHud.toggle()
         if (swapped == SwapManager.SwapState.ALREADY_HELD) {
             AuraManager.auraBlock(block, force = true)
             return

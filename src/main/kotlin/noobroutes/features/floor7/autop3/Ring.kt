@@ -5,6 +5,8 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.rings.BlinkRing
+import noobroutes.features.floor7.autop3.rings.StopRing
+import noobroutes.features.misc.TimerHud
 import noobroutes.features.render.FreeCam
 import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.*
@@ -30,9 +32,10 @@ data class RingBase(
     var await: RingAwait,
     var center: Boolean,
     var rotate: Boolean,
+    var stopWatch: Boolean,
     var diameter: Float,
     var height: Float) {
-    constructor() : this(Vec3(0.0, 0.0, 0.0), 0f, RingAwait.NONE, false, false, 1f, 1f)
+    constructor() : this(Vec3(0.0, 0.0, 0.0), 0f, RingAwait.NONE, false, false, false, 1f, 1f)
 
     companion object {
         val diameterRegex = Regex("""d:(\d+)""")
@@ -71,6 +74,9 @@ abstract class Ring(
     inline var rotate: Boolean
         get() = base.rotate
         set(value) {base.rotate = value}
+    inline var stopWatch: Boolean
+        get() = base.stopWatch
+        set(value) {base.stopWatch = value}
     inline var diameter: Float
         get() = base.diameter
         set(value) {base.diameter = value}
@@ -94,6 +100,7 @@ abstract class Ring(
             addProperty("await", await.name)
             if (center) addProperty("center", true)
             if (rotate) addProperty("rotate", true)
+            if (stopWatch) addProperty("stopwatch", true)
             if (diameter != 1f) addProperty("diameter", diameter)
             if (height != 1f) addProperty("height", height)
         }
@@ -199,6 +206,7 @@ abstract class Ring(
     protected open fun addRingData(obj: JsonObject) {}
 
     open fun doRing() {
+        if (stopWatch && this !is BlinkRing && this !is StopRing) TimerHud.toggle()
         AutoP3MovementHandler.resetShit()
     }
 
@@ -358,6 +366,7 @@ abstract class Ring(
     protected fun EditGuiBase.EditGuiBaseBuilder.addArgs(){
         this.addSwitch("Center", {center}, {center = it})
         this.addSwitch("Rotate", {rotate}, {rotate = it})
+        this.addSwitch("Stopwatch", {stopWatch}, {stopWatch = it})
     }
 
     protected fun EditGuiBase.EditGuiBaseBuilder.addOnCloseAndOpen(){

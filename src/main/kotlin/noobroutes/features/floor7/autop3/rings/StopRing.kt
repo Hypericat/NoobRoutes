@@ -3,6 +3,7 @@ package noobroutes.features.floor7.autop3.rings
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
 import noobroutes.features.floor7.autop3.*
+import noobroutes.features.misc.TimerHud
 import noobroutes.utils.skyblock.PlayerUtils
 
 class StopRing(
@@ -22,6 +23,7 @@ class StopRing(
         if (center && !mc.thePlayer.onGround) return
         triggered = true
 
+        if (stopWatch && !center) TimerHud.toggle()
 
         if (rotate) {
             AutoP3.setBlinkRotation(yaw, 0f)
@@ -29,6 +31,7 @@ class StopRing(
 
         if (center) {
             center()
+            if (stopWatch) TimerHud.toggle()
             if (isAwait) await()
             return
         }
