@@ -8,7 +8,6 @@ import noobroutes.Core.mc
 import noobroutes.events.BossEventDispatcher
 import noobroutes.events.impl.BossEvent
 import noobroutes.events.impl.ChatPacketEvent
-import noobroutes.events.impl.NettyPacketEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.Phase
 import noobroutes.events.impl.TermOpenEvent
@@ -40,7 +39,7 @@ object AutoP3AwaitHandler {
 
     @SubscribeEvent
     fun awaitingLeap(event: PacketEvent.Receive) {
-        if (waitingRing?.await != RingAwait.LEAP || event.packet !is S18PacketEntityTeleport) return
+        if (waitingRing?.ringAwaits?.contains(RingAwait.LEAP) != true || event.packet !is S18PacketEntityTeleport) return
         val ring = waitingRing ?: return
 
         val entity  = mc.theWorld.getEntityByID(event.packet.entityId)
@@ -63,7 +62,7 @@ object AutoP3AwaitHandler {
     fun awaitingTerm(event: TermOpenEvent) {
         val ring = waitingRing ?: return
 
-        if (ring.await != RingAwait.TERM) return
+        if (!ring.ringAwaits.contains(RingAwait.TERM)) return
         doRingSafe(ring)
     }
 
@@ -82,25 +81,31 @@ object AutoP3AwaitHandler {
     private val devRegex = Regex("^(\\w+) completed a device! \\(\\d/\\d\\)")
     private val leverRegex = Regex("^(\\w+) completed a lever! \\(\\d/\\d\\)")
 
+
+    private fun handleRingMessage(ring: Ring, await: RingAwait, regex: Regex, message: String): Boolean {
+        if (!ring.ringAwaits.contains(await)) return false
+
+        val match = regex.find(message) ?: return false
+        val playerName = match.groups[1]?.value ?: return false
+
+        if (mc.thePlayer.name != playerName) return false
+        doRingSafe(ring)
+
+        return true
+    }
+
     @SubscribeEvent
     fun onChat(event: ChatPacketEvent) {
         val ring = waitingRing ?: return
 
-        val match = when (ring.await) {
-            RingAwait.COMPLETE_DEV -> {devRegex.find(event.message)}
-            RingAwait.COMPLETE_LEVER -> {leverRegex.find(event.message)}
-            else -> return
-        } ?: return
-
-        if (mc.thePlayer.name != match.groups[1].toString()) return
-
-        doRingSafe(ring)
+        handleRingMessage(ring, RingAwait.COMPLETE_DEV, devRegex, event.message) || //Note the || statement here, for future me
+        handleRingMessage(ring, RingAwait.COMPLETE_LEVER, leverRegex, event.message)
     }
 
     @SubscribeEvent
     fun onTerminalPhaseChange(event: BossEvent.TerminalPhaseChange) {
         val ring = waitingRing ?: return
-        if (!ring.await.matchesTerminalPhase(event.phase)) return
+        if (!ring.ringAwaits.any { it.matchesTerminalPhase(event.phase) }) return
         doRingSafe(ring)
 
     }
@@ -108,7 +113,7 @@ object AutoP3AwaitHandler {
     @SubscribeEvent
     fun onBossPhaseChange(event: BossEvent.PhaseChange) {
         val ring = waitingRing ?: return
-        if (!ring.await.matchesBossPhase(event.phase)) return
+        if (!ring.ringAwaits.any { it.matchesBossPhase(event.phase) }) return
         doRingSafe(ring)
 
     }

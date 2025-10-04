@@ -20,6 +20,8 @@ import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
+import java.util.EnumSet
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -29,13 +31,13 @@ import kotlin.math.sin
 data class RingBase(
     var coords: Vec3 = Vec3(mc.thePlayer?.posX ?: 0.0, mc.thePlayer?.posY ?: 0.0, mc.thePlayer?.posZ ?: 0.0),
     var yaw: Float,
-    var await: RingAwait,
+    var await: EnumSet<RingAwait>,
     var center: Boolean,
     var rotate: Boolean,
     var stopWatch: Boolean,
     var diameter: Float,
     var height: Float) {
-    constructor() : this(Vec3(0.0, 0.0, 0.0), 0f, RingAwait.NONE, false, false, false, 1f, 1f)
+    constructor() : this(Vec3(0.0, 0.0, 0.0), 0f, EnumSet.noneOf<RingAwait>(RingAwait::class.java), false, false, false, 1f, 1f)
 
     companion object {
         val diameterRegex = Regex("""d:(\d+)""")
@@ -65,7 +67,7 @@ abstract class Ring(
     inline var yaw: Float
         get() = base.yaw
         set(value) {base.yaw = value}
-    inline var await
+    inline var ringAwaits
         get() = base.await
         set(value) {base.await = value}
     inline var center: Boolean
@@ -85,7 +87,7 @@ abstract class Ring(
         set(value) {base.height = value}
 
     inline val isAwait: Boolean
-        get() = (await != RingAwait.NONE)
+        get() = ringAwaits.isNotEmpty()
 
 
     var isEditingRing = false
@@ -97,7 +99,11 @@ abstract class Ring(
             addProperty("type", type.ringName)
             addProperty("coords", coords)
             addProperty("yaw", yaw)
-            addProperty("await", await.name)
+            for (await in ringAwaits) {
+                addProperty(await.name, true)
+            }
+
+
             if (center) addProperty("center", true)
             if (rotate) addProperty("rotate", true)
             if (stopWatch) addProperty("stopwatch", true)
@@ -380,7 +386,8 @@ abstract class Ring(
     }
 
     protected fun EditGuiBase.EditGuiBaseBuilder.addAwait() {
-        this.addSelector("Await", RingAwait.getOptionsList(), { await.getIndex() }, {await = RingAwait[it]})
+
+        //this.addSelector("Await", RingAwait.getOptionsList(), { ringAwaits.getIndex() }, {ringAwaits = RingAwait[it]})
     }
 
     protected open val includeY = true

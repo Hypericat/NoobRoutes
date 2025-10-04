@@ -5,7 +5,6 @@ import noobroutes.events.impl.TerminalPhase
 import noobroutes.utils.capitalizeFirst
 
 enum class RingAwait {
-    NONE,
     LEFT,
     TERM,
     LEAP,
@@ -55,8 +54,8 @@ enum class RingAwait {
             return RingAwait.entries[index]
         }
 
-        fun getFromNameSafe(name: String): RingAwait {
-            return entries.firstOrNull {it.name.lowercase() == name.lowercase()} ?: NONE
+        fun getFromNameSafe(name: String): RingAwait? {
+            return entries.firstOrNull {it.name.lowercase() == name.lowercase()}
         }
 
         fun getFromName(name: String): RingAwait {

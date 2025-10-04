@@ -65,7 +65,7 @@ class CommandRing(ringBase: RingBase = RingBase(), var walk: Boolean = false, va
     }
 
     private fun hasArgs(): Boolean{
-        return await != RingAwait.NONE || center || rotate || walk
+        return ringAwaits.isNotEmpty() || center || rotate || walk
     }
     override fun extraArgs(builder: EditGuiBase.EditGuiBaseBuilder) {
         builder.addSwitch("Walk", {walk}, {walk = it})

@@ -586,19 +586,29 @@ object AutoP3: Module (
                     val instance: Ring = ringClass.ringClass.java.getDeclaredConstructor().newInstance() ?: return@forEach
                     instance.base.coords = ring.get("coords").asVec3
                     instance.base.yaw = MathHelper.wrapAngleTo180_float(ring.get("yaw")?.asFloat ?: 0f)
-                    val await = ring.get("await")?.asString ?: "NONE"
-                    instance.await = RingAwait.getFromName(await)
+                    val awaits = EnumSet.noneOf(RingAwait::class.java)
+                    for (await in RingAwait.entries) {
+                        if (!ring.has(await.name)) continue
+                        awaits.add(await)
+                    }
+
+                    instance.ringAwaits = awaits
+
+                    if (ring.has("await")) {
+                        val await = ring.get("await").asString
+                        instance.ringAwaits.add(RingAwait.getFromName(await))
+                    }
 
                     when {
                         ring.get("term")?.asBoolean == true -> {
-                            instance.await = RingAwait.TERM
+                            instance.ringAwaits.add(RingAwait.TERM)
                         }
 
                         ring.get("leap")?.asBoolean == true -> {
-                            instance.await = RingAwait.LEAP
+                            instance.ringAwaits.add(RingAwait.LEAP)
                         }
                         ring.get("left")?.asBoolean == true -> {
-                            instance.await = RingAwait.LEFT
+                            instance.ringAwaits.add(RingAwait.LEFT)
                         }
                     }
 
@@ -647,17 +657,17 @@ object AutoP3: Module (
         val diameter = obj.get("diameter")?.asFloat ?: 1f
         val height = obj.get("height")?.asFloat ?: 1f
         val walk = obj.get("walk")?.asBoolean == true
-        val ringBase = RingBase(coords, yaw, RingAwait.NONE, center, rotate, stopwatch, diameter, height)
+        val ringBase = RingBase(coords, yaw, EnumSet.noneOf(RingAwait::class.java), center, rotate,stopwatch, diameter, height)
         when {
             obj.get("term")?.asBoolean == true -> {
-                ringBase.await = RingAwait.TERM
+                ringBase.await.add(RingAwait.TERM)
             }
 
             obj.get("leap")?.asBoolean == true -> {
-                ringBase.await = RingAwait.LEAP
+                ringBase.await.add(RingAwait.LEAP)
             }
             obj.get("left")?.asBoolean == true -> {
-                ringBase.await = RingAwait.LEFT
+                ringBase.await.add(RingAwait.LEFT)
             }
         }
 

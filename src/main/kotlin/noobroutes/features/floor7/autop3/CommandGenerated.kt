@@ -2,6 +2,7 @@ package noobroutes.features.floor7.autop3
 
 import net.minecraft.util.MathHelper
 import noobroutes.Core.mc
+import java.util.EnumSet
 
 interface CommandGenerated {
     fun generateRing(args: Array<out String>): Ring?
@@ -20,10 +21,10 @@ interface CommandGenerated {
         val heightString = args.firstOrNull { RingBase.heightRegex.matches(it) }
         val height = heightString?.let { RingBase.heightRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
 
-        var await = RingAwait.NONE
+        val await = EnumSet.noneOf(RingAwait::class.java)
         for (arg in args) {
-            val argAwait = RingAwait.getFromNameSafe(arg)
-            if (argAwait != RingAwait.NONE) await = argAwait
+            val argAwait = RingAwait.getFromNameSafe(arg) ?: continue
+            await.add(argAwait)
         }
 
 
