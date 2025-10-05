@@ -76,8 +76,8 @@ object AutoP3: Module (
     private val nonSilentRotates by BooleanSetting("Non-Silent look", description = "Makes it so rings with the rotate argument rotate client side.").withDependency { renderSettings }
     private val renderMode by SelectorSetting("Render Mode", "Box", arrayListOf("Box", "BBG", "Simple Ring", "Ring", "Octagon"), description = "Ring render type").withDependency { renderSettings }
     private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes").withDependency { renderSettings }
-    val showBlinkLine by BooleanSetting("Show Line", description = "if it should render the line showing where the blink goes", default = true).withDependency { renderSettings }
-    private val balanceHud by HudSetting("Balance Hud", 400f, 400f, 1f, false) {
+    val showBlinkLine by BooleanSetting("Blink Show Line", description = "if it should render the line showing where the blink goes", default = true).withDependency { renderSettings }
+    private val balanceHud by HudSetting("Timer Balance Hud", 400f, 400f, 1f, false) {
         if (inF7Boss) text(cancelled.toString(), 1f, 1f, ColorPalette.textColor, 13f)
         getTextWidth("400", 13f) to getTextHeight("400", 13f)
     }.withDependency { renderSettings }
