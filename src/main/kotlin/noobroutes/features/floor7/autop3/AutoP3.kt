@@ -70,13 +70,20 @@ object AutoP3: Module (
         description = "Swept Collision Detection uses your previous and current position to check if the path you traversed intersects with a ring as its activation condition. Point based detection checks if your position every tick is inside a ring, as such it will miss rings if you are not precise."
     )
 
-    private val ringColor by ColorSetting("Ring Color", Color.GREEN, false, description = "color of the rings")
-    private val secondaryRingColor by ColorSetting("Secondary Ring Color", Color.DARK_GRAY, false, description = "The secondary color of the ring for Ring rendering mode").withDependency { renderMode.hashCode() == RING_HASHCODE }
-    private val nonSilentRotates by BooleanSetting("Non-Silent look", description = "Makes it so rings with the rotate argument rotate client side.")
-    private val renderMode by SelectorSetting("Render Mode", "Box", arrayListOf("Box", "BBG", "Simple Ring", "Ring"), description = "Ring render type")
+    private val renderSettings by DropdownSetting("Render Settings")
+    private val ringColor by ColorSetting("Ring Color", Color.GREEN, false, description = "color of the rings").withDependency { renderSettings }
+    private val secondaryRingColor by ColorSetting("Secondary Ring Color", Color.DARK_GRAY, false, description = "The secondary color of the ring for Ring rendering mode").withDependency { renderSettings && renderMode.hashCode() == RING_HASHCODE }
+    private val nonSilentRotates by BooleanSetting("Non-Silent look", description = "Makes it so rings with the rotate argument rotate client side.").withDependency { renderSettings }
+    private val renderMode by SelectorSetting("Render Mode", "Box", arrayListOf("Box", "BBG", "Simple Ring", "Ring", "Octagon"), description = "Ring render type").withDependency { renderSettings }
+    private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes").withDependency { renderSettings }
+    val showBlinkLine by BooleanSetting("Show Line", description = "if it should render the line showing where the blink goes", default = true).withDependency { renderSettings }
+    private val balanceHud by HudSetting("Balance Hud", 400f, 400f, 1f, false) {
+        if (inF7Boss) text(cancelled.toString(), 1f, 1f, ColorPalette.textColor, 13f)
+        getTextWidth("400", 13f) to getTextHeight("400", 13f)
+    }.withDependency { renderSettings }
+
 
     private val editShit by DropdownSetting("Edit Settings", false)
-    private val renderIndex by BooleanSetting("Render Index", false, description = "Renders the index of the ring. Useful for creating routes").withDependency { editShit }
     private var editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions").withDependency { editShit }
     private val editModeKey by KeybindSetting("Toggle Edit Mode", Keyboard.KEY_NONE, "Toggles editmode on press").onPress {
         editMode = !editMode
@@ -86,13 +93,8 @@ object AutoP3: Module (
 
     private val blinkShit by DropdownSetting("Blink Settings", false)
     val blinkToggle by BooleanSetting("Blink Toggle", description = "main toggle for blink").withDependency { blinkShit }
-    private var showBlinkLine by BooleanSetting("Show Line", description = "if it should render the line showing where the blink goes", default = true).withDependency { blinkShit }
     private val maxBlink by NumberSetting("Max Blink", 150, 100, 400, description = "How many packets can be blinked on one instance").withDependency { blinkShit }
     val suppressMaxBlink by BooleanSetting("Disable in Singleplayer", description = "Disables the max packets per instance check while in single player").withDependency { blinkShit }
-    private val balanceHud by HudSetting("Balance Hud", 400f, 400f, 1f, false) {
-        if (inF7Boss) text(cancelled.toString(), 1f, 1f, ColorPalette.textColor, 13f)
-        getTextWidth("400", 13f) to getTextHeight("400", 13f)
-    }.withDependency { blinkShit }
     private val cancelC05Mode by SelectorSetting("Rot Mode", "Always", arrayListOf("Always", "On Blink/Holding Leap", "Never"), description = "when to cancel Rotations").withDependency { blinkShit }
     private val movementMode by DualSetting("Movement Mode","Playback", "Silent", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
     val dontChargeAll by BooleanSetting("Don't Charge All", description = "Instead of charging all the packets required for a blink only charge some").withDependency { blinkShit }
@@ -149,14 +151,7 @@ object AutoP3: Module (
 
         rings[route]?.toList()?.forEachIndexed { i, ring ->
             ring.renderRing(ringColor, secondaryRingColor, renderMode)
-
             if (renderIndex) Renderer.drawStringInWorld(i.toString(), ring.coords.add(Vec3(0.0, 0.6, 0.0)), ringColor, depth = true, shadow = false)
-
-            if (ring !is BlinkRing || ring.emptyCheck()) return@forEachIndexed
-
-            ring.drawEnd()
-
-            if (showBlinkLine) RenderUtils.drawGradient3DLine(ring.packets.map { Vec3(it.positionX, it.positionY + 0.03, it.positionZ) }, ringColor, Color.RED, 1F, true)
         }
 
         activeBlinkWaypoint?.renderRing(Color.WHITE, secondaryRingColor, renderMode)

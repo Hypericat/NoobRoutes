@@ -10,14 +10,12 @@ import noobroutes.features.floor7.autop3.*
 import noobroutes.features.misc.TimerHud
 import noobroutes.features.render.FreeCam
 import noobroutes.mixin.accessors.LastReportedAccessor
-import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.PacketUtils
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.LowHopUtils
 import noobroutes.utils.skyblock.PlayerUtils
-import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import kotlin.math.pow
 
@@ -166,11 +164,35 @@ class BlinkRing(
         modMessage("used §c${packets.size}§f packets, §7(${AutoP3.getMaxBlinks() - AutoP3.blinksThisInstance} left on this instance)")
     }
 
-    fun drawEnd() {
+    override fun renderRing(color: Color, secondaryColor: Color, renderMode: String) {
+        when(renderMode.hashCode()) {
+            BBG_HASHCODE -> renderBBGRing(color)
+            BOX_HASHCODE -> renderBoxRing(color)
+            RING_HASHCODE -> renderCircularRing(color, secondaryColor)
+            SIMPLE_RING_HASHCODE -> renderSimpleCircularRing(color)
+            OCTAGON_HASHCODE -> {
+                renderOctagonRing(color)
+                drawRingEditing(color)
+                drawOctagonEnd(color)
+                return
+            }
+        }
+        drawRingEditing(color)
+        drawEndStandard(color)
+    }
+
+    private fun drawOctagonEnd(color: Color){
+         val lastPacket = packets.last()
+        val endCoords = Vec3(lastPacket.positionX, lastPacket.positionY + 0.01, lastPacket.positionZ)
+        RenderUtils.drawDisc(endCoords, 0.2,8, 90, 0, 22.5, color, true, 4f)
+        if (AutoP3.showBlinkLine) RenderUtils.drawLines(packets.map { Vec3(it.positionX, it.positionY + 0.0302, it.positionZ) }, color, 2F, true)
+    }
+
+    private fun drawEndStandard(color: Color) {
         val lastPacket = packets.last()
         val endCoords = Vec3(lastPacket.positionX, lastPacket.positionY + 0.01, lastPacket.positionZ)
-        RenderUtils.drawFlatCylinder(endCoords, 0.5, 24, 90, 0, 0, Color.RED, true, 5f)
-        Renderer.drawCylinder(endCoords, 0.5, 0.5, 0.01, 24, 1, 90, 0, 0, Color.RED, depth = true)
+        RenderUtils.drawDisc(endCoords, 0.5, 24, 90, 0, 0, Color.RED, true, 4f)
+        if (AutoP3.showBlinkLine) RenderUtils.drawGradient3DLine(packets.map { Vec3(it.positionX, it.positionY + 0.03, it.positionZ) },color, Color.RED, 1F, true)
     }
 
     fun emptyCheck(): Boolean {

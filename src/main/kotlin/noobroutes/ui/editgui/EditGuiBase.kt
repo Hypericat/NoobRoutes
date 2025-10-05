@@ -95,6 +95,9 @@ class EditGuiBase() : UiElement(0f, 0f) {
                 currentY += element.height
                 currentSide = 0
             }
+            if (currentSide == 1) {
+                currentY += previousHeight
+            }
             base.name = name
             base.height = currentY
             base.onOpen = this.onOpen
@@ -151,6 +154,9 @@ class EditGuiBase() : UiElement(0f, 0f) {
             element.updatePosition(X_ALIGNMENT_RIGHT, currentY)
             currentY += element.height
             currentSide = 0
+        }
+        if (currentSide == 1) {
+            currentY += previousHeight
         }
         this.height = currentY
     }

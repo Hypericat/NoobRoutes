@@ -25,7 +25,6 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13
 import org.lwjgl.util.glu.Cylinder
-import org.lwjgl.util.glu.PartialDisk
 import java.awt.image.BufferedImage
 import kotlin.math.cos
 import kotlin.math.floor
@@ -112,6 +111,10 @@ object RenderUtils {
 
     private fun WorldRenderer.addVertex(x: Double, y: Double, z: Double, nx: Float, ny: Float, nz: Float) {
         pos(x, y, z).normal(nx, ny, nz).endVertex()
+    }
+
+    private fun WorldRenderer.addVertex(pos: Vec3, nx: Float, ny: Float, nz: Float) {
+        pos(pos.xCoord, pos.yCoord, pos.zCoord).normal(nx, ny, nz).endVertex()
     }
 
     private fun preDraw(disableTexture2D: Boolean = true) {
@@ -339,6 +342,7 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
+
     /**
      * Draws a cylinder in the world with the specified parameters.
      *
@@ -385,7 +389,63 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun drawFlatCylinder(
+    fun drawFilledDisc(
+        pos: Vec3, radius: Number,
+        slices: Number, rot1: Number, rot2: Number, rot3: Number,
+        lineColor: Color, fillColor: Color, depth: Boolean = false, thickness: Float = 3f
+    ) {
+        GlStateManager.pushMatrix()
+        GlStateManager.disableCull()
+        GL11.glLineWidth(thickness)
+        preDraw()
+        depth(depth)
+
+        GlStateManager.translate(pos.xCoord, pos.yCoord, pos.zCoord)
+        GlStateManager.rotate(rot1.toFloat() - 90f, 1f, 0f, 0f)
+        GlStateManager.rotate(rot2.toFloat(), 0f, 0f, 1f)
+        GlStateManager.rotate(rot3.toFloat(), 0f, 1f, 0f)
+
+        val r = radius.toFloat()
+        val sliceCount = slices.toInt()
+
+        val edgeVertices = List(sliceCount) { i ->
+            val angle = (i * 2.0 * Math.PI / sliceCount)
+            val x = cos(angle).toFloat() * r
+            val z = sin(angle).toFloat() * r
+            Vec3(x.toDouble(), 0.0, z.toDouble())
+        }
+
+
+        fillColor.bind()
+        worldRenderer {
+            begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_NORMAL)
+            addVertex(0.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f)
+            for (vertex in edgeVertices) {
+                addVertex(vertex.xCoord, vertex.yCoord, vertex.zCoord, 0.0f, 1.0f, 0.0f)
+            }
+            addVertex(edgeVertices[0].xCoord, edgeVertices[0].yCoord, edgeVertices[0].zCoord, 0.0f, 1.0f, 0.0f)
+        }
+        tessellator.draw()
+
+        lineColor.bind()
+        GL11.glEnable(GL11.GL_LINE_SMOOTH)
+        worldRenderer {
+            begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION)
+            for (vertex in edgeVertices) {
+                pos(vertex.xCoord, vertex.yCoord + 0.001, vertex.zCoord).endVertex()
+            }
+        }
+        tessellator.draw()
+        GL11.glDisable(GL11.GL_LINE_SMOOTH)
+
+        postDraw()
+        GL11.glLineWidth(1.0F)
+        GlStateManager.enableCull()
+        if (!depth) resetDepth()
+        GlStateManager.popMatrix()
+    }
+
+    fun drawDisc(
         pos: Vec3, radius: Number,
         slices: Number, rot1: Number, rot2: Number, rot3: Number,
         color: Color, depth: Boolean = false, thickness: Float = 3f
@@ -406,23 +466,23 @@ object RenderUtils {
         GlStateManager.rotate(rot2.toFloat(), 0f, 0f, 1f)
         GlStateManager.rotate(rot3.toFloat(), 0f, 1f, 0f)
 
-        val tessellator = Tessellator.getInstance()
-        val worldrenderer = tessellator.worldRenderer
 
+        worldRenderer {
+            begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION)
 
+            val r = radius.toFloat()
+            val sliceCount = slices.toInt()
 
-        worldrenderer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION)
+            for (i in 0 until sliceCount) {
+                val angle = (i * 2.0 * Math.PI / sliceCount)
+                val x = cos(angle).toFloat() * r
+                val z = sin(angle).toFloat() * r
 
-        val r = radius.toFloat()
-        val sliceCount = slices.toInt()
+                pos(x.toDouble(), 0.0, z.toDouble()).endVertex()
+            }
 
-        for (i in 0 until sliceCount) {
-            val angle = (i * 2.0 * Math.PI / sliceCount)
-            val x = cos(angle).toFloat() * r
-            val z = sin(angle).toFloat() * r
-
-            worldrenderer.pos(x.toDouble(), 0.0, z.toDouble()).endVertex()
         }
+
         tessellator.draw()
 
         postDraw()
