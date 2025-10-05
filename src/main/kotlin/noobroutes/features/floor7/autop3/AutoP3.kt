@@ -89,7 +89,7 @@ object AutoP3: Module (
         editMode = !editMode
         modMessage("edit Mode: $editMode")
     }.withDependency { editShit }
-    val walkBoost by SelectorSetting("Walk Boost", "none", arrayListOf("none", "normal", "big"), description = "how much of a boost to apply walking of edges. Non none values might lagback more").withDependency { editShit }
+    var walkBoost by SelectorSetting("Walk Boost", "none", arrayListOf("None", "Normal", "Large"), description = "how much of a boost to apply walking of edges. Non none values might lagback more").withDependency { editShit }
 
     private val blinkShit by DropdownSetting("Blink Settings", false)
     val blinkToggle by BooleanSetting("Blink Toggle", description = "main toggle for blink").withDependency { blinkShit }
