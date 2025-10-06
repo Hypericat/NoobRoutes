@@ -15,6 +15,12 @@ interface CommandGenerated {
         return args.any {it.lowercase() == "low" || it.lowercase() == "lowhop"}
     }
 
+    fun getWalkBoost(args: Array<out String>): WalkBoost {
+        return WalkBoost.entries.firstOrNull { walkBoost ->
+            args.any { it.equals(walkBoost.name, ignoreCase = true) }
+        } ?: WalkBoost.UNCHANGED
+    }
+
     fun generateRingBaseFromArgs(args: Array<out String>): RingBase {
         val diameterString = args.firstOrNull { RingBase.diameterRegex.matches(it) }
         val diameter = diameterString?.let { RingBase.diameterRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f

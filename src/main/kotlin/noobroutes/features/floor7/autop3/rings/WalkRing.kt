@@ -3,6 +3,7 @@ package noobroutes.features.floor7.autop3.rings
 import com.google.gson.JsonObject
 import noobroutes.features.floor7.autop3.*
 import noobroutes.features.floor7.autop3.WalkBoost.Companion.asWalkBoost
+import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.capitalizeFirst
 
 
@@ -13,15 +14,11 @@ class WalkRing(
     companion object : CommandGenerated {
         override fun generateRing(args: Array<out String>): Ring? {
 
-            val boost = WalkBoost.entries.map { Pair(it.name.lowercase(), it) }
-                .firstOrNull { args.any { arg -> arg == it.first } } ?: Pair(
-                "Unchanged",
-                WalkBoost.UNCHANGED
-            )
+            val boost = getWalkBoost(args)
 
             return if (args.any { it == "jump" }) JumpRing(generateRingBaseFromArgs(args), true) else WalkRing(
                 generateRingBaseFromArgs(args),
-                boost.second
+                boost
             )
         }
     }
@@ -33,10 +30,16 @@ class WalkRing(
     override fun loadRingData(obj: JsonObject) {
         super.loadRingData(obj)
         walkBoost = obj.get("boost")?.asWalkBoost() ?: WalkBoost.UNCHANGED
-
     }
 
-
+    override fun extraArgs(builder: EditGuiBase.EditGuiBaseBuilder) {
+        builder.addSelector(
+            "Walk Boost",
+            WalkBoost.getOptionsList(),
+            { walkBoost.getIndex() },
+            { walkBoost = WalkBoost[it]}
+        )
+    }
 
 
     override fun doRing() {
