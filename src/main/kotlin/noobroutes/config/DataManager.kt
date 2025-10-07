@@ -5,6 +5,14 @@ import noobroutes.Core.logger
 import noobroutes.Core.mc
 import java.io.File
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
+
 
 object DataManager {
     private val gson = GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create()
@@ -154,6 +162,21 @@ object DataManager {
             logger.info("Error loading data from file: ${path.path}")
             e.printStackTrace()
             emptyList()
+        }
+    }
+
+    private val customFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH")
+    private val customDate get(): String = LocalDateTime.now().format(customFormatter)
+
+    fun backupFile(fileName: String) {
+        try {
+            File(mc.mcDataDir, "config/noobroutes/backups/$fileName").takeIf { !it.exists() }?.mkdirs()
+            val source = Paths.get(mc.mcDataDir.toString(), "config/noobroutes/$fileName.json")
+            val destination = Paths.get(mc.mcDataDir.toString(), "config/noobroutes/backups/$fileName/${customDate}.json")
+            Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING)
+        } catch (e: IOException) {
+            logger.info("Error backing up ${fileName}, Object")
+            e.printStackTrace()
         }
     }
 }

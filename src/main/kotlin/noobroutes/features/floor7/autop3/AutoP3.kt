@@ -581,6 +581,7 @@ object AutoP3: Module (
                     val instance: Ring = ringClass.ringClass.java.getDeclaredConstructor().newInstance() ?: return@forEach
                     instance.base.coords = ring.get("coords").asVec3
                     instance.base.yaw = MathHelper.wrapAngleTo180_float(ring.get("yaw")?.asFloat ?: 0f)
+
                     val awaits = EnumSet.noneOf(RingAwait::class.java)
                     for (await in RingAwait.entries) {
                         if (!ring.has(await.name)) continue
@@ -590,9 +591,20 @@ object AutoP3: Module (
                     instance.ringAwaits = awaits
 
                     if (ring.has("await")) {
+                        try {
                         val await = ring.get("await").asString
-                        instance.ringAwaits.add(RingAwait.getFromName(await))
+                        if (await != "NONE") {
+
+                                instance.ringAwaits.add(RingAwait.getFromName(await))
+
+
+                        }
+                        } catch (e: Exception) {
+                            val await = ring.get("await").asString
+                            modMessage(await)
+                        }
                     }
+
 
                     when {
                         ring.get("term")?.asBoolean == true -> {
@@ -606,6 +618,8 @@ object AutoP3: Module (
                             instance.ringAwaits.add(RingAwait.LEFT)
                         }
                     }
+
+
 
                     instance.base.center = ring.get("center")?.asBoolean == true
                     instance.base.rotate = ring.get("rotate")?.asBoolean == true
@@ -621,6 +635,7 @@ object AutoP3: Module (
         } catch (e: Exception) {
             modMessage("Error Loading Rings, Please Send Log to Wadey")
             logger.info(e)
+            DataManager.backupFile("rings")
         }
     }
     fun saveRings() {

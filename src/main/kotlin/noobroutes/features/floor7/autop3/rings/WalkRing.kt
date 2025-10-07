@@ -24,12 +24,12 @@ class WalkRing(
     }
 
     override fun addRingData(obj: JsonObject) {
-        obj.addProperty("boost", walkBoost.name)
+        obj.addProperty("walkBoost", walkBoost.name)
     }
 
     override fun loadRingData(obj: JsonObject) {
         super.loadRingData(obj)
-        walkBoost = obj.get("boost")?.asWalkBoost() ?: WalkBoost.UNCHANGED
+        walkBoost = obj.get("walkBoost")?.asWalkBoost() ?: WalkBoost.UNCHANGED
     }
 
     override fun extraArgs(builder: EditGuiBase.EditGuiBaseBuilder) {

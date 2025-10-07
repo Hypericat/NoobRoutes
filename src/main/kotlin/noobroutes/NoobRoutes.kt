@@ -99,6 +99,7 @@ class NoobRoutes {
     @Mod.EventHandler
     fun loadComplete(event: FMLLoadCompleteEvent) {
         File(mc.mcDataDir, "config/noobroutes").takeIf { !it.exists() }?.mkdirs()
+        File(mc.mcDataDir, "config/noobroutes/backups").takeIf { !it.exists() }?.mkdirs()
         Core.loadComplete()
         ModuleManager.addModules()
         AutoP3.loadRings()
