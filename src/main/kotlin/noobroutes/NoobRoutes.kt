@@ -34,7 +34,7 @@ import java.io.File
 
 const val MODID = "@MOD_ID@"
 
-@Mod(modid = MODID, useMetadata = true)
+@Mod(modid = MODID, useMetadata = true, version = Core.VERSION, clientSideOnly = true)
 class NoobRoutes {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {

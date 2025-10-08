@@ -15,7 +15,9 @@ import noobroutes.ui.hud.EditHUDGui
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.LocationUtils
+import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
+import java.io.File
 
 @AlwaysActive
 object  ClickGUIModule: Module(
@@ -83,6 +85,12 @@ object  ClickGUIModule: Module(
     var editGuiY = +NumberSetting<Float>("editGuiY", 200f, hidden = true, description = "")
         private set
 
+    private fun hasOringo(): Boolean {
+        val folder = File(Core.mc.mcDataDir, "mods")
+        val fileNames = folder.listFiles()?.map { it.name } ?: return false
+
+        return fileNames.any {it.startsWith("OringoClient-Supporter") }
+    }
 
     init {
         execute(250) {
@@ -90,6 +98,9 @@ object  ClickGUIModule: Module(
             if (!LocationUtils.isInSkyblock) return@execute
             joined = true
             Config.save()
+            if (hasOringo()) {
+                modMessage("OringoClient is incompatible with NoobRoutes, and must be removed from the mods folder for NoobRoutes to function.")
+            }
         }
         resetPositions()
     }

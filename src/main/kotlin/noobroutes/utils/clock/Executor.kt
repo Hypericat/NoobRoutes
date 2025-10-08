@@ -17,13 +17,13 @@ open class Executor(val delay: () -> Long, private val profileName: String = "Un
 
     open fun run(): Boolean {
         if (shouldFinish) return true
-            if (clock.hasTimePassed(delay(), true)) {
-                profile(profileName) {
-                    runCatching {
-                        func()
-                    }
+        if (clock.hasTimePassed(delay(), true)) {
+            profile(profileName) {
+                runCatching {
+                    func()
                 }
             }
+        }
         return false
     }
 
