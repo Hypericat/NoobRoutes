@@ -32,6 +32,10 @@ object EditGui : Screen() {
         GlStateManager.popMatrix()
     }
 
+    fun openPage(page: EditGuiPage) {
+        activeEditGuiBase?.pushPageLayer(page)
+    }
+
     override fun onScroll(amount: Int) {
         if (Mouse.getEventDWheel() == 0) return
         activeEditGuiBase?.handleScroll(amount.sign * 16)

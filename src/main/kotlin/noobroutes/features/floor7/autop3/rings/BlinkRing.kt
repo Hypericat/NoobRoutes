@@ -104,7 +104,7 @@ class BlinkRing(
 
         if (needsDisabler && !LowHopUtils.disabled) return modMessage("blink needs disabler")
 
-        if (!AutoP3.blinkToggle || (AutoP3.blinksThisInstance + packets.size > AutoP3.getMaxBlinks() && AutoP3.isBlinkLimitEnabled) ) {
+        if (!AutoP3.blinkToggle) {
             if (stopWatch) TimerHud.toggle()
             doMovement()
             return
@@ -161,7 +161,7 @@ class BlinkRing(
         accessor.setLastReportedPosY(lastPacket.positionY)
         accessor.setLastReportedPosZ(lastPacket.positionZ)
 
-        modMessage("used §c${packets.size}§f packets, §7(${AutoP3.getMaxBlinks() - AutoP3.blinksThisInstance} left on this instance)")
+        modMessage("used §c${packets.size}§f packets.")
     }
 
     override fun renderRing(color: Color, secondaryColor: Color, renderMode: String) {

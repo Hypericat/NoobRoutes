@@ -32,6 +32,11 @@ private val arrowIcon = DynamicTexture(
         "/assets/ui/Arrow.png"
     )
 )
+private val darkArrowIcon = DynamicTexture(
+    loadBufferedImage(
+        "/assets/ui/ArrowDark.png"
+    )
+)
 
 data class Box(var x: Number, var y: Number, var w: Number, var h: Number)
 data class BoxWithClass<T : Number>(var x: T, var y: T, var w: T, var h: T)
@@ -76,8 +81,11 @@ fun roundedRectangle(x: Number, y: Number, w: Number, h: Number, color: Color, r
     roundedRectangle(x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat(), color, color, color,
         0f, radius.toFloat(), radius.toFloat(), radius.toFloat(), radius.toFloat(), edgeSoftness)
 
+/*
 fun <T: Number> roundedRectangle(box: BoxWithClass<T>, color: Color, radius: Number = 0f, edgeSoftness: Number = .5f) =
     roundedRectangle(box.x, box.y, box.w, box.h, color, radius, edgeSoftness)
+
+ */
 
 
 fun rectangleOutline(x: Number, y: Number, w: Number, h: Number, color: Color, radius: Number = 0f, thickness: Number, edgeSoftness: Number = 1f) {
@@ -317,14 +325,18 @@ fun resetScissor(scissor: Scissor) {
 
 }
 
-fun drawArrow(xpos: Float, ypos: Float, rotation: Float = 90f, scale: Float = 1f, color: Color = Color.WHITE) {
+fun drawArrow(x: Float, y: Float, rotation: Float = 90f, scale: Float = 1f, size: Float = 25f, dark: Boolean = false) {
+    val halfSize = size * 0.5f
     GlStateManager.pushMatrix()
-    GlStateManager.translate(xpos, ypos, 0f)
+
+    GlStateManager.translate(x, y, 0f)
     GlStateManager.rotate(rotation, 0f, 0f, 1f)
-    GlStateManager.scale(scale, scale, 1f)
-    GlStateManager.translate(-xpos, -ypos, 0f)
-    GlStateManager.color(color.redFloat, color.greenFloat, color.blueFloat, color.alphaFloat)
-    drawDynamicTexture(arrowIcon, xpos - 25 * 0.5 * scale, ypos - 25 * 0.5 * scale, 25 * scale, 25 * scale)
+
+    if (scale != 1f) {
+        GlStateManager.scale(scale, scale, 1f)
+    }
+
+    drawDynamicTexture(if (dark) darkArrowIcon else arrowIcon, -halfSize, -halfSize, size, size)
     GlStateManager.popMatrix()
 }
 

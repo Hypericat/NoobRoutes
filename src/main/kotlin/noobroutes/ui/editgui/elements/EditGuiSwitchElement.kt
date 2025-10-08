@@ -16,6 +16,7 @@ class EditGuiSwitchElement(
     override var priority: Int = 2
     override val isDoubleWidth: Boolean = false
     override val height: Float = 55f
+
     //10f
 
     inline var value

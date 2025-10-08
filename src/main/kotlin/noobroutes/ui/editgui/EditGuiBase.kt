@@ -2,32 +2,60 @@ package noobroutes.ui.editgui
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.ColorPalette
+import noobroutes.ui.editgui.elements.EditGuiPageOpener
 import noobroutes.ui.editgui.elements.EditGuiSelector
 import noobroutes.ui.editgui.elements.EditGuiSliderElement
 import noobroutes.ui.editgui.elements.EditGuiSwitchElement
 import noobroutes.ui.util.MouseUtils
 import noobroutes.ui.util.UiElement
+import noobroutes.ui.util.animations.impl.CubicBezierAnimation
 import noobroutes.utils.render.Color
+import noobroutes.utils.render.drawArrow
 import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
+import noobroutes.utils.skyblock.modMessage
+import java.util.Stack
 
 class EditGuiBase() : UiElement(0f, 0f) {
     var height = 0f
     var name = ""
     var onOpen: () -> Unit = {}
     var onClose: () -> Unit = {}
+    val pageStack = Stack<EditGuiPage>()
+    lateinit var root: EditGuiPage
 
 
-    class EditGuiBaseBuilder(){
-        val elements = mutableListOf<EditGuiElement>()
+    class EditGuiBaseBuilder() {
+        private val pages = mutableListOf<EditGuiPage>()
+        private val pageStack = Stack<EditGuiPage>()
+        private val root = EditGuiPage("Root")
+
+        init {
+            pageStack.push(root)
+            pages.add(root)
+        }
+
+        private fun addElement(element: EditGuiElement){
+            pageStack.peek().addElement(element as UiElement)
+        }
+
+        fun popPage(){
+            pages.add(pageStack.pop())
+        }
+
+        fun pushPage(name: String) {
+            val page = EditGuiPage(name)
+            addElement(EditGuiPageOpener(page))
+            pageStack.push(page)
+        }
+
+
         fun addSlider(name: String, min: Double, max: Double, increment: Double, roundTo: Int, getter: () -> Double, setter: (Double) -> Unit, priority: Int? = null) {
             val element = EditGuiSliderElement(name, min, max, increment, roundTo, getter, setter)
             priority?.let {
                 element.priority = it
             }
-            elements.add(
-                element
-            )
+            addElement(element)
         }
 
         fun addSwitch(name: String, getter: () -> Boolean, setter: (Boolean) -> Unit, priority: Int? = null){
@@ -35,18 +63,14 @@ class EditGuiBase() : UiElement(0f, 0f) {
             priority?.let {
                 element.priority = it
             }
-            elements.add(
-                element
-            )
+            addElement(element)
         }
         fun addSelector(name: String, options: ArrayList<String>, getter: () -> Int, setter: (Int) -> Unit, priority: Int? = null) {
             val element = EditGuiSelector(name, options, getter, setter)
             priority?.let {
                 element.priority = it
             }
-            elements.add(
-                element
-            )
+            addElement(element)
         }
 
         private var onOpen: () -> Unit = {}
@@ -64,42 +88,15 @@ class EditGuiBase() : UiElement(0f, 0f) {
 
         fun build(): EditGuiBase {
             val base = EditGuiBase()
-            var currentY = 80f
-            var currentSide = 0
-            var previousHeight = 0f
+            base.root = root
+            base.addChild(root)
 
-
-            elements.sortByDescending { it.priority }
-            for (element in elements) {
-                element as UiElement
-                if (element.isDoubleWidth) {
-                    if (currentSide == 1) {
-                        currentY += previousHeight
-                        currentSide = 0
-                    }
-                    element.updatePosition(X_ALIGNMENT_LEFT, currentY)
-                    base.addChild(element)
-                    currentY += element.height
-                    continue
-                }
-
-                if (currentSide == 0) {
-                    element.updatePosition(X_ALIGNMENT_LEFT, currentY)
-                    base.addChild(element)
-                    currentSide = 1
-                    previousHeight = element.height
-                    continue
-                }
-                element.updatePosition(X_ALIGNMENT_RIGHT, currentY)
-                base.addChild(element)
-                currentY += element.height
-                currentSide = 0
+            for (page in pages) {
+                page.updateYPositions()
             }
-            if (currentSide == 1) {
-                currentY += previousHeight
-            }
+
             base.name = name
-            base.height = currentY
+            base.height = root.height
             base.onOpen = this.onOpen
             base.onClose = this.onClose
             base.updatePosition(editGuiBaseX, editGuiBaseY)
@@ -107,60 +104,124 @@ class EditGuiBase() : UiElement(0f, 0f) {
         }
     }
 
+
+
+    val pageSwitchAnimation = CubicBezierAnimation(250)
+    var pageSwitchDirection = LEFT
+    var previousPage: EditGuiPage? = null
+    private val redoStack = Stack<EditGuiPage>()
+
+    private fun handlePreviousPage() {
+        val prevPage = this.previousPage ?: return
+        uiChildren.remove(prevPage)
+        previousPage = null
+    }
+
+    fun pushPageLayer(page: EditGuiPage) {
+        handlePreviousPage()
+        val previousPage = getCurrentPage()
+        this.previousPage = previousPage
+        pageSwitchDirection = LEFT
+
+        pageStack.push(page)
+        addChild(page)
+        pageSwitchAnimation.start(true)
+        redoStack.clear()
+    }
+
+    private fun redo() {
+        if (redoStack.empty()) return
+        handlePreviousPage()
+        val page = redoStack.pop()
+        val previousPage = getCurrentPage()
+        this.previousPage = previousPage
+        pageSwitchDirection = LEFT
+
+        pageStack.push(page)
+        addChild(page)
+        pageSwitchAnimation.start(true)
+    }
+
+    fun popPageLayer() {
+        if (pageStack.empty()) return
+        handlePreviousPage()
+        val previousPage = pageStack.pop()
+        this.previousPage = previousPage
+        pageSwitchDirection = RIGHT
+
+        redoStack.add(previousPage)
+        val currentPage = getCurrentPage()
+        if (currentPage !in this.uiChildren) addChild(getCurrentPage())
+        pageSwitchAnimation.start(true)
+    }
+
     var dragging = false
     var x2 = 0f
     var y2 = 0f
     override fun mouseClicked(mouseButton: Int): Boolean {
         if (mouseButton != 0) return false
-        if (isAreaHovered(0f, 0f, 600f, 70f)) {
-            x2 = x - MouseUtils.mouseX
-            y2 = y - MouseUtils.mouseY
-            dragging = true
-            return true
+        when {
+            isHoveredLeftArrow -> {
+                popPageLayer()
+                return true
+            }
+            isHoveredRightArrow -> {
+                redo()
+                return true
+            }
+            isAreaHovered(0f, 0f, 600f, 70f) -> {
+                x2 = x - MouseUtils.mouseX
+                y2 = y - MouseUtils.mouseY
+                dragging = true
+                return true
+            }
         }
+
+
+
         return false
     }
+
 
     override fun mouseReleased(): Boolean {
         dragging = false
         return false
     }
 
-    fun updateYPositions(){
-        var currentY = 80f
-        var currentSide = 0
-        var previousHeight = 0f
-        val elements = uiChildren.toMutableList()
-
-        elements.sortByDescending { (it as EditGuiElement).priority }
-        for (element in elements) {
-            element as EditGuiElement
-            if (element.isDoubleWidth) {
-                if (currentSide == 1) {
-                    currentY += previousHeight
-                    currentSide = 0
-                }
-                element.updatePosition(X_ALIGNMENT_LEFT, currentY)
-                currentY += element.height
-                continue
-            }
-
-            if (currentSide == 0) {
-                element.updatePosition(X_ALIGNMENT_LEFT, currentY)
-                currentSide = 1
-                previousHeight = element.height
-                continue
-            }
-            element.updatePosition(X_ALIGNMENT_RIGHT, currentY)
-            currentY += element.height
-            currentSide = 0
-        }
-        if (currentSide == 1) {
-            currentY += previousHeight
-        }
-        this.height = currentY
+    private fun getCurrentPage(): EditGuiPage {
+        return if (pageStack.empty()) root else pageStack.peek()
     }
 
+    fun updateYPositions(){
+        getCurrentPage().updateYPositions()
+    }
+
+    fun handlePageAnimation() {
+        if (!pageSwitchAnimation.isAnimating()) {
+            val prevPage = previousPage ?: return
+            previousPage = null
+            uiChildren.remove(prevPage)
+            return
+        }
+        val sign = if (pageSwitchDirection) 1 else -1
+
+
+        val prevPage = previousPage ?: return
+        val x = pageSwitchAnimation.get(0f,sign * 600f, false)
+        prevPage.updatePosition(x, 0f)
+
+        this.height = pageSwitchAnimation.get(prevPage.height, getCurrentPage().height, false)
+        val currentPage = getCurrentPage()
+        currentPage.updatePosition(sign * -600 + x, 0f)
+
+
+    }
+
+    private inline val isHoveredLeftArrow get() = isAreaHovered(WIDTH - 88.75f, 18.75f, 37.5f, 37.5f)
+    private inline val isHoveredRightArrow get() = isAreaHovered(WIDTH - 48.75f, 17.75f, 37.5f, 37.5f)
+
+
+//70
     override fun draw() {
         GlStateManager.pushMatrix()
         if (dragging) {
@@ -168,20 +229,27 @@ class EditGuiBase() : UiElement(0f, 0f) {
             editGuiBaseX = x
             editGuiBaseY = y
         }
+        handlePageAnimation()
         translate(x, y)
-        blurRoundedRectangle(0f, 0f, 600f, height, 20f, 20f, 20f, 20f, 0.5f)
-        roundedRectangle(0f, 0f, 600, 70, ColorPalette.titlePanelColor,  ColorPalette.titlePanelColor, Color.TRANSPARENT, 0, 20f, 20f, 0f, 0f, 0f)
-        roundedRectangle(0f, 0f, 600, height, ColorPalette.buttonColor, radius = 20)
+        blurRoundedRectangle(0f, 0f, WIDTH, height, 20f, 20f, 20f, 20f, 0.5f)
+        roundedRectangle(0f, 0f, WIDTH, 70f, ColorPalette.titlePanelColor,  ColorPalette.titlePanelColor, Color.TRANSPARENT, 0, 20f, 20f, 0f, 0f, 0f)
+        roundedRectangle(0f, 0f, WIDTH, height, ColorPalette.buttonColor, radius = 20)
         text(name, X_ALIGNMENT_LEFT - 10, 37.5, Color.WHITE, size = 30)
+        drawArrow(WIDTH - 70f, 37.5f, 180f, 1.5f, dark = isHoveredLeftArrow)
+        drawArrow(WIDTH - 30f, 36.5f, 0f, 1.5f, dark = isHoveredRightArrow)
+        scissorChildren(0f, 0f, WIDTH, height)
         GlStateManager.popMatrix()
     }
 
     companion object {
         var editGuiBaseX = 0f
         var editGuiBaseY = 0f
+        private const val LEFT = false
+        private const val RIGHT = true
 
-        private const val X_ALIGNMENT_LEFT = 30f
-        private const val X_ALIGNMENT_RIGHT = 300f
+
+        const val X_ALIGNMENT_LEFT = 30f
+        const val X_ALIGNMENT_RIGHT = 300f
         const val WIDTH = 600f
     }
 }

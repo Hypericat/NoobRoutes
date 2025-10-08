@@ -132,6 +132,21 @@ object Utils {
                 modMessage(blockPos)
             }
 
+            "edit" -> {
+                val builder = EditGuiBase.EditGuiBaseBuilder()
+                builder.setName("Test")
+                builder.addSelector("Test", arrayListOf("Test", "Test2"), {0}, {})
+                builder.addSwitch("Test", {true}, {})
+                builder.pushPage("test")
+                builder.addSwitch("Test", {true}, {})
+                builder.pushPage("A")
+                builder.addSlider("Test", 0.0, 5.0, 1.0, 1, {0.0}, {})
+                builder.popPage()
+                builder.popPage()
+                EditGui.openEditGui(builder.build())
+
+            }
+
             "relativeplayerpos", "relppos", "relplayer", "playerrel", "relp" -> {
                 val pos = DungeonUtils.currentRoom?.getRelativeCoords(mc.thePlayer.positionVector) ?: return
                 GuiScreen.setClipboardString("Vec3(${pos.xCoord}, ${pos.yCoord}, ${pos.zCoord})")

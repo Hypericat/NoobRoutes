@@ -33,6 +33,7 @@ class EditGuiSliderElement(
     override val isDoubleWidth: Boolean = true
     override val height: Float = 70f
 
+
     private inline var value
         get() = getter.invoke()
         set(value) = setter(value)

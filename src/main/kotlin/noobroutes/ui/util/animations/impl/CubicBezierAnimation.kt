@@ -25,6 +25,8 @@ class CubicBezierAnimation(duration: Long, val x1: Float, val y1: Float, val x2:
         private val globalCache = ConcurrentHashMap<Int, Map<Int, Float>>()
     }
 
+    constructor(duration: Long) : this(duration, 0.4, 0, 0.2, 1)
+
     constructor(duration: Long, x1: Number, y1: Number, x2: Number, y2: Number) : this(duration, x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat())
 
     private val cache: Map<Int, Float>

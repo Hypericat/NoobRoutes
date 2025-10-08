@@ -93,8 +93,6 @@ object AutoP3: Module (
 
     private val blinkShit by DropdownSetting("Blink Settings", false)
     val blinkToggle by BooleanSetting("Blink Toggle", description = "main toggle for blink").withDependency { blinkShit }
-    private val maxBlink by NumberSetting("Max Blink", 150, 100, 400, description = "How many packets can be blinked on one instance").withDependency { blinkShit }
-    val suppressMaxBlink by BooleanSetting("Disable in Singleplayer", description = "Disables the max packets per instance check while in single player").withDependency { blinkShit }
     private val cancelC05Mode by SelectorSetting("Rot Mode", "Always", arrayListOf("Always", "On Blink/Holding Leap", "Never"), description = "when to cancel Rotations").withDependency { blinkShit }
     private val movementMode by DualSetting("Movement Mode","Playback", "Silent", false, description = "when unable to blink how the movement should look").withDependency { blinkShit }
     val dontChargeAll by BooleanSetting("Don't Charge All", description = "Instead of charging all the packets required for a blink only charge some").withDependency { blinkShit }
@@ -119,7 +117,6 @@ object AutoP3: Module (
     private var activeBlink: BlinkRing? = null
     var lastBlink = -1L
     var waitedTicks = 0
-    inline val isBlinkLimitEnabled get() = !(LocationUtils.isSinglePlayer && suppressMaxBlink)
 
 
     private var activeBlinkWaypoint: BlinkWaypoint? = null
@@ -407,10 +404,6 @@ object AutoP3: Module (
         cancelled = 0
     }
 
-    fun getMaxBlinks(): Int {
-        return maxBlink
-    }
-
     fun setEndY(endYVelo: Double) {
         endY = endYVelo
     }
@@ -605,7 +598,6 @@ object AutoP3: Module (
                         }
                     }
 
-
                     when {
                         ring.get("term")?.asBoolean == true -> {
                             instance.ringAwaits.add(RingAwait.TERM)
@@ -618,8 +610,6 @@ object AutoP3: Module (
                             instance.ringAwaits.add(RingAwait.LEFT)
                         }
                     }
-
-
 
                     instance.base.center = ring.get("center")?.asBoolean == true
                     instance.base.rotate = ring.get("rotate")?.asBoolean == true
