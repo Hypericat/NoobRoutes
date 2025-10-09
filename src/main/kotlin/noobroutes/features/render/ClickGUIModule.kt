@@ -69,9 +69,7 @@ object  ClickGUIModule: Module(
         ColorPalette.defaultPalette.font = FontType.entries.firstOrNull { it.name == font } ?: return
     }
 
-    private var joined by BooleanSetting("First join", false, hidden = true, "")
-    var lastSeenVersion: String by StringSetting("Last seen version", "1.0.0", hidden = true, description = "")
-    var firstTimeOnVersion = false
+    var joined = false
 
     val panelX = mutableMapOf<Category, NumberSetting<Float>>()
     val panelY = mutableMapOf<Category, NumberSetting<Float>>()
