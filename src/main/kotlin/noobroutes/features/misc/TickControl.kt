@@ -3,6 +3,7 @@ package noobroutes.features.misc
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.MovePlayerEvent
@@ -17,6 +18,7 @@ import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.modMessage
+import org.lwjgl.Sys
 import org.lwjgl.input.Keyboard
 import java.util.Stack
 
@@ -27,12 +29,16 @@ object TickControl : Module("Tick Control", category = Category.MISC, descriptio
 
     private data class PlayerState(val pos: Vec3, val velocity: Vec3, val ground: Boolean, val p3State: AutoP3MovementHandler.AutoP3MovementState, val lavaState: Simulation.SimulationLavaState)
 
-    private val rewindTick by KeybindSetting("Rewind Tick", key = Keyboard.KEY_LEFT, description = "").onPress {
-        rewindTick();
+    var lastRewind : Long = 0;
+    var lastAdvance : Long = 0;
+    var intTickCounter = 0;
+
+    private val rewindTick by KeybindSetting("Rewind Tick", key = Keyboard.KEY_LEFT, description = "Rewinds a game tick").onPress {
+
     }
 
     private val advanceTick by KeybindSetting("Advance Tick", key = Keyboard.KEY_RIGHT, description = "Triggers a game tick").onPress {
-        advanceTick();
+
     }
 
     private var canTick = false
@@ -45,6 +51,21 @@ object TickControl : Module("Tick Control", category = Category.MISC, descriptio
     override fun onDisable() {
         stateStack.clear()
         super.onDisable()
+    }
+
+    @SubscribeEvent
+    fun onKey(event: InputEvent.KeyInputEvent) {
+        val key = Keyboard.getEventKey()
+        if (!Keyboard.getEventKeyState()) return;
+        if (key == this.rewindTick.key) {
+            rewindTick();
+            lastRewind = System.currentTimeMillis();
+            return
+        }
+        if (key == this.advanceTick.key) {
+            advanceTick();
+            lastAdvance = System.currentTimeMillis();
+        }
     }
 
     fun tick(count: Int) {
@@ -98,15 +119,26 @@ If this breaks with hclip it has something to do with event priority in the sche
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if (event.isEnd || tick == 0) return
-        if (tick > 0) {
-            tick--;
-            advanceTick();
-            return
+        if (event.isEnd) return
+        intTickCounter++;
+        if (tick != 0) {
+            if (tick > 0) {
+                tick--;
+                advanceTick();
+                return
+            }
+
+            tick++;
+            rewindTick();
         }
 
-        tick++;
-        rewindTick();
+        if (advanceTick.isDown() && System.currentTimeMillis() > lastAdvance + 500 && intTickCounter % 2 == 0) {
+            advanceTick();
+        }
+
+        if (rewindTick.isDown() && System.currentTimeMillis() > lastRewind + 500 && intTickCounter % 2 == 0) {
+            rewindTick();
+        }
         return
     }
 

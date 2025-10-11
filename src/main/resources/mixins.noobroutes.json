@@ -11,6 +11,7 @@
     "MixinModList",
     "MixinNetworkManager",
     "MixinWorldClient",
+    "NetHandlerPlayServerMixin",
     "accessors.C08Accessor",
     "accessors.EntityLivingBaseAccessor",
     "accessors.TimerFieldAccessor",

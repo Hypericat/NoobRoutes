@@ -1,5 +1,6 @@
 package noobroutes.features.floor7
 
+import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraftforge.event.world.WorldEvent
@@ -18,10 +19,11 @@ object Simulation : Module(
     name = "Simulation",
     Keyboard.KEY_NONE,
     category = Category.MISC,
-    description = "Simulates 500 Speed / lava bounces"
+    description = "Simulates server features"
 ) {
     private val speed by BooleanSetting("500 Speed", true, description = "Simulates 500 Speed in singleplayer")
     private val lava by BooleanSetting("Lava Bounce", true, description = "Simulates Lava Bounces in singleplayer")
+    private val ghostBlocks by BooleanSetting("Ghost Blocks", true, description = "Simulates Ghost Blocks in singleplayer")
     private var force by BooleanSetting("Force Singleplayer", false, description = "Runs Simulation in servers (ban in 3, 2, 1, rn)")
 
     private var inLava = false
@@ -76,6 +78,11 @@ object Simulation : Module(
     fun getSimulationLavaState(): SimulationLavaState {
         return SimulationLavaState(inLava, lavaTicks)
     }
+
+    fun allowGhostBLocks() : Boolean {
+        return this.enabled && ghostBlocks && Minecraft.getMinecraft().isSingleplayer;
+    }
+
 
     fun setSimulationLavaState(state: SimulationLavaState){
         inLava = state.inLava
