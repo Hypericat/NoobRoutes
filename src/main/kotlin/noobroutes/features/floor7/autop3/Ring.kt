@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
+import noobroutes.commands.AutoP3Command
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.floor7.autop3.rings.StopRing
 import noobroutes.features.misc.TimerHud
@@ -35,8 +36,11 @@ data class RingBase(
     var rotate: Boolean,
     var stopWatch: Boolean,
     var diameter: Float,
-    var height: Float) {
-    constructor() : this(Vec3(0.0, 0.0, 0.0), 0f, EnumSet.noneOf<RingAwait>(RingAwait::class.java), false, false, false, 1f, 1f)
+    var height: Float
+) {
+    constructor() : this(Vec3(0.0, 0.0, 0.0), 0f, EnumSet.noneOf<RingAwait>(RingAwait::class.java), false, false, false,
+        1f, 1f
+    )
 
     companion object {
         val diameterRegex = Regex("""d:(\d+)""")

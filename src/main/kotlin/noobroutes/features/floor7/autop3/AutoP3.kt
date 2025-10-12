@@ -85,6 +85,9 @@ object AutoP3: Module (
 
     private val editShit by DropdownSetting("Edit Settings", false)
     private var editMode by BooleanSetting("Edit Mode", false, description = "Disables ring actions").withDependency { editShit }
+    var defaultDiameter by NumberSetting<Float>("Default Diameter", 1.0f, 0.01, 3.0f, 0.01, description = "Default diameter when creating ring").withDependency { editShit }
+    var defaultHeight by NumberSetting<Float>("Default Height", 1.0f, 0.01, 3.0f, 0.01, description = "Default height when creating ring").withDependency { editShit }
+
     private val editModeKey by KeybindSetting("Toggle Edit Mode", Keyboard.KEY_NONE, "Toggles editmode on press").onPress {
         editMode = !editMode
         modMessage("edit Mode: $editMode")
@@ -557,6 +560,23 @@ object AutoP3: Module (
         deleteRing(ring)
     }
 
+    fun handleSetDefaultSize(args: Array<out String>) {
+        if (args.size < 2) return printSetDefaultSizeUsage();
+
+        val diameter = args[1].toFloatOrNull() ?: return printSetDefaultSizeUsage();
+        val height = if(args.size < 3) null else args[2].toFloatOrNull();
+        if (diameter <= 0.0f || (height != null && height <= 0.0f)) return printSetDefaultSizeUsage();
+
+        defaultDiameter = diameter;
+        defaultHeight = height ?: defaultHeight;
+        modMessage("$defaultDiameter : : $defaultHeight")
+    }
+
+    fun printSetDefaultSizeUsage() {
+        modMessage("Usages: (float: diameter), (float: diameter, float: height)")
+    }
+
+
     fun loadRings() {
         rings.clear()
         try {
@@ -615,8 +635,8 @@ object AutoP3: Module (
                     instance.base.rotate = ring.get("rotate")?.asBoolean == true
                     instance.base.stopWatch = ring.get("stopwatch")?.asBoolean == true
 
-                    instance.base.diameter = ring.get("diameter")?.asFloat ?: 1f
-                    instance.base.height = ring.get("height")?.asFloat ?: 1f
+                    instance.base.diameter = ring.get("diameter")?.asFloat ?: 1.0f
+                    instance.base.height = ring.get("height")?.asFloat ?: 1.0f
                     instance.loadRingData(ring)
                     ringsInJson.add(instance)
                 }

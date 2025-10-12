@@ -23,9 +23,9 @@ interface CommandGenerated {
 
     fun generateRingBaseFromArgs(args: Array<out String>): RingBase {
         val diameterString = args.firstOrNull { RingBase.diameterRegex.matches(it) }
-        val diameter = diameterString?.let { RingBase.diameterRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
+        val diameter = diameterString?.let { RingBase.diameterRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: AutoP3.defaultDiameter
         val heightString = args.firstOrNull { RingBase.heightRegex.matches(it) }
-        val height = heightString?.let { RingBase.heightRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: 1f
+        val height = heightString?.let { RingBase.heightRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: AutoP3.defaultHeight
 
         val await = EnumSet.noneOf(RingAwait::class.java)
         for (arg in args) {

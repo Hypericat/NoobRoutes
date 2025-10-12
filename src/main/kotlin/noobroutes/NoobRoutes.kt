@@ -39,6 +39,7 @@ class NoobRoutes {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
         AutoPath.onInitKeys();
+        TpCommand.initMap();
 
         listOf(
             NoobRoutesCommand(),
@@ -81,6 +82,7 @@ class NoobRoutes {
             AutoP3MovementHandler,
             PlayerUtils,
             AutoP3AwaitHandler,
+            TpCommand, // This command intercepts the packet so that we dont fuck with other mods
             LowHopUtils
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
