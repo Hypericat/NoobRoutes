@@ -1,5 +1,6 @@
 package noobroutes.features.misc
 
+import net.minecraft.client.Minecraft
 import net.minecraft.util.Vec3
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -55,6 +56,7 @@ object TickControl : Module("Tick Control", category = Category.MISC, descriptio
 
     @SubscribeEvent
     fun onKey(event: InputEvent.KeyInputEvent) {
+        if (Minecraft.getMinecraft().currentScreen != null) return;
         val key = Keyboard.getEventKey()
         if (!Keyboard.getEventKeyState()) return;
         if (key == this.rewindTick.key) {

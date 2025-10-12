@@ -1,5 +1,6 @@
 package noobroutes.utils.render
 
+import gg.essential.elementa.utils.Vector3f
 import gg.essential.universal.shader.BlendState
 import gg.essential.universal.shader.UShader
 import net.minecraft.block.state.IBlockState
@@ -41,6 +42,7 @@ object RenderUtils {
     val worldRenderer: WorldRenderer = tessellator.worldRenderer
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
     private val renderManager: RenderManager = mc.renderManager
+    private val defaultNormals = Vector3f(0.0f, -1.0f, 0.0f);
 
     /**
      * Gets the rendered x-coordinate of an entity based on its last tick and current tick positions.
@@ -209,7 +211,7 @@ object RenderUtils {
      * @param thickness The thickness of the outline.
      * @param depth Whether to enable depth testing.
      */
-    fun drawFilledVertices(points: Collection<Vec3>, color: Color, thickness: Number = 3f, depth: Boolean = false, smoothLines: Boolean = true) {
+    fun drawFilledVertices(points: Collection<Vec3>, color: Color, thickness: Number = 3f, depth: Boolean = false, smoothLines: Boolean = true, normals: Vector3f = defaultNormals) {
         if (color.isTransparent) return
 
         GlStateManager.pushMatrix()
@@ -220,7 +222,7 @@ object RenderUtils {
         worldRenderer {
             begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_NORMAL)
             for (point in points) {
-                addVertex(point.xCoord, point.yCoord, point.zCoord, 0.0f, -1.0f, 0.0f)
+                addVertex(point.xCoord, point.yCoord, point.zCoord, normals.x, normals.y, normals.z)
             }
         }
         tessellator.draw();

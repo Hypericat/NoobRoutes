@@ -167,6 +167,7 @@ class BlinkRing(
     override fun renderRing(color: Color, secondaryColor: Color, renderMode: String) {
         when(renderMode.hashCode()) {
             BBG_HASHCODE -> renderBBGRing(color)
+            SIGMA_HASHCODE -> renderSigmaRing(color)
             BOX_HASHCODE -> renderBoxRing(color)
             RING_HASHCODE -> renderCircularRing(color, secondaryColor)
             SIMPLE_RING_HASHCODE -> renderSimpleCircularRing(color)

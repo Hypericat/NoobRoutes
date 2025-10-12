@@ -1,6 +1,7 @@
 package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonObject
+import gg.essential.elementa.utils.Vector3f
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
@@ -57,6 +58,7 @@ abstract class Ring(
     companion object {
         val OCTAGON_HASHCODE = "Octagon".hashCode()
         val BBG_HASHCODE: Int = "BBG".hashCode()
+        val SIGMA_HASHCODE = "Sigma".hashCode()
         val BOX_HASHCODE = "Box".hashCode()
         val SIMPLE_RING_HASHCODE = "Simple Ring".hashCode()
         val RING_HASHCODE = "Ring".hashCode()
@@ -156,6 +158,7 @@ abstract class Ring(
     open fun renderRing(color: Color, secondaryColor: Color, renderMode: String) {
         when(renderMode.hashCode()) {
             BBG_HASHCODE -> renderBBGRing(color)
+            SIGMA_HASHCODE -> renderSigmaRing(color)
             BOX_HASHCODE -> renderBoxRing(color)
             RING_HASHCODE -> renderCircularRing(color, secondaryColor)
             SIMPLE_RING_HASHCODE -> renderSimpleCircularRing(color)
@@ -215,6 +218,22 @@ abstract class Ring(
         RenderUtils.drawLines(listOf(offset, offset.add(dDia, 0.0, 0.0), offset.add(dDia, 0.0, dDia), offset.add(0.0, 0.0, dDia), offset), color, 4f, true)
 
         Renderer.drawStringInWorld(this.ringName, this.coords.add(Vec3(0.0, 0.3, 0.0)), Color.DARK_GRAY, depth = false, shadow = true, scale = 0.022f)
+    }
+
+
+    protected fun renderSigmaRing(color: Color) {
+        val offsetCoords = this.coords.add(0.0, 0.03, 0.0)
+        var dDia = diameter.toDouble();
+        var offset = offsetCoords.subtract(diameter * 0.5, 0.0, diameter * 0.5);
+
+        var vertices = listOf(offset, offset.add(dDia, 0.0, 0.0), offset.add(dDia, 0.0, dDia), offset.add(0.0, 0.0, dDia), offset);
+        RenderUtils.drawLines(vertices, Color.WHITE, 2f, true)
+        RenderUtils.drawFilledVertices(vertices.subList(0, 4), color.withAlpha(0.333f), 2f, true) //, normals = Vector3f(0.0f, 1.0f, 0.0f)
+
+        offset = offset.add(Vec3(0.0, 0.05, 0.0))
+        vertices = listOf(offset, offset.add(dDia, 0.0, 0.0), offset.add(dDia, 0.0, dDia), offset.add(0.0, 0.0, dDia), offset);
+        RenderUtils.drawLines(vertices, Color.WHITE, 2f, true)
+        RenderUtils.drawFilledVertices(vertices.subList(0, 4), color.withAlpha(0.333f), 2f, true)
     }
 
     protected fun renderBoxRing(color: Color) {
