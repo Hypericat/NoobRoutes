@@ -1,11 +1,10 @@
 package noobroutes.features.floor7.autop3
 
 import com.google.gson.JsonObject
-import gg.essential.elementa.utils.Vector3f
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import noobroutes.Core.mc
-import noobroutes.commands.AutoP3Command
+import noobroutes.features.floor7.autop3.RingAwait.Companion.toArrayOfBooleans
 import noobroutes.features.floor7.autop3.rings.BlinkRing
 import noobroutes.features.floor7.autop3.rings.StopRing
 import noobroutes.features.misc.TimerHud
@@ -22,7 +21,7 @@ import noobroutes.utils.render.ColorUtil.withAlpha
 import noobroutes.utils.render.RenderUtils
 import noobroutes.utils.render.Renderer
 import noobroutes.utils.skyblock.PlayerUtils
-import java.util.EnumSet
+import java.util.*
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -37,14 +36,17 @@ data class RingBase(
     var rotate: Boolean,
     var stopWatch: Boolean,
     var diameter: Float,
-    var height: Float
+    var height: Float,
+    var delay: Int,
+    var serverTick: Boolean
 ) {
     constructor() : this(Vec3(0.0, 0.0, 0.0), 0f, EnumSet.noneOf<RingAwait>(RingAwait::class.java), false, false, false,
-        1f, 1f
+        1f, 1f, 0, false
     )
 
     companion object {
         val diameterRegex = Regex("""d:(\d+)""")
+        val delayRegex = Regex("""delay:(\d+)""")
         val heightRegex = Regex("""h:(\d+)""")
     }
 }
@@ -91,6 +93,13 @@ abstract class Ring(
     inline var height: Float
         get() = base.height
         set(value) {base.height = value}
+    inline var delay: Int
+        get() = base.delay
+        set(value) {base.delay = value}
+    inline var serverTick: Boolean
+        get() = base.serverTick
+        set(value) {base.serverTick = value}
+
 
     inline val isAwait: Boolean
         get() = ringAwaits.isNotEmpty()
@@ -100,7 +109,7 @@ abstract class Ring(
     var triggered = false
     val internalRingData = mutableListOf<SyncData>()
 
-    fun getAsJsonObject(): JsonObject{
+    fun getAsJsonObject(): JsonObject {
         val obj = JsonObject().apply {
             addProperty("type", type.ringName)
             addProperty("coords", coords)
@@ -109,13 +118,15 @@ abstract class Ring(
                 addProperty(await.name, true)
             }
 
-
             if (center) addProperty("center", true)
             if (rotate) addProperty("rotate", true)
             if (stopWatch) addProperty("stopwatch", true)
             if (diameter != 1f) addProperty("diameter", diameter)
             if (height != 1f) addProperty("height", height)
+            if (delay != 0) addProperty("delay", delay)
+            if (serverTick) addProperty("serverTick", serverTick)
         }
+
         addPrimitiveRingData(obj)
         addRingData(obj)
         return obj
@@ -418,8 +429,22 @@ abstract class Ring(
     }
 
     protected fun EditGuiBase.EditGuiBaseBuilder.addAwait() {
+        this.pushPage("Await")
+        this.addCheckBox(
+            "Await",
+            RingAwait.getOptionsList(),
+            { ringAwaits.toArrayOfBooleans() },
+            { ringAwaits = RingAwait.getFromArray(it) }
+        )
+        this.popPage()
+    }
 
-        //this.addSelector("Await", RingAwait.getOptionsList(), { ringAwaits.getIndex() }, {ringAwaits = RingAwait[it]})
+    protected fun EditGuiBase.EditGuiBaseBuilder.addDelay(){
+        this.pushPage("Delay")
+        this.addSlider("Delay", 0.0, 1000.0, 1.0, 0, {delay.toDouble()}, {delay = it.toInt()})
+        this.addSwitch("Server Ticks", {serverTick}, {serverTick = it})
+        this.bindDescription("argua sdlkjhasd klajshalkjsdh lakjsh laksjdh lakjsh lkfjshlkfjahsdlkfhasldkjh alskjd laksjd laksjd alkjsdf lkajsdf lakjsdf laksjd lkasjdf klasjd lkajsd akljsd klajslsdfasdfasdf asdfa dsafhjd ")
+        this.popPage()
     }
 
     protected open val includeY = true
@@ -438,6 +463,7 @@ abstract class Ring(
         builder.setName(ringName)
         builder.addOnCloseAndOpen()
         builder.addAwait()
+        builder.addDelay()
         return builder.build()
     }
 }

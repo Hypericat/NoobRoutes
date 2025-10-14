@@ -13,7 +13,10 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.logger
 import noobroutes.config.DataManager
 import noobroutes.events.BossEventDispatcher.inF7Boss
-import noobroutes.events.impl.*
+import noobroutes.events.impl.MoveEntityWithHeadingEvent
+import noobroutes.events.impl.PacketEvent
+import noobroutes.events.impl.S08Event
+import noobroutes.events.impl.WorldChangeEvent
 import noobroutes.features.Category
 import noobroutes.features.Module
 import noobroutes.features.floor7.autop3.rings.BlinkRing
@@ -31,7 +34,6 @@ import noobroutes.utils.PacketUtils.isResponseToLastS08
 import noobroutes.utils.Utils.isStart
 import noobroutes.utils.json.JsonUtils.asVec3
 import noobroutes.utils.render.*
-import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.LowHopUtils
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayer
 import noobroutes.utils.skyblock.PlayerUtils.distanceToPlayerSq
@@ -171,15 +173,16 @@ object AutoP3: Module (
     fun onMoveEntityWithHeading(event: MoveEntityWithHeadingEvent.Post) {
         if (!inF7Boss || editMode || movementPackets.isNotEmpty()) return
 
+        val playerPos = mc.thePlayer.positionVector
         if (mc.thePlayer.isSneaking) {
-            lastPos = mc.thePlayer.positionVector
+            lastPos = playerPos
             return
         }
-        
-        handleRings(mc.thePlayer.positionVector)
+
+        handleRings(playerPos)
 
         activeBlinkWaypoint?.let { //this needs to be on tick otherwise shit breaks
-            if (detectRing(it, lastPos, mc.thePlayer.positionVector)) {
+            if (it.inRing(playerPos)) {
                 if (!it.triggered) recording = true
                 it.triggered = true
             }
@@ -607,9 +610,7 @@ object AutoP3: Module (
                         try {
                         val await = ring.get("await").asString
                         if (await != "NONE") {
-
                                 instance.ringAwaits.add(RingAwait.getFromName(await))
-
 
                         }
                         } catch (e: Exception) {
@@ -634,9 +635,11 @@ object AutoP3: Module (
                     instance.base.center = ring.get("center")?.asBoolean == true
                     instance.base.rotate = ring.get("rotate")?.asBoolean == true
                     instance.base.stopWatch = ring.get("stopwatch")?.asBoolean == true
-
                     instance.base.diameter = ring.get("diameter")?.asFloat ?: 1.0f
                     instance.base.height = ring.get("height")?.asFloat ?: 1.0f
+                    instance.base.delay = ring.get("delay")?.asInt ?: 0
+                    instance.base.serverTick = ring.get("serverTick")?.asBoolean ?: false
+
                     instance.loadRingData(ring)
                     ringsInJson.add(instance)
                 }
@@ -677,7 +680,18 @@ object AutoP3: Module (
         val diameter = obj.get("diameter")?.asFloat ?: 1f
         val height = obj.get("height")?.asFloat ?: 1f
         val walk = obj.get("walk")?.asBoolean == true
-        val ringBase = RingBase(coords, yaw, EnumSet.noneOf(RingAwait::class.java), center, rotate,stopwatch, diameter, height)
+        val ringBase = RingBase(
+            coords,
+            yaw,
+            EnumSet.noneOf(RingAwait::class.java),
+            center,
+            rotate,
+            stopwatch,
+            diameter,
+            height,
+            0,
+            false
+        )
         when {
             obj.get("term")?.asBoolean == true -> {
                 ringBase.await.add(RingAwait.TERM)
@@ -690,8 +704,6 @@ object AutoP3: Module (
                 ringBase.await.add(RingAwait.LEFT)
             }
         }
-
-
 
         when (ringType) {
             "Insta" -> {

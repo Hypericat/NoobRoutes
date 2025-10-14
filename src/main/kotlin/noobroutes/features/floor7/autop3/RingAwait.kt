@@ -3,6 +3,7 @@ package noobroutes.features.floor7.autop3
 import noobroutes.events.impl.Phase
 import noobroutes.events.impl.TerminalPhase
 import noobroutes.utils.capitalizeFirst
+import java.util.*
 
 enum class RingAwait {
     LEFT,
@@ -70,6 +71,22 @@ enum class RingAwait {
             return list
         }
 
+        fun EnumSet<RingAwait>.toArrayOfBooleans(): Array<Boolean> {
+            val array = Array(RingAwait.entries.size) { false }
+            for (await in this) {
+                array[await.getIndex()] = true
+            }
+            return array
+        }
+
+        fun getFromArray(array: Array<Boolean>): EnumSet<RingAwait> {
+            val set = EnumSet.noneOf(RingAwait::class.java)
+            for (i in array.indices) {
+                if (!array[i]) continue
+                set.add(RingAwait[i])
+            }
+            return set
+        }
 
     }
 }

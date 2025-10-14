@@ -81,6 +81,7 @@ object ClickGUIBase : UiElement(0f, 0f) {
     private const val TEXT_PADDING_X = 7f
     private const val TEXT_PADDING_Y = 9f
     private const val OUTLINE_THICKNESS = 3f
+
     /**
      * draws description
      */

@@ -56,7 +56,7 @@ object EditGui : Screen() {
     }
 
     override fun initGui() {
-        activeEditGuiBase?.onOpen
+        activeEditGuiBase?.onOpen?.invoke()
     }
 
     fun updateBaseY(){
@@ -64,7 +64,7 @@ object EditGui : Screen() {
     }
 
     override fun onGuiClosed() {
-        activeEditGuiBase?.onClose
+        activeEditGuiBase?.onClose?.invoke()
         activeEditGuiBase = null
         ClickGUIModule.editGuiX.value = EditGuiBase.editGuiBaseX
         ClickGUIModule.editGuiY.value = EditGuiBase.editGuiBaseY

@@ -42,6 +42,7 @@ import noobroutes.ui.editgui.EditGui
 import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.render.Color
 import noobroutes.utils.render.ColorUtil.withAlpha
+import noobroutes.utils.render.popStencil
 import noobroutes.utils.skyblock.PlayerUtils
 import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.dungeon.DungeonUtils

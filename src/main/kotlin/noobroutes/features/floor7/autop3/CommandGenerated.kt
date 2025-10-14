@@ -26,7 +26,9 @@ interface CommandGenerated {
         val diameter = diameterString?.let { RingBase.diameterRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: AutoP3.defaultDiameter
         val heightString = args.firstOrNull { RingBase.heightRegex.matches(it) }
         val height = heightString?.let { RingBase.heightRegex.find(it)?.groupValues?.get(1)?.toFloatOrNull() } ?: AutoP3.defaultHeight
-
+        val serverTick = args.any { it.lowercase() == "tick" }
+        val delayString = args.firstOrNull { RingBase.delayRegex.matches(it) }
+        val delay = delayString?.let { RingBase.delayRegex.find(it)?.groupValues?.get(1)?.toIntOrNull() } ?: 0
         val await = EnumSet.noneOf(RingAwait::class.java)
         for (arg in args) {
             val argAwait = RingAwait.getFromNameSafe(arg) ?: continue
@@ -43,7 +45,9 @@ interface CommandGenerated {
             args.any {it.lowercase() == "rotate" || it.lowercase() == "look"},
             args.any {it.lowercase() == "stopwatch"},
             diameter,
-            height
+            height,
+            delay,
+            serverTick
         )
     }
 }

@@ -67,10 +67,10 @@ object AutoP3AwaitHandler {
     }
 
     @SubscribeEvent
-    fun awaitingLeft(event: MouseEvent) {
+    fun leftClick(event: MouseEvent) {
+        if (Mouse.getEventButton() != 0 || !Mouse.getEventButtonState()) return
         val ring = waitingRing ?: return
 
-        if (Mouse.getEventButton() != 0 || !Mouse.getEventButtonState()) return
 
         if (doRingSafe(ring)) {
             event.isCanceled = true

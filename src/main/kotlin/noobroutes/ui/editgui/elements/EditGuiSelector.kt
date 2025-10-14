@@ -6,6 +6,8 @@ import noobroutes.ui.ColorPalette.TEXT_OFFSET
 import noobroutes.ui.ColorPalette.buttonColor
 import noobroutes.ui.editgui.EditGui
 import noobroutes.ui.editgui.EditGuiBase
+import noobroutes.ui.editgui.EditGuiBase.Companion.BUTTON_WIDTH
+import noobroutes.ui.editgui.EditGuiBase.Companion.HALF_BUTTON_WIDTH
 import noobroutes.ui.editgui.EditGuiElement
 import noobroutes.ui.util.UiElement
 import noobroutes.ui.util.animations.impl.CubicBezierAnimation
@@ -44,8 +46,6 @@ class EditGuiSelector(
         private const val TEXT_HEIGHT = 30f
         private const val HALF_TEXT_HEIGHT = TEXT_HEIGHT * 0.5f
         private const val HEIGHT_START = BUTTON_HEIGHT
-        private const val BUTTON_WIDTH = EditGuiBase.WIDTH - TEXT_OFFSET * 2f - 60f //60f is X_ALIGNMENT_LEFT * 2f
-        private const val HALF_WIDTH = BUTTON_WIDTH * 0.5f
         private const val OPTION_LIST_START = TEXT_HEIGHT + BUTTON_HEIGHT
         private const val MAX_VISIBLE_OPTIONS = 4
 
@@ -166,7 +166,7 @@ class EditGuiSelector(
 
     private fun drawButton(name: String, y: Float){
         roundedRectangle(0f, y, BUTTON_WIDTH, BUTTON_HEIGHT, buttonColor)
-        text(name, HALF_WIDTH, y + HALF_BUTTON_HEIGHT, ColorPalette.textColor, 16f, align = TextAlign.Middle)
+        text(name, HALF_BUTTON_WIDTH, y + HALF_BUTTON_HEIGHT, ColorPalette.textColor, 16f, align = TextAlign.Middle)
     }
 
 }

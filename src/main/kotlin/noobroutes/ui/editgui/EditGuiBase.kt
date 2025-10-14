@@ -2,6 +2,9 @@ package noobroutes.ui.editgui
 
 import net.minecraft.client.renderer.GlStateManager
 import noobroutes.ui.ColorPalette
+import noobroutes.ui.ColorPalette.TEXT_OFFSET
+import noobroutes.ui.editgui.elements.EditGuiCheckBox
+import noobroutes.ui.editgui.elements.EditGuiDescription
 import noobroutes.ui.editgui.elements.EditGuiPageOpener
 import noobroutes.ui.editgui.elements.EditGuiSelector
 import noobroutes.ui.editgui.elements.EditGuiSliderElement
@@ -15,6 +18,7 @@ import noobroutes.utils.render.roundedRectangle
 import noobroutes.utils.render.text
 import noobroutes.utils.skyblock.modMessage
 import java.util.Stack
+import kotlin.jvm.Throws
 
 class EditGuiBase() : UiElement(0f, 0f) {
     var height = 0f
@@ -29,6 +33,8 @@ class EditGuiBase() : UiElement(0f, 0f) {
         private val pages = mutableListOf<EditGuiPage>()
         private val pageStack = Stack<EditGuiPage>()
         private val root = EditGuiPage("Root")
+        private var lastAddedElement: EditGuiElement? = null
+
 
         init {
             pageStack.push(root)
@@ -37,6 +43,7 @@ class EditGuiBase() : UiElement(0f, 0f) {
 
         private fun addElement(element: EditGuiElement){
             pageStack.peek().addElement(element as UiElement)
+            lastAddedElement = element
         }
 
         fun popPage(){
@@ -49,9 +56,30 @@ class EditGuiBase() : UiElement(0f, 0f) {
             pageStack.push(page)
         }
 
+        fun addCheckBox(name: String, options: ArrayList<String>, getter: () -> Array<Boolean>, setter: (Array<Boolean>) -> Unit, priority: Int? = null) {
+            val element = EditGuiCheckBox(name, options, getter, setter)
+            priority?.let {
+                element.priority = it
+            }
+            addElement(element)
+        }
 
         fun addSlider(name: String, min: Double, max: Double, increment: Double, roundTo: Int, getter: () -> Double, setter: (Double) -> Unit, priority: Int? = null) {
             val element = EditGuiSliderElement(name, min, max, increment, roundTo, getter, setter)
+            priority?.let {
+                element.priority = it
+            }
+            addElement(element)
+        }
+        @Throws(IllegalStateException::class)
+        fun bindDescription(text: String) {
+            val lastAdded = lastAddedElement
+                ?: throw IllegalStateException("No previous element to bind description to")
+            addElement(EditGuiDescription(text, lastAdded))
+        }
+
+        fun addParagraph(text: String, priority: Int?) {
+            val element = EditGuiDescription(text)
             priority?.let {
                 element.priority = it
             }
@@ -251,5 +279,7 @@ class EditGuiBase() : UiElement(0f, 0f) {
         const val X_ALIGNMENT_LEFT = 30f
         const val X_ALIGNMENT_RIGHT = 300f
         const val WIDTH = 600f
+        const val BUTTON_WIDTH = WIDTH - TEXT_OFFSET * 2f - 60f //60f is X_ALIGNMENT_LEFT * 2f
+        const val HALF_BUTTON_WIDTH = BUTTON_WIDTH * 0.5f
     }
 }
