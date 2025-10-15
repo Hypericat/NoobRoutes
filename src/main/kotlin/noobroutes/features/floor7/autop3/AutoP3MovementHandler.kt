@@ -10,6 +10,7 @@ import noobroutes.events.impl.S08Event
 import noobroutes.features.render.FreeCam
 import noobroutes.utils.Utils
 import noobroutes.utils.skyblock.PlayerUtils
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 

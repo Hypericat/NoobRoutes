@@ -243,7 +243,7 @@ object Zpew : Module(
         doZeroPingAotv(prediction.toBlockPos())
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun onPacket(event: PacketEvent.Send) {
         if (skipPacketCount > 0) {
             skipPacketCount--
@@ -269,7 +269,7 @@ object Zpew : Module(
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent()
     fun onC03(event: PacketEvent.Send) {
         if (skipPacketCount > 0 || event.packet !is C03PacketPlayer) return
 

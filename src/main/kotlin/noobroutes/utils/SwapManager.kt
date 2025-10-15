@@ -32,12 +32,13 @@ object SwapManager {
     private inline val serverItem: ItemStack
         get() = mc.thePlayer.inventory.mainInventory[serverSlot]
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun adjustServer(event: PacketEvent.Send) {
         if (event.packet !is C09PacketHeldItemChange) return
 
         if (event.packet.slotId == serverSlot) {
             event.isCanceled = true
+            devMessage("swapped to server slot")
             return
         }
 

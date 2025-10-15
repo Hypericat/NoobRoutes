@@ -99,7 +99,9 @@ object ModuleManager {
         Relics,
         TickControl,
         HotBarSwitcher,
-        LowHop
+        LowHop,
+        //AutoAlign,
+        AutoDojo
     )
 
     init {

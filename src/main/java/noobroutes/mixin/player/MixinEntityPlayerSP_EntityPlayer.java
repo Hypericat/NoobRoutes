@@ -6,6 +6,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import noobroutes.events.BossEventDispatcher;
 import noobroutes.events.impl.MotionUpdateEvent;
+import noobroutes.features.floor7.autop3.AutoP3;
+import noobroutes.features.misc.AutoDojo;
 import noobroutes.features.misc.NoDebuff;
 import noobroutes.utils.skyblock.PlayerUtils;
 import org.objectweb.asm.Opcodes;
@@ -143,7 +145,7 @@ public abstract class MixinEntityPlayerSP_EntityPlayer extends EntityPlayer {
             )
     )
     private int alwaysZeroPositionUpdateTicks$noobRoutes(EntityPlayerSP self) {
-        if (BossEventDispatcher.INSTANCE.getInF7Boss()) {
+        if (BossEventDispatcher.INSTANCE.getInF7Boss() && AutoP3.INSTANCE.getEnabled() || AutoDojo.INSTANCE.getStarted()) {
             return 0;
         }
         return this.positionUpdateTicks;

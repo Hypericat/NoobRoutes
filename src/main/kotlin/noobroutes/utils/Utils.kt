@@ -38,6 +38,7 @@ import noobroutes.events.impl.MoveEntityWithHeadingEvent
 import noobroutes.events.impl.PacketEvent
 import noobroutes.events.impl.Phase
 import noobroutes.events.impl.TerminalPhase
+import noobroutes.features.misc.AutoDojo
 import noobroutes.ui.editgui.EditGui
 import noobroutes.ui.editgui.EditGuiBase
 import noobroutes.utils.render.Color
@@ -203,6 +204,11 @@ object Utils {
                 PlayerUtils.airClick()
                 SwapManager.performSwap(7)
             }
+
+            /*"startdojo" -> {
+                AutoDojo.resetDojo()
+                AutoDojo.started = true
+            }*/
 
             else -> {
                 modMessage("All tests passed")

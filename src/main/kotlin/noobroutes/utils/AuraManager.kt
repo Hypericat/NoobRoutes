@@ -126,7 +126,7 @@ object AuraManager {
      * Modified from CGA
      * https://github.com/WompWatr/CatgirlAddons
      */
-    private fun clickEntity(entityAura: EntityAura, removeFirst: Boolean = false) {
+    fun clickEntity(entityAura: EntityAura, removeFirst: Boolean = false) {
         //if (isZeroTickSwapping()) return
         if (removeFirst) queuedEntityClicks.removeFirst()
         if (mc.thePlayer.getPositionEyes(0f)
