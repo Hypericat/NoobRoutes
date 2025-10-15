@@ -83,7 +83,8 @@ class NoobRoutes {
             PlayerUtils,
             AutoP3AwaitHandler,
             TpCommand, // This command intercepts the packet so that we dont fuck with other mods
-            LowHopUtils
+            LowHopUtils,
+            SpinnySpinManager
         ).forEach {
             MinecraftForge.EVENT_BUS.register(it)
         }

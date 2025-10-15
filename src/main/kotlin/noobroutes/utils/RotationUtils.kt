@@ -77,15 +77,4 @@ object RotationUtils {
     fun getYawAndPitch(pos: Vec3, sneaking: Boolean = false): Pair<Float, Float> {
         return getYawAndPitch(pos.xCoord, pos.yCoord, pos.zCoord, sneaking)
     }
-
-
-    fun setAngles(yaw: Float?, pitch: Float?) {
-        yaw?.let { mc.thePlayer.rotationYaw = yaw }
-        pitch?.let { mc.thePlayer.rotationPitch = pitch.coerceIn(-90f, 90f) }
-    }
-
-    fun setAngleToVec3(vec3: Vec3, sneaking: Boolean = false) {
-        val angles = getYawAndPitch(vec3.xCoord, vec3.yCoord, vec3.zCoord, sneaking)
-        setAngles(angles.first, angles.second)
-    }
 }
