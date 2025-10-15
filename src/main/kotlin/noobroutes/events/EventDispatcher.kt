@@ -26,6 +26,7 @@ import noobroutes.utils.*
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.dungeonItemDrops
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.inDungeons
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.isSecret
+import noobroutes.utils.skyblock.modMessage
 import noobroutes.utils.skyblock.unformattedName
 
 object EventDispatcher {
@@ -60,8 +61,6 @@ object EventDispatcher {
 
         if (event.packet is S32PacketConfirmTransaction) ServerTickEvent().postAndCatch()
 
-        //if (event.packet !is S02PacketChat || !ChatPacketEvent(event.packet.chatComponent.unformattedText.noControlCodes).postAndCatch()) return
-        //event.isCanceled = true
     }
 
     private fun handleNettyEvents(event: Event, packet: Packet<*>) {
@@ -80,6 +79,9 @@ object EventDispatcher {
             }
             is S08PacketPlayerPosLook -> S08Event().postAndCatch()
             is S2FPacketSetSlot -> S2FPacketSetSlotEvent(packet).postAndCatch()
+            is S02PacketChat -> {
+                handleNettyEvents(ChatPacketEvent(event.packet.chatComponent.unformattedText.noControlCodes), packet)
+            }
         }
     }
 

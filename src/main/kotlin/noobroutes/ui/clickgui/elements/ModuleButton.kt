@@ -148,6 +148,7 @@ class  ModuleButton(y: Float, val module: Module) : UiElement(0f, y){
                     is BooleanSetting -> SettingElementSwitch(setting)
                     is NumberSetting -> SettingElementSlider(setting)
                     is SelectorSetting -> SettingElementSelector(setting)
+                    is DynamicListSetting -> SettingElementDynamicList(setting)
                     is StringSetting -> SettingElementTextField(setting)
                     is ColorSetting -> SettingElementColor(setting)
                     is ActionSetting -> SettingElementAction(setting)

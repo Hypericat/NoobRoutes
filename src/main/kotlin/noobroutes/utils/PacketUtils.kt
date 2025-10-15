@@ -26,16 +26,13 @@ object PacketUtils {
 
     private var packetCancelList = mutableListOf<CanceledPacket>()
 
-
-
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onPacket(event: PacketEvent.Send) {
-        for (cancelledPacket in packetCancelList) {
-            if (event.packet != cancelledPacket.packet) continue
-            event.isCanceled = true
-            packetCancelList.remove(cancelledPacket)
+    fun onPacket(event: PacketEvent.Receive) {
+        val toRemove = packetCancelList.find { it.packet == event.packet }
 
-        }
+        if (toRemove == null) return
+        event.isCanceled = true
+        packetCancelList.remove(toRemove)
     }
 
     fun cancelNettyPacket(packet: Packet<*>) {

@@ -2,6 +2,8 @@ package noobroutes.features.settings.impl
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
+import noobroutes.features.settings.Saving
+import noobroutes.features.settings.Setting
 
 
 /**
@@ -14,8 +16,7 @@ class StringSetting(
     var length: Int = 20,
     hidden: Boolean = false,
     description: String,
-) : noobroutes.features.settings.Setting<String>(name, hidden, description),
-    noobroutes.features.settings.Saving {
+) : Setting<String>(name, hidden, description), Saving {
 
     override var value: String = default
         set(value) {
