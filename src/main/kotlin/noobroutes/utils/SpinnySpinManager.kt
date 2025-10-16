@@ -10,8 +10,11 @@ import kotlin.math.roundToInt
 object SpinnySpinManager {
 
     private var renderRotation: LookVec = LookVec(0f, 0f);
-    private var prevRenderRot: LookVec = LookVec(0f, 0f);
     private var silentRotation: LookVec = LookVec(0f, 0f);
+
+    private var forwardRemainder: Float = 0f;
+    private var strafeRemainder: Float = 0f;
+    private var lastRotationDeltaYaw: Float = 0f;
 
     fun rotate(yaw: Float, pitch: Float, silent: Boolean) {
         if (silent) {
@@ -57,22 +60,53 @@ object SpinnySpinManager {
     }
 
     fun adjustMovementInputs(movementInputs: MovementInputFromOptions) {
-        val yaw = Math.toRadians((renderRotation.yaw - silentRotation.yaw).toDouble())
+        if (movementInputs.moveForward == 0f && movementInputs.moveStrafe == 0f) {
+            forwardRemainder = 0f;
+            strafeRemainder = 0f;
+            lastRotationDeltaYaw = renderRotation.yaw - silentRotation.yaw;
+            return;
+        }
 
-        val sin = kotlin.math.sin(yaw)
-        val cos = kotlin.math.cos(yaw)
+        // Rotate the remainder to reflect the new yaw
+        val currentDeltaYaw = renderRotation.yaw - silentRotation.yaw
+        val yawChange = Math.toRadians((currentDeltaYaw - lastRotationDeltaYaw).toDouble())
 
-        val oldForward = movementInputs.moveForward;
-        val oldStrafe = movementInputs.moveStrafe;
-        movementInputs.moveForward = (oldForward * cos + oldStrafe * sin).round(0).toFloat();
-        movementInputs.moveStrafe = (oldStrafe * cos - oldForward * sin).round(0).toFloat();
+        if (yawChange != 0.0) {
+            val sin = kotlin.math.sin(yawChange).toFloat()
+            val cos = kotlin.math.cos(yawChange).toFloat()
+
+            val rotatedForwardRemainder = forwardRemainder * cos + strafeRemainder * sin
+            val rotatedStrafeRemainder  = strafeRemainder * cos - forwardRemainder * sin
+
+            forwardRemainder = rotatedForwardRemainder
+            strafeRemainder  = rotatedStrafeRemainder
+        }
+
+        lastRotationDeltaYaw = currentDeltaYaw
+
+        val yaw = Math.toRadians((currentDeltaYaw).toDouble())
+
+        val sin: Float = kotlin.math.sin(yaw).toFloat()
+        val cos: Float = kotlin.math.cos(yaw).toFloat()
+
+        val oldForward: Float = movementInputs.moveForward;
+        val oldStrafe: Float = movementInputs.moveStrafe;
+
+        val newForward: Float = ((oldForward * cos + oldStrafe * sin) - forwardRemainder).coerceIn(-1.0F, 1.0F);
+        val newStrafe: Float = ((oldStrafe * cos - oldForward * sin) - strafeRemainder).coerceIn(-1.0F, 1.0F);
+
+        movementInputs.moveForward = newForward.round(0).toFloat();
+        movementInputs.moveStrafe = newStrafe.round(0).toFloat();
+
+        forwardRemainder = (movementInputs.moveForward - newForward);
+        strafeRemainder = (movementInputs.moveStrafe - newStrafe);
     }
 
 
     @SubscribeEvent
     fun onFrame(event: TickEvent.RenderTickEvent) {
         if (mc.thePlayer == null) return
-        serversideRotate((Math.random() * 320 - 180).toFloat(), (Math.random() * 180 - 90).toFloat()) // Spin bot
+        //serversideRotate((Math.random() * 320 - 180).toFloat(), (Math.random() * 180 - 90).toFloat()) // Spin bot
 
         if (event.phase == TickEvent.Phase.START) {
             //silentRotation = LookVec( mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
