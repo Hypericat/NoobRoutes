@@ -25,6 +25,7 @@
     "render.MixinRenderManager"
   ],
   "client": [
+    "MixinMovementInputFromOptions",
     "MixinNetHandlerPlayClient",
     "MixinRenderGlobal",
     "MixinS23PacketBlockChange",

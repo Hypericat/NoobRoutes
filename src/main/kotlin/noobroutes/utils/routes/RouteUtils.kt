@@ -22,10 +22,7 @@ import noobroutes.features.routes.AutoRoute
 import noobroutes.features.routes.nodes.AutoRouteNodeBase
 import noobroutes.features.routes.nodes.AutorouteNode
 import noobroutes.features.routes.nodes.autoroutes.*
-import noobroutes.utils.LookVec
-import noobroutes.utils.RotationUtils
-import noobroutes.utils.Scheduler
-import noobroutes.utils.SwapManager
+import noobroutes.utils.*
 import noobroutes.utils.Utils.isEnd
 import noobroutes.utils.skyblock.*
 import noobroutes.utils.skyblock.dungeon.DungeonUtils.getRealCoords
@@ -200,7 +197,7 @@ object RouteUtils {
     }
 
     fun setRotation(yaw: Float?, pitch: Float?, silent: Boolean) {
-        if (!silent) RotationUtils.setAngles(yaw, pitch)
+        if (!silent) SpinnySpinManager.serversideRotate(yaw, pitch)
         rotating = true
         rotatingPitch = pitch
         rotatingYaw = yaw

@@ -1,13 +1,16 @@
 package noobroutes.mixin.render;
 
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import noobroutes.events.impl.RenderOverlayNoCaching;
 import noobroutes.features.misc.NoDebuff;
 import noobroutes.features.render.FreeCam;
+import noobroutes.utils.SpinnySpinManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static noobroutes.utils.UtilsKt.postAndCatch;
@@ -32,6 +35,11 @@ abstract public class MixinEntityRenderer implements IResourceManagerReloadListe
     @Inject(method = "renderWorld", at = @At("TAIL"))
     private void noobRoutes$afterRenderWorld(float partialTicks, long finishTimeNano, CallbackInfo ci){
         FreeCam.INSTANCE.onAfterRenderWorld();
+    }
+
+    @Redirect(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;setAngles(FF)V"))
+    private void onSetAngles(EntityPlayerSP instance, float yaw, float pitch) {
+        SpinnySpinManager.INSTANCE.handleMouseMovements(yaw, pitch);
     }
 
 }

@@ -113,7 +113,7 @@ class Boom(
         if (state == SwapManager.SwapState.UNKNOWN) return
         if (!AutoRoute.silent) {
             val angles = RotationUtils.getYawAndPitch(pos.toVec3().add(0.5, 0.5, 0.5))
-            RotationUtils.setAngles(angles.first, angles.second)
+            SpinnySpinManager.serversideRotate(angles.first, angles.second) // Temp
         }
         if (state == SwapManager.SwapState.SWAPPED) {
             AutoRoute.delay = System.currentTimeMillis() + 200

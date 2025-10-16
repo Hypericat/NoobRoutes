@@ -333,7 +333,7 @@ object AutoP3: Module (
     }
 
     fun setBlinkRotation(yaw: Float, pitch: Float) {
-        if (nonSilentRotates) RotationUtils.setAngles(yaw, pitch)
+        if (nonSilentRotates) SpinnySpinManager.serversideRotate(yaw, pitch) // Pls fix this, it might not work idk?
         blinkSetRotation = Pair(yaw, pitch)
     }
 
