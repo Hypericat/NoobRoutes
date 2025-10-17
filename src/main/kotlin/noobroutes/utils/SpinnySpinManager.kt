@@ -1,10 +1,14 @@
 package noobroutes.utils
 
 import net.minecraft.util.MovementInputFromOptions
+import net.minecraft.util.MovingObjectPosition
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
+import noobroutes.utils.Utils.isNotStart
+import noobroutes.utils.render.getMCTextWidth
+import noobroutes.utils.skyblock.devMessage
 import kotlin.math.roundToInt
 
 object SpinnySpinManager {
@@ -32,7 +36,13 @@ object SpinnySpinManager {
     fun serversideRotate(yaw: Float?, pitch: Float?) {
         if (mc.thePlayer == null) return;
 
-        silentRotation = LookVec(yaw ?: mc.thePlayer.rotationYaw, pitch ?: mc.thePlayer.rotationPitch);
+        val step = mc.gameSettings.mouseSensitivity * 0.6f + 0.2f
+        val gcd = step * step * step * 8f
+
+        val betterYaw = yaw?.let { (it / gcd).toInt() * gcd }
+        val betterPitch = pitch?.let { (it / gcd).toInt() * gcd }
+
+        silentRotation = LookVec(betterYaw ?: mc.thePlayer.rotationYaw, betterPitch ?: mc.thePlayer.rotationPitch);
         setRotation(silentRotation.yaw, silentRotation.pitch)
     }
 
@@ -110,6 +120,11 @@ object SpinnySpinManager {
 
         if (event.phase == TickEvent.Phase.START) {
             //silentRotation = LookVec( mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
+            mc.thePlayer.renderArmYaw = renderRotation.yaw
+            mc.thePlayer.renderArmPitch = renderRotation.pitch
+            mc.thePlayer.renderArmYaw = renderRotation.yaw
+            mc.thePlayer.renderArmPitch = renderRotation.pitch
+
             mc.thePlayer.prevRotationPitch = renderRotation.pitch; // so that it doesn't bug out in GUIs
             mc.thePlayer.prevRotationYaw = renderRotation.yaw; // so that it doesn't bug out in GUIs
             setRotation(renderRotation)
@@ -130,4 +145,23 @@ object SpinnySpinManager {
     fun getServerSideRotation() : LookVec {
         return silentRotation;
     }
+
+    /*@SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.isNotStart || mc.thePlayer == null) return
+
+        val mouseBlock = mc.objectMouseOver ?: return
+        if (mouseBlock.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
+
+        mc.playerController.onPlayerRightClick(
+            mc.thePlayer,
+            mc.theWorld,
+            mc.thePlayer.heldItem,
+            mouseBlock.blockPos,
+            mouseBlock.sideHit,
+            mouseBlock.hitVec
+        )
+
+        devMessage("click")
+    }*/
 }
