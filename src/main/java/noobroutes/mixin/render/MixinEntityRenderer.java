@@ -1,5 +1,6 @@
 package noobroutes.mixin.render;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
@@ -39,7 +40,7 @@ abstract public class MixinEntityRenderer implements IResourceManagerReloadListe
 
     @Redirect(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;setAngles(FF)V"))
     private void onSetAngles(EntityPlayerSP instance, float yaw, float pitch) {
-        SpinnySpinManager.INSTANCE.handleMouseMovements(yaw, pitch);
+        if (instance != Minecraft.getMinecraft().thePlayer || !SpinnySpinManager.INSTANCE.handleMouseMovements(yaw, pitch)) instance.setAngles(yaw, pitch);
     }
 
 }

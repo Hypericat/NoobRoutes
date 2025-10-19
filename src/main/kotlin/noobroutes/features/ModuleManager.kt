@@ -100,6 +100,7 @@ object ModuleManager {
         TickControl,
         HotBarSwitcher,
         LowHop,
+        SilentRotations,
         //AutoAlign,
         AutoDojo
     )

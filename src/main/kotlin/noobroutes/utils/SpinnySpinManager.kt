@@ -1,18 +1,15 @@
 package noobroutes.utils
 
+import gg.essential.elementa.utils.Vector2f
 import net.minecraft.util.MovementInputFromOptions
-import net.minecraft.util.MovingObjectPosition
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import noobroutes.Core.mc
-import noobroutes.utils.Utils.isNotStart
-import noobroutes.utils.render.getMCTextWidth
-import noobroutes.utils.skyblock.devMessage
-import kotlin.math.roundToInt
+import noobroutes.utils.Utils.isStart
+import kotlin.math.cos
+import kotlin.math.sin
 
 object SpinnySpinManager {
-
     private var renderRotation: LookVec = LookVec(0f, 0f);
     private var silentRotation: LookVec = LookVec(0f, 0f);
 
@@ -20,12 +17,14 @@ object SpinnySpinManager {
     private var strafeRemainder: Float = 0f;
     private var lastRotationDeltaYaw: Float = 0f;
 
+    private var desyncCounter: Int = 0;
+    private var desync: Boolean = false;
+
     fun rotate(yaw: Float, pitch: Float, silent: Boolean) {
-        if (silent) {
+        if (silent || !shouldDesync()) {
             serversideRotate(yaw, pitch)
             return
         }
-
         clientsideRotate(yaw, pitch)
     }
 
@@ -57,7 +56,9 @@ object SpinnySpinManager {
     }
 
     // Entity : SetAngles
-    fun handleMouseMovements(yaw: Float, pitch: Float) {
+    fun handleMouseMovements(yaw: Float, pitch: Float) : Boolean {
+        if (!shouldDesync()) return false;
+
         val oldYaw: Float = renderRotation.yaw
         val oldPitch: Float = renderRotation.pitch
 
@@ -67,9 +68,19 @@ object SpinnySpinManager {
         renderRotation = LookVec(newYaw, newPitch)
         mc.thePlayer.prevRotationPitch = oldPitch; // ???
         mc.thePlayer.prevRotationYaw = oldYaw; // ???
+        return true;
+    }
+
+    private fun rotateVector(x: Float, y: Float, deltaYaw: Float) : Vector2f {
+        val radians = Math.toRadians(deltaYaw.toDouble());
+        val sin = sin(radians)
+        val cos = cos(radians)
+        return Vector2f((x * cos + y * sin).toFloat(), (y * cos - x * sin).toFloat())
     }
 
     fun adjustMovementInputs(movementInputs: MovementInputFromOptions) {
+        if (!shouldDesync()) return;
+
         if (movementInputs.moveForward == 0f && movementInputs.moveStrafe == 0f) {
             forwardRemainder = 0f;
             strafeRemainder = 0f;
@@ -79,31 +90,19 @@ object SpinnySpinManager {
 
         // Rotate the remainder to reflect the new yaw
         val currentDeltaYaw = renderRotation.yaw - silentRotation.yaw
-        val yawChange = Math.toRadians((currentDeltaYaw - lastRotationDeltaYaw).toDouble())
+        val deltaYaw: Float = currentDeltaYaw - lastRotationDeltaYaw;
 
-        if (yawChange != 0.0) {
-            val sin = kotlin.math.sin(yawChange).toFloat()
-            val cos = kotlin.math.cos(yawChange).toFloat()
-
-            val rotatedForwardRemainder = forwardRemainder * cos + strafeRemainder * sin
-            val rotatedStrafeRemainder  = strafeRemainder * cos - forwardRemainder * sin
-
-            forwardRemainder = rotatedForwardRemainder
-            strafeRemainder  = rotatedStrafeRemainder
+        if (deltaYaw != 0.0f) {
+            val newRemainder = rotateVector(forwardRemainder, strafeRemainder, deltaYaw);
+            forwardRemainder = newRemainder.x
+            strafeRemainder  = newRemainder.y
         }
 
         lastRotationDeltaYaw = currentDeltaYaw
 
-        val yaw = Math.toRadians((currentDeltaYaw).toDouble())
-
-        val sin: Float = kotlin.math.sin(yaw).toFloat()
-        val cos: Float = kotlin.math.cos(yaw).toFloat()
-
-        val oldForward: Float = movementInputs.moveForward;
-        val oldStrafe: Float = movementInputs.moveStrafe;
-
-        val newForward: Float = ((oldForward * cos + oldStrafe * sin) - forwardRemainder).coerceIn(-1.0F, 1.0F);
-        val newStrafe: Float = ((oldStrafe * cos - oldForward * sin) - strafeRemainder).coerceIn(-1.0F, 1.0F);
+        val newDir: Vector2f = rotateVector(movementInputs.moveForward, movementInputs.moveStrafe, currentDeltaYaw)
+        val newForward = (newDir.x - forwardRemainder).coerceIn(-1.0F, 1.0F);
+        val newStrafe = (newDir.y - strafeRemainder).coerceIn(-1.0F, 1.0F);
 
         movementInputs.moveForward = newForward.round(0).toFloat();
         movementInputs.moveStrafe = newStrafe.round(0).toFloat();
@@ -115,26 +114,22 @@ object SpinnySpinManager {
 
     @SubscribeEvent
     fun onFrame(event: TickEvent.RenderTickEvent) {
-        if (mc.thePlayer == null) return
+        if (mc.thePlayer == null || !shouldDesync()) return
         //serversideRotate((Math.random() * 320 - 180).toFloat(), (Math.random() * 180 - 90).toFloat()) // Spin bot
 
         if (event.phase == TickEvent.Phase.START) {
-            //silentRotation = LookVec( mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
             mc.thePlayer.renderArmYaw = renderRotation.yaw
             mc.thePlayer.renderArmPitch = renderRotation.pitch
-            mc.thePlayer.renderArmYaw = renderRotation.yaw
-            mc.thePlayer.renderArmPitch = renderRotation.pitch
+            mc.thePlayer.prevRenderArmYaw = renderRotation.yaw
+            mc.thePlayer.prevRenderArmPitch = renderRotation.pitch
 
             mc.thePlayer.prevRotationPitch = renderRotation.pitch; // so that it doesn't bug out in GUIs
             mc.thePlayer.prevRotationYaw = renderRotation.yaw; // so that it doesn't bug out in GUIs
             setRotation(renderRotation)
             return
         }
-        //frame end now :)
 
-
-        //renderRotation = LookVec(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
-
+        // frame end now :) - Wadey
         setRotation(silentRotation)
     }
 
@@ -146,22 +141,61 @@ object SpinnySpinManager {
         return silentRotation;
     }
 
-    /*@SubscribeEvent
+    fun setDesync(bl: Boolean) {
+        if (bl) {
+            enableDesync();
+            return;
+        }
+        disableDesync(false)
+    }
+
+    fun shouldDesync() : Boolean {
+        return desync || desyncCounter > 0;
+    }
+
+    fun getDesyncTicks() : Int {
+        return desyncCounter;
+    }
+
+    fun getDesyncStatus() : Boolean {
+        return desync;
+    }
+
+    fun enableDesync() {
+        if (desync || mc.thePlayer == null) return;
+        if (!shouldDesync()) {
+            serversideRotate(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
+            clientsideRotate(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
+        }
+
+        desync = true;
+    }
+
+    fun disableDesync(force: Boolean = false) {
+        desync = false;
+        if (force)
+            desyncCounter = 0;
+
+        if (!shouldDesync()) {
+            serversideRotate(renderRotation.yaw, renderRotation.pitch)
+        }
+    }
+
+    fun requestDesync(ticks: Int) {
+        if (ticks < 0 || desyncCounter >= ticks) return
+        if (!shouldDesync()) {
+            serversideRotate(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
+            clientsideRotate(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
+        }
+        desyncCounter = ticks;
+    }
+
+    @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.isNotStart || mc.thePlayer == null) return
-
-        val mouseBlock = mc.objectMouseOver ?: return
-        if (mouseBlock.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
-
-        mc.playerController.onPlayerRightClick(
-            mc.thePlayer,
-            mc.theWorld,
-            mc.thePlayer.heldItem,
-            mouseBlock.blockPos,
-            mouseBlock.sideHit,
-            mouseBlock.hitVec
-        )
-
-        devMessage("click")
-    }*/
+        if (event.isStart || mc.thePlayer == null || desyncCounter <= 0) return
+        desyncCounter--;
+        if (!shouldDesync()) {
+            serversideRotate(renderRotation.yaw, renderRotation.pitch)
+        }
+    }
 }
