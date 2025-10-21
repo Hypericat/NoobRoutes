@@ -16,6 +16,7 @@ import noobroutes.ui.util.animations.impl.ColorAnimation
 import noobroutes.utils.render.*
 import noobroutes.utils.render.ColorUtil.brighterIf
 import noobroutes.utils.render.ColorUtil.darkerIf
+import noobroutes.utils.skyblock.devMessage
 import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToInt
@@ -238,7 +239,8 @@ class ElementSlider(
         }
     }
     private fun setter(newVal: Double) {
-        BrushModule.selectedBlockState = BrushModule.selectedBlockState.withProperty(property, newVal.roundToInt().coerceIn(min.toInt(), max.toInt()))
+        //BrushModule.selectedBlockState = BrushModule.selectedBlockState.withProperty(property, newVal.roundToInt().coerceIn(min.toInt(), max.toInt()))
+        devMessage("Fuck me setter!")
     }
 
 

@@ -26,12 +26,13 @@ public abstract class MixinWorldClient extends World {
 
     @Inject(method = "invalidateRegionAndSetBlock", at = @At("HEAD"), cancellable = true)
     private void noobRoutes$invalidateRegionAndSetBlock(BlockPos pos, IBlockState state, CallbackInfoReturnable<Boolean> cir) {
-        int i = pos.getX();
-        int j = pos.getY();
-        int k = pos.getZ();
-        this.invalidateBlockReceiveRegion(i, j, k, i, j, k);
-        IBlockState edited = BrushModule.INSTANCE.getEditedBlock(pos);
-        IBlockState finalState = (edited != null && BrushModule.INSTANCE.getEnabled()) ? edited : state;
-        cir.setReturnValue(super.setBlockState(pos, finalState, 3));
+        // rip FME sob
+//        int i = pos.getX();
+//        int j = pos.getY();
+//        int k = pos.getZ();
+//        this.invalidateBlockReceiveRegion(i, j, k, i, j, k);
+//        IBlockState edited = BrushModule.INSTANCE.isBlockEdited(pos);
+//        IBlockState finalState = (edited != null && BrushModule.INSTANCE.getEnabled()) ? edited : state;
+//        cir.setReturnValue(super.setBlockState(pos, finalState, 3));
     }
 }

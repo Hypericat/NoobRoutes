@@ -18,7 +18,7 @@ class BlockStateElement(x: Int, y: Int, val state: IBlockState, val name: String
 
     override fun mouseClicked() {
         if (isHovered) {
-            BrushModule.selectedBlockState = state
+            //BrushModule.selectedBlockState = state
             BlockEditor.currentBlockName = displayName
         }
     }

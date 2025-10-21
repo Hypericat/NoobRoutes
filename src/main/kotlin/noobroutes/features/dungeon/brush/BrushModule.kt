@@ -5,9 +5,9 @@ import com.google.gson.JsonObject
 import net.minecraft.block.Block
 import net.minecraft.block.properties.IProperty
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
-import net.minecraft.util.EnumFacing
 import net.minecraft.util.MovingObjectPosition
 import net.minecraft.util.Vec3
 import net.minecraft.world.chunk.Chunk
@@ -27,11 +27,9 @@ import noobroutes.features.render.FreeCam
 import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.impl.BooleanSetting
 import noobroutes.features.settings.impl.KeybindSetting
-import noobroutes.features.settings.impl.NumberSetting
 import noobroutes.mixin.accessors.ChunkListingFieldAccessor
 import noobroutes.utils.*
 import noobroutes.utils.IBlockStateUtils.withProperty
-import noobroutes.utils.Utils.ID
 import noobroutes.utils.json.JsonUtils.add
 import noobroutes.utils.json.JsonUtils.asBlockPos
 import noobroutes.utils.skyblock.Island
@@ -44,24 +42,13 @@ import noobroutes.utils.skyblock.modMessage
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import java.util.concurrent.ConcurrentHashMap
+import java.util.function.Consumer
+import java.util.function.Predicate
 
 
 @Suppress("unused")
 @DevOnly
-object BrushModule : Module("Brush", description = "It is just fme but way less laggy. Works with FME floor config, but not the room config.", category = Category.DUNGEON) {
-
-    private val hotbarPalette by BooleanSetting(
-        "Hot Bar Palette",
-        description = "Gets the selected block from the held item"
-    )
-    private val placeCooldown by NumberSetting(
-        "Place Cooldown",
-        min = 0,
-        max = 1000,
-        default = 150,
-        description = "Cooldown between placing blocks in edit mode",
-        unit = "ms"
-    )
+object BrushModule : Module("Brush", description = "Brush, allows editing dungeon breaker aura.", category = Category.DUNGEON) {
     var editMode by BooleanSetting("Edit Mode", description = "Allows you to edit blocks")
     private val editModeToggle by KeybindSetting(
         "Edit Mode Bind",
@@ -71,16 +58,12 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
         toggleEditMode()
     }
 
-    private var savedChunks = hashMapOf<Long, HashMap<BlockPos, IBlockState>>()
+    private var savedChunks = hashMapOf<Long, HashSet<BlockPos>>()
+    private val floorConfig = ConcurrentHashMap<String, HashSet<BlockPos>>()
+    private val roomConfig = ConcurrentHashMap<String, HashSet<BlockPos>>()
 
-    private val floorConfig = ConcurrentHashMap<String, MutableList<Pair<IBlockState, BlockPos>>>()
-    private val roomConfig = ConcurrentHashMap<String, MutableList<Pair<IBlockState, BlockPos>>>()
-
-    var forceRotation by BooleanSetting("Force Rotation", description = "Forces the rotation of the Selected Block while placing. Enables when you control middle click a block")
     private var forceF7 by BooleanSetting("Force F7", description = "Forces Brush to think its in f7 even on servers")
-    var selectedBlockState: IBlockState = IBlockStateUtils.airIBlockState
-    private var lastPlace = System.currentTimeMillis()
-
+    private var simulate by BooleanSetting("Simulate", description = "Creates ghost blocks in singleplayer")
 
 
     private fun calculateChunkHash(chunk: Chunk): Long {
@@ -114,11 +97,7 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
     fun onChunkLoad(chunk: Chunk) {
         if (!enabled) return
         val blocks = savedChunks.get(calculateChunkHash(chunk))
-        if (blocks == null) return
 
-        blocks.forEach { (pos, state) ->
-            setBlock(pos, state)
-        }
     }
 
     @SubscribeEvent
@@ -140,56 +119,12 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
         modMessage("Toggled Edit Mode: ${if (editMode) "§l§aOn" else "§l§cOff"}")
     }
 
-    private inline val canPlaceBlock get() =
-        System.currentTimeMillis() - lastPlace >= placeCooldown &&
-        (getEditingBlockState() ?: IBlockStateUtils.airIBlockState) != IBlockStateUtils.airIBlockState
-
-
-    private fun handlePlaceBlock(pos: BlockPos, hitVec: Vec3, facing: EnumFacing, room: UniqueRoom?){
-        lastPlace = System.currentTimeMillis()
-        val blockState = getEditingBlockState() ?: return
-        val block = mc.theWorld.getBlockState(pos).block
-        if (block != Blocks.air && block != Blocks.lava && block != Blocks.flowing_lava) return
-        val state = if (forceRotation) blockState else blockState.block.onBlockPlaced(
-            mc.theWorld,
-            pos,
-            facing,
-            hitVec.xCoord.toFloat(),
-            hitVec.yCoord.toFloat(),
-            hitVec.zCoord.toFloat(),
-            blockState.block.getMetaFromState(blockState),
-            mc.thePlayer
-        )
-        val blockList = getBlockList(room)
-        val blockToAdd = Pair(state , room?.getRealCoords(pos) ?: pos)
-        blockList.removeAll { it.second.x == blockToAdd.second.x && it.second.y == blockToAdd.second.y && it.second.z == blockToAdd.second.z }
-        removeBlockFromChunk(pos)
-        blockList.add(blockToAdd)
-        setBlock(pos, state)
-        addBlockToChunk(pos, state)
-    }
-
-    fun getEditingBlockState(): IBlockState? {
-        if (hotbarPalette) {
-            val held = mc.thePlayer.heldItem
-            val block = Block.getBlockFromItem(held.item) ?: return null
-            return block.getStateFromMeta(held.metadata)
-        }
-        return selectedBlockState
-    }
-
-    fun getBlockList(room: UniqueRoom?): MutableList<Pair<IBlockState, BlockPos>>{
+    fun getBlockList(room: UniqueRoom?): HashSet<BlockPos>{
         return if (room != null) {
-            roomConfig.getOrPut(room.name) { mutableListOf() }
+            roomConfig.getOrPut(room.name) { hashSetOf() }
         } else {
-            floorConfig.getOrPut(getLocation()) { mutableListOf() }
+            floorConfig.getOrPut(getLocation()) { hashSetOf() }
         }
-    }
-
-    @SubscribeEvent
-    fun mouseEvent(event: InputEvent.MouseInputEvent){
-        if (Mouse.getEventButton() != 1 || Mouse.getEventButtonState()) return
-        lastRight = false
     }
 
     private var lastRight = false
@@ -201,62 +136,39 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
         val room = DungeonUtils.currentRoom
         event.isCanceled = true
 
-        val axeHeld = mc.thePlayer.heldItem.ID == 271
-
-        if (event.type == ClickEvent.ClickType.Right && !lastRight) {
-            if (axeHeld) {
-                lastRight = true
-
-                BrushBuildTools.rightBlockPos = target
-                modMessage("Right:§r§d§l $target")
-                return
-            }
-            if (!canPlaceBlock) return
-
-            val facing = mouseOver.sideHit
-            val offset = target.offset(facing)
-            val hitVec = mouseOver.hitBlockVec() ?: return
-            handlePlaceBlock(offset, hitVec, facing, room)
-
-        }
-
-        if (event.type == ClickEvent.ClickType.Middle) {
-            forceRotation = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)
-            selectedBlockState = getBlockStateAt(target)
-            modMessage(
-                "Selected block state: §l§a${
-                    selectedBlockState.block.registryName.removePrefix("minecraft:").capitalizeFirst().replace("_", " ")
-                }"
-            )
-            return
-        }
-
-
         if (event.type == ClickEvent.ClickType.Left) {
-            if (axeHeld) {
-                BrushBuildTools.leftBlockPos = target
-                modMessage("Left:§r§d§l $target")
-                return
-            }
-
             val blockList = getBlockList(room)
             val pos = room?.getRelativeCoords(target) ?: target
-            removeBlockFromChunk(target)
-            setBlock(target, IBlockStateUtils.airIBlockState)
-            val removed = blockList.removeFirstOrNull { it.second == pos } != null
-            if (removed) return
 
-            addBlockToChunk(target, IBlockStateUtils.airIBlockState)
-            blockList.add(IBlockStateUtils.airIBlockState to pos)
-            return
+            //removeBlockFromChunk(target)
+
+            //val removed = blockList.remove(pos);
+            //if (removed) return
+
+            addBlockToChunk(target)
+            blockList.add(pos)
+            if (simulate && Minecraft.getMinecraft().isSingleplayer)
+                setBlock(target, Blocks.air.defaultState)
+            return;
         }
+
+        if (event.type == ClickEvent.ClickType.Right) {
+            val blockList = getBlockList(room)
+            val pos = room?.getRelativeCoords(target) ?: target
+
+            removeBlockFromChunk(target)
+            val removed = blockList.remove(pos);
+            if (!removed) return
+
+            setBlock(target, Blocks.stone.defaultState)
+        }
+        return
     }
 
-    fun addBlockToChunk(target: BlockPos, state: IBlockState) {
+    fun addBlockToChunk(target: BlockPos) {
         runOnMCThread {
             val hash = calculateChunkHash(target.x shr 4, target.z shr 4)
-            savedChunks.getOrPut(hash) { hashMapOf() }.put(target, state)
-            setBlock(target, state)
+            savedChunks.getOrPut(hash) { hashSetOf() }.add(target)
         }
     }
 
@@ -284,24 +196,20 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
         registerLocation(event.room)
     }
 
-    fun registerChunkBlocks(room: UniqueRoom?, positions: List<Pair<IBlockState, BlockPos>>) {
+    fun registerChunkBlocks(room: UniqueRoom?, positions: Collection<BlockPos>) {
         runOnMCThread {
-            positions.forEach { (state, localPos) ->
-                val pos = room?.getRealCoords(localPos) ?: localPos
-
+            positions.forEach { localPos ->
+                val pos: BlockPos = room?.getRealCoords(localPos) ?: localPos
                 val hash = calculateChunkHash(pos.x shr 4, pos.z shr 4)
-                if (room != null && mc.theWorld.getChunkFromChunkCoords(pos.x shr 4, pos.z shr 4).isLoaded) {
-                    setBlock(pos, state)
-                }
-                savedChunks.getOrPut(hash) { hashMapOf() }.put(pos, state)
+                savedChunks.getOrPut(hash) { hashSetOf() }.add(pos)
             }
         }
     }
 
-    fun getEditedBlock(blockPos: BlockPos): IBlockState? {
+    fun isBlockEdited(blockPos: BlockPos): Boolean? {
         val hash = calculateChunkHash(blockPos.x shr 4, blockPos.z shr 4)
         val blocks = savedChunks[hash] ?: return null
-        return blocks[blockPos]
+        return blocks.contains(blockPos)
     }
 
 
@@ -337,42 +245,52 @@ object BrushModule : Module("Brush", description = "It is just fme but way less 
         loadAreaConfig(roomConfigFile, roomConfig)
     }
 
-    private fun loadAreaConfig(configFile: Map<String, JsonObject>, config: ConcurrentHashMap<String, MutableList<Pair<IBlockState, BlockPos>>>){
+    private fun loadAreaConfig(configFile: Map<String, JsonObject>, config: ConcurrentHashMap<String, HashSet<BlockPos>>){
         for ((area, blocks) in configFile) {
-            val blockList = mutableListOf<Pair<IBlockState, BlockPos>>()
+            val blockList = hashSetOf<BlockPos>();
             val areaObject = blocks.asJsonObject
 
             for ((key, jsonArray) in areaObject.entrySet()) {
-                val state = getBlockStateFromString(key)
-
                 for (posElement in jsonArray.asJsonArray) {
-                    blockList.add(state to posElement.asBlockPos)
+                    blockList.add(posElement.asBlockPos)
                 }
             }
             config[area] = blockList
         }
     }
 
-    private fun saveAreaConfig(config: ConcurrentHashMap<String, MutableList<Pair<IBlockState, BlockPos>>>, name: String) {
+    private fun saveAreaConfig(config: ConcurrentHashMap<String, HashSet<BlockPos>>, name: String) {
         val root = JsonObject()
 
         for ((area, blocks) in config) {
             val areaObject = JsonObject()
+            val array = JsonArray()
+            blocks.forEach {
+                array.add(it)
+            }
 
-            val blockSudoMap = mutableMapOf<String, MutableList<BlockPos>>()
-            for ((state, pos) in blocks) {
-                blockSudoMap.getOrPut(state.toString()) { ArrayList() }.add(pos)
-            }
-            blockSudoMap.forEach { meta, list ->
-                val array = JsonArray()
-                list.forEach {
-                    array.add(it)
-                }
-                areaObject.add(meta, array)
-            }
+            areaObject.add(area, array);
             root.add(area, areaObject)
         }
         DataManager.saveDataToFile(name, root)
+    }
+
+    fun clear() {
+        getBlockList(DungeonUtils.currentRoom).clear();
+    }
+
+    fun consumeBlocks(consumer: Consumer<BlockPos>) {
+        val room = DungeonUtils.currentRoom;
+        getBlockList(room).forEach { pos ->
+            consumer.accept(room?.getRealCoords(pos) ?: pos);
+        }
+    }
+
+    fun predicateFirstBlock(consumer: Predicate<BlockPos>) {
+        val room = DungeonUtils.currentRoom;
+        getBlockList(room).forEach { pos ->
+            if (consumer.test(room?.getRealCoords(pos) ?: pos)) return;
+        }
     }
 
 

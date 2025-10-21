@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack
 import noobroutes.features.dungeon.brush.BrushModule
 import noobroutes.ui.blockgui.blockeditor.BlockEditor
 import noobroutes.utils.render.RenderUtils.drawItem
+import noobroutes.utils.skyblock.devMessage
 
 class BlockItemStackElement(x: Int, y: Int, private val blockItem: ItemStack) : BlockElement(x, y) {
     override var block: Block? = Block.getBlockFromItem(blockItem.item)
@@ -17,7 +18,8 @@ class BlockItemStackElement(x: Int, y: Int, private val blockItem: ItemStack) : 
 
     override fun mouseClicked() {
         if (isHovered) {
-            BrushModule.selectedBlockState = block?.getStateFromMeta(blockItem.metadata) ?: return
+            //BrushModule.selectedBlockState = block?.getStateFromMeta(blockItem.metadata) ?: return
+            devMessage("fuck my bussy!")
             BlockEditor.currentBlockName = displayName
         }
     }

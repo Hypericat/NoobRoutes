@@ -22,7 +22,8 @@ class BrushCommand: CommandBase() {
     }
 
     override fun processCommand(sender: ICommandSender?, args: Array<out String>?) {
-        if (args == null || args.isEmpty()) return modMessage("Usages: Edit, Gui, Clear, Load, Reload, Fill, Clear, Undo")
+        if (!BrushModule.enabled) return modMessage("Brush module must be enabled first!");
+        if (args == null || args.isEmpty()) return modMessage("Usages: Edit, Gui, Clear, Load, Reload, Clear, Undo")
         when (args[0].lowercase()) {
             "em", "e", "edit" -> {
                 BrushModule.toggleEditMode()
@@ -34,43 +35,19 @@ class BrushCommand: CommandBase() {
                 BrushModule.loadConfig()
                 modMessage("Loaded Config")
             }
-            "fill", "f" -> {
-                if (!editMode) return modMessage("Edit Mode Required")
-                val state = BrushModule.getEditingBlockState()
-                if (state == IBlockStateUtils.airIBlockState || state == null) return modMessage("Selected Block State Required")
-                val selectedArea = BrushBuildTools.getSelectedArea()
-                modMessage("§l§aFilling $state")
-                if (args.size < 2) {
-                    val thread = Thread { BrushBuildTools.fill(selectedArea, state) }
-                    thread.start()
-                    return
-                }
-                val thread = Thread { BrushBuildTools.filteredFill(selectedArea, getBlockByText(sender, args[1]), state) }
-                thread.start()
-
-            }
 
             "reload", "r" -> {
                 BrushModule.reload()
                 modMessage("Reloading")
             }
 
-            "undo", "u" -> {
-                BrushBuildTools.handleUndo()
+            "clear", -> {
+                BrushModule.clear()
+                modMessage("Cleared room / floor config!")
             }
 
-            "clear", "c" -> {
-                if (!editMode) return modMessage("Edit Mode Required")
-                modMessage("§l§aClearing")
-                val selectedArea = BrushBuildTools.getSelectedArea()
-                if (args.size < 2) {
-                    val thread = Thread { BrushBuildTools.fill(selectedArea, IBlockStateUtils.airIBlockState) }
-                    thread.start()
-                    return
-                }
-                val thread = Thread { BrushBuildTools.filteredFill(selectedArea, getBlockByText(sender, args[1]), IBlockStateUtils.airIBlockState) }
-                thread.start()
-
+            "undo", "u" -> {
+                BrushBuildTools.handleUndo()
             }
             else -> modMessage("Usages: Edit, Gui, Clear, Load, Reload, Fill, Clear, Undo")
         }

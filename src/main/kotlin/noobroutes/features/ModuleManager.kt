@@ -15,6 +15,7 @@ import noobroutes.features.dungeon.AutoBloodRush
 import noobroutes.features.dungeon.AutoClose
 import noobroutes.features.dungeon.SecretAura
 import noobroutes.features.dungeon.brush.BrushModule
+import noobroutes.features.dungeon.brush.DungeonBreakerAura
 import noobroutes.features.dungeon.puzzle.IceFill
 import noobroutes.features.dungeon.puzzle.TicTacToe
 import noobroutes.features.dungeon.puzzle.WaterBoard
@@ -101,6 +102,7 @@ object ModuleManager {
         HotBarSwitcher,
         LowHop,
         SilentRotations,
+        DungeonBreakerAura,
         //AutoAlign,
         AutoDojo
     )

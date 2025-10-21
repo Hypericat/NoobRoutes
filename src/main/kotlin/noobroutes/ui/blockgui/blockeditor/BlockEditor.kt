@@ -50,9 +50,9 @@ object BlockEditor {
     }
     private var lastBlockState: IBlockState = IBlockStateUtils.airIBlockState
     fun draw() {
-        if (lastBlockState != BrushModule.selectedBlockState) {
-            handleNewBlockState()
-        }
+        //if (lastBlockState != BrushModule.selectedBlockState) {
+        //    handleNewBlockState()
+        //}
         if (dragging) {
             originX = floor(x2 + MouseUtils.mouseX)
             originY = floor(y2 + MouseUtils.mouseY)
@@ -123,19 +123,19 @@ object BlockEditor {
         )
     }
     private fun handleNewBlockState(){
-        elements.clear()
-        BrushModule.selectedBlockState.propertyNames.forEach { property ->
-            if (blackListedPropertyRegexs.any { it.contains(property.name.toString(), true) }) return@forEach
-            when (property) {
-                is PropertyEnum<*> -> {
-                    elements.add(ElementSelector(property, BrushModule.selectedBlockState))
-                }
-                is PropertyInteger -> {
-                    elements.add(ElementSlider(property.name, property, BrushModule.selectedBlockState))
-                }
-            }
-        }
-        lastBlockState = BrushModule.selectedBlockState
+//        elements.clear()
+//        BrushModule.selectedBlockState.propertyNames.forEach { property ->
+//            if (blackListedPropertyRegexs.any { it.contains(property.name.toString(), true) }) return@forEach
+//            when (property) {
+//                is PropertyEnum<*> -> {
+//                    elements.add(ElementSelector(property, BrushModule.selectedBlockState))
+//                }
+//                is PropertyInteger -> {
+//                    elements.add(ElementSlider(property.name, property, BrushModule.selectedBlockState))
+//                }
+//            }
+//        }
+//        lastBlockState = BrushModule.selectedBlockState
     }
 
 }
