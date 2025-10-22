@@ -26,12 +26,14 @@ import noobroutes.features.Module
 import noobroutes.features.render.FreeCam
 import noobroutes.features.settings.DevOnly
 import noobroutes.features.settings.impl.BooleanSetting
+import noobroutes.features.settings.impl.ColorSetting
 import noobroutes.features.settings.impl.KeybindSetting
 import noobroutes.mixin.accessors.ChunkListingFieldAccessor
 import noobroutes.utils.*
 import noobroutes.utils.IBlockStateUtils.withProperty
 import noobroutes.utils.json.JsonUtils.add
 import noobroutes.utils.json.JsonUtils.asBlockPos
+import noobroutes.utils.render.Color
 import noobroutes.utils.skyblock.Island
 import noobroutes.utils.skyblock.LocationUtils
 import noobroutes.utils.skyblock.dungeon.DungeonUtils
@@ -43,6 +45,7 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
+import java.util.function.IntPredicate
 import java.util.function.Predicate
 
 
@@ -58,12 +61,16 @@ object BrushModule : Module("Brush", description = "Brush, allows editing dungeo
         toggleEditMode()
     }
 
+    private var forceF7 by BooleanSetting("Force F7", description = "Forces Brush to think its in f7 even on servers")
+    private var simulate by BooleanSetting("Simulate", description = "Creates ghost blocks in singleplayer")
+    var color by ColorSetting("Block Color", default = Color.GREEN, description = "Brush block color.")
+
+
     private var savedChunks = hashMapOf<Long, HashSet<BlockPos>>()
     private val floorConfig = ConcurrentHashMap<String, HashSet<BlockPos>>()
     private val roomConfig = ConcurrentHashMap<String, HashSet<BlockPos>>()
 
-    private var forceF7 by BooleanSetting("Force F7", description = "Forces Brush to think its in f7 even on servers")
-    private var simulate by BooleanSetting("Simulate", description = "Creates ghost blocks in singleplayer")
+
 
 
     private fun calculateChunkHash(chunk: Chunk): Long {
@@ -131,7 +138,7 @@ object BrushModule : Module("Brush", description = "Brush, allows editing dungeo
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onMouse(event: ClickEvent.All) {
         if (!editMode) return
-        val mouseOver = if (FreeCam.enabled) FreeCam.looking else mc.objectMouseOver ?: return
+        val mouseOver = if (FreeCam.enabled) FreeCam.looking else mc.objectMouseOver ?: return // Fix, use client side rotation from spinnySpinManger
         val target = mouseOver?.hitBlock() ?: return
         val room = DungeonUtils.currentRoom
         event.isCanceled = true
@@ -286,12 +293,40 @@ object BrushModule : Module("Brush", description = "Brush, allows editing dungeo
         }
     }
 
-    fun predicateFirstBlock(consumer: Predicate<BlockPos>) {
+    fun predicateFirstBlock(predicate: Predicate<BlockPos>) {
         val room = DungeonUtils.currentRoom;
         getBlockList(room).forEach { pos ->
-            if (consumer.test(room?.getRealCoords(pos) ?: pos)) return;
+            if (predicate.test(room?.getRealCoords(pos) ?: pos)) return;
         }
     }
+
+    fun findBest(scorer: (BlockPos) -> Double, consumer: Consumer<BlockPos>) {
+        val room = DungeonUtils.currentRoom;
+        var bestScore: Double? = null;
+        var bestPos: BlockPos? = null;
+
+        getBlockList(room).forEach { pos ->
+            val realPos = room?.getRealCoords(pos) ?: pos
+            val score = scorer(realPos)
+            if (score > 0 && (bestScore == null || score < bestScore!!)) {
+                bestScore = score;
+                bestPos = realPos;
+            }
+        }
+        if (bestPos == null) return;
+        consumer.accept(bestPos!!)
+    }
+
+    fun sort(scorer: (BlockPos) -> Double): List<BlockPos> {
+        val room = DungeonUtils.currentRoom
+
+        return getBlockList(room)
+            .map { pos ->
+                val realPos = room?.getRealCoords(pos) ?: pos
+                pos to scorer(realPos)
+            }.sortedBy { it.second }.map { it.first }
+    }
+
 
 
     fun saveConfig() {

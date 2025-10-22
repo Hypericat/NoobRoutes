@@ -55,7 +55,7 @@ object BrushBuildTools {
     }
 
     private fun renderBlock(blockPos: BlockPos) {
-        Renderer.drawBox(AxisAlignedBB(blockPos, blockPos.add(1, 1, 1)), Color.GREEN, fillAlpha = 0.15f);
+        Renderer.drawBox(AxisAlignedBB(blockPos, blockPos.add(1, 1, 1)), BrushModule.color, fillAlpha = 0.15f);
     }
 
 }
